@@ -2,8 +2,12 @@
   "$schema": "https://opencode.ai/config.json",
   "references": {
     "tasks": {
-      "path": "./.tasks",
+      "path": "./tasks",
       "description": "Active task handoff files"
+    },
+    "source-material": {
+      "path": "./source-material",
+      "description": "Seed inputs and supporting artifacts"
     }
   }
 }

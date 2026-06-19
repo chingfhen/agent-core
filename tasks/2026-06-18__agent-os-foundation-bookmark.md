@@ -1,6 +1,6 @@
 # Task: Agent OS foundation
 
-**File:** `.tasks/2026-06-18__agent-os-foundation-bookmark.md`
+**File:** `tasks/2026-06-18__agent-os-foundation-bookmark.md`
 **Created:** 2026-06-18
 **Last Updated:** 2026-06-19
 **Priority:** Now
@@ -15,7 +15,7 @@
 **Blockers:** None. This foundation task is complete.
 
 **Target Docs:** `README.md`, `AGENTS.md`, `docs/consumer-repo-enrollment.md`
-**Relevant Code:** `.raw/initialize.md`, `skills/project-docs/SKILL.md`, `skills/project-tasks/SKILL.md`, `skills/agent-os-bootstrap/SKILL.md`, `schemas/agent-os-manifest.schema.json`, `scripts/enroll_repo.py`
+**Relevant Code:** `source-material/initialize.md`, `skills/project-docs/SKILL.md`, `skills/project-tasks/SKILL.md`, `skills/agent-os-bootstrap/SKILL.md`, `schemas/agent-os-manifest.schema.json`, `scripts/enroll_repo.py`
 
 ## Human Intent
 
@@ -65,7 +65,7 @@
 - Do not introduce tracked `.opencode`, `.claude`, or `.codex` skill copies in this repo.
 - Do not build MCP-first infrastructure for skills.
 - Do not over-design the memory system beyond the agreed pilot.
-- Do not treat `.raw/initialize.md` as the active source of truth after the new docs are in place.
+- Do not treat `source-material/initialize.md` as the active source of truth after the new docs are in place.
 - Do not make executors discover canonical skill locations directly.
 - Do not overwrite unrelated existing harness files or directories without explicit approval.
 
@@ -146,7 +146,7 @@
 - `README.md`
 - `AGENTS.md`
 - `docs/consumer-repo-enrollment.md`
-- `.raw/initialize.md`
+- `source-material/initialize.md`
 - `scripts/enroll_repo.py`
 - `schemas/agent-os-manifest.schema.json`
 - `schemas/examples/consumer-repo.agent-os.example.json`

@@ -1,12 +1,12 @@
 ---
 name: project-tasks
-description: Maintains fresh-session execution briefs in .tasks/ so future agents can resume work with the same alignment, current understanding, and decision context. Continuously rewrites tasks into high-signal handoff bookmarks by preserving what the next executor cannot reliably reconstruct and compressing what no longer changes future decisions.
+description: Maintains fresh-session execution briefs in tasks/ so future agents can resume work with the same alignment, current understanding, and decision context. Continuously rewrites tasks into high-signal handoff bookmarks by preserving what the next executor cannot reliably reconstruct and compressing what no longer changes future decisions.
 disable-model-invocation: false
 ---
 
 # Project Tasks
 
-Maintain task-specific execution briefs, typically in `.tasks/`, for work that needs continuity across sessions.  
+Maintain task-specific execution briefs, typically in `tasks/`, for work that needs continuity across sessions.  
 A task file is not durable documentation and not a raw transcript.  
 Its purpose is to maximize the effectiveness of the next fresh-session executor.  
 A task bookmark should preserve whatever the next executor cannot reliably reconstruct from code, docs, or obvious context.
@@ -15,6 +15,8 @@ A task bookmark should preserve whatever the next executor cannot reliably recon
 
 *   **`project-tasks` owns active execution state**, orchestration context, and fresh-session handoff briefs.
 *   **`project-docs` owns durable project knowledge** and continuously absorbs stable truths throughout execution.
+*   **`source-material/` holds supporting artifacts** that may still inform work without becoming canonical truth.
+*   **`archive/` holds historical material** that is kept for reference but should not drive current execution by default.
 *   **Task files preserve alignment**, evolving understanding, important uncertainty, and execution context.
 *   Tasks may contain investigations, debugging context, planning, implementation guidance, or mini-specs when doing so improves future execution.
 *   A task is **neither a transcript nor a summary**.
@@ -39,9 +41,9 @@ Ask:
 
 ## Non-Negotiables
 
-*   New tasks use `.tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`.
+*   New tasks use `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`.
 *   The date is an **immutable creation date**.
-*   Keep `.tasks/` **flat** unless the repository already uses another convention.
+*   Keep `tasks/` **flat** unless the repository already uses another convention.
 *   **Do not mass-rename** historical tasks.
 *   Use only these explicit fields:
     *   **Priority:** `Now` | `Next` | `Later`
@@ -51,10 +53,11 @@ Ask:
 *   `Docs Sync` reflects **durable knowledge synchronization only**.
 *   Put descriptive state in **Current State**, never in status fields.
 *   **Do not place live task dashboards** in agent guidance files.
-*   `.tasks/INDEX.md`, if present, is an **optional convenience only**.
+*   `tasks/INDEX.md`, if present, is an **optional convenience only**.
 *   Closed tasks are **not automatically deleted**.
 *   **Target Docs** are routing hints, not contracts.
 *   **Preserve uncertainty honestly.** Do not write uncertain claims as established fact.
+*   Do not turn `tasks/` into a general archive; move durable truth to `docs/`, supporting artifacts to `source-material/`, and retired historical material to `archive/`.
 
 ## Adaptive Structure
 
@@ -173,7 +176,7 @@ Use only the sections that improve future execution.
 ```markdown
 # Task: [Clear short name]
 
-**File:** `.tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`
+**File:** `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`
 **Created:** YYYY-MM-DD
 **Last Updated:** YYYY-MM-DD
 **Priority:** [Now | Next | Later]

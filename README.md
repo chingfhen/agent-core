@@ -10,7 +10,7 @@
 
 ### Read First
 
-- `~/agent-os` is the canonical repo for centralized production skills and a cautious cross-project memory pilot.
+- `~/agent-os` is the canonical repo for centralized production skills and the current cautious cross-project memory pilot.
 - `skills/` is the hand-edited production source; consumer repos receive generated local skill aliases, not hand-maintained copies.
 - `AGENTS.md` is the authoritative operating contract for steward agents maintaining this repo.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed consumer-repo enrollment and local alias behavior.
@@ -20,6 +20,8 @@
 - On Windows, enrollment prefers directory symlinks and falls back to directory junctions when symlink privileges are unavailable.
 - After a successful enroll or sync, selected consumer-repo skills should be live aliases, not copied directories; `verify` checks that guarantee directly.
 - Harness-specific skill surfaces and steward enrollment state are generated/local, not canonical content.
+- `tasks/` holds active execution handoff rather than durable architecture.
+- `source-material/` holds seed inputs and supporting artifacts; `archive/` is reserved for retired historical reference material.
 
 ### Scope
 
@@ -43,7 +45,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - `docs/**/*.md`
 - `README.md`
 - `AGENTS.md`
-- Future `memory/memories.jsonl`
+- `memory/memories.jsonl`
 - `repo-profiles/*`
 - `scripts/*`
 - `schemas/*`
@@ -53,8 +55,8 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - Consumer-repo-local `.agent-os.json`
 - Consumer-repo-local `.claude/skills/*` aliases used by Claude and OpenCode
 - Device-local steward enrollment state in `.agent-os-state/enrollments.json`
-- Future `memory/memory.sqlite`
-- Future `MEMORY_INDEX.md`
+- `memory/memory.sqlite`
+- `MEMORY_INDEX.md`
 
 #### Consumer Repo Integration
 
@@ -74,20 +76,27 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - The local steward registry also remembers the working device link mode so future repo enrollments can skip known-failing symlink probes.
 - See `docs/consumer-repo-enrollment.md` for the full enrollment, ignore, and conflict-handling contract.
 
+#### Repo Working Surfaces
+
+- `tasks/` holds active execution handoff and fresh-session continuity.
+- `docs/`, `README.md`, and `AGENTS.md` hold durable repo truth.
+- `source-material/` holds non-canonical seed inputs and supporting artifacts that may still inform later work.
+- `archive/` is the home for retired historical reference material that should not drive current truth by default.
+
 #### Memory Pilot
 
 - Memory is a pilot, not yet a proven core workflow.
-- The canonical truth will be append-only `memory/memories.jsonl`.
+- The canonical truth is append-only `memory/memories.jsonl`.
 - `memory/memories.jsonl` is the only tracked memory ledger.
-- Search and derived state will live in generated artifacts such as `memory.sqlite` and `MEMORY_INDEX.md`, which remain disposable and should not be committed.
+- Search and derived state live in generated artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md`, which remain disposable and should not be committed.
 - Steward agents own the memory subsystem and canonical repo publication in `~/agent-os`.
-- Executors may use memory through future repo-local skills when `memory_enabled` is true, but they should not need storage-internal knowledge.
-- Topic discovery should come from future list/search tooling exposed by `agent-os-memory`, not a hand-maintained registry.
-- Future memory tooling should start with list/search/write/supersede flows; destructive delete and in-place ledger edits stay out of scope for the append-only pilot.
+- Executors may use memory through the separate repo-local `agent-os-memory` skill when `memory_enabled` is true, but they should not need storage-internal knowledge.
+- Topic discovery should come from `uv run scripts/memory.py list` and `search` flows exposed through `agent-os-memory`, not a hand-maintained registry.
+- Memory tooling starts with read-only `list` and `search`, append-only `write`, an explicit delete refusal, and `reindex`; destructive delete and in-place ledger edits stay out of scope for the append-only pilot.
 - Active versus superseded memory state is derived in search/index results, not by rewriting prior ledger rows.
 - Creating a new `topic_key` requires explicit human approval.
 - Updating an existing `topic_key` within the active scope can be autonomous.
-- Future memory behavior should live in a separate `agent-os-memory` skill rather than expanding `agent-os-bootstrap`.
+- Memory behavior lives in a separate `agent-os-memory` skill rather than expanding `agent-os-bootstrap`.
 
 #### Dependency Strategy
 
@@ -112,10 +121,13 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | ------- | ---- | -------------- |
 | Steward contract | `AGENTS.md` | Governs how agents maintain this repo. |
 | Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for steward-managed repo enrollment and executor-facing local aliases. |
+| Memory pilot contract | `docs/memory-pilot.md` | Canonical contract for the append-only ledger, derived artifacts, and approval boundary. |
 | Enrollment script | `scripts/enroll_repo.py` | Writes `.agent-os.json`, manages local aliases, updates ignore rules, and records local enrollment state. |
+| Memory script | `scripts/memory.py` | Implements the list/search/write/reindex memory flows and rebuilds derived artifacts. |
 | Manifest schema | `schemas/agent-os-manifest.schema.json` | Defines the v1 `.agent-os.json` contract for consumer repos. |
 | Verification command | `uv run scripts/enroll_repo.py verify --repo <path>` | Confirms a consumer repo is using live aliases that receive canonical updates immediately. |
-| Historical seed spec | `.raw/initialize.md` | Original input that informed the current architecture; no longer the ongoing source of truth. |
+| Historical seed spec | `source-material/initialize.md` | Original input that informed the current architecture; no longer the ongoing source of truth. |
+| Active handoff | `tasks/` | Fresh-session execution continuity for unfinished work. |
 | Core production skill | `skills/project-docs/SKILL.md` | Defines how durable project knowledge should be routed and maintained. |
 | Core production skill | `skills/project-tasks/SKILL.md` | Defines how execution handoff should be preserved across fresh sessions. |
 
@@ -144,3 +156,5 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | 2026-06-19 | Windows enrollment defaults to symlink with junction fallback. | The first pilot lacked symlink privileges, so a non-destructive fallback was required to complete setup. |
 | 2026-06-19 | Device-local enrollment state lives in `.agent-os-state/enrollments.json`. | Repair runs need a local registry without adding tracked repo noise. |
 | 2026-06-19 | Consumer-repo skill copies are transitional and auto-replaced. | The system's value depends on live canonical updates, so steady state must be alias-backed rather than copy-backed. |
+| 2026-06-19 | Repo working surfaces standardize on `tasks/` and `source-material/`, with `archive/` reserved for retired historical reference. | Visible folder names work with OpenCode discovery and keep active execution, durable docs, and non-canonical artifacts clearly separated. |
+| 2026-06-19 | The first memory pilot ships as `scripts/memory.py` subcommands. | One steward-owned single-file script is the smallest correct surface for list/search/write/reindex memory flows. |

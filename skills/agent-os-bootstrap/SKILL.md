@@ -23,8 +23,8 @@ Read this repo's `.agent-os.json` before relying on Agent OS-specific assumption
 ## Behavior Contract
 
 - Use the manifest only to hydrate runtime context.
-- Treat local skills such as `project-docs`, `project-tasks`, `manage-python-uv`, and later `agent-os-memory` as ordinary repo-local skills.
-- Only reach for future memory behavior when `memory_enabled` is `true` and the corresponding local skill exists.
+- Treat local skills such as `project-docs`, `project-tasks`, `manage-python-uv`, and `agent-os-memory` as ordinary repo-local skills.
+- Only reach for memory behavior when `memory_enabled` is `true` and the corresponding local skill exists.
 - Do not explain or depend on canonical skill provenance, symlink mechanics, or steward internals unless the user explicitly asks.
 - Do not rewrite `.agent-os.json` yourself unless the user explicitly asks for enrollment or repair work.
 

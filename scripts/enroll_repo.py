@@ -276,7 +276,8 @@ def existing_ignore_covers(line: str, desired: str) -> bool:
     if is_comment_or_blank(pattern) or pattern.startswith("!"):
         return False
 
-    desired_clean = desired.rstrip("/")
+    pattern = pattern.lstrip("/")
+    desired_clean = normalize_ignore_line(desired).lstrip("/").rstrip("/")
     if pattern.rstrip("/") == desired_clean:
         return True
 

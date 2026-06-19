@@ -1,22 +1,23 @@
 ---
 name: project-docs
-description: Maintains durable project knowledge as inherited truth for future agents. Selectively syncs only high-leverage knowledge that future executors should not have to rediscover, continuously rewrites docs toward simpler expressions of current understanding, manages README and agent guidance surfaces, and prevents documentation bloat through canonical routing and evidence distillation.
+description: Maintains durable project knowledge as inherited truth for future agents. Selectively syncs only high-leverage knowledge that future executors should not have to rediscover, continuously rewrites docs toward simpler expressions of current understanding, manages docs, README, and agent guidance surfaces, and prevents documentation bloat through canonical routing and evidence distillation.
 disable-model-invocation: false
 ---
 
 # Project Docs
 
 Maintain durable project knowledge as inherited truth for future agents.  
-Durable knowledge may belong in canonical docs, README, agent guidance files, or both.  
-Docs are not task state, raw research, transcripts, status diaries, or execution history.  
+Durable knowledge usually belongs in `docs/`, README, agent guidance files, or a deliberate combination of those surfaces.  
+Docs are not task state, source material, transcripts, status diaries, or execution history.  
 Documentation exists to reduce future rediscovery cost.  
 Optimize documentation and agent guidance for future agent sessions by preserving only durable, high-leverage knowledge that future executors should not have to rediscover.
 
 ## Core Model
 
 * **`project-docs` owns durable project knowledge.**
-* **Active tasks own execution state** and fresh-session handoff.
-* **Raw research and external evidence are inputs**, not authority.
+* **Active tasks in `tasks/` own execution state** and fresh-session handoff.
+* **`source-material/` holds supporting artifacts and source evidence**, not authority.
+* **`archive/` holds historical reference material**, not current truth.
 * A document should answer **one durable question well**.
 * Each durable fact should have **one canonical home**.
 * **Prefer replacing stale content** over appending updates.
@@ -55,6 +56,7 @@ Before persisting knowledge, ask:
 
 ### Docs
 * **Answers:** What is true about the project?
+* **Default home:** `docs/`
 * *Examples:* Architecture, Interfaces, Workflows, Runtime behavior, Infrastructure, Product behavior, Technical decisions, Operational invariants, Troubleshooting guidance worth inheriting.
 
 ### README
@@ -70,11 +72,19 @@ Before persisting knowledge, ask:
 
 ### Tasks
 * **Owns:** Active execution state, Current progress, Session handoff, Work remaining, Investigations still in flight.
+* **Default home:** `tasks/`
 
-### Raw Evidence
-* **Answers:** Why did we believe this?
-* *Examples:* Research, Logs, Investigations, Experiments, External references, Session discoveries.
-* Evidence is **not durable truth** and should not flow directly into docs.
+### Source Material
+* **Answers:** What supporting artifacts or inputs should remain available without becoming canonical truth?
+* **Default home:** `source-material/`
+* *Examples:* Seed specs, imported notes, external references, logs, captured investigations, experiment output, one-off artifacts.
+* Source material is **not durable truth** and should not flow directly into docs.
+
+### Archive
+* **Answers:** What historical material is still worth keeping for reference?
+* **Default home:** `archive/`
+* *Examples:* Superseded specs, retired designs, frozen exports, old snapshots, historical notes that should not shape current truth by default.
+* Archive is **not canonical truth**. Reuse it as context, then validate before promoting conclusions back into docs.
 
 ## Evidence Distillation
 
@@ -82,6 +92,8 @@ Follow this model:
 $$\text{Evidence} \rightarrow \text{Understanding} \rightarrow \text{Decision} \rightarrow \text{Documentation}$$
 
 Persist the **conclusions reached from evidence**, not the evidence itself. Preserve evidence only when future decisions depend on re-evaluating it.
+
+If the evidence itself must be retained, keep it in `source-material/` or `archive/`, not in canonical docs.
 
 Docs should answer **what future agents should act on**, not everything that happened.
 
@@ -97,6 +109,7 @@ Docs should answer **what future agents should act on**, not everything that hap
 * **Preserve only durable, high-leverage knowledge** that benefits future sessions.
 * **Improve existing docs** before creating new ones.
 * **Use README and agent guidance files intentionally** rather than duplicating information elsewhere.
+* **Do not let `source-material/` or `archive/` silently become canonical documentation.**
 
 ---
 
@@ -150,12 +163,15 @@ Small docs may omit optional sections.
 
 Use repository-local routing. First inspect:
 
+* `docs/`
 * README.md
 * Agent guidance files
 * Documentation indexes
 * Existing docs
 * Nearby code ownership
-* Task metadata when relevant
+* `tasks/` when execution context matters
+* `source-material/` when source evidence matters
+* `archive/` only when historical context still affects the decision
 
 ### For Agent Guidance Files
 
@@ -207,6 +223,8 @@ Use when the user asks to sync knowledge (current conversation decisions, active
 * Distill evidence into conclusions and decisions.
 * Separate system-facing knowledge from agent-facing knowledge:
 * Route project truth to docs.
+* Route supporting but non-canonical artifacts to `source-material/` when they should remain available.
+* Route retired or historical reference material to `archive/` when it should be kept but not treated as current truth.
 * Route onboarding knowledge to README when appropriate.
 * Route agent behavior guidance to agent guidance files.
 * Route information to multiple destinations only when each serves a distinct purpose. Avoid duplicating detailed documentation inside agent guidance files.
@@ -218,11 +236,11 @@ Use when the user asks to sync knowledge (current conversation decisions, active
 
 Use when documentation may be stale, duplicated, or bloated.
 
-* Compare docs, README, agent guidance files, tasks, and code.
+* Compare docs, README, agent guidance files, `tasks/`, code, and any relevant `source-material/` or `archive/` context.
 * Flag stale paths, commands, workflows, and assumptions.
 * Identify duplicated knowledge and choose one canonical home.
 * Replace duplication with pointers where appropriate.
-* Remove obsolete implementation chatter, historical residue, and stale agent guidance.
+* Remove obsolete implementation chatter, historical residue, and stale agent guidance from canonical docs.
 * Keep agent guidance focused on behavior.
 * Preserve durable decisions, constraints, and current behavior.
 * Simplify documentation where understanding has improved.

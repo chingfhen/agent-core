@@ -16,7 +16,7 @@
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
 - Trust the setup only when the selected skills are live aliases; copied local skill directories are transitional and should be auto-replaced by steward workflows.
-- `agent-os-bootstrap` only hydrates manifest context; memory behavior belongs in later separate skills.
+- `agent-os-bootstrap` only hydrates manifest context; memory behavior belongs in separate skills.
 
 ### Scope
 
@@ -26,7 +26,7 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 
 - Canonical skill authoring in `skills/`
 - Live implementation status or open task sequencing
-- Memory ledger internals beyond how consumer repos opt into future memory behavior
+- Memory ledger internals beyond how consumer repos opt into memory behavior
 
 ### Current Contract
 
@@ -83,7 +83,7 @@ Example:
 
 - Consumer repos receive `agent-os-bootstrap` as a local alias under `.claude/skills` alongside other selected skills.
 - `agent-os-bootstrap` reads `.agent-os.json` and hydrates repo identity, scope, memory availability, and repo-local Agent OS settings.
-- `agent-os-bootstrap` may point executors to ordinary local skills such as `project-docs`, `project-tasks`, and later `agent-os-memory`.
+- `agent-os-bootstrap` may point executors to ordinary local skills such as `project-docs`, `project-tasks`, and `agent-os-memory`.
 - `agent-os-bootstrap` does not explain canonical provenance or install mechanics to executor agents.
 
 #### Link Strategy
@@ -123,10 +123,10 @@ Example:
 
 #### Memory Integration Boundary
 
-- `memory_enabled` in `.agent-os.json` controls whether future memory behavior should be available in that repo.
+- `memory_enabled` in `.agent-os.json` controls whether memory behavior should be available in that repo.
 - Memory instructions belong in a separate `agent-os-memory` skill rather than expanding `agent-os-bootstrap`.
-- Memory remains a pilot; the canonical truth stays append-only in `memory/memories.jsonl`, while generated search state remains disposable.
-- When `memory_enabled` is true, executors may use a future local `agent-os-memory` skill for list/search/write flows without needing direct knowledge of `jsonl` or `sqlite` internals.
+- Memory remains a pilot; the canonical truth stays append-only in `memory/memories.jsonl`, while generated search state in `memory/memory.sqlite` and `MEMORY_INDEX.md` remains disposable.
+- When `memory_enabled` is true, stewards may also install the local `agent-os-memory` skill so executors can use list/search/write flows without direct knowledge of `jsonl` or `sqlite` internals.
 - Topic discovery should come from generated list/search commands exposed by that skill, not from a hand-maintained registry in consumer repos.
 - Steward agents still own canonical memory tooling and publication in `~/agent-os`; enabling memory in a consumer repo does not make that repo the source of truth.
 
@@ -137,10 +137,12 @@ Example:
 | Repo architecture | `README.md` | High-level orientation and top-level boundaries for Agent OS. |
 | Steward contract | `AGENTS.md` | Defines steward-agent operating rules and overwrite safety behavior. |
 | Bootstrap skill | `skills/agent-os-bootstrap/SKILL.md` | Executor-facing manifest hydration instructions. |
+| Memory skill | `skills/agent-os-memory/SKILL.md` | Executor-facing list/search/write memory guidance for memory-enabled repos. |
 | Enrollment script | `scripts/enroll_repo.py` | Implements enrollment, repair, local registry updates, and Windows link fallback behavior. |
+| Memory script | `scripts/memory.py` | Canonical steward memory tooling behind the local memory skill. |
 | Manifest schema | `schemas/agent-os-manifest.schema.json` | Defines the v1 `.agent-os.json` contract. |
 | Verification command | `uv run scripts/enroll_repo.py verify --repo <path>` | Confirms whether a repo is in the trusted live-alias steady state. |
-| Active foundation task | `.tasks/2026-06-18__agent-os-foundation-bookmark.md` | Tracks sequencing, open uncertainties, and implementation follow-up. |
+| Active memory task | `tasks/2026-06-19__agent-os-memory-real-repo-validation-bookmark.md` | Tracks the next real enrolled-repo validation pass for memory-enabled repos. |
 
 ### Decisions
 
