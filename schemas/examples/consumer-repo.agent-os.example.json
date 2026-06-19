@@ -1,0 +1,8 @@
+{
+  "version": 1,
+  "repo_id": "consumer-repo",
+  "scope": "repo",
+  "scope_id": "consumer-repo",
+  "agent_os_path": "C:\\Users\\chingfhen\\Documents\\ching\\agent-core\\agent-core",
+  "memory_enabled": false
+}

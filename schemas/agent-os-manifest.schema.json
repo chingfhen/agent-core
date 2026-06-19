@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agent-os.local/schemas/agent-os-manifest.schema.json",
+  "title": "Agent OS Consumer Repo Manifest",
+  "type": "object",
+  "required": [
+    "version",
+    "repo_id",
+    "scope",
+    "scope_id",
+    "agent_os_path",
+    "memory_enabled"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "repo_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope": {
+      "type": "string",
+      "minLength": 1
+    },
+    "scope_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "agent_os_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "memory_enabled": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": true
+}

@@ -43,6 +43,13 @@ Never activate the virtualenv manually. These are all wrong:
 
 All execution goes through `uv run`.
 
+`uv` supports two valid workflows:
+
+- **Scripts-first:** `uv run` with PEP 723 inline script metadata. This does **not** require `uv init`, `pyproject.toml`, or `uv.lock`.
+- **Project mode:** `uv init` plus `pyproject.toml` and `uv.lock` for a managed Python application, package, or shared tooling setup.
+
+`uv` does not create `pyproject.toml` automatically just because you use `uv run`. A repo-level `pyproject.toml` appears when you intentionally initialize or manage a project in project mode.
+
 ---
 
 # Project Discovery
@@ -52,7 +59,8 @@ Inspect in order:
 1. `pyproject.toml` — exists? has `[project]` section? has `[tool.uv]`?
 2. `uv.lock` — exists and committed?
 3. `.python-version` — pinned version?
-4. `.gitignore` — contains `.venv/`?
+4. Existing source/test/script layout — package/app layout, or just standalone scripts?
+5. `.gitignore` — contains `.venv/`?
 
 **Classify and act:**
 
@@ -60,14 +68,51 @@ Inspect in order:
 |---|---|---|
 | Existing uv project | `pyproject.toml` + `uv.lock` present | Run `uv sync`, verify with `uv tree` |
 | Needs migration | `requirements.txt` / `setup.py` / `poetry.lock` present | See Migration section — ask user first |
-| New Python project | Source files, no config | Run `uv init` |
+| Scripts-first repo | One or a few standalone `.py` files, utility scripts, or a non-Python repo that only needs Python helpers | Use `uv run`; add or maintain PEP 723 metadata in each script. Do **not** run `uv init` unless shared project config is clearly needed |
+| New managed Python project | Repo is clearly a Python app/library/package, has shared tests/tooling needs, or the user asked to bootstrap a project | Run `uv init` |
 | Non-Python project | No Python files | Do nothing, report to user |
 
 Do not rewrite project structure unless requested.
 
+Prefer the smaller correct workflow:
+
+- Use **scripts-first** when the repo only needs standalone utilities or steward scripts.
+- Use **project mode** when the repo needs shared dependencies, shared test/tool config, package metadata, or a committed lockfile.
+
 ---
 
-# Bootstrapping New Projects
+# Choosing `uv init` vs `uv run`
+
+## Use `uv run` only
+
+Choose scripts-first `uv run` when most of these are true:
+
+- The repo only needs one or a few standalone Python scripts
+- The scripts are utilities, automation, or repo-local helpers
+- There is no Python package/app structure yet
+- There is no clear need for shared dependency management across multiple modules/tests
+- There is no need yet for shared tool configuration in `pyproject.toml`
+
+Typical commands:
+
+```powershell
+uv run python scripts\some_script.py
+uv run --with requests python -c "import requests; print(requests.__version__)"
+```
+
+For scripts-first repos, prefer PEP 723 inline metadata in the script itself.
+
+## Use `uv init`
+
+Choose project mode when any of these are true:
+
+- The repo is a Python application, library, or package
+- Multiple modules/tests share the same dependency set
+- CI or teammates need a reproducible project environment
+- Tooling such as `pytest`, `ruff`, or `mypy` should be managed at the project level
+- The user explicitly asked to bootstrap a Python project
+
+Typical command:
 
 ```powershell
 uv init
@@ -180,13 +225,15 @@ Run `uv sync` when:
 
 `uv add` and `uv remove` auto-sync — no manual `uv sync` needed after those commands.
 
-CI must never update lockfiles — always use `uv sync --locked` in CI.
+In project mode, CI must never update lockfiles — always use `uv sync --locked` in CI.
 
 ---
 
 # Lockfile Rules
 
-`uv.lock` is source-controlled. Always commit it.
+In project mode, `uv.lock` is source-controlled. Always commit it when present.
+
+In scripts-first mode, it is normal to have no `uv.lock` at all.
 
 | Do | Don't |
 |---|---|
@@ -216,7 +263,7 @@ For standalone global CLI tools (not project-specific):
 uv tool install ruff                      # installs globally, outside the project
 ```
 
-Default to `uv add --dev` for any tool used in CI or project scripts. Use `uv tool install` only when you want the tool available system-wide regardless of project context.
+Default to `uv add --dev` for any tool used in CI or project-level tooling. For scripts-first repos, prefer inline PEP 723 dependencies or `uv run --with ...` for one-offs. Use `uv tool install` only when you want the tool available system-wide regardless of project context.
 
 ---
 
@@ -233,10 +280,12 @@ __pycache__/
 Track in version control:
 
 ```
-pyproject.toml
-uv.lock
-.python-version
+pyproject.toml    # project mode only
+uv.lock           # project mode only
+.python-version   # when intentionally pinned
 ```
+
+For scripts-first repos, it is valid to have no `pyproject.toml` and no `uv.lock` at all.
 
 ---
 
@@ -267,12 +316,14 @@ After migration:
 
 - Syncing the environment
 - Adding missing dev tools (ruff, pytest) when obviously needed
-- Creating missing `uv.lock`
+- Choosing scripts-first `uv run` for standalone utilities or repo-local helper scripts
+- Creating missing `uv.lock` for an existing project-mode repo
 - Adding `.gitignore` entries for `.venv/`
 
 **Ask the user first:**
 
 - Changing Python major versions
+- Converting a scripts-first repo into a managed `pyproject.toml` project when the need is not clear
 - Replacing dependency managers
 - Removing existing dependencies
 - Changing versions with compatibility risk
@@ -284,13 +335,14 @@ After migration:
 
 When environment issues occur:
 
-1. `uv tree` — check for dependency conflicts
-2. `uv sync` — re-sync the environment
-3. Inspect `pyproject.toml` and `uv.lock` for constraint problems
+1. In project mode, `uv tree` — check for dependency conflicts
+2. In project mode, `uv sync` — re-sync the environment
+3. In project mode, inspect `pyproject.toml` and `uv.lock` for constraint problems
+4. In scripts-first mode, inspect the script's PEP 723 metadata and rerun with `uv run`
 
 Do not:
 
 - Recreate environments manually
 - Use pip to patch issues
-- Delete `uv.lock` as a first step
+- In project mode, delete `uv.lock` as a first step
 
