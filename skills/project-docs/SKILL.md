@@ -1,0 +1,242 @@
+---
+name: project-docs
+description: Maintains durable project knowledge as inherited truth for future agents. Selectively syncs only high-leverage knowledge that future executors should not have to rediscover, continuously rewrites docs toward simpler expressions of current understanding, manages README and agent guidance surfaces, and prevents documentation bloat through canonical routing and evidence distillation.
+disable-model-invocation: false
+---
+
+# Project Docs
+
+Maintain durable project knowledge as inherited truth for future agents.  
+Durable knowledge may belong in canonical docs, README, agent guidance files, or both.  
+Docs are not task state, raw research, transcripts, status diaries, or execution history.  
+Documentation exists to reduce future rediscovery cost.  
+Optimize documentation and agent guidance for future agent sessions by preserving only durable, high-leverage knowledge that future executors should not have to rediscover.
+
+## Core Model
+
+* **`project-docs` owns durable project knowledge.**
+* **Active tasks own execution state** and fresh-session handoff.
+* **Raw research and external evidence are inputs**, not authority.
+* A document should answer **one durable question well**.
+* Each durable fact should have **one canonical home**.
+* **Prefer replacing stale content** over appending updates.
+* **Preserve current truth** over historical narrative.
+* Optimize for future agent effectiveness **without accumulating documentation bloat**.
+* **Ask only when a durable choice is materially ambiguous**, conflicts with existing truth, or changes architecture, product direction, or stable operating behavior.
+
+### Guiding Philosophy
+
+Ask:
+> If this task disappeared tomorrow, what knowledge would future executors repeatedly pay to rediscover?
+
+* **Preserve that.**
+* Everything else is negotiable.
+* The purpose of documentation is **not to remember everything**.
+* The purpose of documentation is to **preserve inherited truth**.
+* Use version control for history.
+* Use documentation for **current understanding**.
+
+## Documentation Admission Test
+
+Before persisting knowledge, ask:
+
+1.  **Would future executors likely need this after the current task disappears?**
+    * *If no:* Do not document it.
+2.  **If forgotten, would future sessions repeatedly rediscover it at meaningful cost?**
+    * *If no:* Do not document it.
+3.  **Does this change:** how the system works, how agents should behave, or how future decisions should be made?
+    * *If no:* Do not document it.
+4.  **Is version control already the better memory?**
+    * *If yes:* Do not document it.
+
+*Interesting is not enough.* *Useful during the current task is not enough.* Only preserve knowledge that meaningfully reduces future rediscovery.
+
+## Knowledge Destinations
+
+### Docs
+* **Answers:** What is true about the project?
+* *Examples:* Architecture, Interfaces, Workflows, Runtime behavior, Infrastructure, Product behavior, Technical decisions, Operational invariants, Troubleshooting guidance worth inheriting.
+
+### README
+* **Answers:** How should someone orient themselves to this repository?
+* *Examples:* Project overview, Entry points, High-level architecture, Setup and usage, Important workflows, Navigation guidance, Onboarding essentials.
+* README should optimize discoverability and orientation. It should remain concise and is **not a dumping ground for implementation detail**.
+
+### Agent Guidance Files
+* **Answers:** How should agents operate in this project?
+* *Examples:* Repo-wide operating principles, Stable workflow rules, Coding philosophy, Planning heuristics, High-frequency conventions, Important agent guidance, Recurring mistakes worth preventing.
+* *Supported examples include:* `AGENTS.md`, `CLAUDE.md`, and other repository-defined agent guidance files.
+* Agent guidance files are **not a second documentation system**. Keep them concise and prefer behavioral guidance over project knowledge.
+
+### Tasks
+* **Owns:** Active execution state, Current progress, Session handoff, Work remaining, Investigations still in flight.
+
+### Raw Evidence
+* **Answers:** Why did we believe this?
+* *Examples:* Research, Logs, Investigations, Experiments, External references, Session discoveries.
+* Evidence is **not durable truth** and should not flow directly into docs.
+
+## Evidence Distillation
+
+Follow this model:
+$$\text{Evidence} \rightarrow \text{Understanding} \rightarrow \text{Decision} \rightarrow \text{Documentation}$$
+
+Persist the **conclusions reached from evidence**, not the evidence itself. Preserve evidence only when future decisions depend on re-evaluating it.
+
+Docs should answer **what future agents should act on**, not everything that happened.
+
+## Non-Negotiables
+
+* **Do not copy task summaries** into docs.
+* **Do not write uncertain claims** as established fact.
+* **Do not duplicate facts** across docs.
+* **Do not create new docs** when an existing canonical home works.
+* **Prefer moving, merging, and restructuring** over duplication.
+* **Verify conflicting information** before choosing a source of truth.
+* Mark unresolved uncertainty as `Needs validation`.
+* **Preserve only durable, high-leverage knowledge** that benefits future sessions.
+* **Improve existing docs** before creating new ones.
+* **Use README and agent guidance files intentionally** rather than duplicating information elsewhere.
+
+---
+
+## Preferred Doc Shape
+
+Use relevant sections intentionally. The first screen should remain short and scannable.
+
+```markdown
+# [Doc Title]
+
+**Last Updated:** YYYY-MM-DD
+
+**Status:** Current | Draft | Stale | Deprecated
+
+**Source Of Truth:** [One durable question this doc answers.]
+
+**Update When:** [Concrete triggers.]
+
+### Read First
+
+- Current fact or invariant.
+- Current fact or invariant.
+
+### Scope
+
+What belongs here.
+
+### Not Here
+
+What belongs elsewhere.
+
+### Current Contract
+
+Stable behavior, interfaces, workflows, schemas, commands, or rules.
+
+### Related Surfaces
+
+| Surface | Path / System | Why It Matters |
+| ------- | ------------- | -------------- |
+
+### Decisions
+
+| Date | Decision | Rationale |
+| ---- | -------- | --------- |
+
+Small docs may omit optional sections.
+
+```
+
+## Canonical Routing
+
+Use repository-local routing. First inspect:
+
+* README.md
+* Agent guidance files
+* Documentation indexes
+* Existing docs
+* Nearby code ownership
+* Task metadata when relevant
+
+### For Agent Guidance Files
+
+* Prefer the repository's established convention.
+* Recognize AGENTS.md, CLAUDE.md, and other repo-defined equivalents.
+* If multiple agent guidance files exist, identify the canonical one and avoid duplicating guidance.
+* Prefer thin pointers over duplicated instructions when appropriate.
+* Create a new agent guidance file only when explicitly requested or clearly required by repository convention.
+
+Choose the narrowest existing canonical home that fits. Improve an existing document before creating a new one. Create a new doc only when no existing document answers the durable question well.
+
+## Documentation Evolution
+
+Documentation should evolve toward simpler expressions of current understanding. When updating docs:
+
+* Prefer rewriting over appending.
+* Replace obsolete explanations.
+* Collapse duplicated decisions.
+* Remove historical residue once its lessons have been absorbed.
+* Simplify wording when understanding improves.
+* Improve discoverability, orientation, and reduce future cognitive load.
+
+Do not preserve earlier explanations merely because they existed. Version control preserves history; documentation preserves inherited truth.
+
+## Lifecycle Operations
+
+### Update
+
+Use when durable knowledge changes.
+
+* Read the target document and relevant surrounding context.
+* Check likely related docs for overlap or conflict.
+* Apply the Documentation Admission Test.
+* Choose the canonical home.
+* Rewrite current understanding where appropriate and replace stale content with current truth.
+* Keep the first screen concise and update timestamps/metadata when appropriate.
+* Add decisions only when they prevent future drift.
+* Evaluate whether README or agent guidance files also require updates.
+* Optimize updates for future agent sessions while avoiding bloat.
+* Report what changed, what was skipped, and any Needs validation residue.
+
+### Sync Durable Knowledge
+
+Use when the user asks to sync knowledge (current conversation decisions, active tasks, completed tasks, code changes, debugging findings, investigations, design discussions, or any other session context).
+
+* Do not assume sync means task harvest only or preserving everything.
+* Treat tasks, discussions, and evidence as inputs, not authority.
+* Apply the Documentation Admission Test and extract only durable knowledge.
+* Distill evidence into conclusions and decisions.
+* Separate system-facing knowledge from agent-facing knowledge:
+* Route project truth to docs.
+* Route onboarding knowledge to README when appropriate.
+* Route agent behavior guidance to agent guidance files.
+* Route information to multiple destinations only when each serves a distinct purpose. Avoid duplicating detailed documentation inside agent guidance files.
+* Validate important claims against current docs, code, or evidence when practical.
+* Rewrite existing docs or restructure documentation when a clearer canonical shape or better expression of current understanding emerges.
+* Report: Persisted, Already documented / skipped, Rewritten / simplified, Uncertain, Rerouted / restructured.
+
+### Verify / Trim
+
+Use when documentation may be stale, duplicated, or bloated.
+
+* Compare docs, README, agent guidance files, tasks, and code.
+* Flag stale paths, commands, workflows, and assumptions.
+* Identify duplicated knowledge and choose one canonical home.
+* Replace duplication with pointers where appropriate.
+* Remove obsolete implementation chatter, historical residue, and stale agent guidance.
+* Keep agent guidance focused on behavior.
+* Preserve durable decisions, constraints, and current behavior.
+* Simplify documentation where understanding has improved.
+* Preserve future usefulness while minimizing maintenance burden.
+* Mark risky uncertainty as Needs validation.
+
+### Resume
+
+Use when the user asks where a topic stands.
+
+* Read the most relevant docs and context.
+* State the current source of truth.
+* Summarize the current contract.
+* Highlight important constraints and known uncertainty.
+* Identify related work when useful.
+* Keep the response concise.
+
