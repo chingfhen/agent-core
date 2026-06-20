@@ -1,6 +1,6 @@
 # Memory Pilot
 
-**Last Updated:** 2026-06-19
+**Last Updated:** 2026-06-20
 
 **Status:** Current
 
@@ -15,6 +15,8 @@
 - `uv run scripts/memory.py` is the steward-owned entry point for `list`, `search`, `write`, and `reindex` flows.
 - Updating an existing `topic_key` within the active scope can be autonomous.
 - Creating a new `topic_key` requires explicit human approval.
+- Executor memory behavior is an active recall and conservative capture layer, not transcript storage or task logging.
+- Source code, tests, docs, and active task files remain the better surfaces when they already own the information.
 - Executor-facing memory behavior lives in `skills/agent-os-memory/SKILL.md`, not in `agent-os-bootstrap`.
 
 ### Scope
@@ -77,8 +79,12 @@ Each JSONL row stores one immutable memory revision with these fields:
 
 - Consumer repos opt into memory by setting `memory_enabled` in `.agent-os.json`.
 - Executors should use the separate local `agent-os-memory` skill only when memory is enabled.
+- Executors should proactively recall memory before consequential work when durable user or repo context could affect the task.
 - Executors should discover existing topics through `list` and `search`, not by reading `jsonl` or `sqlite` internals.
 - Executors should pass `scope` and `scope_id` from `.agent-os.json` into `scripts/memory.py`.
+- Executors should treat retrieved memory as advisory context. Current user instructions, system/developer instructions, and current repo files have higher priority.
+- Executors should capture only high-signal durable knowledge: recurring user preferences, stable repo or environment constraints, durable decisions and rationale, validated repeatable procedures, and unusual resolved failures likely to recur.
+- Executors should not capture raw transcripts, scratch notes, routine command output, ordinary task progress, guesses, secrets, or facts already better represented in code, tests, docs, or `tasks/`.
 
 ### Related Surfaces
 

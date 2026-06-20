@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-06-19
+**Last Updated:** 2026-06-20
 
 **Status:** Current
 
@@ -18,6 +18,7 @@
 - On Windows, prefer directory symlinks but fall back to directory junctions when symlink privileges are unavailable.
 - Symlinks and directory junctions both satisfy the live-update guarantee; copied local skill directories do not.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed repo enrollment details.
+- `docs/autonomous-state-and-memory-routing.md` holds the reusable canonical wording for memory-routing instructions used in this repo and future repos.
 - `README.md` holds the durable repo architecture; keep this file focused on operating rules.
 - `source-material/initialize.md` is seed input kept for reference, not the ongoing source of truth.
 - Use `tasks/` for active execution handoff, not durable architecture.
@@ -30,6 +31,18 @@ This file governs agents maintaining `~/agent-os`.
 ### Not Here
 
 Consumer-repo-local instructions, runtime task state, or generated harness output.
+
+### Autonomous State & Memory Routing
+
+You are a node in an ongoing execution chain. Optimize repository context for future agent sessions while preserving a strict boundary between active execution state and durable memory.
+
+- **Read-only execution state:** The human architect manages `tasks/` for active alignment and session handoff. You may read these files to understand current state, but do not create, edit, or manage task files unless explicitly instructed.
+- **Durable memory routing:** Maintain `docs/`, `source-material/`, and `archive/` as follows:
+  - **Route to `docs/`:** Store stable project truth such as decisions, invariants, contracts, and confirmed fixes. Prefer the smallest durable update that improves clarity for future sessions.
+  - **Route to `source-material/`:** Store external intelligence, third-party references, web research, or seed inputs that inform the work but are not canonical project truth.
+  - **Route to `archive/`:** Move content here only when it is clearly superseded by a newer canonical source and should no longer guide future work.
+- **Quality bar:** Only persist information that is stable, repo-relevant, and likely to help a future agent. Do not promote transient notes, tentative hypotheses, or session-local debugging artifacts into durable memory.
+- **Silent optimization:** Perform these updates opportunistically at natural workflow boundaries without asking for permission, but avoid unnecessary churn and do not archive or rewrite content unless the status is clear.
 
 ### Current Contract
 
@@ -79,6 +92,7 @@ Consumer-repo-local instructions, runtime task state, or generated harness outpu
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | Durable explanation of what this repo is and how it is structured. |
+| Memory-routing template | `docs/autonomous-state-and-memory-routing.md` | Canonical reusable wording for the durable-memory routing policy applied in this repo and future repos. |
 | Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for enrollment, alias installs, ignore rules, and bootstrap scope. |
 | Memory pilot contract | `docs/memory-pilot.md` | Defines the ledger schema, approval boundary, and steward memory tooling. |
 | Enrollment script | `scripts/enroll_repo.py` | Implements enrollment, repair, local registry updates, and Windows link fallback behavior. |
