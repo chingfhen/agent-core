@@ -1,6 +1,6 @@
 # Consumer Repo Enrollment
 
-**Last Updated:** 2026-06-21
+**Last Updated:** 2026-06-22
 
 **Status:** Current
 
@@ -12,6 +12,7 @@
 
 - Consumer repos are enrolled per device by steward workflows, not by manual repo editing.
 - The steward-managed local skill surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
+- New enrollments install the default consumer-repo skill set: `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`. All other canonical skills are opt-in with `--skill`.
 - Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
@@ -33,11 +34,21 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 #### Enrollment Model
 
 - Each consumer repo is enrolled per device by a steward workflow.
-- Enrollment writes a repo-local `.agent-os.json`, installs selected local skill aliases, updates repo ignore rules for steward-managed outputs, and records device-local steward state.
+- Enrollment writes a repo-local `.agent-os.json`, installs local skill aliases, installs the default consumer-repo skill set, updates repo ignore rules for steward-managed outputs, and records device-local steward state.
 - Enrollment does not require an existing Git worktree; if `.gitignore` is missing, the steward creates it.
 - Device-local steward state is untracked.
 - This system does not depend on modifying consumer repo `AGENTS.md` files.
 - Enrollment and sync both converge the repo toward live aliases rather than copied skill directories.
+
+#### Default Enrollment Skill Set
+
+- `yagni-review`
+- `project-docs`
+- `project-tasks`
+- `manage-python-uv`
+- `agent-os-memory`
+- `grilling`
+- All other canonical skills install only when explicitly requested with `--skill`.
 
 #### Generated Consumer-Repo Surfaces
 
@@ -154,6 +165,7 @@ Example:
 | 2026-06-19 | `.agent-os.json` is gitignored by default. | The manifest contains per-user and per-device integration state and should not confuse teammates. |
 | 2026-06-19 | Managed ignore rules default to exact alias paths. | Narrow ignores avoid masking other repo-owned harness files. |
 | 2026-06-21 | Consumer repos do not receive a shared bootstrap skill. | Only `agent-os-memory` currently needs manifest context, so skill-local reads are simpler than a separate bootstrap layer. |
+| 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | The default set is `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`; all other skills stay opt-in via `--skill`. |
 | 2026-06-21 | Shared local project skills sync to both `.claude/skills` and `.opencode/skills`. | Claude and OpenCode should each receive the same canonical skills through their native project-local discovery paths. |
 | 2026-06-19 | Windows enrollment defaults to symlink with junction fallback. | The first pilot lacked symlink privileges, so a non-destructive fallback was required to complete setup. |
 | 2026-06-19 | Device-local enrollment state lives in `.agent-os-state/enrollments.json`. | Repair runs need a local registry without tracked repo noise. |

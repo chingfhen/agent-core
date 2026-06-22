@@ -23,6 +23,14 @@ SUPPORTED_SURFACES = {
     "opencode": Path(".opencode/skills"),
 }
 DEFAULT_SURFACES = ("claude", "opencode")
+DEFAULT_ENROLL_SKILLS = (
+    "yagni-review",
+    "project-docs",
+    "project-tasks",
+    "manage-python-uv",
+    "agent-os-memory",
+    "grilling",
+)
 RETIRED_SKILLS = {
     "agent-os-bootstrap": (
         "Shared bootstrap was removed. Executor skills that need Agent OS context should read "
@@ -671,9 +679,7 @@ def perform_enroll(args: argparse.Namespace) -> int:
         raise SystemExit(f"Repo path does not exist: {repo_path}")
     registry = load_registry()
 
-    requested_skills = dedupe(args.skill)
-    if args.include_bootstrap:
-        requested_skills.append("agent-os-bootstrap")
+    requested_skills = dedupe([*DEFAULT_ENROLL_SKILLS, *args.skill])
     skills, retired_skills = split_retired_skills(requested_skills)
     if not skills:
         raise SystemExit("At least one supported --skill is required")
@@ -894,18 +900,17 @@ def build_parser() -> argparse.ArgumentParser:
     enroll.add_argument("--repo-id", help="Repo identifier for .agent-os.json. Defaults to the folder name.")
     enroll.add_argument("--scope", default="repo", help="Manifest scope. Defaults to 'repo'.")
     enroll.add_argument("--scope-id", help="Manifest scope identifier. Defaults to repo_id.")
-    enroll.add_argument("--skill", action="append", default=[], help="Canonical skill to install. Repeat for multiple skills.")
+    enroll.add_argument(
+        "--skill",
+        action="append",
+        default=[],
+        help="Additional canonical skill to install. Repeat for multiple skills. Default skills are enrolled automatically.",
+    )
     enroll.add_argument(
         "--surface",
         action="append",
         default=[],
         help="Repo-local skill surface to manage. Steward sync converges enrollments onto both 'claude' and 'opencode'.",
-    )
-    enroll.add_argument(
-        "--include-bootstrap",
-        action=argparse.BooleanOptionalAction,
-        default=False,
-        help=argparse.SUPPRESS,
     )
     enroll.add_argument(
         "--memory-enabled",

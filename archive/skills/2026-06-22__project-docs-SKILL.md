@@ -1,6 +1,6 @@
 ---
 name: project-docs
-description: Maintains durable project knowledge as inherited truth for future agents. Updates or syncs high-leverage knowledge that future executors should not have to rediscover, continuously rewrites docs toward simpler current understanding, manages docs, README, and agent guidance surfaces, and prevents documentation bloat through canonical routing and evidence distillation.
+description: Maintains durable project knowledge as inherited truth for future agents. Selectively syncs only high-leverage knowledge that future executors should not have to rediscover, continuously rewrites docs toward simpler expressions of current understanding, manages docs, README, and agent guidance surfaces, and prevents documentation bloat through canonical routing and evidence distillation.
 disable-model-invocation: false
 ---
 
@@ -9,12 +9,12 @@ disable-model-invocation: false
 Maintain durable project knowledge as inherited truth for future agents.  
 Durable knowledge usually belongs in `docs/`, README, agent guidance files, or a deliberate combination of those surfaces.  
 Docs are not task state, source material, transcripts, status diaries, or execution history.  
-Documentation exists to reduce future rediscovery cost and keep future agents correct, smooth, and consistent.  
+Documentation exists to reduce future rediscovery cost.  
 Optimize documentation and agent guidance for future agent sessions by preserving only durable, high-leverage knowledge that future executors should not have to rediscover.
 
 ## Core Model
 
-* **`project-docs` owns durable project knowledge and long-term agent behavior.**
+* **`project-docs` owns durable project knowledge.**
 * **Active tasks in `tasks/` own execution state** and fresh-session handoff.
 * **`source-material/` holds supporting artifacts and source evidence**, not authority.
 * **`archive/` holds historical reference material**, not current truth.
@@ -28,12 +28,12 @@ Optimize documentation and agent guidance for future agent sessions by preservin
 ### Guiding Philosophy
 
 Ask:
-> If this task disappeared tomorrow, what knowledge would future executors repeatedly pay to rediscover, or what behavior should future agents consistently preserve?
+> If this task disappeared tomorrow, what knowledge would future executors repeatedly pay to rediscover?
 
 * **Preserve that.**
 * Everything else is negotiable.
 * The purpose of documentation is **not to remember everything**.
-* The purpose of documentation is to **preserve inherited truth and durable behavior**.
+* The purpose of documentation is to **preserve inherited truth**.
 * Use version control for history.
 * Use documentation for **current understanding**.
 
@@ -50,7 +50,7 @@ Before persisting knowledge, ask:
 4.  **Is version control already the better memory?**
     * *If yes:* Do not document it.
 
-*Interesting is not enough.* *Useful during the current task is not enough.* Only preserve knowledge that meaningfully reduces future rediscovery or stabilizes future agent behavior.
+*Interesting is not enough.* *Useful during the current task is not enough.* Only preserve knowledge that meaningfully reduces future rediscovery.
 
 ## Knowledge Destinations
 
@@ -113,31 +113,9 @@ Docs should answer **what future agents should act on**, not everything that hap
 
 ---
 
-## Preferred Doc Shape And Canonical Routing
+## Preferred Doc Shape
 
 Use relevant sections intentionally. The first screen should remain short and scannable.
-
-Choose the narrowest existing canonical home that fits. Improve an existing document before creating a new one. Create a new doc only when no existing document answers the durable question well.
-
-Before writing, inspect repository-local routing surfaces:
-
-* `docs/`
-* README.md
-* Agent guidance files
-* Documentation indexes
-* Existing docs
-* Nearby code ownership
-* `tasks/` when execution context matters
-* `source-material/` when source evidence matters
-* `archive/` only when historical context still affects the decision
-
-For agent guidance files:
-
-* Prefer the repository's established convention.
-* Recognize AGENTS.md, CLAUDE.md, and other repo-defined equivalents.
-* If multiple agent guidance files exist, identify the canonical one and avoid duplicating guidance.
-* Prefer thin pointers over duplicated instructions when appropriate.
-* Create a new agent guidance file only when explicitly requested or clearly required by repository convention.
 
 ```markdown
 # [Doc Title]
@@ -181,6 +159,30 @@ Small docs may omit optional sections.
 
 ```
 
+## Canonical Routing
+
+Use repository-local routing. First inspect:
+
+* `docs/`
+* README.md
+* Agent guidance files
+* Documentation indexes
+* Existing docs
+* Nearby code ownership
+* `tasks/` when execution context matters
+* `source-material/` when source evidence matters
+* `archive/` only when historical context still affects the decision
+
+### For Agent Guidance Files
+
+* Prefer the repository's established convention.
+* Recognize AGENTS.md, CLAUDE.md, and other repo-defined equivalents.
+* If multiple agent guidance files exist, identify the canonical one and avoid duplicating guidance.
+* Prefer thin pointers over duplicated instructions when appropriate.
+* Create a new agent guidance file only when explicitly requested or clearly required by repository convention.
+
+Choose the narrowest existing canonical home that fits. Improve an existing document before creating a new one. Create a new doc only when no existing document answers the durable question well.
+
 ## Documentation Evolution
 
 Documentation should evolve toward simpler expressions of current understanding. When updating docs:
@@ -196,17 +198,30 @@ Do not preserve earlier explanations merely because they existed. Version contro
 
 ## Lifecycle Operations
 
-### Update / Sync Durable Knowledge
+### Update
 
-Use when durable knowledge changes, or when the user asks to update or sync knowledge from current conversation decisions, active tasks, completed tasks, code changes, debugging findings, investigations, design discussions, existing docs, or any other session context.
+Use when durable knowledge changes.
 
-* Do not assume update or sync means task harvest only or preserving everything.
 * Read the target document and relevant surrounding context.
 * Check likely related docs for overlap or conflict.
-* Treat tasks, discussions, code changes, and evidence as inputs, not authority.
+* Apply the Documentation Admission Test.
+* Choose the canonical home.
+* Rewrite current understanding where appropriate and replace stale content with current truth.
+* Keep the first screen concise and update timestamps/metadata when appropriate.
+* Add decisions only when they prevent future drift.
+* Evaluate whether README or agent guidance files also require updates.
+* Optimize updates for future agent sessions while avoiding bloat.
+* Report what changed, what was skipped, and any Needs validation residue.
+
+### Sync Durable Knowledge
+
+Use when the user asks to sync knowledge (current conversation decisions, active tasks, completed tasks, code changes, debugging findings, investigations, design discussions, or any other session context).
+
+* Do not assume sync means task harvest only or preserving everything.
+* Treat tasks, discussions, and evidence as inputs, not authority.
 * Apply the Documentation Admission Test and extract only durable knowledge.
 * Distill evidence into conclusions and decisions.
-* Choose the canonical home.
+* Separate system-facing knowledge from agent-facing knowledge:
 * Route project truth to docs.
 * Route supporting but non-canonical artifacts to `source-material/` when they should remain available.
 * Route retired or historical reference material to `archive/` when it should be kept but not treated as current truth.
@@ -215,11 +230,7 @@ Use when durable knowledge changes, or when the user asks to update or sync know
 * Route information to multiple destinations only when each serves a distinct purpose. Avoid duplicating detailed documentation inside agent guidance files.
 * Validate important claims against current docs, code, or evidence when practical.
 * Rewrite existing docs or restructure documentation when a clearer canonical shape or better expression of current understanding emerges.
-* Keep the first screen concise and update timestamps/metadata when appropriate.
-* Add decisions only when they prevent future drift.
 * Report: Persisted, Already documented / skipped, Rewritten / simplified, Uncertain, Rerouted / restructured.
-
-Done when the canonical surface reflects current durable truth, transient state was left out, stale guidance no longer competes with it, and every promoted fact has one appropriate home.
 
 ### Verify / Trim
 

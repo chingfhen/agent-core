@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-06-21
+**Last Updated:** 2026-06-22
 
 **Status:** Current
 
@@ -54,6 +54,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - Do not add tracked `.opencode`, `.claude`, or `.codex` production copies to this repo.
 - Consumer repos are enrolled per device by steward workflows; this repo does not depend on editing consumer-repo `AGENTS.md`.
 - Executor skills that need manifest context should read `.agent-os.json` directly rather than relying on a shared bootstrap layer.
+- New enrollments include the default consumer-repo skill set defined in `docs/consumer-repo-enrollment.md`; explicit `--skill` values add more repo-local aliases.
 - Executor agents should consume repo-local skill aliases as ordinary repo skills; they do not need canonical/source-provenance explanation.
 - Keep `.claude/skills/*` and `.opencode/skills/*` aligned during enroll and sync so Claude and OpenCode receive the same canonical skill set.
 - The trusted steady state is live aliasing to canonical skills; copied local skill directories are only transitional and should be replaced during enroll or sync.

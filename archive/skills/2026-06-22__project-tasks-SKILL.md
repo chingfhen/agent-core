@@ -39,49 +39,19 @@ Ask:
 *   The goal is **not to preserve history**.
 *   The goal is to **preserve execution effectiveness**.
 
-## Dashboard Contract
-
-New tasks use `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`. The date is an **immutable creation date**. Keep `tasks/` **flat** unless the repository already uses another convention. **Do not mass-rename** historical tasks.
-
-Use only these explicit fields:
-
-| Field | Values | Meaning |
-| ----- | ------ | ------- |
-| **Priority** | `Now` | Active priority. |
-| **Priority** | `Next` | Intended next-up work. |
-| **Priority** | `Later` | Preserved but not near-term. |
-| **Status** | `Active` | Execution is live. |
-| **Status** | `Blocked` | Execution cannot proceed until a blocker clears. |
-| **Status** | `On Hold` | Intentionally paused. |
-| **Status** | `Closed` | Execution has ended. |
-| **Docs Sync** | `Not Synced` | Durable knowledge has not been checked or promoted. |
-| **Docs Sync** | `Partial` | Some durable knowledge was promoted or checked; more may remain. |
-| **Docs Sync** | `Synced` | Durable knowledge has been handled. |
-
-`Status` reflects **execution state only**. `Docs Sync` reflects **durable knowledge synchronization only**. Put descriptive state in **Current State**, never in status fields.
-
-```markdown
-# Task: [Clear short name]
-
-**File:** `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`
-**Created:** YYYY-MM-DD
-**Last Updated:** YYYY-MM-DD
-**Priority:** [Now | Next | Later]
-**Status:** [Active | Blocked | On Hold | Closed]
-**Docs Sync:** [Not Synced | Partial | Synced]
-
-**Goal:** [...]
-**Success Bar:** [...]
-**Current State:** [...]
-**Next Action:** [...]
-**Blockers:** [...]
-
-**Target Docs:** [...]
-**Relevant Code:** [...]
-```
-
 ## Non-Negotiables
 
+*   New tasks use `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`.
+*   The date is an **immutable creation date**.
+*   Keep `tasks/` **flat** unless the repository already uses another convention.
+*   **Do not mass-rename** historical tasks.
+*   Use only these explicit fields:
+    *   **Priority:** `Now` | `Next` | `Later`
+    *   **Status:** `Active` | `Blocked` | `On Hold` | `Closed`
+    *   **Docs Sync:** `Not Synced` | `Partial` | `Synced`
+*   `Status` reflects **execution state only**.
+*   `Docs Sync` reflects **durable knowledge synchronization only**.
+*   Put descriptive state in **Current State**, never in status fields.
 *   **Do not place live task dashboards** in agent guidance files.
 *   `tasks/INDEX.md`, if present, is an **optional convenience only**.
 *   Closed tasks are **not automatically deleted**.
@@ -91,29 +61,14 @@ Use only these explicit fields:
 
 ## Adaptive Structure
 
-The dashboard is the only default shape. Additional sections are available tools, not mandatory output. Use only sections that **materially improve future execution**.
+The template defines available tools, not mandatory output. Use only sections that **materially improve future execution**.
 
 *   **Do not populate sections** simply because they exist.
 *   **Omit sections** that are obvious, empty, redundant, or low-value.
 *   A **shorter bookmark with stronger signal** is preferred over a fully populated template.
 *   Different tasks require different structure.
 
-Optional sections:
-
-*   Human Intent
-*   Expected Outcomes
-*   Decisions Locked
-*   Non-Goals / Stop Conditions
-*   Problem Origin
-*   Current Understanding
-*   Remaining Uncertainty
-*   Superseded Understanding
-*   Executor Guidance
-*   Likely Blind Spots
-*   Verification Contract
-*   Context Pointers
-
-Examples:
+### Examples:
 *   **Feature work** may emphasize: Human Intent, Expected Outcomes, Decisions Locked.
 *   **Debugging** may emphasize: Problem Origin, Current State, Superseded Understanding, Verification Contract.
 *   **Investigations** may emphasize: Current Understanding, Remaining Uncertainty, Next Evidence.
@@ -123,7 +78,7 @@ Choose your structure intentionally.
 
 ## Alignment Gate
 
-Use **grilling** before creating or materially reshaping consequential work, especially when writing plans for future execution. Before creating a substantial new task, establish:
+Use **grill-me** before creating or materially reshaping consequential work, especially when writing plans for future execution. Before creating a substantial new task, establish:
 
 1.  The real goal
 2.  Success criteria
@@ -174,7 +129,7 @@ Avoid preserving full reasoning trails unless future execution genuinely depends
 
 ## Lifecycle
 
-### Create / Plan
+### 1. Create / Plan For Fresh Session
 Use when preserving goals, creating work, or preparing future execution.
 *   Create the dated task file.
 *   Build the dashboard first.
@@ -182,9 +137,7 @@ Use when preserving goals, creating work, or preparing future execution.
 *   Record only the context future executors cannot reconstruct.
 *   Include Expected Outcomes and guidance only when they change execution quality or order matters.
 
-Done when a future executor can start without asking what the work is, why it matters, what success means, or what to do next.
-
-### Update
+### 2. Update
 Use after meaningful progress, handoff, or when asked to update the task.
 *   Update `Last Updated`.
 *   **Rewrite rather than append.**
@@ -192,27 +145,21 @@ Use after meaningful progress, handoff, or when asked to update the task.
 *   Replace stale context with current understanding and compress obsolete material.
 *   Move durable truths into docs when they stabilize. Keep `Target Docs` current.
 
-Done when Current State, Next Action, Blockers, uncertainty, and Docs Sync are accurate enough for smooth continuation.
-
-### Resume
+### 3. Resume
 Use when continuing work.
 *   Start with the dashboard.
 *   Understand current truth before acting.
 *   Review additional sections only as needed.
 *   Recommend trimming if stale, contradictory, bloated, or misleading.
 
-Done when the agent knows what to do next, what constraints matter, and what not to repeat.
-
-### Trim / Consolidate
+### 4. Trim / Consolidate
 Use when tasks become noisy, overlapping, or difficult to resume.
 *   Preserve core alignment, current understanding, next actions, and critical lessons.
 *   Compress duplicate evidence, obsolete attempts, and stale guidance.
 *   Mark unresolved claims as `Needs validation`.
 *   Consolidate overlapping work into the clearest surviving task.
 
-Done when stale history no longer competes with current state and a future executor can resume without archaeological reading.
-
-### Close
+### 5. Close
 Use when active execution has ended.
 *   Set Status to `Closed`.
 *   Update `Last Updated` and `Docs Sync`.
@@ -220,7 +167,56 @@ Use when active execution has ended.
 *   State any remaining follow-up explicitly.
 *   Avoid creating duplicate persistence summaries; keep it clean for future reference.
 
-Done when the task no longer reads like active execution state and any durable learnings have either been synced or clearly marked as not synced.
+---
+
+## Suggested Structure
+
+Use only the sections that improve future execution.
+
+```markdown
+# Task: [Clear short name]
+
+**File:** `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`
+**Created:** YYYY-MM-DD
+**Last Updated:** YYYY-MM-DD
+**Priority:** [Now | Next | Later]
+**Status:** [Active | Blocked | On Hold | Closed]
+**Docs Sync:** [Not Synced | Partial | Synced]
+
+**Goal:** [...]
+**Success Bar:** [...]
+**Current State:** [...]
+**Next Action:** [...]
+**Blockers:** [...]
+
+**Target Docs:** [...]
+**Relevant Code:** [...]
+
+## Human Intent
+
+## Expected Outcomes
+
+## Decisions Locked
+
+## Non-Goals / Stop Conditions
+
+## Problem Origin
+
+## Current Understanding
+
+## Remaining Uncertainty
+
+## Superseded Understanding
+
+## Executor Guidance
+
+## Likely Blind Spots
+
+## Verification Contract
+
+## Context Pointers
+
+```
 
 ## Quality Bar
 
@@ -235,3 +231,5 @@ A good task bookmark:
 * Supports effective resumption after a fresh session.
 
 If a future executor can resume confidently and effectively without rereading the entire history of the work, the task is doing its job.
+
+
