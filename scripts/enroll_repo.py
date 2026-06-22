@@ -20,6 +20,14 @@ MANIFEST_VERSION = 1
 REGISTRY_VERSION = 1
 SUPPORTED_SURFACES = {
     "claude": Path(".claude/skills"),
+    "opencode": Path(".opencode/skills"),
+}
+DEFAULT_SURFACES = ("claude", "opencode")
+RETIRED_SKILLS = {
+    "agent-os-bootstrap": (
+        "Shared bootstrap was removed. Executor skills that need Agent OS context should read "
+        ".agent-os.json directly."
+    ),
 }
 REQUIRED_MANIFEST_KEYS = (
     "version",
@@ -50,6 +58,15 @@ class PlannedManifest:
     detail: str
 
 
+@dataclass
+class PlannedRetiredSkill:
+    surface: str
+    skill_name: str
+    target_dir: Path
+    state: str
+    detail: str
+
+
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[1]
 
@@ -72,6 +89,14 @@ def dedupe(values: list[str]) -> list[str]:
     return result
 
 
+def path_lexists(path: Path) -> bool:
+    try:
+        path.stat(follow_symlinks=False)
+    except FileNotFoundError:
+        return False
+    return True
+
+
 def file_hash(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -89,13 +114,13 @@ def directory_file_manifest(path: Path) -> dict[str, str]:
 
 
 def is_reparse_directory(path: Path) -> bool:
-    if path.is_symlink() or not path.exists():
+    if path.is_symlink() or not path_lexists(path):
         return False
     try:
         attributes = path.stat(follow_symlinks=False).st_file_attributes
     except (AttributeError, FileNotFoundError):
         return False
-    return bool(attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT) and path.is_dir()
+    return bool(attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT) and (path.is_dir() or not path.exists())
 
 
 def read_json(path: Path) -> dict | list | None:
@@ -134,8 +159,29 @@ def ensure_skill_source(agent_os_path: Path, skill_name: str) -> Path:
     return skill_dir
 
 
+def split_retired_skills(skills: list[str]) -> tuple[list[str], list[str]]:
+    active: list[str] = []
+    retired: list[str] = []
+    for skill_name in dedupe(skills):
+        if skill_name in RETIRED_SKILLS:
+            retired.append(skill_name)
+        else:
+            active.append(skill_name)
+    return active, retired
+
+
+def normalize_surfaces(surfaces: list[str]) -> list[str]:
+    normalized = dedupe(surfaces)
+    for surface in normalized:
+        ensure_supported_surface(surface)
+    for surface in DEFAULT_SURFACES:
+        if surface not in normalized:
+            normalized.append(surface)
+    return normalized
+
+
 def classify_manifest(manifest_path: Path, agent_os_path: Path) -> PlannedManifest:
-    if not manifest_path.exists() and not manifest_path.is_symlink():
+    if not path_lexists(manifest_path):
         return PlannedManifest(manifest_path, "missing", "manifest does not exist yet")
 
     payload = read_json(manifest_path)
@@ -167,7 +213,7 @@ def classify_skill_target(
     source_dir: Path,
     skill_name: str,
 ) -> tuple[str, str, bool, str | None]:
-    if not target_dir.exists() and not target_dir.is_symlink():
+    if not path_lexists(target_dir):
         return ("missing", "skill alias path does not exist yet", False, None)
 
     if target_dir.is_symlink():
@@ -228,6 +274,53 @@ def classify_skill_target(
         "existing local skill copy differs from the canonical source and will be replaced with a live alias on apply",
         False,
         f"{target_dir} diverged from canonical and will be auto-replaced with the live alias.",
+    )
+
+
+def classify_retired_skill_target(target_dir: Path, skill_name: str, agent_os_path: Path) -> tuple[str, str]:
+    expected_source_dir = (agent_os_path / "skills" / skill_name).resolve()
+    if not path_lexists(target_dir):
+        return ("missing", "retired skill alias path does not exist")
+
+    if target_dir.is_symlink():
+        try:
+            resolved = target_dir.resolve(strict=True)
+        except FileNotFoundError:
+            return ("managed", "retired skill alias is a broken symlink and will be removed on sync")
+        if resolved == expected_source_dir:
+            return ("managed", "retired skill alias points at the canonical retired skill and will be removed on sync")
+        return ("conflict", f"skill alias path is a symlink to a different target: {resolved}")
+
+    if is_reparse_directory(target_dir):
+        try:
+            resolved = target_dir.resolve(strict=True)
+        except FileNotFoundError:
+            return ("managed", "retired skill alias is a broken junction and will be removed on sync")
+        if resolved == expected_source_dir:
+            return ("managed", "retired skill alias points at the canonical retired skill and will be removed on sync")
+        return ("conflict", f"skill alias path is a junction to a different target: {resolved}")
+
+    if target_dir.is_file():
+        return ("conflict", "retired skill alias path is a file")
+
+    if not target_dir.is_dir():
+        return ("conflict", "retired skill alias path uses an unsupported filesystem type")
+
+    skill_file = target_dir / "SKILL.md"
+    if not skill_file.is_file():
+        entries = sorted(child.name for child in target_dir.iterdir())
+        return (
+            "conflict",
+            "retired skill directory does not contain SKILL.md; entries: " + ", ".join(entries[:5]),
+        )
+
+    local_skill_name = parse_skill_name(skill_file)
+    if local_skill_name == skill_name:
+        return ("managed", "retired local skill copy will be removed on sync")
+
+    return (
+        "conflict",
+        f"retired skill directory declares a different skill name: {local_skill_name or 'missing'}",
     )
 
 
@@ -329,6 +422,8 @@ def remove_path(path: Path) -> None:
     if path.is_dir():
         shutil.rmtree(path)
         return
+    if not path_lexists(path):
+        return
     raise RuntimeError(f"Cannot remove unsupported path type: {path}")
 
 
@@ -372,16 +467,16 @@ def install_skill_alias(planned_skill: PlannedSkill, dry_run: bool, link_mode: s
 
     planned_skill.target_dir.parent.mkdir(parents=True, exist_ok=True)
     temp_target = planned_skill.target_dir.parent / f".{planned_skill.target_dir.name}.agent-os-tmp"
-    if temp_target.exists() or temp_target.is_symlink():
+    if path_lexists(temp_target):
         remove_path(temp_target)
 
     actual_link_mode = create_directory_link(planned_skill.source_dir, temp_target, link_mode)
     try:
-        if planned_skill.target_dir.exists() or planned_skill.target_dir.is_symlink():
+        if path_lexists(planned_skill.target_dir):
             remove_path(planned_skill.target_dir)
         temp_target.replace(planned_skill.target_dir)
     except Exception:
-        if temp_target.exists() or temp_target.is_symlink():
+        if path_lexists(temp_target):
             remove_path(temp_target)
         raise
     return actual_link_mode
@@ -442,16 +537,55 @@ def build_skill_plan(
     return planned
 
 
+def build_retired_skill_plan(
+    *,
+    repo_path: Path,
+    agent_os_path: Path,
+    skills: list[str],
+    surfaces: list[str],
+) -> list[PlannedRetiredSkill]:
+    planned: list[PlannedRetiredSkill] = []
+    for surface in surfaces:
+        ensure_supported_surface(surface)
+        for skill_name in skills:
+            target_dir = repo_path / SUPPORTED_SURFACES[surface] / skill_name
+            state, detail = classify_retired_skill_target(target_dir, skill_name, agent_os_path)
+            planned.append(
+                PlannedRetiredSkill(
+                    surface=surface,
+                    skill_name=skill_name,
+                    target_dir=target_dir,
+                    state=state,
+                    detail=detail,
+                )
+            )
+    return planned
+
+
 def write_manifest(manifest_path: Path, payload: dict, dry_run: bool) -> None:
     if dry_run:
         return
     manifest_path.write_text(render_manifest(payload), encoding="utf-8")
 
 
-def has_conflicts(manifest_plan: PlannedManifest, skill_plan: list[PlannedSkill]) -> bool:
+def apply_retired_skill_cleanup(retired_skill_plan: list[PlannedRetiredSkill], dry_run: bool) -> None:
+    if dry_run:
+        return
+    for item in retired_skill_plan:
+        if item.state == "managed" and path_lexists(item.target_dir):
+            remove_path(item.target_dir)
+
+
+def has_conflicts(
+    manifest_plan: PlannedManifest,
+    skill_plan: list[PlannedSkill],
+    retired_skill_plan: list[PlannedRetiredSkill],
+) -> bool:
     if manifest_plan.state == "conflict":
         return True
-    return any(item.state == "conflict" for item in skill_plan)
+    return any(item.state == "conflict" for item in skill_plan) or any(
+        item.state == "conflict" for item in retired_skill_plan
+    )
 
 
 def print_plan(
@@ -459,6 +593,7 @@ def print_plan(
     repo_path: Path,
     manifest_plan: PlannedManifest,
     skill_plan: list[PlannedSkill],
+    retired_skill_plan: list[PlannedRetiredSkill],
     new_ignore_entries: list[str],
     git_repo_detected: bool,
     dry_run: bool,
@@ -471,6 +606,10 @@ def print_plan(
     for item in skill_plan:
         live_flag = "yes" if item.live_updates else "no"
         print(f"  - {item.surface}:{item.skill_name}: {item.state} - {item.detail} [live updates: {live_flag}]")
+    if retired_skill_plan:
+        print("Retired skill aliases:")
+        for item in retired_skill_plan:
+            print(f"  - {item.surface}:{item.skill_name}: {item.state} - {item.detail}")
     if new_ignore_entries:
         print("Gitignore additions:")
         for entry in new_ignore_entries:
@@ -484,8 +623,14 @@ def print_plan(
             print(f"  - {notice}")
 
 
-def live_update_guarantee(manifest_plan: PlannedManifest, skill_plan: list[PlannedSkill]) -> bool:
+def live_update_guarantee(
+    manifest_plan: PlannedManifest,
+    skill_plan: list[PlannedSkill],
+    retired_skill_plan: list[PlannedRetiredSkill],
+) -> bool:
     if manifest_plan.state != "managed":
+        return False
+    if retired_skill_plan:
         return False
     return all(item.state == "managed" and item.live_updates for item in skill_plan)
 
@@ -526,13 +671,14 @@ def perform_enroll(args: argparse.Namespace) -> int:
         raise SystemExit(f"Repo path does not exist: {repo_path}")
     registry = load_registry()
 
-    skills = dedupe(args.skill)
-    if args.include_bootstrap and "agent-os-bootstrap" not in skills:
-        skills.append("agent-os-bootstrap")
+    requested_skills = dedupe(args.skill)
+    if args.include_bootstrap:
+        requested_skills.append("agent-os-bootstrap")
+    skills, retired_skills = split_retired_skills(requested_skills)
     if not skills:
-        raise SystemExit("At least one --skill is required")
+        raise SystemExit("At least one supported --skill is required")
 
-    surfaces = dedupe(args.surface or ["claude"])
+    surfaces = normalize_surfaces(args.surface)
     requested_link_mode = args.link_mode
     if requested_link_mode == "auto":
         requested_link_mode = str(registry.get("device_defaults", {}).get("link_mode", "auto"))
@@ -555,12 +701,19 @@ def perform_enroll(args: argparse.Namespace) -> int:
         skills=skills,
         surfaces=surfaces,
     )
+    retired_skill_plan = build_retired_skill_plan(
+        repo_path=repo_path,
+        agent_os_path=agent_os_path,
+        skills=retired_skills,
+        surfaces=surfaces,
+    )
 
-    if has_conflicts(manifest_plan, skill_plan):
+    if has_conflicts(manifest_plan, skill_plan, retired_skill_plan):
         print_plan(
             repo_path=repo_path,
             manifest_plan=manifest_plan,
             skill_plan=skill_plan,
+            retired_skill_plan=retired_skill_plan,
             new_ignore_entries=[],
             git_repo_detected=(repo_path / ".git").exists(),
             dry_run=True,
@@ -575,15 +728,19 @@ def perform_enroll(args: argparse.Namespace) -> int:
         repo_path=repo_path,
         manifest_plan=manifest_plan,
         skill_plan=skill_plan,
+        retired_skill_plan=retired_skill_plan,
         new_ignore_entries=new_ignore_entries,
         git_repo_detected=(repo_path / ".git").exists(),
         dry_run=args.dry_run,
     )
+    for skill_name in retired_skills:
+        print(f"Notice: {skill_name} is retired and will not be installed. {RETIRED_SKILLS[skill_name]}")
 
     if args.dry_run:
         return 0
 
     write_manifest(manifest_path, manifest_payload, dry_run=False)
+    apply_retired_skill_cleanup(retired_skill_plan, dry_run=False)
     actual_link_mode = requested_link_mode
     for planned_skill in skill_plan:
         previous_link_mode = actual_link_mode
@@ -616,8 +773,8 @@ def perform_sync(args: argparse.Namespace) -> int:
         agent_os_path=repo_root(),
         memory_enabled=bool(enrollment["memory_enabled"]),
     )
-    skills = dedupe(list(enrollment["skills"]))
-    surfaces = dedupe(list(enrollment["surfaces"]))
+    skills, retired_skills = split_retired_skills(list(enrollment["skills"]))
+    surfaces = normalize_surfaces(list(enrollment.get("surfaces", [])))
     link_mode = args.link_mode or str(enrollment.get("link_mode", "auto"))
     manifest_path = repo_path / ".agent-os.json"
     manifest_plan = classify_manifest(manifest_path, repo_root())
@@ -627,12 +784,19 @@ def perform_sync(args: argparse.Namespace) -> int:
         skills=skills,
         surfaces=surfaces,
     )
+    retired_skill_plan = build_retired_skill_plan(
+        repo_path=repo_path,
+        agent_os_path=repo_root(),
+        skills=retired_skills,
+        surfaces=surfaces,
+    )
 
-    if has_conflicts(manifest_plan, skill_plan):
+    if has_conflicts(manifest_plan, skill_plan, retired_skill_plan):
         print_plan(
             repo_path=repo_path,
             manifest_plan=manifest_plan,
             skill_plan=skill_plan,
+            retired_skill_plan=retired_skill_plan,
             new_ignore_entries=[],
             git_repo_detected=(repo_path / ".git").exists(),
             dry_run=True,
@@ -647,15 +811,19 @@ def perform_sync(args: argparse.Namespace) -> int:
         repo_path=repo_path,
         manifest_plan=manifest_plan,
         skill_plan=skill_plan,
+        retired_skill_plan=retired_skill_plan,
         new_ignore_entries=new_ignore_entries,
         git_repo_detected=(repo_path / ".git").exists(),
         dry_run=args.dry_run,
     )
+    for skill_name in retired_skills:
+        print(f"Notice: Sync will remove retired skill '{skill_name}'. {RETIRED_SKILLS[skill_name]}")
 
     if args.dry_run:
         return 0
 
     write_manifest(manifest_path, manifest_payload, dry_run=False)
+    apply_retired_skill_cleanup(retired_skill_plan, dry_run=False)
     actual_link_mode = link_mode
     for planned_skill in skill_plan:
         previous_link_mode = actual_link_mode
@@ -681,8 +849,8 @@ def perform_verify(args: argparse.Namespace) -> int:
     if not isinstance(enrollment, dict):
         raise SystemExit(f"No enrollment record found for repo: {repo_path}")
 
-    skills = dedupe(list(enrollment["skills"]))
-    surfaces = dedupe(list(enrollment["surfaces"]))
+    skills, retired_skills = split_retired_skills(list(enrollment["skills"]))
+    surfaces = normalize_surfaces(list(enrollment.get("surfaces", [])))
     manifest_plan = classify_manifest(repo_path / ".agent-os.json", repo_root())
     skill_plan = build_skill_plan(
         repo_path=repo_path,
@@ -690,18 +858,27 @@ def perform_verify(args: argparse.Namespace) -> int:
         skills=skills,
         surfaces=surfaces,
     )
+    retired_skill_plan = build_retired_skill_plan(
+        repo_path=repo_path,
+        agent_os_path=repo_root(),
+        skills=retired_skills,
+        surfaces=surfaces,
+    )
     print_plan(
         repo_path=repo_path,
         manifest_plan=manifest_plan,
         skill_plan=skill_plan,
+        retired_skill_plan=retired_skill_plan,
         new_ignore_entries=[],
         git_repo_detected=(repo_path / ".git").exists(),
         dry_run=True,
     )
-    guarantee = live_update_guarantee(manifest_plan, skill_plan)
+    for skill_name in retired_skills:
+        print(f"Notice: Retired skill '{skill_name}' is still recorded for this repo. Run sync to remove it.")
+    guarantee = live_update_guarantee(manifest_plan, skill_plan, retired_skill_plan)
     print(f"Live update guarantee: {'yes' if guarantee else 'no'}")
     if not guarantee:
-        print("Run enroll or sync to replace copied skill directories with live aliases and repair any missing links.")
+        print("Run enroll or sync to replace copied skill directories, remove retired skill aliases, and repair any missing links.")
         return 2
     return 0
 
@@ -722,13 +899,13 @@ def build_parser() -> argparse.ArgumentParser:
         "--surface",
         action="append",
         default=[],
-        help="Repo-local skill surface to manage. Defaults to 'claude', which OpenCode also discovers.",
+        help="Repo-local skill surface to manage. Steward sync converges enrollments onto both 'claude' and 'opencode'.",
     )
     enroll.add_argument(
         "--include-bootstrap",
         action=argparse.BooleanOptionalAction,
-        default=True,
-        help="Also install agent-os-bootstrap. Enabled by default.",
+        default=False,
+        help=argparse.SUPPRESS,
     )
     enroll.add_argument(
         "--memory-enabled",

@@ -1,6 +1,6 @@
 # Memory Pilot
 
-**Last Updated:** 2026-06-20
+**Last Updated:** 2026-06-21
 
 **Status:** Current
 
@@ -17,7 +17,7 @@
 - Creating a new `topic_key` requires explicit human approval.
 - Executor memory behavior is an active recall and conservative capture layer, not transcript storage or task logging.
 - Source code, tests, docs, and active task files remain the better surfaces when they already own the information.
-- Executor-facing memory behavior lives in `skills/agent-os-memory/SKILL.md`, not in `agent-os-bootstrap`.
+- Executor-facing memory behavior lives in `skills/agent-os-memory/SKILL.md`, which reads `.agent-os.json` directly when memory is enabled.
 
 ### Scope
 
@@ -25,8 +25,7 @@ This document covers the canonical memory ledger, derived search/index outputs, 
 
 ### Not Here
 
-- Consumer-repo enrollment mechanics
-- Bootstrap manifest hydration rules
+- Consumer-repo enrollment mechanics beyond the memory opt-in boundary
 - Task-level decisions about which new topics should actually be created
 
 ### Current Contract
@@ -93,7 +92,6 @@ Each JSONL row stores one immutable memory revision with these fields:
 | Repo architecture | `README.md` | Top-level orientation and durable system boundaries. |
 | Steward contract | `AGENTS.md` | Governs append-only behavior and human approval rules. |
 | Consumer repo integration | `docs/consumer-repo-enrollment.md` | Defines how consumer repos opt into memory-enabled executor behavior. |
-| Executor bootstrap skill | `skills/agent-os-bootstrap/SKILL.md` | Hydrates `memory_enabled`, `scope`, and `scope_id` for executor use. |
 | Executor memory skill | `skills/agent-os-memory/SKILL.md` | Tells executors how to use memory without direct storage internals. |
 | Steward memory script | `scripts/memory.py` | Implements list/search/write/reindex flows and the topic approval gate. |
 | Active memory task | `tasks/2026-06-19__agent-os-memory-real-repo-validation-bookmark.md` | Tracks the next real enrolled-repo validation pass for the memory pilot. |

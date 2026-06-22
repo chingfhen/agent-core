@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-06-20
+**Last Updated:** 2026-06-21
 
 **Status:** Current
 
@@ -13,8 +13,8 @@
 - You are the steward agent when working in this repo.
 - `skills/` is the hand-edited production source for executor agents.
 - Consumer repos are enrolled per device; do not hand-maintain consumer-repo skill copies.
-- `agent-os-bootstrap` is a thin manifest-hydration skill; executor agents should use local aliases without being taught canonical provenance.
-- The first shared project-local alias surface is `.claude/skills/*`; Claude uses it natively and OpenCode also discovers it.
+- There is no shared executor bootstrap skill; executor skills that need Agent OS repo context should read `.agent-os.json` directly.
+- The shared project-local alias surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
 - On Windows, prefer directory symlinks but fall back to directory junctions when symlink privileges are unavailable.
 - Symlinks and directory junctions both satisfy the live-update guarantee; copied local skill directories do not.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed repo enrollment details.
@@ -50,13 +50,12 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - **Executor agent:** Agent working inside another repo that consumes Agent OS capabilities.
 - **Consumer repo:** Any non-`agent-os` repo that participates in this system.
 - Canonical surfaces are `skills/`, steward docs such as `README.md`, `AGENTS.md`, and `docs/**/*.md`, plus the append-only memory ledger `memory/memories.jsonl`.
-- Generated surfaces include consumer-repo-local `.agent-os.json`, consumer-repo-local `.claude/skills/*` aliases consumed by Claude and OpenCode, future harness-native aliases only where they add distinct value, device-local steward enrollment state in `.agent-os-state/enrollments.json`, and derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md`.
+- Generated surfaces include consumer-repo-local `.agent-os.json`, consumer-repo-local `.claude/skills/*` and `.opencode/skills/*` aliases, future harness-native aliases only where they add distinct value, device-local steward enrollment state in `.agent-os-state/enrollments.json`, and derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 - Do not add tracked `.opencode`, `.claude`, or `.codex` production copies to this repo.
 - Consumer repos are enrolled per device by steward workflows; this repo does not depend on editing consumer-repo `AGENTS.md`.
-- `skills/agent-os-bootstrap/SKILL.md` is the executor bootstrap skill in the canonical production store.
-- `agent-os-bootstrap` should only teach executors to read `.agent-os.json` and hydrate repo identity, scope, memory availability, and repo-local Agent OS settings.
+- Executor skills that need manifest context should read `.agent-os.json` directly rather than relying on a shared bootstrap layer.
 - Executor agents should consume repo-local skill aliases as ordinary repo skills; they do not need canonical/source-provenance explanation.
-- OpenCode discovers `.claude/skills/*`, so do not duplicate the same skill names under `.opencode/skills/*` unless the contract changes.
+- Keep `.claude/skills/*` and `.opencode/skills/*` aligned during enroll and sync so Claude and OpenCode receive the same canonical skill set.
 - The trusted steady state is live aliasing to canonical skills; copied local skill directories are only transitional and should be replaced during enroll or sync.
 - Default ignore behavior in consumer repos is `.agent-os.json` plus exact managed alias paths, unless a broader existing ignore already covers them.
 - Memory remains a pilot: append-only JSONL is canonical truth, generated search/index artifacts are disposable, and active/superseded state is derived rather than rewritten into prior rows.
@@ -68,7 +67,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 ### Steward Rules
 
 - Keep `skills/` production-ready and hand-edited.
-- Keep shared bootstrap behavior in canonical skills rather than consumer-repo-local guidance.
+- Keep manifest reads local to the executor skills that actually need them; do not reintroduce a shared bootstrap skill unless multiple active workflows truly require one.
 - Sync durable architecture into `README.md`; keep this file concise and operational.
 - Put active execution context in `tasks/`.
 - Prefer single-file Python scripts with PEP 723 metadata and run them with `uv`.
@@ -81,7 +80,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - Replace matching local skill directories with live aliases automatically and surface a human-visible notice.
 - Remember the working device link mode locally so future enrollments can skip known-failing symlink probes.
 - Gitignore `.agent-os.json` and exact managed alias paths by default unless a broader existing ignore already covers them.
-- Keep `agent-os-bootstrap` thin and move memory behavior into separate future skills.
+- Keep memory behavior in `agent-os-memory`; do not add a new shared bootstrap layer unless the real executor workflows justify it.
 - Keep memory operations append-only; prefer write/supersede plus generated reindexing over delete or edit-in-place flows.
 - Route memory reads and writes through `uv run scripts/memory.py` rather than direct ledger edits.
 - Use `uv run scripts/enroll_repo.py verify --repo <path>` when you need to confirm the live update guarantee quickly.
@@ -93,7 +92,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | Durable explanation of what this repo is and how it is structured. |
 | Memory-routing template | `docs/autonomous-state-and-memory-routing.md` | Canonical reusable wording for the durable-memory routing policy applied in this repo and future repos. |
-| Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for enrollment, alias installs, ignore rules, and bootstrap scope. |
+| Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for enrollment, alias installs, ignore rules, and manifest-consumer behavior. |
 | Memory pilot contract | `docs/memory-pilot.md` | Defines the ledger schema, approval boundary, and steward memory tooling. |
 | Enrollment script | `scripts/enroll_repo.py` | Implements enrollment, repair, local registry updates, and Windows link fallback behavior. |
 | Memory script | `scripts/memory.py` | Implements list/search/write/reindex over the append-only memory ledger. |
