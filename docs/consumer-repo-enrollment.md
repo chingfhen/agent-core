@@ -12,7 +12,7 @@
 
 - Consumer repos are enrolled per device by steward workflows, not by manual repo editing.
 - The steward-managed local skill surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
-- New enrollments install the default consumer-repo skill set: `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`. All other canonical skills are opt-in with `--skill`.
+- New enrollments install the default consumer-repo skill set: `yagni-review`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, `grilling`, and `diagram-generation`. All other canonical skills are opt-in with `--skill`.
 - Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
@@ -43,11 +43,13 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 #### Default Enrollment Skill Set
 
 - `yagni-review`
+- `yagni`
 - `project-docs`
 - `project-tasks`
 - `manage-python-uv`
 - `agent-os-memory`
 - `grilling`
+- `diagram-generation`
 - All other canonical skills install only when explicitly requested with `--skill`.
 
 #### Generated Consumer-Repo Surfaces
@@ -166,6 +168,7 @@ Example:
 | 2026-06-19 | Managed ignore rules default to exact alias paths. | Narrow ignores avoid masking other repo-owned harness files. |
 | 2026-06-21 | Consumer repos do not receive a shared bootstrap skill. | Only `agent-os-memory` currently needs manifest context, so skill-local reads are simpler than a separate bootstrap layer. |
 | 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | The default set is `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`; all other skills stay opt-in via `--skill`. |
+| 2026-06-22 | Added `yagni` and `diagram-generation` to the default consumer-repo skill set; re-ran enroll for all four currently enrolled repos to apply it retroactively. | `diagram-generation` is a new canonical skill that should ship by default; `yagni` was added alongside it on the same request. |
 | 2026-06-21 | Shared local project skills sync to both `.claude/skills` and `.opencode/skills`. | Claude and OpenCode should each receive the same canonical skills through their native project-local discovery paths. |
 | 2026-06-19 | Windows enrollment defaults to symlink with junction fallback. | The first pilot lacked symlink privileges, so a non-destructive fallback was required to complete setup. |
 | 2026-06-19 | Device-local enrollment state lives in `.agent-os-state/enrollments.json`. | Repair runs need a local registry without tracked repo noise. |

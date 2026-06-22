@@ -25,11 +25,13 @@ SUPPORTED_SURFACES = {
 DEFAULT_SURFACES = ("claude", "opencode")
 DEFAULT_ENROLL_SKILLS = (
     "yagni-review",
+    "yagni",
     "project-docs",
     "project-tasks",
     "manage-python-uv",
     "agent-os-memory",
     "grilling",
+    "diagram-generation",
 )
 RETIRED_SKILLS = {
     "agent-os-bootstrap": (

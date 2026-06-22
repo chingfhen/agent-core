@@ -14,7 +14,7 @@
 - `skills/` is the hand-edited production source; consumer repos receive generated local skill aliases, not hand-maintained copies.
 - `AGENTS.md` is the authoritative operating contract for steward agents maintaining this repo.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed consumer-repo enrollment and local alias behavior.
-- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
+- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `yagni-review`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, `grilling`, and `diagram-generation` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
 - There is no shared executor bootstrap skill; any executor skill that needs Agent OS repo context reads `.agent-os.json` directly.
 - Steward-managed local skill aliases are installed under `.claude/skills` for Claude and `.opencode/skills` for OpenCode.
 - On Windows, enrollment prefers directory symlinks and falls back to directory junctions when symlink privileges are unavailable.

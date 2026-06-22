@@ -1,0 +1,14 @@
+flowchart TD
+
+Start([Run enroll_repo.py]) --> Preflight[Preflight each target path]
+Preflight --> Status{Path status?}
+
+Status -->|missing| Create[Create alias]
+Status -->|managed| Repair[Repair or replace alias]
+Status -->|conflict| Ask[Stop and ask human]
+
+Create --> Manifest[Write .agent-os.json]
+Repair --> Manifest
+Manifest --> Install[Install default skill set]
+Install --> Verify[Verify live aliases]
+Verify --> End([Enrollment complete])
