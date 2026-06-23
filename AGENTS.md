@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-23
 
 **Status:** Current
 
@@ -12,6 +12,8 @@
 
 - You are the steward agent when working in this repo.
 - `skills/` is the hand-edited production source for executor agents.
+- Do not update production workflow skills in `skills/` unless the human explicitly approves the skill edit.
+- Prefer autonomous durable guidance updates in `AGENTS.md` and `docs/` rather than changing production workflow skills.
 - Consumer repos are enrolled per device; do not hand-maintain consumer-repo skill copies.
 - There is no shared executor bootstrap skill; executor skills that need Agent OS repo context should read `.agent-os.json` directly.
 - The shared project-local alias surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
@@ -68,6 +70,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 ### Steward Rules
 
 - Keep `skills/` production-ready and hand-edited.
+- Do not edit production workflow skills autonomously; wait for explicit human approval before changing `skills/`.
 - Keep manifest reads local to the executor skills that actually need them; do not reintroduce a shared bootstrap skill unless multiple active workflows truly require one.
 - Sync durable architecture into `README.md`; keep this file concise and operational.
 - Put active execution context in `tasks/`.
