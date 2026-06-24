@@ -50,6 +50,8 @@ All execution goes through `uv run`.
 
 `uv` does not create `pyproject.toml` automatically just because you use `uv run`. A repo-level `pyproject.toml` appears when you intentionally initialize or manage a project in project mode.
 
+Do not assume `uv` means "full project mode." The default choice is the smaller correct workflow: use scripts-first for standalone helpers and move to project mode only when the repo clearly needs shared project-level Python management.
+
 ---
 
 # Project Discovery
@@ -78,6 +80,7 @@ Prefer the smaller correct workflow:
 
 - Use **scripts-first** when the repo only needs standalone utilities or steward scripts.
 - Use **project mode** when the repo needs shared dependencies, shared test/tool config, package metadata, or a committed lockfile.
+- Do **not** convert to project mode just because the repo uses Python or because `uv` is installed.
 
 ---
 
@@ -92,6 +95,12 @@ Choose scripts-first `uv run` when most of these are true:
 - There is no Python package/app structure yet
 - There is no clear need for shared dependency management across multiple modules/tests
 - There is no need yet for shared tool configuration in `pyproject.toml`
+
+Normal scripts-first state:
+
+- No repo-level `pyproject.toml`
+- No `uv.lock`
+- No repo-local `.venv/` to manage or commit
 
 Typical commands:
 
@@ -111,6 +120,8 @@ Choose project mode when any of these are true:
 - CI or teammates need a reproducible project environment
 - Tooling such as `pytest`, `ruff`, or `mypy` should be managed at the project level
 - The user explicitly asked to bootstrap a Python project
+
+Project mode is not the default. Use it when the repo has crossed from "a few scripts" into "a shared Python project."
 
 Typical command:
 
@@ -195,6 +206,16 @@ uv run ruff check .
 uv run mypy .
 ```
 
+`uv run` also supports `--env-file` for loading environment variables from a file before starting the command:
+
+```powershell
+uv run --env-file .env python app.py
+```
+
+This loads variables from `.env` into the launched process environment for that run only. It does not permanently modify the shell session.
+
+Use `--env-file` in either scripts-first or project mode when a script or app expects environment variables.
+
 One-off execution with an ad-hoc dependency (without adding it to the project):
 
 ```powershell
@@ -233,7 +254,7 @@ In project mode, CI must never update lockfiles — always use `uv sync --locked
 
 In project mode, `uv.lock` is source-controlled. Always commit it when present.
 
-In scripts-first mode, it is normal to have no `uv.lock` at all.
+In scripts-first mode, it is normal to have no `uv.lock` at all and no repo-local `.venv/`.
 
 | Do | Don't |
 |---|---|
@@ -285,7 +306,7 @@ uv.lock           # project mode only
 .python-version   # when intentionally pinned
 ```
 
-For scripts-first repos, it is valid to have no `pyproject.toml` and no `uv.lock` at all.
+For scripts-first repos, it is valid to have no `pyproject.toml`, no `uv.lock`, and no repo-local `.venv/` at all.
 
 ---
 

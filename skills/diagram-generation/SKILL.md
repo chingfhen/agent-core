@@ -53,7 +53,7 @@ File name: `diagrams/YYYY-MM-DD__kebab-case-name.mmd`. The date is an **immutabl
 
 Structure inside `diagrams/` beyond the root is the executing agent's call. Default to flat. Only introduce subfolders when the number of diagrams genuinely makes flat hard to scan, or when the user explicitly asks for a specific structure — in that case, follow exactly what was asked.
 
-Render an `.svg` alongside the source whenever `mmdc` is on `PATH` (see Tooling). Never let a missing renderer block producing the `.mmd` source — the source is the deliverable.
+Render an `.svg` alongside the source whenever `mmdc` is on `PATH` (see Tooling). Never let a missing renderer block producing the `.mmd` source — the source is the deliverable. When an existing `.mmd` file is updated, re-render its `.svg` immediately so the two never drift.
 
 ---
 
@@ -153,6 +153,53 @@ Instead of:
 
 ---
 
+## Structural vs Behavioral — Don't Mix
+
+A flowchart shows topology: which components exist and who calls whom. It does not show order.
+
+A sequenceDiagram shows order: who calls whom, and when, including loops and branches.
+
+Do not add ordering claims to a flowchart. A numbered edge label (`1. do X`, `2. do Y`) is an order claim. If a flowchart needs order, that's a sign the content belongs in a sequenceDiagram instead, where `loop` and `alt` blocks express it correctly.
+
+If a flowchart's layout itself implies an order it doesn't have (`flowchart LR` reads left-to-right as "first to last"), either keep left-to-right strictly chronological, or accept that this diagram doesn't claim order and let a sequence diagram own that question.
+
+---
+
+# Visual Language
+
+A diagram's visual encoding — line style, color, numbering — is itself information. Each encoding choice must carry exactly one meaning, declared once per diagram, and reused consistently. Never let one style mean two different things in the same diagram.
+
+## Line Styles
+
+Pick a small, fixed set of line styles before drawing, and make sure each one's meaning is recoverable from the diagram itself (a legend, or labels that make the distinction obvious). A common pattern for call-based diagrams:
+
+* solid arrow (`-->`) — a call that happens once
+* thick solid arrow (`==>`) — a call that repeats (polling, retries) until a condition resolves
+* dotted arrow (`-.->`) — asynchronous / out-of-band, not on the primary path being traced
+
+This is one example, not a mandate — the right vocabulary depends on what the diagram shows. What's not optional: three styles or fewer, one meaning each, never reused for a second meaning in the same diagram. If a diagram needs a fourth distinct call semantic, split the diagram rather than growing the line vocabulary.
+
+## Color / Fill Legend
+
+When using fills/colors to categorize nodes, render the legend inside the diagram itself — a small `Legend` subgraph or note with one labeled, colored swatch per category — rather than leaving the meaning only in chat history or an external doc. A reader should be able to decode the diagram without having seen the conversation that produced it.
+
+Define categories that fit the content of that specific diagram (by layer, by ownership, by trust boundary — whatever distinction matters there) rather than reusing another diagram's palette by default. A network diagram, a data model, and a state machine each need their own category set.
+
+Never reuse a color to mean "this part was wrong" or "this part changed" in a diagram meant as a durable reference — that meaning rots the moment the context that motivated it is forgotten. A "what changed" diagram is a different, disposable diagram type, not the reference diagram.
+
+## Edge and Node Text
+
+* Node text: name + one-line role, not a procedural description of what it does internally.
+* Edge text: verb + key payload, five words or fewer. Full sentences belong in chat or a doc, not on the canvas.
+
+## Numbering vs. Trigger Conditions
+
+Don't number edges in a flowchart to show order — that's a sequence diagram's job (see Structural vs Behavioral, above). Partial numbering (some edges numbered, most not) is worse than none: it implies a complete ordering that isn't there.
+
+If an edge's firing depends on something else happening first, say so in that edge's own label instead of numbering it — e.g. `runs once upstream check passes` rather than `2. run check`. This expresses a local precondition (real structural information) without making a global step-count claim the diagram type can't back up.
+
+---
+
 # Mermaid Guidelines
 
 ## Flowcharts (architecture and workflows)
@@ -247,6 +294,8 @@ Before finalizing any diagram:
 * Are decision points visible?
 * Is the sequence or relationship unambiguous?
 * Is the diagram understandable in under 30 seconds, without asking questions?
+* Does every line style and color carry exactly one meaning, declared in a legend?
+* Are structural (topology) and temporal (order) information kept in separate diagrams, with no numbering smuggled into the structural one?
 
 If not, simplify.
 
