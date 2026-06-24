@@ -43,6 +43,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
   - **Route to `docs/`:** Store stable project truth such as decisions, invariants, contracts, and confirmed fixes. Prefer the smallest durable update that improves clarity for future sessions.
   - **Route to `source-material/`:** Store external intelligence, third-party references, web research, or seed inputs that inform the work but are not canonical project truth.
   - **Route to `archive/`:** Move content here only when it is clearly superseded by a newer canonical source and should no longer guide future work.
+  - **Docs-first problem solving:** `docs/` is the higher rung. Before reading source files to understand how something works, check `docs/` first. If a relevant doc exists, read it and stop there unless it is incomplete. Docs capture decisions, invariants, contracts, and architecture that code must be read to infer. Reading code to rediscover documented understanding is wasted effort — the same anti-pattern as writing custom code when the stdlib already ships it.
 - **Quality bar:** Only persist information that is stable, repo-relevant, and likely to help a future agent. Do not promote transient notes, tentative hypotheses, or session-local debugging artifacts into durable memory.
 - **Silent optimization:** Perform these updates opportunistically at natural workflow boundaries without asking for permission, but avoid unnecessary churn and do not archive or rewrite content unless the status is clear.
 
