@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-06-23
+**Last Updated:** 2026-06-26
 
 **Status:** Current
 
@@ -13,14 +13,15 @@
 - You are the steward agent when working in this repo.
 - `skills/` is the hand-edited production source for executor agents.
 - Do not update production workflow skills in `skills/` unless the human explicitly approves the skill edit.
-- Prefer autonomous durable guidance updates in `AGENTS.md` and `docs/` rather than changing production workflow skills.
+- Prefer autonomous durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` rather than changing production workflow skills.
 - Consumer repos are enrolled per device; do not hand-maintain consumer-repo skill copies.
 - There is no shared executor bootstrap skill; executor skills that need Agent OS repo context should read `.agent-os.json` directly.
 - The shared project-local alias surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
 - On Windows, prefer directory symlinks but fall back to directory junctions when symlink privileges are unavailable.
 - Symlinks and directory junctions both satisfy the live-update guarantee; copied local skill directories do not.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed repo enrollment details.
-- `docs/autonomous-state-and-memory-routing.md` holds the reusable canonical wording for memory-routing instructions used in this repo and future repos.
+- `prompts/` holds canonical reusable prompt snippets and policy blocks steward agents manage.
+- `prompts/autonomous-state-and-memory-routing.md` holds the reusable canonical wording for memory-routing instructions used in this repo and future repos.
 - `README.md` holds the durable repo architecture; keep this file focused on operating rules.
 - `source-material/initialize.md` is seed input kept for reference, not the ongoing source of truth.
 - Use `tasks/` for active execution handoff, not durable architecture.
@@ -52,7 +53,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - **Steward agent:** Agent working inside `~/agent-os` to maintain the system itself.
 - **Executor agent:** Agent working inside another repo that consumes Agent OS capabilities.
 - **Consumer repo:** Any non-`agent-os` repo that participates in this system.
-- Canonical surfaces are `skills/`, steward docs such as `README.md`, `AGENTS.md`, and `docs/**/*.md`, plus the append-only memory ledger `memory/memories.jsonl`.
+- Canonical surfaces are `skills/`, steward docs such as `README.md`, `AGENTS.md`, `docs/**/*.md`, and `prompts/**/*.md`, plus the append-only memory ledger `memory/memories.jsonl`.
 - Generated surfaces include consumer-repo-local `.agent-os.json`, consumer-repo-local `.claude/skills/*` and `.opencode/skills/*` aliases, future harness-native aliases only where they add distinct value, device-local steward enrollment state in `.agent-os-state/enrollments.json`, and derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 - Do not add tracked `.opencode`, `.claude`, or `.codex` production copies to this repo.
 - Consumer repos are enrolled per device by steward workflows; this repo does not depend on editing consumer-repo `AGENTS.md`.
@@ -96,7 +97,8 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | Durable explanation of what this repo is and how it is structured. |
-| Memory-routing template | `docs/autonomous-state-and-memory-routing.md` | Canonical reusable wording for the durable-memory routing policy applied in this repo and future repos. |
+| Prompt library | `prompts/` | Canonical reusable prompt snippets and policy blocks steward agents manage. |
+| Memory-routing template | `prompts/autonomous-state-and-memory-routing.md` | Canonical reusable wording for the durable-memory routing policy applied in this repo and future repos. |
 | Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for enrollment, alias installs, ignore rules, and manifest-consumer behavior. |
 | Memory pilot contract | `docs/memory-pilot.md` | Defines the ledger schema, approval boundary, and steward memory tooling. |
 | Enrollment script | `scripts/enroll_repo.py` | Implements enrollment, repair, local registry updates, and Windows link fallback behavior. |

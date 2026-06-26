@@ -1,6 +1,6 @@
 # Agent OS
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-26
 
 **Status:** Current
 
@@ -12,6 +12,7 @@
 
 - `~/agent-os` is the canonical repo for centralized production skills and the current cautious cross-project memory pilot.
 - `skills/` is the hand-edited production source; consumer repos receive generated local skill aliases, not hand-maintained copies.
+- `prompts/` holds canonical reusable prompt snippets and policy blocks steward agents can reuse across repos and workflows.
 - `AGENTS.md` is the authoritative operating contract for steward agents maintaining this repo.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed consumer-repo enrollment and local alias behavior.
 - Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `yagni-review`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, `grilling`, and `diagram-generation` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
@@ -45,6 +46,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - `docs/**/*.md`
 - `README.md`
 - `AGENTS.md`
+- `prompts/**/*.md`
 - `memory/memories.jsonl`
 - `repo-profiles/*`
 - `scripts/*`
@@ -82,6 +84,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 
 - `tasks/` holds active execution handoff and fresh-session continuity.
 - `docs/`, `README.md`, and `AGENTS.md` hold durable repo truth.
+- `prompts/` holds canonical reusable prompt snippets and policy blocks.
 - `source-material/` holds non-canonical seed inputs and supporting artifacts that may still inform later work.
 - `archive/` is the home for retired historical reference material that should not drive current truth by default.
 
@@ -122,6 +125,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
 | Steward contract | `AGENTS.md` | Governs how agents maintain this repo. |
+| Prompt library | `prompts/` | Canonical reusable prompt snippets and policy blocks steward agents manage. |
 | Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for steward-managed repo enrollment and executor-facing local aliases. |
 | Memory pilot contract | `docs/memory-pilot.md` | Canonical contract for the append-only ledger, derived artifacts, and approval boundary. |
 | Enrollment script | `scripts/enroll_repo.py` | Writes `.agent-os.json`, manages local aliases, updates ignore rules, and records local enrollment state. |
