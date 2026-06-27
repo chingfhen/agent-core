@@ -15,6 +15,7 @@ A task bookmark should preserve whatever the next executor cannot reliably recon
 
 *   **`project-tasks` owns active execution state**, orchestration context, and fresh-session handoff briefs.
 *   **`project-docs` owns durable project knowledge** and continuously absorbs stable truths throughout execution.
+*   **`ai_video_saas/docs/backlog/` owns deferred future-work briefs** that should survive without becoming active execution state.
 *   **`source-material/` holds supporting artifacts** that may still inform work without becoming canonical truth.
 *   **`archive/` holds historical material** that is kept for reference but should not drive current execution by default.
 *   **Task files preserve alignment**, evolving understanding, important uncertainty, and execution context.
@@ -87,7 +88,7 @@ Use only these explicit fields:
 *   Closed tasks are **not automatically deleted**.
 *   **Target Docs** are routing hints, not contracts.
 *   **Preserve uncertainty honestly.** Do not write uncertain claims as established fact.
-*   Do not turn `tasks/` into a general archive; move durable truth to `docs/`, supporting artifacts to `source-material/`, and retired historical material to `archive/`.
+*   Do not turn `tasks/` into a general archive or backlog; move durable truth to `docs/`, deferred future-work briefs to `ai_video_saas/docs/backlog/`, supporting artifacts to `source-material/`, and retired historical material to `archive/`.
 
 ## Adaptive Structure
 
@@ -181,6 +182,7 @@ Use when preserving goals, creating work, or preparing future execution.
 *   Capture alignment decisions from the conversation.
 *   Record only the context future executors cannot reconstruct.
 *   Include Expected Outcomes and guidance only when they change execution quality or order matters.
+*   If the work is intentionally deferred with no active next action, route it to `ai_video_saas/docs/backlog/` via `project-docs` instead of creating a task bookmark.
 
 Done when a future executor can start without asking what the work is, why it matters, what success means, or what to do next.
 

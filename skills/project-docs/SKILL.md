@@ -16,6 +16,7 @@ Optimize documentation and agent guidance for future agent sessions by preservin
 
 * **`project-docs` owns durable project knowledge and long-term agent behavior.**
 * **Active tasks in `tasks/` own execution state** and fresh-session handoff.
+* **`ai_video_saas/docs/backlog/` owns deferred future-work briefs** that should survive without becoming active task state.
 * **`source-material/` holds supporting artifacts and source evidence**, not authority.
 * **`archive/` holds historical reference material**, not current truth.
 * A document should answer **one durable question well**.
@@ -74,6 +75,13 @@ Before persisting knowledge, ask:
 * **Owns:** Active execution state, Current progress, Session handoff, Work remaining, Investigations still in flight.
 * **Default home:** `tasks/`
 
+### Backlog Reports
+* **Answers:** What deferred future work should survive without becoming active task state or canonical runtime truth?
+* **Default home:** `ai_video_saas/docs/backlog/`
+* *Examples:* Deferred feature briefs, future integrations, later opportunities, and preserve-for-later execution notes.
+* Use dated filenames: `YYYY-MM-DD__kebab-case-bookmark.md`.
+* `ai_video_saas/docs/backlog.md`, if present, should stay a thin index or summary.
+
 ### Source Material
 * **Answers:** What supporting artifacts or inputs should remain available without becoming canonical truth?
 * **Default home:** `source-material/`
@@ -110,6 +118,7 @@ Docs should answer **what future agents should act on**, not everything that hap
 * **Improve existing docs** before creating new ones.
 * **Use README and agent guidance files intentionally** rather than duplicating information elsewhere.
 * **Do not let `source-material/` or `archive/` silently become canonical documentation.**
+* **Do not let `ai_video_saas/docs/backlog/` become active task state, a raw research dump, or a general archive.**
 
 ---
 
@@ -208,6 +217,7 @@ Use when durable knowledge changes, or when the user asks to update or sync know
 * Distill evidence into conclusions and decisions.
 * Choose the canonical home.
 * Route project truth to docs.
+* Route deferred future-feature briefs and preserve-for-later execution notes to `ai_video_saas/docs/backlog/` when they should survive but are not active work.
 * Route supporting but non-canonical artifacts to `source-material/` when they should remain available.
 * Route retired or historical reference material to `archive/` when it should be kept but not treated as current truth.
 * Route onboarding knowledge to README when appropriate.
