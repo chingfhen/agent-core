@@ -55,11 +55,14 @@ Use only these explicit fields:
 | **Status** | `Blocked` | Execution cannot proceed until a blocker clears. |
 | **Status** | `On Hold` | Intentionally paused. |
 | **Status** | `Closed` | Execution has ended. |
+| **Execution Gate** | `Needs Human Unblock` | A human must act/approve/decide before execution can begin. |
+| **Execution Gate** | `Ready for Main-Agent Execution` | No known hard blockers; execute mainly phase-by-phase via the main agent. |
+| **Execution Gate** | `Ready for Delegated Execution` | No known hard blockers; some bounded parts are safe to hand to subagents. |
 | **Docs Sync** | `Not Synced` | Durable knowledge has not been checked or promoted. |
 | **Docs Sync** | `Partial` | Some durable knowledge was promoted or checked; more may remain. |
 | **Docs Sync** | `Synced` | Durable knowledge has been handled. |
 
-`Status` reflects **execution state only**. `Docs Sync` reflects **durable knowledge synchronization only**. Put descriptive state in **Current State**, never in status fields.
+`Status` reflects **execution state only**. `Docs Sync` reflects **durable knowledge synchronization only**. `Execution Gate` reflects **whether an executor may begin and what execution shape is allowed** — it is not lifecycle state. `Status` = where the task is in its lifecycle; `Execution Gate` = whether it is safe to start. When the gate is `Needs Human Unblock`, set `Status: Blocked` and make `Next Action` the exact human unblock step. Put descriptive state in **Current State**, never in status fields.
 
 ```markdown
 # Task: [Clear short name]
@@ -69,6 +72,7 @@ Use only these explicit fields:
 **Last Updated:** YYYY-MM-DD
 **Priority:** [Now | Next | Later]
 **Status:** [Active | Blocked | On Hold | Closed]
+**Execution Gate:** [Needs Human Unblock | Ready for Main-Agent Execution | Ready for Delegated Execution]
 **Docs Sync:** [Not Synced | Partial | Synced]
 
 **Goal:** [...]
@@ -113,6 +117,8 @@ Optional sections:
 *   Likely Blind Spots
 *   Verification Contract
 *   Context Pointers
+*   Visual Handle (a small ASCII flow / state / before-after sketch when structure is the thing to grasp — see below)
+*   Execution Topology (larger tasks only — Recommended Shape / Human Gates / Delegation Plan / Do Not Delegate; the `execution-topology` skill owns subagent decisions, not this skill)
 
 Examples:
 *   **Feature work** may emphasize: Human Intent, Expected Outcomes, Decisions Locked.
@@ -121,6 +127,29 @@ Examples:
 *   **Small tasks** may require only: Dashboard, Current State, Next Action.
 
 Choose your structure intentionally.
+
+### Visual Handle
+
+A few lines of ASCII — a flow, a state machine, or a before→after sketch — when **structure is the thing the next executor must grasp**. It is a compression tool, not decoration.
+
+*   **Use it** when the mental model is a graph, pipeline, or state machine, or when the task changes an execution path. Prose is lossy for these; a sketch is not.
+*   **Skip it** for linear or small tasks, pure config/copy changes, or anything already obvious from the code. Never add one for polish.
+*   **Keep it cheap.** A handful of lines, not a diagram to maintain. If it would go stale faster than it helps, leave it out.
+
+```text
+request → route → auth → handler → DB → response
+```
+
+```text
+queued → running → completed
+          ↓
+        failed → retry
+```
+
+```text
+Before: route calls provider directly
+After:  route creates job → worker calls provider
+```
 
 ## Alignment Gate
 
@@ -134,6 +163,18 @@ Use **grilling** before creating or materially reshaping consequential work, esp
 6.  Critical mistakes future executors must avoid
 
 Draft **Expected Outcomes** for confirmation unless the user's instructions already define them clearly, or the update is routine. **Do not over-question straightforward updates.**
+
+## Blocker Preflight
+
+Before writing a substantial execution plan, resuming a task, or preparing a fresh-session handoff, check whether execution needs anything only the human can provide or approve:
+
+*   credentials, API keys, secrets, tokens, env vars
+*   cloud / provider / dashboard / repo / database access
+*   OAuth, webhook, DNS, billing, or other external setup
+*   migration, production-deploy, security, payment, or product-decision approval
+*   unclear acceptance criteria, or manual login/testing required before progress is meaningful
+
+If any apply, set `Execution Gate: Needs Human Unblock`, `Status: Blocked`, and make `Next Action` the exact human action required. Do not brute-force around a missing human unblock — stop and surface it.
 
 ## Compression Principle
 
@@ -182,6 +223,7 @@ Use when preserving goals, creating work, or preparing future execution.
 *   Capture alignment decisions from the conversation.
 *   Record only the context future executors cannot reconstruct.
 *   Include Expected Outcomes and guidance only when they change execution quality or order matters.
+*   Run Blocker Preflight and set the Execution Gate before declaring the task ready for execution.
 *   If the work is intentionally deferred with no active next action, route it to `ai_video_saas/docs/backlog/` via `project-docs` instead of creating a task bookmark.
 
 Done when a future executor can start without asking what the work is, why it matters, what success means, or what to do next.
@@ -192,6 +234,7 @@ Use after meaningful progress, handoff, or when asked to update the task.
 *   **Rewrite rather than append.**
 *   Refresh the dashboard first.
 *   Replace stale context with current understanding and compress obsolete material.
+*   Refresh the Execution Gate if blockers were discovered or cleared.
 *   Move durable truths into docs when they stabilize. Keep `Target Docs` current.
 
 Done when Current State, Next Action, Blockers, uncertainty, and Docs Sync are accurate enough for smooth continuation.
@@ -199,6 +242,7 @@ Done when Current State, Next Action, Blockers, uncertainty, and Docs Sync are a
 ### Resume
 Use when continuing work.
 *   Start with the dashboard.
+*   Check the Execution Gate before acting; if `Needs Human Unblock`, stop and surface the human action instead of executing.
 *   Understand current truth before acting.
 *   Review additional sections only as needed.
 *   Recommend trimming if stale, contradictory, bloated, or misleading.
