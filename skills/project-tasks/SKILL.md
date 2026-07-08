@@ -11,7 +11,10 @@ A task file is not durable documentation and not a raw transcript.
 Its purpose is to maximize the effectiveness of the next fresh-session executor.  
 A task bookmark should preserve whatever the next executor cannot reliably reconstruct from code, docs, or obvious context.
 
-Some tasks preserve ideas, investigations, or future work. Others are prepared for execution. When preparing a task for execution, ensure the task itself contains everything a fresh executor needs to proceed without relying on prior conversations. Do not assume the executor will read this skill.
+Some tasks preserve ideas, investigations, or future work. Others are prepared for execution. When preparing a task for execution, ensure the task itself contains everything a fresh executor needs to proceed without relying on prior conversations. 
+
+For execution-bound tasks, the task file should stand on its own. A fresh executor should not need the prior conversation, and should only need this skill for conventions, not for missing task context.
+
 
 ## Core Model
 
