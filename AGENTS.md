@@ -15,6 +15,7 @@
 - Do not update production workflow skills in `skills/` unless the human explicitly approves the skill edit.
 - Prefer autonomous durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` rather than changing production workflow skills.
 - Consumer repos are enrolled per device; do not hand-maintain consumer-repo skill copies.
+- Device-local enrolled repo paths live in `.agent-os-state/enrollments.json`; read it when a requested consumer repo is not obvious from the workspace tree.
 - There is no shared executor bootstrap skill; executor skills that need Agent OS repo context should read `.agent-os.json` directly.
 - The shared project-local alias surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
 - On Windows, prefer directory symlinks but fall back to directory junctions when symlink privileges are unavailable.
@@ -55,6 +56,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - **Consumer repo:** Any non-`agent-os` repo that participates in this system.
 - Canonical surfaces are `skills/`, steward docs such as `README.md`, `AGENTS.md`, `docs/**/*.md`, and `prompts/**/*.md`, plus the append-only memory ledger `memory/memories.jsonl`.
 - Generated surfaces include consumer-repo-local `.agent-os.json`, consumer-repo-local `.claude/skills/*` and `.opencode/skills/*` aliases, future harness-native aliases only where they add distinct value, device-local steward enrollment state in `.agent-os-state/enrollments.json`, and derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md`.
+- `.agent-os-state/enrollments.json` is untracked but authoritative for this device's enrolled consumer repo paths and recorded link modes.
 - Do not add tracked `.opencode`, `.claude`, or `.codex` production copies to this repo.
 - Consumer repos are enrolled per device by steward workflows; this repo does not depend on editing consumer-repo `AGENTS.md`.
 - Executor skills that need manifest context should read `.agent-os.json` directly rather than relying on a shared bootstrap layer.
