@@ -11,6 +11,8 @@ A task file is not durable documentation and not a raw transcript.
 Its purpose is to maximize the effectiveness of the next fresh-session executor.  
 A task bookmark should preserve whatever the next executor cannot reliably reconstruct from code, docs, or obvious context.
 
+Some tasks preserve ideas, investigations, or future work. Others are prepared for execution. When preparing a task for execution, ensure the task itself contains everything a fresh executor needs to proceed without relying on prior conversations. Do not assume the executor will read this skill.
+
 ## Core Model
 
 *   **`project-tasks` owns active execution state**, orchestration context, and fresh-session handoff briefs.
@@ -85,6 +87,16 @@ Use only these explicit fields:
 **Relevant Code:** [...]
 ```
 
+For execution-bound tasks:
+
+* Use `None` when execution can begin immediately.
+* If blocked, state:
+  * the blocker,
+  * the required action to unblock it,
+  * and whether execution should stop.
+* Human-only blockers (credentials, approvals, access, product decisions, external actions, etc.) should normally be resolved before handoff where practical.
+* Do not hand off a task that encourages the next executor to brute-force around a blocker that only a human can resolve.
+
 ## Non-Negotiables
 
 *   **Do not place live task dashboards** in agent guidance files.
@@ -93,6 +105,7 @@ Use only these explicit fields:
 *   **Target Docs** are routing hints, not contracts.
 *   **Preserve uncertainty honestly.** Do not write uncertain claims as established fact.
 *   Do not turn `tasks/` into a general archive or backlog; move durable truth to `docs/`, deferred future-work briefs to `ai_video_saas/docs/backlog/`, supporting artifacts to `source-material/`, and retired historical material to `archive/`.
+*   For execution-bound tasks, blockers should describe both the obstacle and the required action to unblock it.
 
 ## Adaptive Structure
 
@@ -222,7 +235,7 @@ Use when preserving goals, creating work, or preparing future execution.
 *   Build the dashboard first.
 *   Capture alignment decisions from the conversation.
 *   Record only the context future executors cannot reconstruct.
-*   Include Expected Outcomes and guidance only when they change execution quality or order matters.
+*   Include Expected Outcomes, Decisions Locked, Non-Goals / Stop Conditions, Executor Guidance, or Verification Contract only when they materially improve execution quality. For execution-bound work, capture approved decisions that materially constrain future execution and any unresolved blockers that should stop execution.
 *   Run Blocker Preflight and set the Execution Gate before declaring the task ready for execution.
 *   If the work is intentionally deferred with no active next action, route it to `ai_video_saas/docs/backlog/` via `project-docs` instead of creating a task bookmark.
 
@@ -279,5 +292,6 @@ A good task bookmark:
 * Prevents repeated mistakes.
 * Identifies what remains to be done and points toward the right evidence.
 * Supports effective resumption after a fresh session.
+* Makes blockers actionable instead of merely listing them.
 
 If a future executor can resume confidently and effectively without rereading the entire history of the work, the task is doing its job.
