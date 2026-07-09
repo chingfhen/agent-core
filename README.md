@@ -1,6 +1,6 @@
 # Agent OS
 
-**Last Updated:** 2026-06-26
+**Last Updated:** 2026-07-09
 
 **Status:** Current
 
@@ -15,7 +15,7 @@
 - `prompts/` holds canonical reusable prompt snippets and policy blocks steward agents can reuse across repos and workflows.
 - `AGENTS.md` is the authoritative operating contract for steward agents maintaining this repo.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed consumer-repo enrollment and local alias behavior.
-- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `yagni-review`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, `grilling`, and `diagram-generation` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
+- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, and `grilling` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
 - There is no shared executor bootstrap skill; any executor skill that needs Agent OS repo context reads `.agent-os.json` directly.
 - Steward-managed local skill aliases are installed under `.claude/skills` for Claude and `.opencode/skills` for OpenCode.
 - On Windows, enrollment prefers directory symlinks and falls back to directory junctions when symlink privileges are unavailable.
@@ -153,6 +153,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | 2026-06-19 | `.agent-os.json` is gitignored by default. | The manifest contains per-user and per-device integration state and should not confuse teammates. |
 | 2026-06-19 | Managed ignore rules default to exact alias paths. | Narrow ignores avoid masking other repo-owned harness files. |
 | 2026-06-21 | There is no shared executor bootstrap skill. | Only `agent-os-memory` currently needs manifest fields, so a separate bootstrap step only duplicated logic and created conceptual noise. |
+| 2026-07-09 | Removed `yagni-review`, `agent-os-memory`, and `diagram-generation` from default enrollment. | These skills remain opt-in, while new enrollments start from a smaller default skill set. |
 | 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | Review, docs, task handoff, Python workflow, memory, and grilling support should be present in most enrolled consumer repos, while more specialized skills stay opt-in. |
 | 2026-06-19 | Steward enrollment state is local and untracked. | Device-specific repo enrollment should not create cross-device drift or tracked repo noise. |
 | 2026-06-19 | Consumer repo enrollment details live in `docs/consumer-repo-enrollment.md`. | The README should stay orienting while one dedicated doc owns the full integration contract. |
