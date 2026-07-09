@@ -176,6 +176,8 @@ What belongs elsewhere.
 
 Stable behavior, interfaces, workflows, schemas, commands, or rules.
 
+Tiny visuals / ASCII sketches are recommended when they make structure easier to scan, but only as lightweight compression, not decoration.
+
 ### Related Surfaces
 
 | Surface | Path / System | Why It Matters |

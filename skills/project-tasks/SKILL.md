@@ -133,7 +133,7 @@ Optional sections:
 *   Likely Blind Spots
 *   Verification Contract
 *   Context Pointers
-*   Visual Handle (a small ASCII flow / state / before-after sketch when structure is the thing to grasp — see below)
+*   Visual Handle (a tiny visual / ASCII sketch when structure is the thing to grasp — see below)
 *   Execution Topology (larger tasks only — Recommended Shape / Human Gates / Delegation Plan / Do Not Delegate; the `execution-topology` skill owns subagent decisions, not this skill)
 
 Examples:
@@ -146,7 +146,7 @@ Choose your structure intentionally.
 
 ### Visual Handle
 
-A few lines of ASCII — a flow, a state machine, or a before→after sketch — when **structure is the thing the next executor must grasp**. It is a compression tool, not decoration.
+A tiny visual / ASCII sketch — a flow, state machine, or before→after sketch — is recommended when **structure is the thing the next executor must grasp**. It is a compression tool, not decoration.
 
 *   **Use it** when the mental model is a graph, pipeline, or state machine, or when the task changes an execution path. Prose is lossy for these; a sketch is not.
 *   **Skip it** for linear or small tasks, pure config/copy changes, or anything already obvious from the code. Never add one for polish.

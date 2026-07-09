@@ -651,6 +651,7 @@ def update_registry_entry(
     manifest_payload: dict,
     skills: list[str],
     surfaces: list[str],
+    manage_ignore: bool,
     link_mode: str,
     device_link_mode_default: str | None,
     dry_run: bool,
@@ -668,6 +669,7 @@ def update_registry_entry(
         "memory_enabled": manifest_payload["memory_enabled"],
         "skills": skills,
         "surfaces": surfaces,
+        "manage_ignore": manage_ignore,
         "link_mode": link_mode,
         "updated_at": now_iso(),
     }
@@ -729,8 +731,10 @@ def perform_enroll(args: argparse.Namespace) -> int:
         print("Conflicts detected. Re-run with explicit approval or repair the conflicting paths first.")
         return 2
 
-    ignore_entries = managed_ignore_entries(skills, surfaces)
-    new_ignore_entries = update_gitignore(repo_path, ignore_entries, dry_run=args.dry_run)
+    new_ignore_entries: list[str] = []
+    if args.manage_ignore:
+        ignore_entries = managed_ignore_entries(skills, surfaces)
+        new_ignore_entries = update_gitignore(repo_path, ignore_entries, dry_run=args.dry_run)
 
     print_plan(
         repo_path=repo_path,
@@ -760,6 +764,7 @@ def perform_enroll(args: argparse.Namespace) -> int:
         manifest_payload=manifest_payload,
         skills=skills,
         surfaces=surfaces,
+        manage_ignore=args.manage_ignore,
         link_mode=actual_link_mode,
         device_link_mode_default=actual_link_mode if args.link_mode == "auto" and actual_link_mode in {"symlink", "junction"} else None,
         dry_run=False,
@@ -783,6 +788,7 @@ def perform_sync(args: argparse.Namespace) -> int:
     )
     skills, retired_skills = split_retired_skills(list(enrollment["skills"]))
     surfaces = normalize_surfaces(list(enrollment.get("surfaces", [])))
+    manage_ignore = bool(enrollment.get("manage_ignore", True))
     link_mode = args.link_mode or str(enrollment.get("link_mode", "auto"))
     manifest_path = repo_path / ".agent-os.json"
     manifest_plan = classify_manifest(manifest_path, repo_root())
@@ -812,8 +818,10 @@ def perform_sync(args: argparse.Namespace) -> int:
         print("Conflicts detected. Re-run with explicit approval or repair the conflicting paths first.")
         return 2
 
-    ignore_entries = managed_ignore_entries(skills, surfaces)
-    new_ignore_entries = update_gitignore(repo_path, ignore_entries, dry_run=args.dry_run)
+    new_ignore_entries: list[str] = []
+    if manage_ignore:
+        ignore_entries = managed_ignore_entries(skills, surfaces)
+        new_ignore_entries = update_gitignore(repo_path, ignore_entries, dry_run=args.dry_run)
 
     print_plan(
         repo_path=repo_path,
@@ -843,6 +851,7 @@ def perform_sync(args: argparse.Namespace) -> int:
         manifest_payload=manifest_payload,
         skills=skills,
         surfaces=surfaces,
+        manage_ignore=manage_ignore,
         link_mode=actual_link_mode,
         device_link_mode_default=None,
         dry_run=False,
@@ -919,6 +928,12 @@ def build_parser() -> argparse.ArgumentParser:
         action=argparse.BooleanOptionalAction,
         default=False,
         help="Set memory_enabled in the manifest. Disabled by default.",
+    )
+    enroll.add_argument(
+        "--manage-ignore",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+        help="Update repo-local ignore rules for steward-managed outputs. Enabled by default.",
     )
     enroll.add_argument(
         "--link-mode",

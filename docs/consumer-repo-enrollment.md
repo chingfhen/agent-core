@@ -35,6 +35,7 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 
 - Each consumer repo is enrolled per device by a steward workflow.
 - Enrollment writes a repo-local `.agent-os.json`, installs local skill aliases, installs the default consumer-repo skill set, updates repo ignore rules for steward-managed outputs, and records device-local steward state.
+- Steward enrollment can skip ignore-rule management with `--no-manage-ignore` when the chosen enrollment folder should not receive a managed `.gitignore` update.
 - Enrollment does not require an existing Git worktree; if `.gitignore` is missing, the steward creates it.
 - Device-local steward state is untracked.
 - This system does not depend on modifying consumer repo `AGENTS.md` files.
@@ -122,6 +123,7 @@ Example:
 
 - Gitignore `.agent-os.json` by default.
 - Gitignore exact steward-managed alias paths by default.
+- Use `uv run scripts/enroll_repo.py enroll --repo <path> --no-manage-ignore` when enrolling a parent folder or other location where steward-managed ignore entries should be omitted.
 - If a repo already ignores a broader harness path, reuse that coverage rather than duplicating narrower ignore entries.
 - Do not rely on Git to ignore symlinks or alias installs automatically.
 
