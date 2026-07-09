@@ -24,6 +24,7 @@ SUPPORTED_SURFACES = {
 }
 DEFAULT_SURFACES = ("claude", "opencode")
 DEFAULT_ENROLL_SKILLS = (
+    "agent-os-session",
     "yagni",
     "project-docs",
     "project-tasks",
@@ -32,8 +33,8 @@ DEFAULT_ENROLL_SKILLS = (
 )
 RETIRED_SKILLS = {
     "agent-os-bootstrap": (
-        "Shared bootstrap was removed. Executor skills that need Agent OS context should read "
-        ".agent-os.json directly."
+        "Manifest bootstrap was removed. Executor skills that need Agent OS context should read "
+        ".agent-os.json directly; session-start behavior now lives in agent-os-session."
     ),
 }
 REQUIRED_MANIFEST_KEYS = (

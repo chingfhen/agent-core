@@ -15,8 +15,8 @@
 - `prompts/` holds canonical reusable prompt snippets and policy blocks steward agents can reuse across repos and workflows.
 - `AGENTS.md` is the authoritative operating contract for steward agents maintaining this repo.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed consumer-repo enrollment and local alias behavior.
-- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, and `grilling` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
-- There is no shared executor bootstrap skill; any executor skill that needs Agent OS repo context reads `.agent-os.json` directly.
+- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, and `grilling` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
+- `agent-os-session` is the shared session-start skill; any executor skill that needs Agent OS repo context reads `.agent-os.json` directly.
 - Steward-managed local skill aliases are installed under `.claude/skills` for Claude and `.opencode/skills` for OpenCode.
 - On Windows, enrollment prefers directory symlinks and falls back to directory junctions when symlink privileges are unavailable.
 - After a successful enroll or sync, selected consumer-repo skills should be live aliases, not copied directories; `verify` checks that guarantee directly.
@@ -69,7 +69,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - Matching local skill directories are auto-replaced with live aliases during enroll and sync, with a human-visible notice.
 - Executors consume ordinary local skill aliases rather than reasoning about canonical skill provenance.
 - This system does not depend on modifying consumer repo `AGENTS.md`.
-- Consumer repos do not receive a shared bootstrap skill.
+- Consumer repos receive `agent-os-session` as a shared session-start skill, not as a manifest bootstrap layer.
 - Executor skills that need Agent OS repo context read `.agent-os.json` directly.
 - `agent-os-memory` is the current executor skill that consumes manifest fields such as `agent_os_path`, `scope`, `scope_id`, and `memory_enabled`.
 - Executor agents use local skill aliases as ordinary repo skills; they do not need to know whether the installed surface is symlinked or a junction-backed alias.
@@ -101,7 +101,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - Active versus superseded memory state is derived in search/index results, not by rewriting prior ledger rows.
 - Creating a new `topic_key` requires explicit human approval.
 - Updating an existing `topic_key` within the active scope can be autonomous.
-- Memory behavior lives in the repo-local `agent-os-memory` skill rather than a shared bootstrap layer.
+- Memory behavior lives in the repo-local `agent-os-memory` skill rather than the shared session-start skill.
 
 #### Dependency Strategy
 
@@ -125,6 +125,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
 | Steward contract | `AGENTS.md` | Governs how agents maintain this repo. |
+| Session skill | `skills/agent-os-session/SKILL.md` | Shared session-start routing policy and visible load confirmation. |
 | Prompt library | `prompts/` | Canonical reusable prompt snippets and policy blocks steward agents manage. |
 | Consumer repo integration | `docs/consumer-repo-enrollment.md` | Canonical contract for steward-managed repo enrollment and executor-facing local aliases. |
 | Memory pilot contract | `docs/memory-pilot.md` | Canonical contract for the append-only ledger, derived artifacts, and approval boundary. |
@@ -153,6 +154,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | 2026-06-19 | `.agent-os.json` is gitignored by default. | The manifest contains per-user and per-device integration state and should not confuse teammates. |
 | 2026-06-19 | Managed ignore rules default to exact alias paths. | Narrow ignores avoid masking other repo-owned harness files. |
 | 2026-06-21 | There is no shared executor bootstrap skill. | Only `agent-os-memory` currently needs manifest fields, so a separate bootstrap step only duplicated logic and created conceptual noise. |
+| 2026-07-09 | Added `agent-os-session` as a default session-start skill. | Session routing should live in one live-aliased skill with visible load confirmation instead of drifting through pasted `AGENTS.md` snippets. |
 | 2026-07-09 | Removed `yagni-review`, `agent-os-memory`, and `diagram-generation` from default enrollment. | These skills remain opt-in, while new enrollments start from a smaller default skill set. |
 | 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | Review, docs, task handoff, Python workflow, memory, and grilling support should be present in most enrolled consumer repos, while more specialized skills stay opt-in. |
 | 2026-06-19 | Steward enrollment state is local and untracked. | Device-specific repo enrollment should not create cross-device drift or tracked repo noise. |

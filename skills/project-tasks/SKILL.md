@@ -1,6 +1,6 @@
 ---
 name: project-tasks
-description: Maintains fresh-session execution briefs in tasks/ so future agents can resume work with the same alignment, current understanding, and decision context. Continuously rewrites tasks into high-signal handoff bookmarks by preserving what the next executor cannot reliably reconstruct and compressing what no longer changes future decisions.
+description: Maintains fresh-session execution briefs in tasks/ (including tasks/backlog/ for deferred work) so future agents resume with the same alignment and decision context. Load before creating, editing, or managing anything under tasks/; not needed to merely read task files. Rewrites tasks into high-signal handoff bookmarks — preserving what the next executor cannot reconstruct and compressing what no longer changes future decisions.
 disable-model-invocation: false
 ---
 
@@ -20,7 +20,7 @@ For execution-bound tasks, the task file should stand on its own. A fresh execut
 
 *   **`project-tasks` owns active execution state**, orchestration context, and fresh-session handoff briefs.
 *   **`project-docs` owns durable project knowledge** and continuously absorbs stable truths throughout execution.
-*   **`ai_video_saas/docs/backlog/` owns deferred future-work briefs** that should survive without becoming active execution state.
+*   **`tasks/backlog/` owns deferred future-work briefs** that should survive without becoming active execution state.
 *   **`source-material/` holds supporting artifacts** that may still inform work without becoming canonical truth.
 *   **`archive/` holds historical material** that is kept for reference but should not drive current execution by default.
 *   **Task files preserve alignment**, evolving understanding, important uncertainty, and execution context.
@@ -107,7 +107,7 @@ For execution-bound tasks:
 *   Closed tasks are **not automatically deleted**.
 *   **Target Docs** are routing hints, not contracts.
 *   **Preserve uncertainty honestly.** Do not write uncertain claims as established fact.
-*   Do not turn `tasks/` into a general archive or backlog; move durable truth to `docs/`, deferred future-work briefs to `ai_video_saas/docs/backlog/`, supporting artifacts to `source-material/`, and retired historical material to `archive/`.
+*   Do not turn `tasks/` into a general archive or backlog; move durable truth to `docs/`, deferred future-work briefs to `tasks/backlog/`, supporting artifacts to `source-material/`, and retired historical material to `archive/`.
 *   For execution-bound tasks, blockers should describe both the obstacle and the required action to unblock it.
 
 ## Adaptive Structure
@@ -240,7 +240,7 @@ Use when preserving goals, creating work, or preparing future execution.
 *   Record only the context future executors cannot reconstruct.
 *   Include Expected Outcomes, Decisions Locked, Non-Goals / Stop Conditions, Executor Guidance, or Verification Contract only when they materially improve execution quality. For execution-bound work, capture approved decisions that materially constrain future execution and any unresolved blockers that should stop execution.
 *   Run Blocker Preflight and set the Execution Gate before declaring the task ready for execution.
-*   If the work is intentionally deferred with no active next action, route it to `ai_video_saas/docs/backlog/` via `project-docs` instead of creating a task bookmark.
+*   If the work is intentionally deferred with no active next action, route it to `tasks/backlog/` as a dated backlog bookmark instead of an active task bookmark.
 
 Done when a future executor can start without asking what the work is, why it matters, what success means, or what to do next.
 

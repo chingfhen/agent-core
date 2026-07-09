@@ -12,12 +12,12 @@
 
 - Consumer repos are enrolled per device by steward workflows, not by manual repo editing.
 - The steward-managed local skill surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
-- New enrollments install the default consumer-repo skill set: `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, and `grilling`. All other canonical skills are opt-in with `--skill`.
+- New enrollments install the default consumer-repo skill set: `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, and `grilling`. All other canonical skills are opt-in with `--skill`.
 - Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
 - Trust the setup only when the selected skills are live aliases; copied local skill directories are transitional and should be auto-replaced by steward workflows.
-- Consumer repos do not receive a shared bootstrap skill; executor skills that need Agent OS context read `.agent-os.json` directly.
+- Consumer repos receive `agent-os-session` as a shared session-start skill; executor skills that need Agent OS context read `.agent-os.json` directly.
 
 ### Scope
 
@@ -43,6 +43,7 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 
 #### Default Enrollment Skill Set
 
+- `agent-os-session`
 - `yagni`
 - `project-docs`
 - `project-tasks`
@@ -93,7 +94,7 @@ Example:
 
 #### Manifest Consumers
 
-- Consumer repos do not receive a shared bootstrap skill.
+- Consumer repos receive `agent-os-session` as a shared session-start skill, not as a manifest bootstrap layer.
 - Executor skills that need repo-local Agent OS context read `.agent-os.json` directly.
 - `agent-os-memory` is the current canonical executor skill that consumes manifest fields.
 - If a future executor skill needs manifest context, keep that read local to the skill instead of reintroducing a separate shared bootstrap step.
@@ -150,6 +151,7 @@ Example:
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | High-level orientation and top-level boundaries for Agent OS. |
 | Steward contract | `AGENTS.md` | Defines steward-agent operating rules and overwrite safety behavior. |
+| Session skill | `skills/agent-os-session/SKILL.md` | Shared session-start routing policy and visible load confirmation. |
 | Memory skill | `skills/agent-os-memory/SKILL.md` | Executor-facing list/search/write memory guidance for memory-enabled repos. |
 | Enrollment script | `scripts/enroll_repo.py` | Implements enrollment, repair, local registry updates, and Windows link fallback behavior. |
 | Memory script | `scripts/memory.py` | Canonical steward memory tooling behind the local memory skill. |
@@ -166,6 +168,7 @@ Example:
 | 2026-06-19 | `.agent-os.json` is gitignored by default. | The manifest contains per-user and per-device integration state and should not confuse teammates. |
 | 2026-06-19 | Managed ignore rules default to exact alias paths. | Narrow ignores avoid masking other repo-owned harness files. |
 | 2026-06-21 | Consumer repos do not receive a shared bootstrap skill. | Only `agent-os-memory` currently needs manifest context, so skill-local reads are simpler than a separate bootstrap layer. |
+| 2026-07-09 | Added `agent-os-session` to default enrollment. | Session routing should live in one live-aliased skill with visible load confirmation instead of drifting through pasted `AGENTS.md` snippets. |
 | 2026-07-09 | Removed `yagni-review`, `agent-os-memory`, and `diagram-generation` from the default consumer-repo skill set. | These skills remain available on demand with `--skill`, but new enrollments should start with a smaller default set. |
 | 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | The default set is `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`; all other skills stay opt-in via `--skill`. |
 | 2026-06-22 | Added `yagni` and `diagram-generation` to the default consumer-repo skill set; re-ran enroll for all four currently enrolled repos to apply it retroactively. | `diagram-generation` is a new canonical skill that should ship by default; `yagni` was added alongside it on the same request. |
