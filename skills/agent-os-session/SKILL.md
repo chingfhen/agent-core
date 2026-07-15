@@ -1,4 +1,3 @@
-```yaml
 ---
 name: agent-os-session
 description: MUST be loaded at the start of every new chat/session
@@ -14,9 +13,9 @@ disable-model-invocation: false
 - **Repository routing.**
   - `docs/` — canonical project knowledge: architecture, decisions, invariants, contracts, workflows, and confirmed fixes.
   - `tasks/backlog/` — deferred work items, one file per task (`YYYY-MM-DD__slug.md`), indexed by `tasks/backlog.md`.
-  - `source-material/` — external references, research, specifications, and seed material.
-  - `archive/` — superseded or historical content only; never the source of truth.
-
+  - `tasks/archive/` — completed, cancelled, or superseded tasks kept for historical reference.
+  - `source-material/` — external references, research, specifications, and seed material; not the source of truth.
+  
 - **Read relevant docs first.** Before changing project behavior, making repository-specific decisions, investigating existing behavior, or giving implementation guidance, read the smallest relevant set of files under `docs/`.
 
   Read docs whenever the request may depend on documented architecture, conventions, contracts, invariants, workflows, prior fixes, or design decisions. Typical examples include behavior-changing code edits, API/schema/data-flow changes, cross-component work, deployments, bug investigations, task scoping, and questions about how the repository is intended to work.
@@ -26,4 +25,4 @@ disable-model-invocation: false
   Identify the knowledge needed, locate only the docs likely to contain it, and follow references only to resolve concrete uncertainty. Prefer canonical `docs/` over tasks, source material, comments, or historical artifacts. Do not scan all documentation by default. Stop once the relevant constraints and decisions are understood.
 
   If no relevant documentation exists, proceed using the repository and the user's request. Clearly state any material assumptions. Ask only when missing information is human-owned or would materially change the outcome.
-```
+
