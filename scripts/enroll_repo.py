@@ -30,6 +30,7 @@ DEFAULT_ENROLL_SKILLS = (
     "project-tasks",
     "manage-python-uv",
     "grilling",
+    "human-technical-orientation",
 )
 RETIRED_SKILLS = {
     "agent-os-bootstrap": (

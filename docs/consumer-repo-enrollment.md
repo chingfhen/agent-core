@@ -1,6 +1,6 @@
 # Consumer Repo Enrollment
 
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-15
 
 **Status:** Current
 
@@ -12,7 +12,7 @@
 
 - Consumer repos are enrolled per device by steward workflows, not by manual repo editing.
 - The steward-managed local skill surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
-- New enrollments install the default consumer-repo skill set: `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, and `grilling`. All other canonical skills are opt-in with `--skill`.
+- New enrollments install the default consumer-repo skill set: `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `grilling`, and `human-technical-orientation`. All other canonical skills are opt-in with `--skill`.
 - Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
@@ -49,6 +49,7 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 - `project-tasks`
 - `manage-python-uv`
 - `grilling`
+- `human-technical-orientation`
 - All other canonical skills install only when explicitly requested with `--skill`.
 
 #### Generated Consumer-Repo Surfaces
@@ -170,6 +171,7 @@ Example:
 | 2026-06-21 | Consumer repos do not receive a shared bootstrap skill. | Only `agent-os-memory` currently needs manifest context, so skill-local reads are simpler than a separate bootstrap layer. |
 | 2026-07-09 | Added `agent-os-session` to default enrollment. | Session routing should live in one live-aliased skill with visible load confirmation instead of drifting through pasted `AGENTS.md` snippets. |
 | 2026-07-09 | Removed `yagni-review`, `agent-os-memory`, and `diagram-generation` from the default consumer-repo skill set. | These skills remain available on demand with `--skill`, but new enrollments should start with a smaller default set. |
+| 2026-07-15 | Added `human-technical-orientation` to the default consumer-repo skill set and kept `quick-orientation` opt-in. | New enrollments should provide the deeper human-oriented technical context skill without making the quick orientation skill part of the default surface. |
 | 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | The default set is `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`; all other skills stay opt-in via `--skill`. |
 | 2026-06-22 | Added `yagni` and `diagram-generation` to the default consumer-repo skill set; re-ran enroll for all four currently enrolled repos to apply it retroactively. | `diagram-generation` is a new canonical skill that should ship by default; `yagni` was added alongside it on the same request. |
 | 2026-06-21 | Shared local project skills sync to both `.claude/skills` and `.opencode/skills`. | Claude and OpenCode should each receive the same canonical skills through their native project-local discovery paths. |
