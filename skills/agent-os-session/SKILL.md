@@ -1,3 +1,4 @@
+```yaml
 ---
 name: agent-os-session
 description: MUST be loaded at the start of every new chat/session
@@ -6,10 +7,23 @@ disable-model-invocation: false
 
 ### Autonomous State & Memory Routing
 
-- **Stay in-repo; ask first.** Operate only within this repo. Don't read, search, or act on files outside it unless the user names an external path in the current request. If you need something outside the repo, or something is obviously human-gated — a judgment call, a fact only the user has, a one-sentence clarification — ask. Don't hunt the filesystem or spin in circles when the user can resolve it directly.
+- **Stay in-repo; ask first.** Operate only within this repository. Don't read, search, or act on files outside it unless the user explicitly names an external path in the current request. If required information exists outside the repo, or is inherently human-owned (judgment calls, business intent, missing requirements, credentials, etc.), ask the user instead of searching broadly or making assumptions.
 
-- **`docs/` and `tasks/` writes are skill-gated.** Reading them is free. Load `project-docs` before editing anything under `docs/`, and `project-tasks` before creating or editing anything under `tasks/`; those skills carry the maintenance rules.
+- **`docs/` and `tasks/` are skill-gated.** Reading is unrestricted. Before editing anything under `docs/`, load `project-docs`. Before creating or editing anything under `tasks/`, load `project-tasks`. Those skills define the maintenance rules.
 
-- **Routing.** `docs/` = stable project truth (decisions, invariants, contracts, confirmed fixes); `tasks/backlog/` = deferred future work, dated `YYYY-MM-DD__slug.md`, with `tasks/backlog.md` as a thin index. `source-material/` = external references, research, and seed inputs. `archive/` = only content superseded by a newer canonical source.
+- **Repository routing.**
+  - `docs/` — canonical project knowledge: architecture, decisions, invariants, contracts, workflows, and confirmed fixes.
+  - `tasks/backlog/` — deferred work items, one file per task (`YYYY-MM-DD__slug.md`), indexed by `tasks/backlog.md`.
+  - `source-material/` — external references, research, specifications, and seed material.
+  - `archive/` — superseded or historical content only; never the source of truth.
 
-- **Read-Relevant-Docs-first.** Make sure you are grounded with reading relevant `docs/`, before proceeding with any significant response or execution of work.  
+- **Read relevant docs first.** Before changing project behavior, making repository-specific decisions, investigating existing behavior, or giving implementation guidance, read the smallest relevant set of files under `docs/`.
+
+  Read docs whenever the request may depend on documented architecture, conventions, contracts, invariants, workflows, prior fixes, or design decisions. Typical examples include behavior-changing code edits, API/schema/data-flow changes, cross-component work, deployments, bug investigations, task scoping, and questions about how the repository is intended to work.
+
+  Skip docs for isolated syntax questions, mechanical edits, formatting, typo fixes, straightforward renames, or work fully specified by the user that does not depend on repository context.
+
+  Identify the knowledge needed, locate only the docs likely to contain it, and follow references only to resolve concrete uncertainty. Prefer canonical `docs/` over tasks, source material, comments, or historical artifacts. Do not scan all documentation by default. Stop once the relevant constraints and decisions are understood.
+
+  If no relevant documentation exists, proceed using the repository and the user's request. Clearly state any material assumptions. Ask only when missing information is human-owned or would materially change the outcome.
+```
