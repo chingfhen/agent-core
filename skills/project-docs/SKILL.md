@@ -40,16 +40,17 @@ Ask:
 
 ## Documentation Admission Test
 
-Before persisting knowledge, ask:
+Before persisting knowledge, make one holistic judgment:
 
-1.  **Would future executors likely need this after the current task disappears?**
-    * *If no:* Do not document it.
-2.  **If forgotten, would future sessions repeatedly rediscover it at meaningful cost?**
-    * *If no:* Do not document it.
-3.  **Does this change:** how the system works, how agents should behave, or how future decisions should be made?
-    * *If no:* Do not document it.
-4.  **Is version control already the better memory?**
-    * *If yes:* Do not document it.
+> Is this durable, actionable project truth that future agents would pay meaningful cost to rediscover?
+
+Consider three reinforcing lenses, not separate mandatory gates:
+
+* **Durable:** It remains true after the current task.
+* **Expensive to rediscover:** Forgetting it would create meaningful repeated investigation or uncertainty.
+* **Actionable:** It affects system behavior, agent behavior, or future decisions.
+
+Document knowledge when these lenses together show it is worth inheriting. If version control is already the better memory, do not document it.
 
 *Interesting is not enough.* *Useful during the current task is not enough.* Only preserve knowledge that meaningfully reduces future rediscovery or stabilizes future agent behavior.
 
