@@ -148,49 +148,52 @@ For agent guidance files:
 * Prefer thin pointers over duplicated instructions when appropriate.
 * Create a new agent guidance file only when explicitly requested or clearly required by repository convention.
 
+Canonical Markdown docs use `title`, `description`, and `updated` frontmatter. `type`, `tags`, and `update_when` are optional and should appear only when useful. README and agent-guidance files should keep their established conventions unless the repository deliberately chooses otherwise.
+
+Write `description` so it helps readers discover the document and identifies its canonical knowledge boundary. When an established documentation index includes a description, reuse the canonical frontmatter description instead of maintaining a separate summary.
+
+Change `updated` only when durable meaning changes, not for formatting, spelling, metadata normalization, or mechanical link repair.
+
 ```markdown
+---
+title: [Doc Title]
+description: [One sentence describing the document's canonical knowledge boundary.]
+updated: YYYY-MM-DD
+---
+
 # [Doc Title]
 
-**Last Updated:** YYYY-MM-DD
-
-**Status:** Current | Draft | Stale | Deprecated
-
-**Source Of Truth:** [One durable question this doc answers.]
-
-**Update When:** [Concrete triggers.]
-
-### Read First
+## Read First
 
 - Current fact or invariant.
 - Current fact or invariant.
 
-### Scope
+## Scope
 
 What belongs here.
 
-### Not Here
+## Not Here
 
 What belongs elsewhere.
 
-### Current Contract
+## Current Contract
 
 Stable behavior, interfaces, workflows, schemas, commands, or rules.
 
 Tiny visuals / ASCII sketches are recommended when they make structure easier to scan, but only as lightweight compression, not decoration.
 
-### Related Surfaces
+## Related Surfaces
 
 | Surface | Path / System | Why It Matters |
 | ------- | ------------- | -------------- |
 
-### Decisions
+## Decisions
 
 | Date | Decision | Rationale |
 | ---- | -------- | --------- |
-
-Small docs may omit optional sections.
-
 ```
+
+Small docs may omit optional body sections. Prefer contextual links between related canonical docs and selective references to stable implementation entry points.
 
 ## Documentation Evolution
 
@@ -209,7 +212,7 @@ Do not preserve earlier explanations merely because they existed. Version contro
 
 ### Update / Sync Durable Knowledge
 
-Use when durable knowledge changes, or when the user asks to update or sync knowledge from current conversation decisions, active tasks, completed tasks, code changes, debugging findings, investigations, design discussions, existing docs, or any other session context.
+Use when durable knowledge changes, or when the user asks to update or sync knowledge from current conversation decisions, active tasks, completed tasks, code changes, debugging findings, investigations, design discussions, existing docs, or any other session context. This is the default documentation-maintenance operation.
 
 * Do not assume update or sync means task harvest only or preserving everything.
 * Read the target document and relevant surrounding context.
@@ -227,7 +230,10 @@ Use when durable knowledge changes, or when the user asks to update or sync know
 * Route information to multiple destinations only when each serves a distinct purpose. Avoid duplicating detailed documentation inside agent guidance files.
 * Validate important claims against current docs, code, or evidence when practical.
 * Rewrite existing docs or restructure documentation when a clearer canonical shape or better expression of current understanding emerges.
-* Keep the first screen concise and update timestamps/metadata when appropriate.
+* Update every canonical document whose durable truth is materially affected.
+* Add or normalize required frontmatter only on canonical documents materially edited; do not perform unrelated metadata churn.
+* When a canonical document's title, description, path, scope, or existence changes, update its established index entry and directly affected documentation links.
+* Keep the first screen concise.
 * Add decisions only when they prevent future drift.
 * Report: Persisted, Already documented / skipped, Rewritten / simplified, Uncertain, Rerouted / restructured.
 
@@ -235,7 +241,7 @@ Done when the canonical surface reflects current durable truth, transient state 
 
 ### Verify / Trim
 
-Use when documentation may be stale, duplicated, or bloated.
+Use for an explicitly requested documentation audit, migration, or scoped cleanup. Do not turn an ordinary documentation update into a repository-wide audit. During normal updates, repair only obvious, nearby issues that are certain, cheap, and material to future understanding.
 
 * Compare docs, README, agent guidance files, `tasks/`, code, and any relevant `source-material/` or `archive/` context.
 * Flag stale paths, commands, workflows, and assumptions.
@@ -245,6 +251,7 @@ Use when documentation may be stale, duplicated, or bloated.
 * Keep agent guidance focused on behavior.
 * Preserve durable decisions, constraints, and current behavior.
 * Simplify documentation where understanding has improved.
+* For a requested audit or migration, also check frontmatter consistency, index drift, broken documentation links, and orphan canonical documents.
 * Preserve future usefulness while minimizing maintenance burden.
 * Mark risky uncertainty as Needs validation.
 
