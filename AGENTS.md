@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-07-09
+**Last Updated:** 2026-07-18
 
 **Status:** Current
 
@@ -21,6 +21,7 @@
 - The shared project-local alias surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
 - On Windows, prefer directory symlinks but fall back to directory junctions when symlink privileges are unavailable.
 - Symlinks and directory junctions both satisfy the live-update guarantee; copied local skill directories do not.
+- Consumer aliases can resolve directly into canonical `skills/`. Never recursively delete, move, or modify an alias or its `.claude/skills` or `.opencode/skills` parent; use `unenroll` for verified aliases or stop and ask.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed repo enrollment details.
 - `prompts/` holds canonical reusable prompt snippets and policy blocks steward agents manage.
 - `prompts/autonomous-state-and-memory-routing.md` is historical source material for the routing policy now canonicalized in `agent-os-session`.
@@ -65,7 +66,7 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - New enrollments include the default consumer-repo skill set defined in `docs/consumer-repo-enrollment.md`; explicit `--skill` values add more repo-local aliases.
 - Executor agents should consume repo-local skill aliases as ordinary repo skills; they do not need canonical/source-provenance explanation.
 - Keep `.claude/skills/*` and `.opencode/skills/*` aligned during enroll and sync so Claude and OpenCode receive the same canonical skill set.
-- The trusted steady state is live aliasing to canonical skills; copied local skill directories are only transitional and should be replaced during enroll or sync.
+- The trusted steady state is live aliasing to canonical skills; real local skill directories are conflicts that require explicit migration.
 - Default ignore behavior in consumer repos is `.agent-os.json` plus exact managed alias paths, unless a broader existing ignore already covers them.
 - Memory remains a pilot: append-only JSONL is canonical truth, generated search/index artifacts are disposable, and active/superseded state is derived rather than rewritten into prior rows.
 - `memory/memories.jsonl` is the only tracked memory ledger; `memory/memory.sqlite` and `MEMORY_INDEX.md` are generated/local artifacts and should not be committed.
@@ -87,7 +88,8 @@ You are a node in an ongoing execution chain. Optimize repository context for fu
 - Prefer steward-managed enrollment over manual consumer-repo setup.
 - When syncing/installing consumer-repo skills, preflight each target path as `missing`, `managed`, or `conflict`.
 - Replace only clearly steward-managed aliases automatically; stop and ask before overwriting unrelated existing files or directories.
-- Replace matching local skill directories with live aliases automatically and surface a human-visible notice.
+- Treat every real local skill directory as a conflict; do not delete it automatically, even when it declares the expected skill name.
+- Remove consumer aliases only through `uv run scripts/enroll_repo.py unenroll --repo <path> --apply`; if link verification fails or no supported command exists, stop and ask.
 - Remember the working device link mode locally so future enrollments can skip known-failing symlink probes.
 - Gitignore `.agent-os.json` and exact managed alias paths by default unless a broader existing ignore already covers them.
 - Keep memory behavior in `agent-os-memory`; do not expand `agent-os-session` into memory or manifest bootstrap behavior unless the real executor workflows justify it.

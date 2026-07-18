@@ -1,6 +1,6 @@
 # Agent OS
 
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-18
 
 **Status:** Current
 
@@ -66,7 +66,7 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - Each consumer repo is enrolled per device by a steward workflow.
 - Enrollment writes a repo-local `.agent-os.json`, installs repo-local skill aliases under both `.claude/skills` and `.opencode/skills`, installs the default consumer-repo skill set documented in `docs/consumer-repo-enrollment.md`, and keeps those outputs gitignored by default.
 - Steward sync keeps the same canonical skills aligned across Claude's native `.claude/skills` path and OpenCode's native `.opencode/skills` path.
-- Matching local skill directories are auto-replaced with live aliases during enroll and sync, with a human-visible notice.
+- Real local skill directories are conflicts during enroll and sync; they require explicit migration rather than automatic replacement.
 - Executors consume ordinary local skill aliases rather than reasoning about canonical skill provenance.
 - This system does not depend on modifying consumer repo `AGENTS.md`.
 - Consumer repos receive `agent-os-session` as a shared session-start skill, not as a manifest bootstrap layer.
@@ -76,7 +76,8 @@ Detailed implementation tasks, generated output, or session-by-session execution
 - On Windows, link installation tries a directory symlink first and falls back to a directory junction when Win32 symlink privileges are unavailable.
 - Both symlinks and directory junctions satisfy the live update guarantee: edits propagate immediately in both directions because the consumer path resolves to the canonical skill directory.
 - `uv run scripts/enroll_repo.py verify --repo <path>` returns success only when the repo is in that live-alias steady state.
-- `uv run scripts/enroll_repo.py sync --repo <path>` removes retired `agent-os-bootstrap` aliases and drops the stale registry entry from older enrollments.
+- `uv run scripts/enroll_repo.py sync --repo <path>` safely removes verified retired `agent-os-bootstrap` aliases while repairing the recorded enrollment.
+- `uv run scripts/enroll_repo.py unenroll --repo <path>` previews removal; add `--apply` to remove only verified aliases, the manifest, and the local registry entry while preserving harness parent directories and ignore rules.
 - The local steward registry also remembers the working device link mode so future repo enrollments can skip known-failing symlink probes.
 - See `docs/consumer-repo-enrollment.md` for the full enrollment, ignore, and conflict-handling contract.
 
@@ -165,6 +166,5 @@ Detailed implementation tasks, generated output, or session-by-session execution
 | 2026-06-21 | Shared local project skills sync to both `.claude/skills` and `.opencode/skills`. | Claude and OpenCode should each receive the same canonical skills through their native project-local discovery paths. |
 | 2026-06-19 | Windows enrollment defaults to symlink with junction fallback. | The first pilot lacked symlink privileges, so a non-destructive fallback was required to complete setup. |
 | 2026-06-19 | Device-local enrollment state lives in `.agent-os-state/enrollments.json`. | Repair runs need a local registry without adding tracked repo noise. |
-| 2026-06-19 | Consumer-repo skill copies are transitional and auto-replaced. | The system's value depends on live canonical updates, so steady state must be alias-backed rather than copy-backed. |
 | 2026-06-19 | Repo working surfaces standardize on `tasks/` and `source-material/`, with `archive/` reserved for retired historical reference. | Visible folder names work with OpenCode discovery and keep active execution, durable docs, and non-canonical artifacts clearly separated. |
 | 2026-06-19 | The first memory pilot ships as `scripts/memory.py` subcommands. | One steward-owned single-file script is the smallest correct surface for list/search/write/reindex memory flows. |

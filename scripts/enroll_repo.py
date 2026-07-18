@@ -5,10 +5,8 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
-import shutil
 import stat
 import subprocess
 import sys
@@ -106,30 +104,19 @@ def path_lexists(path: Path) -> bool:
     return True
 
 
-def file_hash(path: Path) -> str:
-    digest = hashlib.sha256()
-    with path.open("rb") as handle:
-        for chunk in iter(lambda: handle.read(65536), b""):
-            digest.update(chunk)
-    return digest.hexdigest()
-
-
-def directory_file_manifest(path: Path) -> dict[str, str]:
-    manifest: dict[str, str] = {}
-    for child in sorted(path.rglob("*")):
-        if child.is_file():
-            manifest[child.relative_to(path).as_posix()] = file_hash(child)
-    return manifest
-
-
-def is_reparse_directory(path: Path) -> bool:
-    if path.is_symlink() or not path_lexists(path):
-        return False
+def link_kind(path: Path) -> str | None:
     try:
-        attributes = path.stat(follow_symlinks=False).st_file_attributes
+        metadata = os.lstat(path)
     except (AttributeError, FileNotFoundError):
-        return False
-    return bool(attributes & stat.FILE_ATTRIBUTE_REPARSE_POINT) and (path.is_dir() or not path.exists())
+        return None
+
+    if stat.S_ISLNK(metadata.st_mode) or path.is_symlink():
+        return "symlink"
+
+    attributes = getattr(metadata, "st_file_attributes", 0)
+    if attributes & getattr(stat, "FILE_ATTRIBUTE_REPARSE_POINT", 0):
+        return "junction"
+    return None
 
 
 def read_json(path: Path) -> dict | list | None:
@@ -225,23 +212,15 @@ def classify_skill_target(
     if not path_lexists(target_dir):
         return ("missing", "skill alias path does not exist yet", False, None)
 
-    if target_dir.is_symlink():
+    kind = link_kind(target_dir)
+    if kind is not None:
         try:
             resolved = target_dir.resolve(strict=True)
         except FileNotFoundError:
-            return ("conflict", "skill alias is a broken symlink", False, None)
+            return ("conflict", f"skill alias is a broken {kind}", False, None)
         if resolved == source_dir.resolve():
-            return ("managed", "symlink already points at the canonical skill", True, None)
-        return ("conflict", f"symlink points at a different target: {resolved}", False, None)
-
-    if is_reparse_directory(target_dir):
-        try:
-            resolved = target_dir.resolve(strict=True)
-        except FileNotFoundError:
-            return ("conflict", "skill alias is a broken junction", False, None)
-        if resolved == source_dir.resolve():
-            return ("managed", "junction already points at the canonical skill", True, None)
-        return ("conflict", f"junction points at a different target: {resolved}", False, None)
+            return ("managed", f"{kind} already points at the canonical skill", True, None)
+        return ("conflict", f"{kind} points at a different target: {resolved}", False, None)
 
     if target_dir.is_file():
         return ("conflict", "skill alias path is a file", False, None)
@@ -268,21 +247,11 @@ def classify_skill_target(
             None,
         )
 
-    source_manifest = directory_file_manifest(source_dir)
-    target_manifest = directory_file_manifest(target_dir)
-    if target_manifest == source_manifest:
-        return (
-            "managed",
-            "existing local skill copy matches the canonical source and will be replaced with a live alias on apply",
-            False,
-            f"{target_dir} is a copied skill directory, not a live alias. Enroll/sync will replace it.",
-        )
-
     return (
-        "managed",
-        "existing local skill copy differs from the canonical source and will be replaced with a live alias on apply",
+        "conflict",
+        "skill directory is not a live alias; replace or migrate it explicitly before enrollment",
         False,
-        f"{target_dir} diverged from canonical and will be auto-replaced with the live alias.",
+        None,
     )
 
 
@@ -291,23 +260,15 @@ def classify_retired_skill_target(target_dir: Path, skill_name: str, agent_os_pa
     if not path_lexists(target_dir):
         return ("missing", "retired skill alias path does not exist")
 
-    if target_dir.is_symlink():
+    kind = link_kind(target_dir)
+    if kind is not None:
         try:
             resolved = target_dir.resolve(strict=True)
         except FileNotFoundError:
-            return ("managed", "retired skill alias is a broken symlink and will be removed on sync")
+            return ("conflict", f"retired skill alias is a broken {kind}")
         if resolved == expected_source_dir:
-            return ("managed", "retired skill alias points at the canonical retired skill and will be removed on sync")
-        return ("conflict", f"skill alias path is a symlink to a different target: {resolved}")
-
-    if is_reparse_directory(target_dir):
-        try:
-            resolved = target_dir.resolve(strict=True)
-        except FileNotFoundError:
-            return ("managed", "retired skill alias is a broken junction and will be removed on sync")
-        if resolved == expected_source_dir:
-            return ("managed", "retired skill alias points at the canonical retired skill and will be removed on sync")
-        return ("conflict", f"skill alias path is a junction to a different target: {resolved}")
+            return ("managed", f"retired {kind} points at the canonical retired skill and will be removed on sync")
+        return ("conflict", f"skill alias path is a {kind} to a different target: {resolved}")
 
     if target_dir.is_file():
         return ("conflict", "retired skill alias path is a file")
@@ -315,21 +276,9 @@ def classify_retired_skill_target(target_dir: Path, skill_name: str, agent_os_pa
     if not target_dir.is_dir():
         return ("conflict", "retired skill alias path uses an unsupported filesystem type")
 
-    skill_file = target_dir / "SKILL.md"
-    if not skill_file.is_file():
-        entries = sorted(child.name for child in target_dir.iterdir())
-        return (
-            "conflict",
-            "retired skill directory does not contain SKILL.md; entries: " + ", ".join(entries[:5]),
-        )
-
-    local_skill_name = parse_skill_name(skill_file)
-    if local_skill_name == skill_name:
-        return ("managed", "retired local skill copy will be removed on sync")
-
     return (
         "conflict",
-        f"retired skill directory declares a different skill name: {local_skill_name or 'missing'}",
+        "retired skill directory is not a live alias; remove it explicitly before sync",
     )
 
 
@@ -421,19 +370,25 @@ def update_gitignore(repo_path: Path, desired_entries: list[str], dry_run: bool)
     return new_entries
 
 
-def remove_path(path: Path) -> None:
-    if path.is_symlink() or path.is_file():
-        path.unlink()
-        return
-    if is_reparse_directory(path):
-        path.rmdir()
-        return
-    if path.is_dir():
-        shutil.rmtree(path)
-        return
-    if not path_lexists(path):
-        return
-    raise RuntimeError(f"Cannot remove unsupported path type: {path}")
+def remove_verified_alias(target_dir: Path, source_dir: Path) -> None:
+    kind = link_kind(target_dir)
+    if kind is None:
+        raise RuntimeError(f"Refusing to remove non-alias path: {target_dir}")
+
+    try:
+        resolved = target_dir.resolve(strict=True)
+    except FileNotFoundError as exc:
+        raise RuntimeError(f"Refusing to remove broken {kind}: {target_dir}") from exc
+
+    if resolved != source_dir.resolve():
+        raise RuntimeError(
+            f"Refusing to remove alias with an unexpected target: {target_dir} -> {resolved}"
+        )
+
+    if kind == "symlink":
+        target_dir.unlink()
+    else:
+        target_dir.rmdir()
 
 
 def create_junction(source_dir: Path, target_dir: Path) -> None:
@@ -477,16 +432,16 @@ def install_skill_alias(planned_skill: PlannedSkill, dry_run: bool, link_mode: s
     planned_skill.target_dir.parent.mkdir(parents=True, exist_ok=True)
     temp_target = planned_skill.target_dir.parent / f".{planned_skill.target_dir.name}.agent-os-tmp"
     if path_lexists(temp_target):
-        remove_path(temp_target)
+        raise RuntimeError(f"Temporary alias path is occupied: {temp_target}")
 
     actual_link_mode = create_directory_link(planned_skill.source_dir, temp_target, link_mode)
     try:
         if path_lexists(planned_skill.target_dir):
-            remove_path(planned_skill.target_dir)
+            remove_verified_alias(planned_skill.target_dir, planned_skill.source_dir)
         temp_target.replace(planned_skill.target_dir)
     except Exception:
         if path_lexists(temp_target):
-            remove_path(temp_target)
+            remove_verified_alias(temp_target, planned_skill.source_dir)
         raise
     return actual_link_mode
 
@@ -577,12 +532,14 @@ def write_manifest(manifest_path: Path, payload: dict, dry_run: bool) -> None:
     manifest_path.write_text(render_manifest(payload), encoding="utf-8")
 
 
-def apply_retired_skill_cleanup(retired_skill_plan: list[PlannedRetiredSkill], dry_run: bool) -> None:
+def apply_retired_skill_cleanup(
+    retired_skill_plan: list[PlannedRetiredSkill], agent_os_path: Path, dry_run: bool
+) -> None:
     if dry_run:
         return
     for item in retired_skill_plan:
         if item.state == "managed" and path_lexists(item.target_dir):
-            remove_path(item.target_dir)
+            remove_verified_alias(item.target_dir, agent_os_path / "skills" / item.skill_name)
 
 
 def has_conflicts(
@@ -675,6 +632,12 @@ def update_registry_entry(
     save_registry(registry, dry_run=dry_run)
 
 
+def remove_registry_entry(repo_path: Path, dry_run: bool) -> None:
+    registry = load_registry()
+    registry["enrollments"].pop(str(repo_path), None)
+    save_registry(registry, dry_run=dry_run)
+
+
 def perform_enroll(args: argparse.Namespace) -> int:
     agent_os_path = repo_root()
     repo_path = Path(args.repo).resolve()
@@ -751,7 +714,7 @@ def perform_enroll(args: argparse.Namespace) -> int:
         return 0
 
     write_manifest(manifest_path, manifest_payload, dry_run=False)
-    apply_retired_skill_cleanup(retired_skill_plan, dry_run=False)
+    apply_retired_skill_cleanup(retired_skill_plan, agent_os_path, dry_run=False)
     actual_link_mode = requested_link_mode
     for planned_skill in skill_plan:
         previous_link_mode = actual_link_mode
@@ -838,7 +801,7 @@ def perform_sync(args: argparse.Namespace) -> int:
         return 0
 
     write_manifest(manifest_path, manifest_payload, dry_run=False)
-    apply_retired_skill_cleanup(retired_skill_plan, dry_run=False)
+    apply_retired_skill_cleanup(retired_skill_plan, repo_root(), dry_run=False)
     actual_link_mode = link_mode
     for planned_skill in skill_plan:
         previous_link_mode = actual_link_mode
@@ -855,6 +818,67 @@ def perform_sync(args: argparse.Namespace) -> int:
         device_link_mode_default=None,
         dry_run=False,
     )
+    return 0
+
+
+def perform_unenroll(args: argparse.Namespace) -> int:
+    repo_path = Path(args.repo).resolve()
+    registry = load_registry()
+    enrollment = registry["enrollments"].get(str(repo_path))
+    if not isinstance(enrollment, dict):
+        raise SystemExit(f"No enrollment record found for repo: {repo_path}")
+
+    agent_os_path = repo_root()
+    skills, retired_skills = split_retired_skills(list(enrollment["skills"]))
+    surfaces = normalize_surfaces(list(enrollment.get("surfaces", [])))
+    manifest_plan = classify_manifest(repo_path / ".agent-os.json", agent_os_path)
+    skill_plan = build_skill_plan(
+        repo_path=repo_path,
+        agent_os_path=agent_os_path,
+        skills=skills,
+        surfaces=surfaces,
+    )
+    retired_skill_plan = build_retired_skill_plan(
+        repo_path=repo_path,
+        agent_os_path=agent_os_path,
+        skills=retired_skills,
+        surfaces=surfaces,
+    )
+
+    if has_conflicts(manifest_plan, skill_plan, retired_skill_plan):
+        print_plan(
+            repo_path=repo_path,
+            manifest_plan=manifest_plan,
+            skill_plan=skill_plan,
+            retired_skill_plan=retired_skill_plan,
+            new_ignore_entries=[],
+            git_repo_detected=(repo_path / ".git").exists(),
+            dry_run=True,
+        )
+        print("Conflicts detected. Unenroll removes only verified live aliases.")
+        return 2
+
+    print_plan(
+        repo_path=repo_path,
+        manifest_plan=manifest_plan,
+        skill_plan=skill_plan,
+        retired_skill_plan=retired_skill_plan,
+        new_ignore_entries=[],
+        git_repo_detected=(repo_path / ".git").exists(),
+        dry_run=not args.apply,
+    )
+    if not args.apply:
+        print("Preview only. Re-run with --apply to remove verified aliases, the manifest, and the registry entry.")
+        return 0
+
+    for planned_skill in skill_plan:
+        if planned_skill.state == "managed" and path_lexists(planned_skill.target_dir):
+            remove_verified_alias(planned_skill.target_dir, planned_skill.source_dir)
+    apply_retired_skill_cleanup(retired_skill_plan, agent_os_path, dry_run=False)
+    if manifest_plan.state == "managed" and path_lexists(manifest_plan.path):
+        manifest_plan.path.unlink()
+    remove_registry_entry(repo_path, dry_run=False)
+    print("Unenrollment complete. Harness parent directories and ignore rules were left unchanged.")
     return 0
 
 
@@ -894,14 +918,14 @@ def perform_verify(args: argparse.Namespace) -> int:
     guarantee = live_update_guarantee(manifest_plan, skill_plan, retired_skill_plan)
     print(f"Live update guarantee: {'yes' if guarantee else 'no'}")
     if not guarantee:
-        print("Run enroll or sync to replace copied skill directories, remove retired skill aliases, and repair any missing links.")
+        print("Run enroll or sync to repair missing links. Resolve copied skill directories explicitly before retrying.")
         return 2
     return 0
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
-        description="Enroll, repair, and verify consumer repos for Agent OS local skill aliases.",
+        description="Enroll, repair, unenroll, and verify consumer repos for Agent OS local skill aliases.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
 
@@ -943,7 +967,7 @@ def build_parser() -> argparse.ArgumentParser:
     enroll.add_argument(
         "--force",
         action="store_true",
-        help="Deprecated compatibility flag. Matching local skill directories are auto-replaced by default.",
+        help="Deprecated compatibility flag. Real local skill directories remain conflicts.",
     )
     enroll.add_argument("--dry-run", action="store_true", help="Print the plan without changing files.")
     enroll.set_defaults(func=perform_enroll)
@@ -958,10 +982,22 @@ def build_parser() -> argparse.ArgumentParser:
     sync.add_argument(
         "--force",
         action="store_true",
-        help="Deprecated compatibility flag. Matching local skill directories are auto-replaced by default.",
+        help="Deprecated compatibility flag. Real local skill directories remain conflicts.",
     )
     sync.add_argument("--dry-run", action="store_true", help="Print the repair plan without changing files.")
     sync.set_defaults(func=perform_sync)
+
+    unenroll = subparsers.add_parser(
+        "unenroll",
+        help="Preview or remove only verified live aliases from a previously enrolled repo.",
+    )
+    unenroll.add_argument("--repo", required=True, help="Path to the enrolled consumer repo.")
+    unenroll.add_argument(
+        "--apply",
+        action="store_true",
+        help="Remove verified aliases, the manifest, and the local registry entry. Defaults to preview only.",
+    )
+    unenroll.set_defaults(func=perform_unenroll)
 
     verify = subparsers.add_parser("verify", help="Check whether enrolled skills are live aliases that receive canonical updates immediately.")
     verify.add_argument("--repo", required=True, help="Path to the enrolled consumer repo.")

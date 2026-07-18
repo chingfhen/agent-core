@@ -1,6 +1,6 @@
 # Consumer Repo Enrollment
 
-**Last Updated:** 2026-07-15
+**Last Updated:** 2026-07-18
 
 **Status:** Current
 
@@ -16,7 +16,7 @@
 - Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
-- Trust the setup only when the selected skills are live aliases; copied local skill directories are transitional and should be auto-replaced by steward workflows.
+- Trust the setup only when the selected skills are live aliases; real local skill directories are conflicts that require explicit migration.
 - Consumer repos receive `agent-os-session` as a shared session-start skill; executor skills that need Agent OS context read `.agent-os.json` directly.
 
 ### Scope
@@ -39,7 +39,15 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 - Enrollment does not require an existing Git worktree; if `.gitignore` is missing, the steward creates it.
 - Device-local steward state is untracked.
 - This system does not depend on modifying consumer repo `AGENTS.md` files.
-- Enrollment and sync both converge the repo toward live aliases rather than copied skill directories.
+- Enrollment and sync install or repair only verified aliases; they stop on real local skill directories instead of deleting them.
+
+#### Unenrollment Model
+
+- Run `uv run scripts/enroll_repo.py unenroll --repo <path>` to preview an unenrollment. Add `--apply` to proceed.
+- Unenrollment removes only registry-recorded aliases that still resolve to their expected canonical skill directories.
+- It removes a steward-managed `.agent-os.json` and the matching device-local registry entry after alias removal succeeds.
+- It never removes `.claude/skills`, `.opencode/skills`, their parent directories, or `.gitignore` entries.
+- A broken, unexpected, or real-directory target is a conflict. The command stops without deleting it.
 
 #### Default Enrollment Skill Set
 
@@ -62,7 +70,7 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 - Official OpenCode docs confirm project skill discovery for `.opencode/skills/*`.
 - Steward enroll and sync keep the same canonical skill set aligned across both managed surfaces.
 - Codex repo-local skill semantics remain future work.
-- Exact or divergent local copies under those alias paths are not the trusted steady state; they are auto-replaced on enroll and sync.
+- Exact or divergent local copies under those alias paths are not the trusted steady state; they are conflicts on enroll and sync until explicitly migrated.
 
 #### Manifest Schema V1
 
@@ -99,7 +107,7 @@ Example:
 - Executor skills that need repo-local Agent OS context read `.agent-os.json` directly.
 - `agent-os-memory` is the current canonical executor skill that consumes manifest fields.
 - If a future executor skill needs manifest context, keep that read local to the skill instead of reintroducing a separate shared bootstrap step.
-- `uv run scripts/enroll_repo.py sync --repo <path>` removes retired `agent-os-bootstrap` aliases and stale registry references from older enrollments.
+- `uv run scripts/enroll_repo.py sync --repo <path>` removes verified retired `agent-os-bootstrap` aliases while repairing the recorded enrollment.
 
 #### Link Strategy
 
@@ -116,6 +124,7 @@ Example:
 - For this workflow, both directory symlinks and directory junctions count as live aliases.
 - Exact or divergent copied skill directories do not satisfy the guarantee even if they happen to match the canonical content today.
 - Edits propagate both ways through a live alias: changing the canonical skill updates the consumer repo immediately, and editing through the consumer path edits the canonical source.
+- Never recursively delete, move, or modify a live alias or a harness skill parent directory. Such operations can affect canonical source content.
 - `uv run scripts/enroll_repo.py verify --repo <path>` returns success only when the repo is in that live-alias steady state.
 
 #### Ignore Policy
@@ -129,12 +138,12 @@ Example:
 #### Steward Safety Model
 
 - Preflight every planned target path as `missing`, `managed`, or `conflict`.
-- `managed` means the path is already steward-installed, clearly points at the expected Agent OS skill target, or is a matching local skill directory that should be auto-replaced.
+- `managed` means the path is already steward-installed and clearly points at the expected Agent OS skill target.
 - Create `missing` paths automatically.
-- Repair or replace only clearly `managed` paths automatically.
-- Matching local skill directories are auto-replaced with live aliases and reported as a notice to the human.
-- A local directory that declares a different skill name, is a file, or points at some unrelated location is still a `conflict` and must not be overwritten automatically.
-- Stop and ask before replacing a `conflict` path that is an unrelated real file or directory.
+- Repair or replace only clearly `managed` live aliases automatically.
+- A local directory, including one that declares the expected skill name, is a `conflict` and must not be overwritten automatically.
+- A broken or unexpected symlink or junction is a `conflict`; link-detection uncertainty must fail closed.
+- Stop and ask before replacing or removing a `conflict` path.
 - Do not wipe whole harness directories when only exact managed alias paths are steward-owned.
 
 #### Memory Integration Boundary
@@ -158,12 +167,14 @@ Example:
 | Memory script | `scripts/memory.py` | Canonical steward memory tooling behind the local memory skill. |
 | Manifest schema | `schemas/agent-os-manifest.schema.json` | Defines the v1 `.agent-os.json` contract. |
 | Verification command | `uv run scripts/enroll_repo.py verify --repo <path>` | Confirms whether a repo is in the trusted live-alias steady state. |
+| Unenrollment command | `uv run scripts/enroll_repo.py unenroll --repo <path> [--apply]` | Previews or removes only verified aliases without touching harness parent directories. |
 | Active memory task | `tasks/2026-06-19__agent-os-memory-real-repo-validation-bookmark.md` | Tracks the next real enrolled-repo validation pass for memory-enabled repos. |
 
 ### Decisions
 
 | Date | Decision | Rationale |
 | ---- | -------- | --------- |
+| 2026-07-18 | Enroll and sync fail on real local skill directories; unenroll is dry-run-first and removes only verified aliases. | A live alias can resolve into canonical source, so recursive cleanup and automatic local-directory replacement are unsafe. |
 | 2026-06-19 | Consumer repos are enrolled per device by steward workflows. | Repo setup should be repeatable and steward-managed rather than relying on manual manifest placement. |
 | 2026-06-19 | Executors consume repo-local skill aliases. | Executor agents should use ordinary local skill names without caring about canonical provenance. |
 | 2026-06-19 | `.agent-os.json` is gitignored by default. | The manifest contains per-user and per-device integration state and should not confuse teammates. |
@@ -177,4 +188,3 @@ Example:
 | 2026-06-21 | Shared local project skills sync to both `.claude/skills` and `.opencode/skills`. | Claude and OpenCode should each receive the same canonical skills through their native project-local discovery paths. |
 | 2026-06-19 | Windows enrollment defaults to symlink with junction fallback. | The first pilot lacked symlink privileges, so a non-destructive fallback was required to complete setup. |
 | 2026-06-19 | Device-local enrollment state lives in `.agent-os-state/enrollments.json`. | Repair runs need a local registry without tracked repo noise. |
-| 2026-06-19 | Consumer-repo skill copies are transitional and auto-replaced. | The whole value of the system depends on trustworthy live canonical updates rather than stale duplicates. |

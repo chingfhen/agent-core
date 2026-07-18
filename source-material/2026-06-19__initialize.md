@@ -1,3 +1,5 @@
+> Historical seed material only. Its "Nuke and Pave" guidance is superseded by `docs/consumer-repo-enrollment.md`: never wipe harness skill directories, and remove only verified aliases through `scripts/enroll_repo.py unenroll`.
+
 Here is the complete, unambiguous technical specification. You can copy this directly into a HANDOFF.md or README.md file in your new repository, and a coding agent will have all the context, schemas, boundaries, and rules it needs to build the Agent OS exactly as we designed it.
 ```markdown
 # Agent OS: Implementation Handoff & Architecture Spec
