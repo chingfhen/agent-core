@@ -12,8 +12,8 @@ Maintain task-specific execution briefs, typically in `tasks/`, for work that ne
 
 A task file is a **shared control surface** serving two purposes:
 
-1. **Execution continuity**: a fresh-session executor can continue and verify the work without the old conversation.
-2. **Human control**: the human owner can understand the direction, inspect important nuance, challenge decisions, assess risk, and decide whether execution should proceed.
+1. **Execution continuity** — a fresh-session executor can continue and verify the work without the old conversation.
+2. **Human control** — the human owner can understand the direction, inspect important nuance, challenge decisions, assess risk, and decide whether execution should proceed.
 
 A task file is not durable documentation, a transcript, a session diary, an exhaustive implementation manual, or a dumping ground for technical detail. It is a **continuously rewritten execution brief**.
 
@@ -21,7 +21,7 @@ For execution-bound work, it must stand alone. The executor should not need the 
 
 ```text
 Human owns                         Agent owns
------------                        ----------
+──────────                         ──────────
 Intent                             Code navigation
 Priorities                         Routine implementation mechanics
 Product expectations               Low-level sequencing
@@ -32,7 +32,7 @@ Risk tolerance                     Ordinary code-placement choices
 Approvals and access               Reconstructible technical detail
 
                  Task file
-       -------------------------
+       ─────────────────────────
        Shared understanding of:
        what, why, chosen direction,
        current state, important nuance,
@@ -40,7 +40,9 @@ Approvals and access               Reconstructible technical detail
        of success
 ```
 
-The human should see anything that could materially change direction, responsibility boundaries, user-visible or failure behavior, security, privacy, data integrity, cost, maintainability, recovery semantics, or confidence in the plan. The agent should own routine mechanics that do not affect those concerns.
+The human should see anything that could materially change direction, responsibility boundaries, user-visible or failure behaviour, security, privacy, data integrity, cost, maintainability, recovery semantics, or confidence in the plan. The agent should own routine mechanics that do not affect those concerns.
+
+---
 
 ## Core Model
 
@@ -57,6 +59,8 @@ The human should see anything that could materially change direction, responsibi
 - Keep the first screen highly scannable.
 - Prefer one authoritative statement of each important fact.
 
+---
+
 ## Information Selection
 
 Ask both:
@@ -69,36 +73,37 @@ Then apply:
 
 ```text
 Does it affect human steering, approval, risk, or direction?
-        |-- Yes -> surface clearly
-        `-- No
-             |
-             v
+        ├── Yes → surface clearly
+        └── No
+             ↓
 Is it execution-critical and hard to reconstruct?
-        |-- Yes -> preserve in executor detail
-        `-- No  -> compress or omit
+        ├── Yes → preserve in executor detail
+        └── No  → compress or omit
 ```
 
-### Surface Clearly
+### Surface clearly
 
 Use the first screen or `Human Attention` for details affecting:
 
 - human steering or approval;
-- product behavior or architecture direction;
+- product behaviour or architecture direction;
 - responsibility boundaries;
 - security, privacy, safety, cost, or data integrity;
 - rollback, retry, replay, recovery, or idempotency;
 - long-term maintainability;
 - confidence that the selected plan is sound.
 
-### Preserve Below the First Screen
+### Preserve below the first screen
 
 Keep detail that is execution-critical, difficult to reconstruct, needed to prevent a repeated mistake, or necessary to understand a non-obvious constraint.
 
-### Compress or Omit
+### Compress or omit
 
 Usually omit routine code navigation, obvious sequencing, ordinary commands, reconstructible test mechanics, duplicated facts, stale investigation history, and trivia that changes neither execution nor human control.
 
 The goal is not to preserve history. The goal is to preserve **execution effectiveness and human control**.
+
+---
 
 ## First-Screen Contract
 
@@ -110,10 +115,10 @@ tasks/YYYY-MM-DD__kebab-case-name-bookmark.md
 
 The date is an **immutable creation date**. Keep `tasks/` flat unless the repository already uses another convention. Do not mass-rename historical tasks.
 
-### Lifecycle Fields
+### Lifecycle fields
 
 | Field | Values | Meaning |
-| --- | --- | --- |
+|---|---|---|
 | **Priority** | `Now` | Active priority. |
 |  | `Next` | Intended next-up work. |
 |  | `Later` | Preserved but not near-term. |
@@ -121,13 +126,14 @@ The date is an **immutable creation date**. Keep `tasks/` flat unless the reposi
 |  | `Blocked` | Meaningful execution cannot proceed until a blocker clears. |
 |  | `On Hold` | Intentionally paused. |
 |  | `Closed` | Active execution has ended. |
-| **Execution Gate** | `Needs Human Unblock` | A human must act, approve, decide, provide access, or coordinate an external unblock. |
+| **Execution Gate** | `Needs Human Unblock` | A human must act, approve, decide, or provide access. |
 |  | `Ready for Main-Agent Execution` | No known hard blockers; execute mainly through the main agent. |
 |  | `Ready for Delegated Execution` | No known hard blockers; bounded parts may be delegated safely. |
 |  | `Not Applicable (Closed)` | The task is closed. |
 | **Docs Sync** | `Not Synced` | Durable knowledge has not been checked or promoted. |
 |  | `Partial` | Some durable knowledge was handled; more may remain. |
-|  | `Synced` | Durable knowledge has been checked and any required promotion is complete. |
+|  | `Synced` | Durable knowledge has been handled. |
+|  | `Not Applicable` | No durable knowledge requires promotion. |
 
 `Status` describes lifecycle state. `Execution Gate` describes whether execution may begin and what execution shape is allowed. `Docs Sync` describes durable-knowledge handling only.
 
@@ -137,7 +143,7 @@ When `Execution Gate: Needs Human Unblock`, set `Status: Blocked`, make `Next Ac
 
 When `Status: Closed`, set `Execution Gate: Not Applicable (Closed)` and leave no pending execution disguised as completed work.
 
-### Normal Shape
+### Normal shape
 
 ```markdown
 # Task: [Clear short name]
@@ -148,7 +154,7 @@ When `Status: Closed`, set `Execution Gate: Not Applicable (Closed)` and leave n
 **Priority:** [Now | Next | Later]
 **Status:** [Active | Blocked | On Hold | Closed]
 **Execution Gate:** [Needs Human Unblock | Ready for Main-Agent Execution | Ready for Delegated Execution | Not Applicable (Closed)]
-**Docs Sync:** [Not Synced | Partial | Synced]
+**Docs Sync:** [Not Synced | Partial | Synced | Not Applicable]
 
 **Goal:** [...]
 **Why:** [...]
@@ -165,7 +171,7 @@ When `Status: Closed`, set `Execution Gate: Not Applicable (Closed)` and leave n
 
 For a genuinely small task, `Why`, `Chosen Approach`, or `Human Attention` may be omitted when they add no value. For consequential or execution-bound work, omission should be deliberate.
 
-### Human Skim Test
+### Human skim test
 
 After reading the first screen, the human should be able to explain:
 
@@ -177,10 +183,10 @@ After reading the first screen, the human should be able to explain:
 6. What important nuance deserves supervision?
 7. Can anything stop execution?
 
-### Writing Rules
+### Writing rules
 
 - Use plain language before code symbols or shorthand.
-- Explain system behavior and consequences, not merely file edits.
+- Explain system behaviour and consequences, not merely file edits.
 - Keep each field focused on one purpose.
 - Use compact bullets for independently verifiable conditions.
 - Name code locations only after explaining why they matter.
@@ -205,13 +211,15 @@ A nuance belongs here when it:
 - changes component ownership or responsibility boundaries;
 - creates silent, repeated, or cumulative degradation;
 - creates a non-obvious security, privacy, financial, data-integrity, or operational risk;
-- determines important fallback, retry, replay, recovery, or idempotency behavior;
+- determines important fallback, retry, replay, recovery, or idempotency behaviour;
 - exposes hidden coupling or a brittle assumption;
 - explains why an apparently simple implementation is dangerous;
 - captures a lesson future agents are likely to miss;
 - materially affects approval or architecture direction.
 
 Explain why the nuance matters. Do not fill this field with routine implementation detail.
+
+---
 
 ## Adaptive Structure
 
@@ -230,27 +238,21 @@ Optional sections:
 - Chosen Approach Detail
 - Important Trade-offs
 - Boundaries / Stop Conditions
-- Problem Origin
-- Current Understanding
 - Remaining Uncertainty
-- Superseded Understanding
 - Implementation Plan
 - Executor Guidance
-- Likely Blind Spots
 - Verification Contract
-- Context Pointers
 - Visual Handle
 - Dangerous Evolution to Avoid
-- Execution Topology
 
 Typical emphasis:
 
-- **Feature work:** outcomes, locked decisions, and implementation plan.
-- **Debugging:** problem origin, current understanding, useful ruled-out conclusions, and verification.
-- **Investigation:** current understanding, uncertainty, and next evidence.
-- **Architecture change:** approach detail, trade-offs, Human Attention, and a visual.
-- **Small task:** dashboard, next action, and verification.
-- **Risky operational work:** Human Attention, stop conditions, rollback or recovery, and verification.
+- **Feature work:** outcomes, locked decisions, implementation plan.
+- **Debugging:** current state, useful ruled-out conclusions, verification.
+- **Investigation:** current understanding, uncertainty, next evidence.
+- **Architecture change:** approach detail, trade-offs, Human Attention, visual.
+- **Small task:** dashboard, next action, verification.
+- **Risky operational work:** Human Attention, stop conditions, rollback or recovery, verification.
 
 ### Dangerous Evolution to Avoid
 
@@ -263,19 +265,22 @@ Use a tiny ASCII sketch when the mental model is a pipeline, graph, state machin
 Skip it for linear, small, or obvious changes, and when it would go stale faster than it helps.
 
 ```text
-queued -> running -> completed
-          |
-          v
-        failed -> retry
+queued → running → completed
+          ↓
+        failed → retry
 ```
 
 A visual is a compression tool, not decoration.
 
+---
+
 ## Alignment and Decision Finality
 
-Before creating or materially reshaping consequential work, load and use `grilling` to establish human-owned intent and decisions. Apply the evidence-first pass below before asking questions so grilling stays focused rather than repetitive.
+Before creating or materially reshaping consequential work, run an alignment pass.
 
-### Evidence First
+### Evidence first
+
+Before asking the human anything:
 
 1. Extract the goal, constraints, boundaries, expected outcomes, and prior decisions from the conversation, task, docs, and code.
 2. Identify only missing details that materially affect human control.
@@ -295,7 +300,7 @@ Establish when relevant:
 
 Draft `Expected Outcomes` for confirmation only when material outcomes remain ambiguous.
 
-### Finality Rule
+### Finality rule
 
 A task is not ready merely because an executor could make a reasonable choice.
 
@@ -305,11 +310,11 @@ For every material unresolved choice, do exactly one:
 2. **Classify it** as executor-owned implementation detail.
 3. **Surface it** as a human blocker.
 
-Do not hide material product, architecture, security, fallback, cost, migration, or user-behavior choices inside phrases such as `either`, `optionally`, `depending on preference`, or `choose during implementation`.
+Do not hide material product, architecture, security, fallback, cost, migration, or user-behaviour choices inside phrases such as `either`, `optionally`, `depending on preference`, or `choose during implementation`.
 
 Those phrases are acceptable only for genuine executor-owned details that do not affect human control.
 
-### Outcome-Oriented Plans
+### Outcome-oriented plans
 
 Plans should describe meaningful phases, not merely file operations. Each phase should communicate its outcome, purpose, important boundary or risk, and verification.
 
@@ -324,39 +329,41 @@ Weak:
 Better:
 
 ```markdown
-### Phase 1: Establish the artifact contract
+### Phase 1 — Establish the artifact contract
 
 Define how the threshold belongs to one trained model so it cannot drift independently from the deployed weights.
 
-### Phase 2: Apply and validate the threshold
+### Phase 2 — Apply and validate the threshold
 
-Load the threshold during model initialization, define behavior for missing or incompatible files, and expose the active value through logs or metadata.
+Load the threshold during model initialization, define behaviour for missing or incompatible files, and expose the active value through logs or metadata.
 
-### Phase 3: Prove deployed behavior
+### Phase 3 — Prove deployed behaviour
 
 Verify valid, missing, malformed, and incompatible artifact paths.
 ```
+
+---
 
 ## Blocker Preflight
 
 Before writing a substantial execution plan, resuming work, or preparing a fresh-session handoff, actively inspect for blockers.
 
-1. **Human access:** missing credentials, permissions, private data, provider access, OAuth, billing, or external configuration.
-2. **Human decision:** unresolved acceptance criteria or product, architecture, security, privacy, migration, fallback, cost, or deployment choices.
-3. **External system:** unavailable provider capability, pending approval, insufficient quota, missing test environment, hardware, or live validation.
-4. **Technical contract:** a required schema, interface, identifier mapping, dependency capability, production state, or safe validation path is unknown and cannot be inferred safely.
-5. **Operational safety:** no rollback, backup, controlled validation, observability, clear ownership, or protection against destructive or paid-provider replay.
+1. **Human access** — missing credentials, permissions, private data, provider access, OAuth, billing, or external configuration.
+2. **Human decision** — unresolved acceptance criteria or product, architecture, security, privacy, migration, fallback, cost, or deployment choices.
+3. **External system** — unavailable provider capability, pending approval, insufficient quota, missing test environment, hardware, or live validation.
+4. **Technical contract** — a required schema, interface, identifier mapping, dependency capability, production state, or safe validation path is unknown and cannot be inferred safely.
+5. **Operational safety** — no rollback, backup, controlled validation, observability, clear ownership, or protection against destructive or paid-provider replay.
 
-### Blocker Versus Executor-Owned Uncertainty
+### Blocker versus executor-owned uncertainty
 
 ```text
 Can a fresh executor resolve this through a bounded investigation?
-        |-- Yes -> put it in the execution plan
-        `-- No, or meaningful work cannot continue
-                -> hard blocker
+        ├── Yes → put it in the execution plan
+        └── No, or meaningful work cannot continue
+               → hard blocker
 ```
 
-A bounded investigation must state the exact question, evidence to inspect, and the decision or implementation step that follows. `Investigate further` is not a plan.
+A bounded investigation must state the exact question, evidence to inspect, and the decision or implementation step that follows. “Investigate further” is not a plan.
 
 For every hard blocker, record:
 
@@ -366,6 +373,8 @@ For every hard blocker, record:
 - whether all execution or only a later phase is blocked.
 
 Human-only blockers should normally be cleared before handoff where practical. Never encourage an executor to brute-force around a blocker only a human can resolve.
+
+---
 
 ## Execution Readiness Gate
 
@@ -393,7 +402,7 @@ A task passes only when:
 - the task does not depend on the old conversation;
 - dashboard, plan, blockers, and lifecycle fields agree.
 
-### Consistency Checks
+### Consistency checks
 
 Reject or correct:
 
@@ -412,7 +421,7 @@ Reject or correct:
 
 The dashboard is not decorative metadata. It must agree with the body.
 
-### Ready Outcome
+### Ready outcome
 
 When no hard blockers remain:
 
@@ -428,13 +437,13 @@ Blockers: None
 First executable action: [...]
 ```
 
-### Blocked Outcome
+### Blocked outcome
 
 When a hard blocker remains:
 
 - set `Execution Gate: Needs Human Unblock`;
 - set `Status: Blocked`;
-- make `Next Action` the exact human action required to resolve or coordinate the blocker;
+- make `Next Action` the exact human action required;
 - explain why meaningful execution must stop;
 - do not describe the task as ready.
 
@@ -447,6 +456,8 @@ Execution gate: Needs Human Unblock
 ```
 
 Never silently update the file while leaving the human to assume it is executable.
+
+---
 
 ## Compression and Current Truth
 
@@ -464,7 +475,7 @@ Rewrite tasks for both a technically strong fresh executor and a human owner wit
 - dangerous directions to avoid;
 - verification requirements.
 
-### Compress or Remove
+### Compress or remove
 
 - stale hypotheses and superseded root causes;
 - duplicate observations or evidence;
@@ -479,6 +490,8 @@ Do not preserve history merely because it happened. Do not add detail merely bec
 When understanding changes, update `Current State` and the selected plan, remove invalidated beliefs from active sections, and retain a ruled-out conclusion only when it prevents repeated mistakes.
 
 The task should reflect current understanding, not archaeological layers.
+
+---
 
 ## Lifecycle
 
@@ -513,7 +526,7 @@ Done when a fresh executor can execute without reconstructing missing context an
 ### Resume
 
 - Start with the dashboard and check the gate before acting.
-- If `Execution Gate: Needs Human Unblock`, stop and surface the required human action.
+- If human-unblocked, stop and surface the required action.
 - Understand current truth before editing.
 - Review deeper sections only as needed.
 - Preserve newly discovered human-control nuance.
@@ -533,6 +546,8 @@ Done when a fresh executor can execute without reconstructing missing context an
 - Create a separate active or backlog task when meaningful work remains.
 - Do not leave deployment, validation, approval, or cleanup inside a closed task.
 
+---
+
 ## Non-Negotiables
 
 - Do not place live task dashboards in agent guidance files.
@@ -546,6 +561,8 @@ Done when a fresh executor can execute without reconstructing missing context an
 - Do not hide product or architecture decisions inside implementation discretion.
 - Do not bury human-control nuance in code-level detail.
 - Do not bloat the task with reconstructible mechanics.
+
+---
 
 ## Final Test
 
