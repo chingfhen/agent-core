@@ -15,7 +15,7 @@
 - `prompts/` holds canonical reusable prompt snippets and policy blocks steward agents can reuse across repos and workflows.
 - `AGENTS.md` is the authoritative operating contract for steward agents maintaining this repo.
 - `docs/consumer-repo-enrollment.md` is the canonical contract for steward-managed consumer-repo enrollment and local alias behavior.
-- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `grilling`, and `human-technical-orientation` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
+- Consumer repos are enrolled per device by steward workflows that install local skill aliases under both `.claude/skills` and `.opencode/skills`, install `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `grilling`, `human-technical-orientation`, and `execution-readiness` by default, write `.agent-os.json`, and keep those outputs gitignored by default.
 - `agent-os-session` is the shared session-start skill; any executor skill that needs Agent OS repo context reads `.agent-os.json` directly.
 - Steward-managed local skill aliases are installed under `.claude/skills` for Claude and `.opencode/skills` for OpenCode.
 - On Windows, enrollment prefers directory symlinks and falls back to directory junctions when symlink privileges are unavailable.

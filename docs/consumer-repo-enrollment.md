@@ -12,7 +12,7 @@
 
 - Consumer repos are enrolled per device by steward workflows, not by manual repo editing.
 - The steward-managed local skill surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
-- New enrollments install the default consumer-repo skill set: `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `grilling`, and `human-technical-orientation`. All other canonical skills are opt-in with `--skill`.
+- New enrollments install the default consumer-repo skill set: `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `grilling`, `human-technical-orientation`, and `execution-readiness`. All other canonical skills are opt-in with `--skill`.
 - Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
 - `.agent-os.json` is generated repo-local state and gitignored by default.
 - On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
@@ -58,6 +58,7 @@ This document covers repo-local manifests, local skill surface installs, ignore 
 - `manage-python-uv`
 - `grilling`
 - `human-technical-orientation`
+- `execution-readiness`
 - All other canonical skills install only when explicitly requested with `--skill`.
 
 #### Generated Consumer-Repo Surfaces
