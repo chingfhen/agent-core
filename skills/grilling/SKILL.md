@@ -1,10 +1,12 @@
 ---
 name: grilling
-description: Interview the user relentlessly about a plan or design. Use when the user wants to stress-test a plan before building, or uses any 'grill' trigger phrases.
+description: Stress-tests a plan or design through sequential, dependency-aware questioning. Use when the user asks to be grilled, wants deep interrogation before building, or needs unresolved design decisions explored one at a time.
 ---
 
-Interview me relentlessly about every aspect of this plan until we reach a shared understanding. Walk down each branch of the design tree, resolving dependencies between decisions one-by-one. For each question, provide your recommended answer.
+Interrogate the plan until we reach shared understanding.
 
-Ask the questions one at a time, waiting for feedback on each question before continuing. Asking multiple questions at once is bewildering.
+Ask one question at a time. Each question should follow from the current answers, target the highest-value unresolved decision, and include your recommended answer with a brief rationale.
 
-If a question can be answered by exploring the codebase, explore the codebase instead.
+Explore the codebase instead of asking when the answer can be discovered from available evidence.
+
+Continue until the important branches, dependencies, assumptions, and trade-offs are resolved.
