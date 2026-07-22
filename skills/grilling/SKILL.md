@@ -1,6 +1,6 @@
 ---
 name: grilling
-description: Stress-tests a plan or design through sequential, dependency-aware questioning. Use when the user asks to be grilled, wants deep interrogation before building, or needs unresolved design decisions explored one at a time.
+description: Stress-tests a plan or design through sequential, dependency-aware questioning. Use when the user asks to be grilled, wants deep interrogation before building, or needs unresolved design decisions explored one at a time - typically run early during planning of task. 
 ---
 
 Interrogate the plan until we reach shared understanding.

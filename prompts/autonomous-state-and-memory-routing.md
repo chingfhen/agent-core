@@ -1,3 +1,5 @@
+Depreciated for a skill instead.
+
 # Autonomous State And Memory Routing
 
 **Status:** Current
