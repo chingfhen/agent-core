@@ -309,6 +309,8 @@ Do not hide material product, architecture, security, fallback, cost, migration,
 
 Those phrases are acceptable only for genuine executor-owned details that do not affect human control.
 
+
+
 ### Outcome-Oriented Plans
 
 Plans should describe meaningful phases, not merely file operations. Each phase should communicate its outcome, purpose, important boundary or risk, and verification.
@@ -447,6 +449,12 @@ Execution gate: Needs Human Unblock
 ```
 
 Never silently update the file while leaving the human to assume it is executable.
+
+### Security and Privacy
+
+- Never include secrets, credentials, API keys, tokens, passwords, or private keys.
+- Minimize personally identifiable or confidential information.
+- Reference protected source material rather than copying sensitive content.
 
 ## Compression and Current Truth
 

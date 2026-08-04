@@ -13,7 +13,7 @@ disable-model-invocation: false
   * When the user asks to be grilled or wants a plan deeply stress-tested before building, load `grilling`.
   * Before substantial end-to-end execution or preparing a fresh-agent execution handoff, load `execution-readiness`.
 
-* **`docs/` and `tasks/` are skill-gated.** Reading is unrestricted. Before editing anything under `docs/`, README files, or agent-guidance surfaces such as `AGENTS.md`, load `project-docs`. Before creating or editing anything under `tasks/`, load `project-tasks`. Those skills define the maintenance rules.
+* **`docs/` and `tasks/` are skill-gated.** Reading is unrestricted. Before editing anything under `docs/`, README files, or agent-guidance surfaces such as `AGENTS.md`, load `project-docs`. Before creating or editing anything under `tasks/`, load `project-tasks`. Those skills define the maintenance rules. Stop and raise immediately the the skills cannot be loaded or found.
 
 * **Repository routing.**
 
