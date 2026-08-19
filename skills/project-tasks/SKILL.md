@@ -36,15 +36,16 @@ Approvals and access               Reconstructible technical detail
        Shared understanding of:
        what, why, chosen direction,
        current state, important nuance,
-       blockers, next move, and proof
-       of success
+       blockers, next move, approved plan,
+       and proof of success
 ```
 
 The human should see anything that could materially change direction, responsibility boundaries, user-visible or failure behavior, security, privacy, data integrity, cost, maintainability, recovery semantics, or confidence in the plan. The agent should own routine mechanics that do not affect those concerns.
 
 ## Core Model
 
-- **`project-tasks` owns active execution state**, planning decisions, blockers, and fresh-session handoffs.
+- **`project-tasks` owns active execution state**, the approved or currently authoritative plan, blockers, verification state, and fresh-session handoffs.
+- **`planning` owns how substantial work is shaped and resolved before approval.**
 - **`project-docs` owns durable project knowledge** and absorbs stable truths.
 - **`tasks/backlog/` owns deferred future-work briefs** that should survive without becoming active execution state.
 - **`source-material/` holds supporting artifacts** that may inform work without becoming canonical truth.
@@ -252,6 +253,30 @@ Typical emphasis:
 - **Small task:** dashboard, next action, and verification.
 - **Risky operational work:** Human Attention, stop conditions, rollback or recovery, and verification.
 
+### Implementation Plan
+
+When an approved or authoritative plan exists, preserve it here as a compact sequence of meaningful outcomes.
+
+The task file owns the persisted plan, but it does not need to reproduce the full reasoning process used to create it.
+
+Prefer:
+
+```markdown
+### Phase 1: Establish the artifact contract
+
+Define how the threshold belongs to one trained model so it cannot drift independently from the deployed weights.
+
+### Phase 2: Apply and validate the threshold
+
+Load the threshold during model initialization, define behavior for missing or incompatible files, and expose the active value through logs or metadata.
+
+### Phase 3: Prove deployed behavior
+
+Verify valid, missing, malformed, and incompatible artifact paths.
+```
+
+Avoid reducing a human-approved plan into a low-level file-edit checklist unless those exact mechanics are important to execution or supervision.
+
 ### Dangerous Evolution to Avoid
 
 Use this sparingly when a tempting shortcut could grow into a brittle, misowned, unsafe, or costly subsystem. State the shortcut, why it is harmful, and the boundary that prevents it.
@@ -271,77 +296,25 @@ queued -> running -> completed
 
 A visual is a compression tool, not decoration.
 
-## Alignment and Decision Finality
+## Decision Finality in the Task
 
-Before creating or materially reshaping consequential work, load and use `grilling` to establish human-owned intent and decisions. Apply the evidence-first pass below before asking questions so grilling stays focused rather than repetitive.
-
-### Evidence First
-
-1. Extract the goal, constraints, boundaries, expected outcomes, and prior decisions from the conversation, task, docs, and code.
-2. Identify only missing details that materially affect human control.
-3. Classify each missing choice as human-owned, executor-owned, or blocking.
-4. Ask only about unresolved human-owned choices.
-
-Do not over-question straightforward updates. Do not ask the human to decide routine mechanics a strong executor can resolve safely.
-
-Establish when relevant:
-
-- the real goal and observable success criteria;
-- important constraints and non-goals;
-- expected outcomes;
-- mistakes future executors must avoid;
-- responsibility boundaries;
-- trade-offs requiring human ownership.
-
-Draft `Expected Outcomes` for confirmation only when material outcomes remain ambiguous.
-
-### Finality Rule
-
-A task is not ready merely because an executor could make a reasonable choice.
+The task must reflect one authoritative current direction.
 
 For every material unresolved choice, do exactly one:
 
-1. **Lock it** as an approved decision.
+1. **Lock it** as an approved or authoritative decision.
 2. **Classify it** as executor-owned implementation detail.
-3. **Surface it** as a human blocker.
+3. **Surface it** as unresolved uncertainty or a human blocker.
 
 Do not hide material product, architecture, security, fallback, cost, migration, or user-behavior choices inside phrases such as `either`, `optionally`, `depending on preference`, or `choose during implementation`.
 
 Those phrases are acceptable only for genuine executor-owned details that do not affect human control.
 
-
-
-### Outcome-Oriented Plans
-
-Plans should describe meaningful phases, not merely file operations. Each phase should communicate its outcome, purpose, important boundary or risk, and verification.
-
-Weak:
-
-```text
-1. Update config.
-2. Change loader.
-3. Add tests.
-```
-
-Better:
-
-```markdown
-### Phase 1: Establish the artifact contract
-
-Define how the threshold belongs to one trained model so it cannot drift independently from the deployed weights.
-
-### Phase 2: Apply and validate the threshold
-
-Load the threshold during model initialization, define behavior for missing or incompatible files, and expose the active value through logs or metadata.
-
-### Phase 3: Prove deployed behavior
-
-Verify valid, missing, malformed, and incompatible artifact paths.
-```
+When substantial planning is still required and the user has not approved a direction, use `planning` rather than turning the task file into the planning conversation.
 
 ## Blocker Preflight
 
-Before writing a substantial execution plan, resuming work, or preparing a fresh-session handoff, actively inspect for blockers.
+Before marking substantial work ready for execution, resuming execution after material changes, or preparing a fresh-session handoff, inspect for blockers.
 
 1. **Human access:** missing credentials, permissions, private data, provider access, OAuth, billing, or external configuration.
 2. **Human decision:** unresolved acceptance criteria or product, architecture, security, privacy, migration, fallback, cost, or deployment choices.
@@ -353,12 +326,12 @@ Before writing a substantial execution plan, resuming work, or preparing a fresh
 
 ```text
 Can a fresh executor resolve this through a bounded investigation?
-        |-- Yes -> put it in the execution plan
+        |-- Yes -> preserve the investigation in the plan or next action.
         `-- No, or meaningful work cannot continue
-                -> hard blocker
+                -> hard blocker.
 ```
 
-A bounded investigation must state the exact question, evidence to inspect, and the decision or implementation step that follows. `Investigate further` is not a plan.
+A bounded investigation should state the exact question, evidence to inspect, and the decision or implementation step that follows. `Investigate further` is not a useful next action.
 
 For every hard blocker, record:
 
@@ -371,23 +344,23 @@ Human-only blockers should normally be cleared before handoff where practical. N
 
 ## Execution Readiness Gate
 
-Use this stricter operation when the user asks to finalize plans, check blockers, prepare the task for a fresh agent, or otherwise make it executable.
+Use this gate when the user asks to finalize a task for execution, prepare a fresh-agent handoff, or when substantial execution is about to begin from the task.
 
 ```text
-1. Synchronize current truth
-2. Finalize or classify every material decision
-3. Build a readable human skim layer
-4. Finalize an outcome-oriented execution plan
-5. Run Blocker Preflight
-6. Check dashboard/body consistency
-7. Declare READY or BLOCKED
+1. Synchronize current truth.
+2. Ensure the selected direction is authoritative.
+3. Ensure the human skim layer is readable.
+4. Ensure the implementation plan is preserved when needed.
+5. Run Blocker Preflight.
+6. Check dashboard/body consistency.
+7. Declare READY or BLOCKED.
 ```
 
 A task passes only when:
 
 - the goal, why, success bar, and chosen approach are clear;
 - the human can understand the direction and important nuance;
-- the plan is coherent, outcome-oriented, and verifiable;
+- the persisted plan is coherent and verifiable when one is needed;
 - decisions are separated from uncertainty;
 - every material unresolved issue is classified;
 - no undisclosed hard blocker remains;
@@ -407,7 +380,7 @@ Reject or correct:
 - `Needs Human Unblock` without `Status: Blocked`;
 - `Status: Closed` without `Not Applicable (Closed)`;
 - a success bar unsupported by the verification contract;
-- a chosen approach that conflicts with the plan;
+- a chosen approach that conflicts with the implementation plan;
 - current state that preserves superseded understanding;
 - duplicate or contradictory authoritative statements;
 - a missing Execution Gate on execution-bound work.
@@ -464,6 +437,7 @@ Rewrite tasks for both a technically strong fresh executor and a human owner wit
 
 - current truth, goal, and why;
 - decisions constraining future choices;
+- the approved or authoritative implementation plan when needed;
 - responsibility boundaries and material trade-offs;
 - control-critical nuance;
 - uncertainty that still changes execution;
@@ -492,20 +466,22 @@ The task should reflect current understanding, not archaeological layers.
 
 All lifecycle operations must preserve dashboard/body consistency, rewrite stale understanding, and update the Execution Gate truthfully.
 
-### Create / Plan
+### Create / Persist Plan
 
 - Create the dated task file and dashboard.
-- Capture established alignment and explain outcome, why, and selected direction.
+- Capture established alignment and explain outcome, why, selected direction, and approved plan when one exists.
 - Include optional sections only when useful.
 - Run Blocker Preflight and set the gate truthfully.
 - Route intentionally deferred work with no active next action to `tasks/backlog/`.
 
 Done when the work is preserved clearly, even if it is not yet execution-ready.
 
+When the user explicitly wants to vet substantial planning before persistence, use `planning` first and write the approved result here afterward.
+
 ### Update
 
 - Update `Last Updated` and rewrite rather than append.
-- Refresh dashboard, current truth, decisions, uncertainty, blockers, Docs Sync, Human Attention, and gate.
+- Refresh dashboard, current truth, decisions, plan, uncertainty, blockers, Docs Sync, Human Attention, and gate.
 - Compress obsolete material.
 
 An update may legitimately leave the task exploratory, incomplete, or blocked.
@@ -513,7 +489,8 @@ An update may legitimately leave the task exploratory, incomplete, or blocked.
 ### Prepare for Fresh-Session Execution
 
 - Run the full Execution Readiness Gate.
-- Finalize one selected plan and remove stale alternatives.
+- Preserve one authoritative selected direction.
+- Remove or clearly mark stale alternatives.
 - Issue an explicit `READY` or `BLOCKED` verdict.
 
 Done when a fresh executor can execute without reconstructing missing context and the human can confidently supervise the plan.
@@ -525,6 +502,7 @@ Done when a fresh executor can execute without reconstructing missing context an
 - Understand current truth before editing.
 - Review deeper sections only as needed.
 - Preserve newly discovered human-control nuance.
+- If execution discovers a material plan-changing decision that requires human ownership, stop and surface it rather than silently redesigning the task.
 
 ### Trim / Consolidate
 
@@ -550,19 +528,23 @@ Done when a fresh executor can execute without reconstructing missing context an
 - Preserve uncertainty honestly.
 - Move durable truth to `docs/`, deferred work to `tasks/backlog/`, supporting artifacts to `source-material/`, and retired history to `archive/`.
 - Blockers must state both the obstacle and required action.
-- Do not declare readiness when the plan is vague, contradictory, dependent on the old chat, or contains unresolved material choices.
+- Do not declare readiness when the task is vague, contradictory, dependent on the old chat, or contains unresolved material choices.
 - Do not hide product or architecture decisions inside implementation discretion.
 - Do not bury human-control nuance in code-level detail.
 - Do not bloat the task with reconstructible mechanics.
+- Do not use the task file as a transcript of the planning conversation.
+- Preserve the approved plan without preserving every thought that led to it.
 
 ## Final Test
 
-A good task bookmark lets a fresh executor continue quickly, lets the human understand and supervise the work, preserves alignment code cannot reveal, separates decisions from uncertainty, makes blockers actionable, defines verification, prevents repeated mistakes, and remains readable rather than becoming an implementation transcript.
+A good task bookmark lets a fresh executor continue quickly, lets the human understand and supervise the work, preserves alignment code cannot reveal, preserves the authoritative plan, separates decisions from uncertainty, makes blockers actionable, defines verification, prevents repeated mistakes, and remains readable rather than becoming an implementation transcript.
 
 ```text
 Agent can execute it
         +
 Human can understand and supervise it
+        +
+Approved direction survives the session
         +
 No hidden blockers
         =
