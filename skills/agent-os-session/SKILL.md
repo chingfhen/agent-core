@@ -66,3 +66,5 @@ disable-model-invocation: false
 * **Preserve established direction for continuity.** When work will continue across sessions, ensure the approved direction, or the established direction when explicit approval was not required, is represented in the relevant project task together with blockers, verification expectations, and the next action. Do not rely on conversational memory.
 
 * **Prefer progress over ceremony.** Use the smallest amount of process needed to keep the work understandable, safe, verifiable, and aligned. Do not create planning or documentation artifacts merely because a workflow could support them.
+
+Explain the purpose succinctly when deploying subagents and ask for permission. Request permission before deploying subagents. 

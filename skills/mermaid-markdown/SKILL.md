@@ -1,6 +1,6 @@
 ---
 name: mermaid-markdown
-description: Creates clear Mermaid diagrams for already-understood systems, processes, and relationships, and inserts them directly into the user's chosen Markdown file. Clarifies the intended diagram when necessary; does not perform architecture or planning work.
+description: Creates clear Mermaid diagrams for already-understood systems, processes, relationships, and simple quantitative results, and inserts them directly into the user's chosen Markdown file. Clarifies the intended diagram when necessary; does not perform architecture or planning work.
 disable-model-invocation: true
 license: MIT
 ---
@@ -13,7 +13,7 @@ Draw the diagram the human actually wants to understand, then implant it directl
 
 The goal is communication, not completeness.
 
-This is a supporting skill. It visualizes understanding and decisions that already exist. It does not perform architecture design, planning, or alternative evaluation.
+This is a supporting skill. It visualizes understanding, decisions, relationships, and quantitative results that already exist. It does not perform architecture design, planning, statistical analysis, or alternative evaluation.
 
 > Draw the diagram the human actually wants to understand.
 
@@ -31,6 +31,8 @@ Examples:
 - "Put the worker flow into `docs/architecture.md`."
 - "Add a Mermaid diagram showing how this request works."
 - "Diagram the job lifecycle in this plan."
+- "Add a chart comparing the benchmark results."
+- "Show these evaluation scores as a Mermaid chart."
 - "Update the diagram in this Markdown."
 - "Add a diagram here."
 
@@ -42,9 +44,8 @@ flowchart LR
     User --> API
     API --> Worker
     Worker --> Database
-`````
-
-`````
+```
+````
 
 Do not create a separate `.mmd`, `.svg`, image, or `diagrams/` artifact unless the user explicitly asks for one.
 
@@ -52,11 +53,11 @@ Do not create a separate `.mmd`, `.svg`, image, or `diagrams/` artifact unless t
 
 # Boundary: Visualize, Do Not Design
 
-This skill runs after the relevant system, workflow, or plan is understood well enough to visualize.
+This skill runs after the relevant system, workflow, plan, or quantitative result is understood well enough to visualize.
 
-It may inspect relevant tasks, docs, plans, repository files, or implementation evidence to understand what should be drawn.
+It may inspect relevant tasks, docs, plans, repository files, experiment outputs, benchmark results, or implementation evidence to understand what should be drawn.
 
-It must not use diagram generation as an excuse to redesign the underlying system.
+It must not use diagram generation as an excuse to redesign the underlying system or reinterpret the underlying results.
 
 Do not:
 
@@ -65,9 +66,11 @@ Do not:
 - evaluate competing implementation approaches;
 - invent missing system behavior;
 - change responsibilities or boundaries merely to improve the diagram;
+- perform new statistical analysis that the source material does not support;
+- change, normalize, aggregate, or selectively omit quantitative results merely to make a chart look better;
 - expand into general planning.
 
-If the source material reveals a material contradiction or missing relationship, surface it instead of silently resolving it in the diagram.
+If the source material reveals a material contradiction, missing relationship, or unclear quantitative result, surface it instead of silently resolving it in the diagram.
 
 A diagram must not look more certain than the evidence behind it.
 
@@ -77,7 +80,7 @@ A diagram must not look more certain than the evidence behind it.
 
 A request for "a diagram" may have many valid interpretations.
 
-The same system could reasonably have:
+The same material could reasonably have:
 
 - a system/component overview;
 - an end-to-end process flow;
@@ -85,7 +88,9 @@ The same system could reasonably have:
 - a state lifecycle;
 - a deployment view;
 - a data flow;
-- a specific subsystem diagram.
+- a specific subsystem diagram;
+- a quantitative comparison;
+- a trend chart.
 
 The skill's first responsibility is therefore to understand:
 
@@ -100,6 +105,8 @@ Examples:
 > "What would you like this diagram to make clear: the overall architecture, the end-to-end job flow, or a specific subsystem?"
 
 > "Do you want the component relationships or the runtime sequence?"
+
+> "Should the chart emphasize the ranking between results or the change across runs?"
 
 Also clarify the target Markdown file when the destination is genuinely unknown.
 
@@ -128,13 +135,17 @@ Prefer existing truth such as:
 - current task files;
 - architecture or design docs;
 - relevant implementation files;
+- benchmark or evaluation outputs;
+- experiment summaries;
 - existing diagrams that the new diagram must remain consistent with.
 
 Use only as much investigation as is needed for the requested diagram.
 
-This is a lightweight supporting task, not an exhaustive repository audit.
+This is a lightweight supporting task, not an exhaustive repository audit or statistical investigation.
 
-Do not represent an uncertain edge, component, state, or interaction as established fact.
+Do not represent an uncertain edge, component, state, interaction, value, or comparison as established fact.
+
+For quantitative charts, preserve the source values and their units unless the surrounding material explicitly defines a transformation that should be shown.
 
 ---
 
@@ -188,6 +199,65 @@ Good for:
 - workflows;
 - processing states.
 
+## `xychart-beta`
+
+Use for simple quantitative results when bars or lines communicate the comparison more clearly than prose, tables, or nodes and arrows.
+
+Good for:
+
+- comparing one metric across categories;
+- showing benchmark or evaluation results;
+- showing rankings or relative magnitude;
+- comparing counts, rates, scores, latency, cost, or other numeric outcomes;
+- showing a simple ordered progression;
+- showing a time-based trend;
+- showing a bar series with a meaningful reference or target line.
+
+Prefer:
+
+- `bar` for categorical comparison, ranking, or magnitude;
+- `line` for ordered progression and trends;
+- `xychart-beta horizontal` when category labels are long or horizontal comparison is easier to read.
+
+Example:
+
+```mermaid
+xychart-beta
+    title "Model Accuracy"
+    x-axis ["Baseline", "Model A", "Model B"]
+    y-axis "Accuracy (%)" 0 --> 100
+    bar [82, 87, 91]
+```
+
+A bar and line may be combined when they communicate genuinely different information on a compatible scale, for example measured results against a target:
+
+```mermaid
+xychart-beta
+    title "Latency by Release"
+    x-axis ["v1", "v2", "v3", "v4"]
+    y-axis "Latency (ms)" 0 --> 500
+    bar [420, 330, 280, 240]
+    line [300, 300, 300, 300]
+```
+
+Do not plot the same values as both bars and a line merely for decoration.
+
+Prefer one bar series. Do not use multiple bar series to imitate grouped or stacked bars unless the target Mermaid renderer is known to support the intended result clearly.
+
+Keep advanced renderer-dependent features optional. Legends, data labels, point labels, label rotation, and similar conveniences may depend on the Mermaid version used by the target Markdown renderer.
+
+If the chart requires capabilities Mermaid does not express clearly, use a more appropriate visualization format rather than forcing it into Mermaid.
+
+Examples include:
+
+- confidence intervals or error bars;
+- logarithmic scales;
+- box plots or distribution plots;
+- complex grouped or stacked comparisons;
+- dense datasets;
+- several metrics with incompatible scales;
+- advanced statistical annotation.
+
 ## Other Mermaid types
 
 Use more specialized types when they clearly communicate the requested information better, for example:
@@ -209,7 +279,7 @@ Every diagram should have an obvious reason to exist.
 
 Avoid combining several independent questions into one canvas.
 
-If a reader has to understand architecture, execution order, deployment, and state transitions simultaneously, separate them.
+If a reader has to understand architecture, execution order, deployment, state transitions, and quantitative performance simultaneously, separate them.
 
 Split a diagram when:
 
@@ -219,7 +289,7 @@ Split a diagram when:
 - edge crossings or density materially hurt comprehension;
 - it is answering more than one important question.
 
-Do not split merely because a fixed node count has been exceeded.
+Do not split merely because a fixed node or data-point count has been exceeded.
 
 ---
 
@@ -233,7 +303,8 @@ Usually include:
 - major relationships;
 - meaningful boundaries;
 - important data or control movement;
-- relevant decisions or states.
+- relevant decisions or states;
+- quantitative results that directly support the comparison being shown.
 
 Usually exclude:
 
@@ -242,9 +313,98 @@ Usually exclude:
 - every helper function;
 - every API endpoint;
 - configuration trivia;
-- implementation detail that does not improve the reader's mental model.
+- implementation detail that does not improve the reader's mental model;
+- quantitative columns or categories that do not help answer the chart's main question.
 
 Do not mix abstraction levels without a good reason.
+
+---
+
+## Quantitative Chart Design
+
+A quantitative chart should make the important comparison easier to see without distorting the underlying results.
+
+### Choose the encoding by the question
+
+Use bars when the reader needs to compare magnitude across discrete categories.
+
+Use lines when the reader needs to understand progression, trend, or change across an ordered x-axis such as time, release number, experiment step, or increasing input size.
+
+Do not use a line merely to connect unrelated categories.
+
+### Preserve truthful scale
+
+For bar charts, include zero in the quantitative axis range. Bar length represents magnitude, so truncating the axis can exaggerate small differences.
+
+For line charts, choose an axis range that communicates the trend accurately. A non-zero minimum may be appropriate when it improves readability, but it must not create a misleading impression of the size of the change.
+
+Do not manipulate axis limits merely to make an improvement or regression look more dramatic.
+
+### Order categories intentionally
+
+When ranking or relative magnitude is the point, order ordinary categories by value when that makes comparison easier.
+
+Preserve natural ordering when the categories have inherent meaning, for example:
+
+- chronological order;
+- model or release progression;
+- severity levels;
+- ordered experiment settings;
+- increasing thresholds or input sizes.
+
+Do not sort categories mechanically when doing so would destroy the meaning of the sequence.
+
+### Make units and meaning obvious
+
+Use a clear chart title when the surrounding heading does not already explain the chart.
+
+Label the quantitative axis and include units when they are not obvious.
+
+Examples:
+
+- `Accuracy (%)`
+- `Latency (ms)`
+- `Cost (USD)`
+- `Throughput (req/s)`
+- `Count`
+
+Keep category labels concise and readable.
+
+If an abbreviation is necessary, ensure its meaning is clear from the surrounding Markdown.
+
+### Keep the chart focused
+
+Show only the data needed to answer the chart's main question.
+
+Avoid:
+
+- decorative series;
+- redundant encodings;
+- unnecessary categories;
+- excessive precision;
+- visual clutter;
+- plotting the same measure in multiple forms without purpose.
+
+A table may be better when exact individual values matter more than visual comparison.
+
+Two simple charts may be better than one overloaded chart when the results answer different questions.
+
+### Preserve context
+
+Do not silently remove context needed to interpret the numbers.
+
+When relevant, keep information such as the following in the surrounding Markdown:
+
+- metric definition;
+- dataset or benchmark name;
+- sample size;
+- evaluation conditions;
+- baseline definition;
+- whether higher or lower is better;
+- source of the measurements;
+- important uncertainty or caveats.
+
+The chart should visualize the result, not manufacture confidence that the underlying evidence does not support.
 
 ---
 
@@ -255,9 +415,11 @@ Choose diagram direction intentionally.
 Typical defaults:
 
 - `LR` for pipelines, dependencies, and horizontal flows;
-- `TD`/`TB` when hierarchy or vertical progression reads more naturally.
+- `TD`/`TB` when hierarchy or vertical progression reads more naturally;
+- vertical XY charts for short categorical comparisons;
+- horizontal XY charts when category labels are long.
 
-Prefer layouts where the main path is visually easy to follow.
+Prefer layouts where the main path or comparison is visually easy to follow.
 
 Avoid unnecessary edge crossings.
 
@@ -283,7 +445,7 @@ over implementation identifiers such as:
 
 Use implementation names only when those names are themselves important to the reader.
 
-Keep node labels concise.
+Keep node and chart labels concise.
 
 Edge labels should explain the relationship or payload when that information matters.
 
@@ -295,6 +457,8 @@ Worker -->|store result| Blob
 ```
 
 over long sentences on the canvas.
+
+For charts, prefer labels that describe the actual metric or category rather than internal variable names.
 
 ---
 
@@ -312,6 +476,8 @@ Do not invent elaborate house conventions for:
 If a visual distinction carries meaning, make that meaning obvious and use it consistently.
 
 Prefer explicit labels and the semantics of the chosen Mermaid diagram type over relying on subtle styling.
+
+Do not rely on color alone to communicate an important distinction.
 
 The diagram should remain understandable in different themes and renderers.
 
@@ -332,6 +498,8 @@ Preserve the document's:
 
 A diagram may be preceded or followed by a short sentence when that materially helps the reader understand its purpose.
 
+For quantitative charts, keep necessary interpretation or methodological context in normal Markdown rather than overloading the chart itself.
+
 Do not add verbose explanation merely because a diagram was inserted.
 
 Example:
@@ -348,7 +516,23 @@ flowchart LR
     Worker -->|generate| Provider["Video Provider"]
     Worker -->|store result| Storage["Blob Storage"]
 ```
-`````
+````
+
+Quantitative example:
+
+````markdown
+## Evaluation Results
+
+Model B achieved the highest accuracy on the evaluation set.
+
+```mermaid
+xychart-beta
+    title "Evaluation Accuracy"
+    x-axis ["Baseline", "Model A", "Model B"]
+    y-axis "Accuracy (%)" 0 --> 100
+    bar [82, 87, 91]
+```
+````
 
 ---
 
@@ -371,6 +555,8 @@ flowchart LR
 
 The description should summarize the information conveyed by the diagram, not reproduce every node and edge.
 
+For quantitative charts, do not depend on color alone. Titles, axis labels, units, ordering, and surrounding Markdown should make the result understandable.
+
 ---
 
 # Validation
@@ -380,15 +566,21 @@ Before finishing:
 1. Check that the Mermaid syntax is internally consistent.
 2. Check that the diagram matches the underlying source material.
 3. Check that the chosen diagram type matches the question being answered.
-4. Check that the main reading path is obvious.
+4. Check that the main reading path or quantitative comparison is obvious.
 5. Remove information that does not improve understanding.
-6. Confirm the diagram was inserted into the intended Markdown file and location.
+6. For quantitative charts, confirm that plotted values and units match the source.
+7. For bar charts, confirm that the quantitative axis includes zero.
+8. Confirm that category ordering is intentional.
+9. Confirm that axis labels and units are clear where needed.
+10. Confirm that the diagram was inserted into the intended Markdown file and location.
 
 If the repository already has a Mermaid validation or rendering command, it may be used.
 
 Do not install Mermaid CLI or create a rendering pipeline solely for this skill.
 
 Native Markdown Mermaid rendering is the normal workflow.
+
+When using newer Mermaid features, prefer syntax already known to render correctly in the target environment.
 
 ---
 
@@ -398,11 +590,20 @@ A successful diagram lets the reader quickly answer the question it was created 
 
 The reader should be able to tell:
 
-* what they are looking at;
-* where to start;
-* what the important elements are;
-* how those elements relate;
-* what the main flow or structure is.
+- what they are looking at;
+- where to start;
+- what the important elements are;
+- how those elements relate;
+- what the main flow, structure, comparison, or trend is.
+
+For a quantitative chart, the reader should also be able to tell:
+
+- what is being measured;
+- what the units are;
+- what is being compared;
+- whether ordering is meaningful;
+- which result or trend matters;
+- whether higher or lower values are preferable when that is not obvious.
 
 The diagram should not require chat history to decode it.
 
@@ -414,19 +615,21 @@ If the result looks impressive but the reader still cannot quickly form the inte
 
 This skill is not responsible for:
 
-* architecture design;
-* project planning;
-* requirements discovery beyond diagram intent;
-* alternative evaluation;
-* implementation decisions;
-* exhaustive repository analysis;
-* opportunistically diagramming unrelated work;
-* maintaining a standalone diagram library;
-* generating SVG or image derivatives;
-* installing Mermaid tooling;
-* elaborate visual design systems.
+- architecture design;
+- project planning;
+- requirements discovery beyond diagram intent;
+- alternative evaluation;
+- implementation decisions;
+- performing new statistical analysis;
+- changing or selectively presenting results to strengthen a narrative;
+- exhaustive repository analysis;
+- advanced data visualization;
+- opportunistically diagramming unrelated work;
+- maintaining a standalone diagram library;
+- generating SVG or image derivatives;
+- installing Mermaid tooling;
+- elaborate visual design systems.
 
 It is a small supporting skill:
 
 > understand which diagram the human wants → ground it in existing truth → draw the clearest useful Mermaid diagram → insert it into the desired Markdown.
-
