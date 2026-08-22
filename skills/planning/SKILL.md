@@ -1,6 +1,14 @@
 ---
 name: planning
-description: Plans substantial work into a clear, approval-ready direction before execution. Use when the user wants to understand, shape, evaluate, or approve a non-trivial change before building, especially when consequential decisions, assumptions, risks, or sequencing need to be resolved. Investigates available evidence first, asks one high-value question at a time only when needed, challenges premature commitment, and produces a scannable plan with enough information for the human owner to confidently approve execution.
+description: >
+  Plans substantial work into a clear, approval-ready direction before execution.
+  Use when the user wants to understand, shape, evaluate, or approve a non-trivial
+  change before building, especially when consequential decisions, assumptions,
+  risks, architecture, or sequencing need to be resolved. Starts from maintained
+  project context, investigates only what materially affects the plan, asks one
+  high-value human question at a time when needed, challenges premature commitment,
+  and produces a scannable plan that can be approved and persisted for a fresh
+  execution session.
 disable-model-invocation: false
 ---
 
@@ -8,9 +16,11 @@ disable-model-invocation: false
 
 ## Purpose
 
-Turn a request into a sufficiently resolved, human-ownable plan before substantial execution begins.
+Turn a request into a sufficiently resolved, human-ownable plan before substantial
+execution begins.
 
-The goal is not to produce the most detailed plan possible. The goal is to reach enough clarity that the human can:
+The goal is not to produce the most detailed plan possible. The goal is to reach
+enough clarity that the human can:
 
 - understand what will be achieved and why;
 - understand the proposed solution shape;
@@ -21,24 +31,110 @@ The goal is not to produce the most detailed plan possible. The goal is to reach
 
 Planning should reduce uncertainty, not manufacture ceremony.
 
+A typical workflow is:
+
+```text
+maintained project context
+        ↓
+focused investigation
+        ↓
+human questions only when consequential
+        ↓
+approval-ready plan
+        ↓
+human approval
+        ↓
+persist to task file
+        ↓
+fresh execution session
+        ↓
+engineering executes
+```
+
 ## Core Principles
+
+### Start From Maintained Project Context
+
+Begin with the project's maintained documentation and current task context when
+available.
+
+Use them to establish:
+
+- architecture and ownership;
+- conventions and important boundaries;
+- prior decisions;
+- current constraints and non-goals;
+- intended behavior;
+- relevant operational context.
+
+Project documentation is the fastest map of the system, not unquestionable truth.
+
+Use code, tests, configuration, logs, schemas, outputs, and other artifacts when
+the plan depends on implementation reality, when documentation may be incomplete
+or stale, or when a consequential assumption needs verification.
+
+Do not re-discover the whole repository when maintained context already answers the
+planning question.
 
 ### Evidence Before Questions
 
-Inspect the smallest relevant set of repository evidence before asking the human for information that may already be available.
+Inspect the smallest relevant set of evidence before asking the human for
+information that may already be available.
 
 Use, as relevant:
 
 - canonical project docs;
 - current task files;
-- code and tests;
+- relevant code and tests;
 - configuration and manifests;
 - logs, generated artifacts, schemas, or outputs;
 - available external evidence when the request requires it.
 
-Use docs for intended behavior and rationale. Use code, tests, and artifacts to verify current implementation truth.
+Use docs for intended behavior and rationale. Use implementation evidence to verify
+current truth when that distinction matters.
 
 Do not ask the human to reconstruct information the agent can discover directly.
+
+### Investigate Directly by Default
+
+Routine planning discovery belongs to the main agent.
+
+Read the relevant docs, task context, code, tests, configuration, and artifacts
+directly rather than casually delegating discovery to subagents.
+
+Do not dispatch a discovery subagent merely to:
+
+- summarize a few files;
+- parallelize ordinary repository reading;
+- obtain a second description of information the main agent can inspect directly;
+- create the appearance of thoroughness.
+
+Use a discovery subagent only when the investigation is genuinely large,
+separable, and likely to improve the planning result materially, such as a clearly
+bounded investigation of a large unfamiliar subsystem or an independent research
+question.
+
+Subagent use is an exception, not the default planning reflex.
+
+### Investigation Must Serve a Decision
+
+Every investigation should answer a planning question.
+
+Do not explore the repository merely to become broadly familiar with it.
+
+Read additional evidence only when it could:
+
+- change the proposed direction;
+- resolve a material uncertainty;
+- verify an important assumption;
+- expose a consequential architectural constraint;
+- reduce a meaningful risk;
+- improve the human's ability to approve the plan.
+
+Stop when more discovery is unlikely to change the decision.
+
+Planning is not pre-execution. Do not inspect implementation detail merely to
+remove uncertainty that a strong executor can safely resolve later.
 
 ### Avoid Premature Commitment
 
@@ -52,13 +148,17 @@ Before committing to a material direction:
 4. surface non-obvious trade-offs or risks when they matter;
 5. then converge on the most practical direction.
 
-Do not create alternatives merely to demonstrate breadth. Exploration is useful only when it can change the decision.
+Do not create alternatives merely to demonstrate breadth. Exploration is useful
+only when it can change the decision.
 
-Prefer truth and evidence over agreement. Disagree clearly when the proposed direction is weak, risky, unnecessarily complex, or contradicted by available evidence.
+Prefer truth and evidence over agreement. Disagree clearly when the proposed
+direction is weak, risky, unnecessarily complex, or contradicted by available
+evidence.
 
 ### Ask One Question at a Time
 
-When a material human-owned decision remains unresolved, ask exactly one question at a time.
+When a material human-owned decision remains unresolved, ask exactly one question
+at a time.
 
 Each question should:
 
@@ -67,7 +167,8 @@ Each question should:
 - explain the recommended answer briefly when a useful recommendation can be made;
 - materially affect scope, architecture, behavior, risk, verification, or approval.
 
-After each answer, reassess the entire planning state before deciding whether another question is still necessary.
+After each answer, reassess the entire planning state before deciding whether
+another question is still necessary.
 
 Do not batch speculative questionnaires.
 
@@ -95,15 +196,63 @@ Can a strong executor safely decide it during implementation?
         `-- No  -> surface the uncertainty or blocker.
 ```
 
-Routine code placement, ordinary sequencing, test mechanics, naming, and other reconstructible implementation choices usually belong to the executor unless they carry meaningful consequences.
+Routine code placement, ordinary sequencing, test mechanics, naming, local
+refactoring, and other reconstructible implementation choices usually belong to
+the executor unless they carry meaningful consequences.
+
+### Existing Architecture Is Evidence, Not Authority
+
+Understand the current architecture and repository patterns before proposing
+change, but do not preserve them automatically.
+
+Treat them as evidence:
+
+- some patterns encode deliberate constraints and should be respected;
+- some are historical accidents;
+- some are inconsistent or weak;
+- some may no longer fit the requested change.
+
+If the current request exposes a consequential weak boundary, harmful coupling,
+poor ownership, or an established pattern that no longer fits, consider whether
+improving the architecture belongs in the proposed direction.
+
+Do not leave a material architectural problem for the executor to silently redesign
+during implementation.
+
+Equally, do not redesign unrelated areas merely because a cleaner architecture can
+be imagined.
 
 ### Prefer the Simplest Adequate Direction
 
-Planning should naturally avoid speculative scope, unnecessary abstractions, premature infrastructure, and complexity without demonstrated value.
+Planning should naturally avoid speculative scope, unnecessary abstractions,
+premature infrastructure, and complexity without demonstrated value.
 
 This is ordinary planning discipline, not the stronger `/yagni` mode.
 
-When the user explicitly invokes `yagni`, allow that skill to apply its stronger simplicity rules.
+When the user explicitly invokes `yagni`, allow that skill to apply its stronger
+simplicity rules.
+
+### Prefer Reversible Decisions Under Uncertainty
+
+When meaningful uncertainty remains and multiple approaches are otherwise
+credible, consider reversibility and migration cost.
+
+Prefer decisions that preserve options and are inexpensive to change unless the
+less-reversible choice has a demonstrated advantage.
+
+When useful, state what evidence or future condition would justify revisiting the
+decision.
+
+Do not use reversibility as an excuse to avoid making a necessary decision.
+
+### Scale Planning by Consequence, Not Size
+
+Planning depth should follow consequence and uncertainty, not estimated line count.
+
+A small schema, migration, security, contract, or externally visible change may
+deserve more planning than a large but isolated implementation.
+
+Use only enough planning depth to resolve the decisions that matter.
 
 ## Planning Process
 
@@ -119,11 +268,20 @@ Understand:
 
 Do not restate everything the user said. Extract what actually controls the plan.
 
-### 2. Investigate Current Reality
+### 2. Read Maintained Context
 
-Read only enough evidence to understand the relevant system and avoid planning against stale or imagined architecture.
+Start from the project's maintained documentation, current task context, and other
+canonical sources when available.
 
-Stop expanding the search once the important constraints and current state are understood.
+Use them to establish the system map before dropping into implementation detail.
+
+Do not perform broad repository exploration when the maintained context already
+provides enough orientation to ask the next meaningful planning question.
+
+### 3. Investigate Current Reality
+
+Read only enough additional evidence to understand the relevant system and avoid
+planning against stale or imagined architecture.
 
 Separate:
 
@@ -133,7 +291,10 @@ Separate:
 
 Do not imply stronger certainty than the evidence supports.
 
-### 3. Resolve Material Uncertainty
+Stop expanding investigation once additional evidence is unlikely to change the
+plan, remove a material assumption, or improve approval confidence.
+
+### 4. Resolve Material Uncertainty
 
 For every important unresolved point, decide whether to:
 
@@ -143,9 +304,10 @@ For every important unresolved point, decide whether to:
 - record it as a genuine assumption;
 - expose it as a blocker.
 
-Continue only while another unresolved point could materially change the plan or the human's ability to approve it.
+Continue only while another unresolved point could materially change the plan or
+the human's ability to approve it.
 
-### 4. Select the Direction
+### 5. Select the Direction
 
 Converge on one recommended approach.
 
@@ -157,13 +319,15 @@ Surface:
 - the most important trade-offs;
 - meaningful alternatives rejected and why, when that helps approval;
 - boundaries or explicit exclusions that prevent scope drift;
-- important risks or failure modes.
+- important risks or failure modes;
+- reversibility or migration implications when they materially affect the choice.
 
-Do not leave material alternatives hidden inside phrases such as `either`, `optionally`, `depending on preference`, or `choose during implementation`.
+Do not leave material alternatives hidden inside phrases such as `either`,
+`optionally`, `depending on preference`, or `choose during implementation`.
 
 Either resolve them, classify them as executor-owned, or surface them as unresolved.
 
-### 5. Build the Plan
+### 6. Build the Plan
 
 Plans should describe meaningful outcomes and phases, not narrate routine mechanics.
 
@@ -188,11 +352,16 @@ Avoid plans like:
 3. Add tests
 ```
 
-unless those exact files or commands are materially useful to human understanding or approval.
+unless those exact files or commands are materially useful to human understanding
+or approval.
 
-### 6. Make the Plan Human-Ownable
+Do not pre-specify routine executor-owned mechanics just to make the plan look
+complete.
 
-Surface the minimum sufficient information the human needs to understand, verify, and approve the work.
+### 7. Make the Plan Human-Ownable
+
+Surface the minimum sufficient information the human needs to understand, verify,
+and approve the work.
 
 Depending on the task, useful information may include:
 
@@ -210,9 +379,10 @@ Depending on the task, useful information may include:
 
 Do not force all of these into every plan.
 
-Use the structure that best exposes the decisions and evidence relevant to the current work.
+Use the structure that best exposes the decisions and evidence relevant to the
+current work.
 
-### 7. Define Verification
+### 8. Define Verification
 
 State how success will be demonstrated.
 
@@ -229,9 +399,10 @@ Prefer concrete verification such as:
 
 When practical, provide the shortest useful independent verification path.
 
-Do not claim verification that has not happened yet. During planning, describe intended proof, not completed proof.
+Do not claim verification that has not happened yet. During planning, describe
+intended proof, not completed proof.
 
-### 8. Surface Remaining Attention
+### 9. Surface Remaining Attention
 
 Before asking for approval, make unresolved material concerns obvious.
 
@@ -247,7 +418,7 @@ Examples:
 
 Do not bury these inside implementation detail.
 
-### 9. Present for Approval
+### 10. Present for Approval
 
 When the user asked to vet the plan, stop before substantial execution.
 
@@ -272,7 +443,7 @@ The approval test is:
 
 If not, the plan is not ready for approval.
 
-### 10. Persist After Approval When Requested
+### 11. Persist for a Fresh Executor When Requested
 
 When the user asks to create or update a project task after planning:
 
@@ -281,6 +452,22 @@ When the user asks to create or update a project task after planning:
 3. wait for approval when approval was requested;
 4. load `project-tasks`;
 5. persist the approved direction, current truth, implementation plan, verification, blockers, and next action.
+
+Persist enough decision context that a fresh executor can implement the task
+without reconstructing the planning conversation.
+
+The task should preserve:
+
+- what is being achieved and why;
+- the approved solution shape;
+- consequential decisions and constraints;
+- explicit non-goals or boundaries;
+- important assumptions and risks;
+- intended verification;
+- blockers or human actions that remain.
+
+Do not over-specify routine implementation details that `engineering` can safely
+resolve during execution.
 
 Do not write an exploratory or superseded plan into the task as if it were approved.
 
@@ -319,18 +506,31 @@ Stop planning and ask for approval when:
 - the work shape is coherent;
 - success can be verified.
 
-Do not keep planning merely because more detail could be written.
+Do not keep planning merely because:
+
+- more repository detail could be read;
+- another subagent could be dispatched;
+- another alternative could be invented;
+- more implementation mechanics could be specified.
+
+Planning is complete when further detail is unlikely to improve the decision.
 
 ## Non-Negotiables
 
+- Start from maintained project context when available.
 - Investigate before asking when evidence can answer.
+- Investigate directly by default; do not casually delegate routine discovery.
+- Every investigation must serve a material planning question.
 - Ask one human question at a time.
 - Let each answer determine the next move.
 - Do not batch speculative questions.
 - Do not commit to the first plausible frame without testing important assumptions.
 - Do not fabricate alternatives for appearance.
+- Treat existing architecture as evidence, not automatic authority.
 - Do not hide material decisions inside executor discretion.
+- Do not pre-execute the task during planning.
 - Do not over-plan routine mechanics.
 - Do not confuse future verification with completed verification.
 - Do not execute substantial work before approval when the user explicitly requested plan review first.
+- Persist enough approved decision state for a fresh executor when requested.
 - Prefer the most practical sufficiently supported direction over maximum theoretical completeness.
