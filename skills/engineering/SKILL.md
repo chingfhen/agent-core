@@ -123,6 +123,9 @@ bias toward postponing work and minimizing scope.
 Treat every implementation as a contribution to a long-lived system, not an
 isolated patch.
 
+When multiple designs are otherwise comparable, prefer the one that keeps likely
+future changes local and inexpensive.
+
 Preserve or improve:
 
 - clear ownership of responsibilities;

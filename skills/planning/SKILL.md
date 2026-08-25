@@ -136,6 +136,28 @@ Stop when more discovery is unlikely to change the decision.
 Planning is not pre-execution. Do not inspect implementation detail merely to
 remove uncertainty that a strong executor can safely resolve later.
 
+### Use Bounded Experiments When Evidence Requires Execution
+
+When consequential uncertainty cannot be resolved reliably through inspection,
+existing checks, external evidence, or human clarification, consider whether a
+bounded experiment would resolve it more cheaply than speculative planning.
+
+Routine read-only or ephemeral investigation that does not create meaningful side
+effects belongs to normal planning discovery.
+
+If the experiment requires new implementation, repository changes, meaningful
+external side effects, or material cost, recommend the smallest experiment and
+obtain human approval before execution.
+
+An approved experiment should define the question, required evidence, and stop
+condition. When useful, persist it as a bounded phase in the task file and have
+`engineering` execute it. After the result is recorded, resume planning from the
+new evidence before committing to any direction the experiment was meant to inform.
+
+Do not let a prototype or spike silently become production implementation. A thin
+end-to-end slice that belongs to an already approved direction is execution
+strategy, not planning discovery.
+
 ### Avoid Premature Commitment
 
 The first plausible approach is not automatically the right one.
@@ -300,6 +322,7 @@ For every important unresolved point, decide whether to:
 
 - investigate further;
 - ask the human one question;
+- recommend a bounded experiment for human approval when execution is the cheapest reliable way to obtain the needed evidence;
 - treat it as executor-owned implementation detail;
 - record it as a genuine assumption;
 - expose it as a blocker.
