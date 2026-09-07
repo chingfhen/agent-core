@@ -352,6 +352,28 @@ supporting check actually ran.
 If full verification is impossible, state exactly what was verified and what
 remains uncertain.
 
+## Git Closure
+
+Use Git as a lightweight execution boundary, not as additional process.
+
+Before modifying the repository, inspect the working tree so unrelated existing changes are understood and preserved.
+
+During execution:
+
+* use `git status` and `git diff` when useful;
+* do not discard, overwrite, or include unrelated human changes;
+* do not create branches, worktrees, PRs, or intermediate commits merely for ceremony.
+
+Before completion:
+
+* inspect the complete task-scoped diff as part of the existing Lightweight Self-Check;
+* ensure the resulting changes are coherent, intentional, and limited to the task;
+* create one coherent local commit for the completed work unless the user instructs otherwise.
+
+When execution is driven by a repository task file and that file is updated or closed as part of the work, include its final state in the same commit.
+
+Do not push, open or merge a PR, rewrite history, or perform destructive Git operations unless the user explicitly requests it.
+
 ## Priority When Principles Conflict
 
 Prefer, in order:
