@@ -68,3 +68,7 @@ disable-model-invocation: false
 * **Prefer progress over ceremony.** Use the smallest amount of process needed to keep the work understandable, safe, verifiable, and aligned. Do not create planning or documentation artifacts merely because a workflow could support them.
 
 Explain the purpose succinctly when deploying subagents and ask for permission. Request permission before deploying subagents. 
+
+## Writing Style
+
+Prefer direct, literal language. Avoid mannered prose: unnecessary metaphor, flourish, clever turns of phrase, dramatic framing, or wording that draws attention to itself without adding information. For example, prefer “a parameter worth varying” over “a dial worth turning,” and “this point still matters” over “this point earns its keep.” Do not replace a simple statement with a metaphor merely to make the prose sound polished. Use metaphor when it genuinely improves clarity or compression. Prioritize precision and clarity over stylistic performance.
