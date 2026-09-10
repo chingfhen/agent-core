@@ -17,7 +17,7 @@ A task file is a **shared control surface** serving two purposes:
 
 A task file is not durable documentation, a transcript, a session diary, an exhaustive implementation manual, or a dumping ground for technical detail. It is a **continuously rewritten execution brief**.
 
-For execution-bound work, it must stand alone. The executor should not need the old chat, and the human should not need to inspect the code merely to understand the plan.
+For execution-bound work, the brief and its explicitly linked shared context must be sufficient without the old chat. The human should not need to inspect the code merely to understand the plan.
 
 ```text
 Human owns                         Agent owns
@@ -46,6 +46,7 @@ The human should see anything that could materially change direction, responsibi
 
 - **`project-tasks` owns active execution state**, the approved or currently authoritative plan, blockers, verification state, and fresh-session handoffs.
 - **`planning` owns how substantial work is shaped and resolved before approval.**
+- **`engineering` owns implementation and runtime verification.** This skill records execution state and evidence; maintaining a task does not perform the work described by it.
 - **`project-docs` owns durable project knowledge** and absorbs stable truths.
 - **`tasks/backlog/` owns deferred future-work briefs** that should survive without becoming active execution state.
 - **`source-material/` holds supporting artifacts** that may inform work without becoming canonical truth.
@@ -103,13 +104,35 @@ The goal is not to preserve history. The goal is to preserve **execution effecti
 
 ## First-Screen Contract
 
-New tasks use:
+New standalone tasks use:
 
 ```text
 tasks/YYYY-MM-DD__kebab-case-name-bookmark.md
 ```
 
-The date is an **immutable creation date**. Keep `tasks/` flat unless the repository already uses another convention. Do not mass-rename historical tasks.
+The date is an **immutable creation date**. Keep standalone tasks flat; use the optional grouping below for related tasks. Follow established repository naming conventions and do not mass-rename historical tasks.
+
+### Related Task Groups
+
+For several separately executable tasks sharing an outcome, use a dated folder:
+
+```text
+tasks/
+    YYYY-MM-DD__standalone-task-bookmark.md
+    YYYY-MM-DD__related-effort/
+        overview.md
+        01-first-outcome.md
+        02-next-outcome.md
+```
+
+Use the effort's immutable creation date for the folder. Child task dates remain in their metadata; numeric prefixes indicate intended reading/execution order, not readiness or dependency enforcement.
+
+- **Overview:** shared outcome, constraints, links to tasks, dependency/handoff map, and recommended starting point. No task dashboard or duplicate progress tracking.
+- **Individual task:** its normal dashboard, outcome, inputs/outputs, specific decisions, state, blockers, next action, and verification. Set `File` to its actual path and link required shared context and predecessor tasks explicitly.
+- Make the first actionable task concrete. Later tasks retain meaningful direction and completion criteria, with decisions dependent on earlier results assigned to those results rather than guessed.
+- Keep shared facts authoritative in the overview and task-specific facts in the task. Update affected downstream assumptions after upstream results; do not reopen the whole plan.
+
+One task with several steps remains one file without an overview. If it later needs independent tasks, group it while preserving creation metadata and updating references. Do not migrate unrelated historical tasks. Dependent stages in a current effort stay with that effort; intentionally deferred future work still belongs in the backlog.
 
 ### Lifecycle Fields
 
@@ -123,8 +146,9 @@ The date is an **immutable creation date**. Keep `tasks/` flat unless the reposi
 |  | `On Hold` | Intentionally paused. |
 |  | `Closed` | Active execution has ended. |
 | **Execution Gate** | `Needs Human Unblock` | A human must act, approve, decide, provide access, or coordinate an external unblock. |
-|  | `Ready for Main-Agent Execution` | No known hard blockers; execute mainly through the main agent. |
-|  | `Ready for Delegated Execution` | No known hard blockers; bounded parts may be delegated safely. |
+|  | `Waiting for Dependency` | An upstream task or external event must complete; no human intervention is currently required. |
+|  | `Ready for Main-Agent Execution` | No known blockers to the next meaningful action; execute mainly through the main agent. |
+|  | `Ready for Delegated Execution` | No known blockers to the next meaningful action; bounded parts may be delegated safely. |
 |  | `Not Applicable (Closed)` | The task is closed. |
 | **Docs Sync** | `Not Synced` | Durable knowledge has not been checked or promoted. |
 |  | `Partial` | Some durable knowledge was handled; more may remain. |
@@ -135,6 +159,8 @@ The date is an **immutable creation date**. Keep `tasks/` flat unless the reposi
 `Ready for Delegated Execution` indicates only that bounded delegation is permissible. A delegation or execution-topology skill decides what to delegate and how.
 
 When `Execution Gate: Needs Human Unblock`, set `Status: Blocked`, make `Next Action` the exact human action required, and state why meaningful execution should stop.
+
+When `Execution Gate: Waiting for Dependency`, set `Status: Blocked`, name the dependency and completion evidence in `Blockers`, and make `Next Action` identify the producing task or event and the step to take once it completes. If a human must intervene, use `Needs Human Unblock` instead.
 
 When `Status: Closed`, set `Execution Gate: Not Applicable (Closed)` and leave no pending execution disguised as completed work.
 
@@ -148,7 +174,7 @@ When `Status: Closed`, set `Execution Gate: Not Applicable (Closed)` and leave n
 **Last Updated:** YYYY-MM-DD
 **Priority:** [Now | Next | Later]
 **Status:** [Active | Blocked | On Hold | Closed]
-**Execution Gate:** [Needs Human Unblock | Ready for Main-Agent Execution | Ready for Delegated Execution | Not Applicable (Closed)]
+**Execution Gate:** [Needs Human Unblock | Waiting for Dependency | Ready for Main-Agent Execution | Ready for Delegated Execution | Not Applicable (Closed)]
 **Docs Sync:** [Not Synced | Partial | Synced]
 
 **Goal:** [...]
@@ -314,7 +340,7 @@ When substantial planning is still required and the user has not approved a dire
 
 ## Blocker Preflight
 
-Before marking substantial work ready for execution, resuming execution after material changes, or preparing a fresh-session handoff, inspect for blockers.
+Before declaring work ready to begin or resume, inspect blockers relevant to its next meaningful action. When merely persisting a plan, classify known prerequisites and unchecked facts from available evidence; do not test credentials, environments, or future operational conditions just to write the brief.
 
 1. **Human access:** missing credentials, permissions, private data, provider access, OAuth, billing, or external configuration.
 2. **Human decision:** unresolved acceptance criteria or product, architecture, security, privacy, migration, fallback, cost, or deployment choices.
@@ -337,14 +363,16 @@ For every hard blocker, record:
 
 - the blocker;
 - why it prevents meaningful execution;
-- the exact human or external action required;
+- the exact human action, upstream task result, or external event required;
 - whether all execution or only a later phase is blocked.
 
 Human-only blockers should normally be cleared before handoff where practical. Never encourage an executor to brute-force around a blocker only a human can resolve.
 
+Readiness is relative to the next meaningful action, not a claim that every future prerequisite has been verified. A bounded investigation may itself be ready to execute. Record later-phase prerequisites and their gates explicitly; never proceed into a phase before its required inputs, approvals, or safety conditions are satisfied.
+
 ## Execution Readiness Gate
 
-Use this gate when the user asks to finalize a task for execution, prepare a fresh-agent handoff, or when substantial execution is about to begin from the task.
+Use this gate when the user asks to prepare a task for immediate execution or a fresh-agent execution handoff, or when substantial execution is about to begin. Persisting an approved task set requires an honest brief and a consistency review, not completing this operational preflight for every future stage.
 
 ```text
 1. Synchronize current truth.
@@ -373,11 +401,12 @@ A task passes only when:
 Reject or correct:
 
 - `Status: Closed` with pending execution, validation, approval, or human action;
-- a ready gate with an unresolved human-only prerequisite;
-- `Blockers: None` while another section describes required access, approval, credentials, or manual validation;
-- a ready task containing unresolved material alternatives;
+- a ready gate with a prerequisite preventing the next meaningful action;
+- `Blockers: None` while another section describes a blocker to that action; identify later-phase prerequisites separately;
+- a ready task containing unresolved material alternatives without an explicit investigation or approval gate before the affected work;
 - `Next Action` assigned to the human while the gate says ready for agent execution;
 - `Needs Human Unblock` without `Status: Blocked`;
+- `Waiting for Dependency` without `Status: Blocked`, an identified dependency, and a completion condition;
 - `Status: Closed` without `Not Applicable (Closed)`;
 - a success bar unsupported by the verification contract;
 - a chosen approach that conflicts with the implementation plan;
@@ -389,10 +418,10 @@ The dashboard is not decorative metadata. It must agree with the body.
 
 ### Ready Outcome
 
-When no hard blockers remain:
+When no hard blockers prevent the next meaningful action:
 
 - set the appropriate ready gate;
-- set `Blockers: None`;
+- set `Blockers: None` when none prevent that action, recording any later-phase prerequisites explicitly;
 - put the first executable action in `Next Action`;
 - ensure no missing intent or plan must be recovered from the old chat.
 
@@ -405,7 +434,7 @@ First executable action: [...]
 
 ### Blocked Outcome
 
-When a hard blocker remains:
+When a hard blocker requires human intervention:
 
 - set `Execution Gate: Needs Human Unblock`;
 - set `Status: Blocked`;
@@ -420,6 +449,8 @@ Required action: [...]
 Execution impact: [...]
 Execution gate: Needs Human Unblock
 ```
+
+For a dependency requiring no human intervention, report `Execution readiness: BLOCKED` with `Execution Gate: Waiting for Dependency`, `Status: Blocked`, the producing task or event, its required completion evidence, and the action that follows. Do not mark a consumer ready while its required input is unavailable, or manufacture a human action for an ordinary task dependency.
 
 Never silently update the file while leaving the human to assume it is executable.
 
@@ -468,10 +499,10 @@ All lifecycle operations must preserve dashboard/body consistency, rewrite stale
 
 ### Create / Persist Plan
 
-- Create the dated task file and dashboard.
+- Create the dated standalone task or related-task group, with dashboards on individual tasks.
 - Capture established alignment and explain outcome, why, selected direction, and approved plan when one exists.
 - Include optional sections only when useful.
-- Run Blocker Preflight and set the gate truthfully.
+- Classify known blockers and future prerequisites from available evidence and set each gate truthfully; do not execute the planned investigations to finish writing.
 - Route intentionally deferred work with no active next action to `tasks/backlog/`.
 
 Done when the work is preserved clearly, even if it is not yet execution-ready.
@@ -493,12 +524,13 @@ An update may legitimately leave the task exploratory, incomplete, or blocked.
 - Remove or clearly mark stale alternatives.
 - Issue an explicit `READY` or `BLOCKED` verdict.
 
-Done when a fresh executor can execute without reconstructing missing context and the human can confidently supervise the plan.
+Done when the fresh executor has the context to take the next permitted action, or a precise blocker and unblock condition, and the human can confidently supervise the plan. For a task set, distinguish the actionable tasks from dependent stages; do not imply all tasks are ready.
 
 ### Resume
 
 - Start with the dashboard and check the gate before acting.
 - If `Execution Gate: Needs Human Unblock`, stop and surface the required human action.
+- If `Execution Gate: Waiting for Dependency`, check the stated completion evidence before starting the dependent work. If unavailable, surface the dependency; do not poll indefinitely or start unrelated work. When it clears, refresh the gate.
 - Understand current truth before editing.
 - Review deeper sections only as needed.
 - Preserve newly discovered human-control nuance.
@@ -528,7 +560,7 @@ Done when a fresh executor can execute without reconstructing missing context an
 - Preserve uncertainty honestly.
 - Move durable truth to `docs/`, deferred work to `tasks/backlog/`, supporting artifacts to `source-material/`, and retired history to `archive/`.
 - Blockers must state both the obstacle and required action.
-- Do not declare readiness when the task is vague, contradictory, dependent on the old chat, or contains unresolved material choices.
+- Do not declare readiness when the next meaningful action is vague, contradictory, blocked, dependent on the old chat, or requires an unresolved material choice without a prior investigation or approval gate.
 - Do not hide product or architecture decisions inside implementation discretion.
 - Do not bury human-control nuance in code-level detail.
 - Do not bloat the task with reconstructible mechanics.
