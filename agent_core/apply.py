@@ -566,7 +566,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     except ApplyError as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)
         return 1
-    print(f"Applied {len(plans)} configured skills.")
+    actions = {
+        "absent": "added",
+        "owned-missing": "recreated",
+        "owned-unchanged": "replaced",
+    }
+    print(f"Applied {len(plans)} configured skills:")
+    for plan in plans:
+        print(f"- {actions[plan.classification]}: {plan.source.name}")
     return 0
 
 

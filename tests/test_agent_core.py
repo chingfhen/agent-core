@@ -7,6 +7,7 @@ import subprocess
 import tempfile
 import tomllib
 import unittest
+from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
@@ -238,6 +239,42 @@ class AgentCoreApplyTests(unittest.TestCase):
         self.assertFalse(self.ownership_path().exists())
         artifacts = list((self.project / ".agents").glob(".agent-core-*") if (self.project / ".agents").exists() else [])
         self.assertEqual(artifacts, [])
+
+    def test_apply_cli_reports_each_skill_action(self) -> None:
+        fingerprint = "a" * 64
+        plans = [
+            apply.TargetPlan(
+                apply.SourceSkill("added", Path("source"), fingerprint),
+                ".agents/skills/added",
+                Path("target"),
+                "absent",
+            ),
+            apply.TargetPlan(
+                apply.SourceSkill("recreated", Path("source"), fingerprint),
+                ".agents/skills/recreated",
+                Path("target"),
+                "owned-missing",
+            ),
+            apply.TargetPlan(
+                apply.SourceSkill("replaced", Path("source"), fingerprint),
+                ".agents/skills/replaced",
+                Path("target"),
+                "owned-unchanged",
+            ),
+        ]
+
+        with patch.object(apply, "apply_checkout", return_value=plans), patch(
+            "sys.stdout", new_callable=StringIO
+        ) as stdout:
+            self.assertEqual(apply.main(["--checkout", "canonical", "--cwd", "project"]), 0)
+
+        self.assertEqual(
+            stdout.getvalue(),
+            "Applied 3 configured skills:\n"
+            "- added: added\n"
+            "- recreated: recreated\n"
+            "- replaced: replaced\n",
+        )
 
     def test_exclusions_are_idempotent_and_preserve_unrelated_content(self) -> None:
         project_paths = apply.resolve_project(self.project)

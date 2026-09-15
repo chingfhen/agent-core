@@ -72,6 +72,8 @@ Pull, authentication, network, or divergence failures stop before project files 
 
 Apply validates the complete list and every source before replacing any configured target. Names must be unique safe directory names, each real source directory must contain a regular `SKILL.md`, and every copied source file must be tracked in the canonical Git commit. Ignored or otherwise uncommitted source files, links, reparse points, and other unsupported entries are rejected rather than copied.
 
+Adding a name to the list adds that missing skill at the next successful apply. Existing owned, unchanged copies are replaced with their canonical versions, and manually deleted owned copies are recreated. This is one atomic operation: if any configured target has unowned content, is tracked, or was locally modified, apply makes no changes at all, including adding new skills. To intentionally discard local edits to a managed copy, preserve them elsewhere if needed, delete only that skill directory, then run apply again.
+
 ### Destination And Ownership
 
 Each configured source is copied to:
@@ -103,6 +105,8 @@ For every configured target, apply fails closed unless it is one of:
 - recorded as owned but manually deleted.
 
 When Git metadata is available, a tracked target or tracked descendant is always a conflict. Existing unowned content and locally modified managed copies are never overwritten. There is no `--force` option. Non-Git `--here` targets skip only tracked-path and Git-exclusion behavior.
+
+Successful output identifies every configured skill and whether it was `added`, `replaced`, or `recreated`.
 
 Removing a name from `core-skills.toml` does not inspect, update, or delete its prior copy or ownership record. If it is re-added unchanged, it can update normally. If it was modified while absent from configuration, re-adding it exposes the conflict.
 

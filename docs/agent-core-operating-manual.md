@@ -80,6 +80,8 @@ The command automatically:
 4. validates all sources and destinations;
 5. safely copies or updates each configured skill.
 
+Successful output lists every configured skill and whether it was `added`, `replaced`, or `recreated`.
+
 For `--here`, ownership metadata is stored at:
 
 ```text
@@ -184,6 +186,8 @@ Apply the update in each desired target:
 Set-Location "<target-directory>"
 agent-core apply --here
 ```
+
+This replaces the target copy only when Agent Core still owns it and it has not been edited locally. A local edit to any configured target stops the entire apply before any skill is changed or newly added. Preserve any target-local edits you need, delete only the affected skill directory, and rerun apply to restore that canonical skill and apply the remaining configured skills.
 
 ## Stop Distributing A Skill
 
