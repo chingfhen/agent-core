@@ -71,8 +71,12 @@ def _ensure_clean(checkout: Path) -> None:
         raise AgentCoreError("Canonical checkout has staged, unstaged, or untracked changes; refusing to pull")
 
 
-def refresh_and_launch(checkout: Path, project_cwd: Path) -> int:
-    _ensure_project_worktree(project_cwd)
+def refresh_and_launch(checkout: Path, project_cwd: Path, *, here: bool = False) -> int:
+    if here:
+        if not project_cwd.is_dir():
+            raise AgentCoreError(f"Target directory does not exist: {project_cwd}")
+    else:
+        _ensure_project_worktree(project_cwd)
     _validate_checkout(checkout)
     _ensure_clean(checkout)
 
@@ -83,17 +87,17 @@ def refresh_and_launch(checkout: Path, project_cwd: Path) -> int:
 
     _validate_checkout(checkout)
     implementation = checkout / "agent_core" / "apply.py"
-    result = subprocess.run(
-        [
-            sys.executable,
-            str(implementation),
-            "--checkout",
-            str(checkout),
-            "--cwd",
-            str(project_cwd),
-        ],
-        check=False,
-    )
+    command = [
+        sys.executable,
+        str(implementation),
+        "--checkout",
+        str(checkout),
+        "--cwd",
+        str(project_cwd),
+    ]
+    if here:
+        command.append("--here")
+    result = subprocess.run(command, check=False)
     return result.returncode
 
 
@@ -103,7 +107,14 @@ def build_parser() -> argparse.ArgumentParser:
         description="Refresh the private Agent Core checkout and apply configured skills.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("apply", help="Refresh and safely copy core skills into the current Git project.")
+    apply_parser = subparsers.add_parser(
+        "apply", help="Refresh and safely copy core skills into a project or the current directory."
+    )
+    apply_parser.add_argument(
+        "--here",
+        action="store_true",
+        help="Use the current directory exactly, whether or not it is a Git worktree.",
+    )
     return parser
 
 
@@ -114,7 +125,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         parser.error(f"unsupported command: {args.command}")
 
     try:
-        return refresh_and_launch(canonical_checkout(), Path.cwd())
+        return refresh_and_launch(canonical_checkout(), Path.cwd(), here=args.here)
     except AgentCoreError as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)
         return 1

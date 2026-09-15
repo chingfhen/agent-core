@@ -12,7 +12,7 @@
 
 - `~/.agent-core` is the fixed canonical private checkout for cross-device use.
 - `skills/` is the hand-edited production source. Do not edit production skills without explicit human approval.
-- The normal personal distribution workflow is `agent-core apply`, which refreshes the clean canonical checkout and safely copies `core-skills.toml` entries into the current Git project's `.agents/skills/` directory.
+- Use `agent-core apply --here` to copy `core-skills.toml` entries into the current directory's `.agents/skills/`, whether or not the directory is a Git worktree. Plain `agent-core apply` retains Git-root targeting.
 - Copied skills update only when apply runs. Project-local ownership fingerprints prevent unrelated or locally modified content from being overwritten.
 - `scripts/enroll_repo.py` remains separate advanced tooling for `.agent-os.json`, memory-enabled enrollment, and live `.claude`/`.opencode` aliases.
 - `AGENTS.md` is the steward operating contract; `docs/consumer-repo-enrollment.md` owns the complete distribution contract.
@@ -32,7 +32,7 @@ Detailed implementation tasks, generated consumer output, or session history.
 
 - **Steward agent:** An agent maintaining this canonical repository.
 - **Executor agent:** An agent working in another repo that consumes Agent Core capabilities.
-- **Consumer repo:** A Git project receiving copied core skills or optional advanced enrollment.
+- **Consumer target:** A directory receiving copied core skills; advanced enrollment still requires its own repository contract.
 
 ### Canonical Surfaces
 
@@ -52,9 +52,9 @@ Detailed implementation tasks, generated consumer output, or session history.
 
 Simple apply workflow:
 
-- consumer `.agents/skills/<configured-skill>` copies;
-- `<actual-git-dir>/agent-core/ownership.json`;
-- a managed exact-path block in `<git-common-dir>/info/exclude`.
+- target `.agents/skills/<configured-skill>` copies;
+- target-local `.agents/.agent-core/ownership.json` for `--here`, or `<actual-git-dir>/agent-core/ownership.json` for plain apply;
+- a managed exact-path block in `<git-common-dir>/info/exclude` when Git is available.
 
 Advanced enrollment workflow:
 
@@ -75,15 +75,19 @@ git clone <private-gitlab-url> "$HOME\.agent-core"
 uv tool install --editable "$HOME\.agent-core"
 ```
 
-Then run this from any Git worktree:
+To target the current directory exactly, whether or not it is a Git worktree:
 
 ```text
-agent-core apply
+agent-core apply --here
 ```
+
+Plain `agent-core apply` remains available inside a Git worktree and targets that worktree's root.
 
 The stable console launcher refuses a dirty canonical checkout, runs `git pull --ff-only`, and starts the newly pulled apply implementation in a fresh process. The implementation requires configured source files to match committed Git content and validates all project targets before replacement. It stages verified copies, uses backup-and-rollback replacement, atomically records ownership, and locally excludes exact copied paths without changing project `.gitignore`.
 
 Only `core-skills.toml` controls the copied set. Removing a configured name is non-destructive: the prior copy, ownership record, and exclusion remain. Apply has no deletion or force behavior.
+
+`--here` keeps ownership state under `<current-directory>/.agents/.agent-core/`. When the directory is inside Git, tracked-target refusal and local Git exclusions still apply. Outside Git, those Git-only checks are skipped.
 
 See `docs/consumer-repo-enrollment.md` for source validation, tracked-target refusal, linked-worktree metadata, fingerprint, and failure semantics.
 

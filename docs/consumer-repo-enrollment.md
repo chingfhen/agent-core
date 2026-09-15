@@ -10,7 +10,7 @@
 
 ### Read First
 
-- The normal personal workflow is `agent-core apply` from a Git worktree.
+- The normal personal workflow is `agent-core apply --here`, which targets the current directory whether or not it is a Git worktree. Plain `agent-core apply` targets the containing Git root.
 - The canonical private checkout is fixed at `~/.agent-core`; every apply fast-forwards that clean checkout before touching project skill targets.
 - `core-skills.toml` is the authoritative core list. Apply copies only those skills to `.agents/skills/<skill>`.
 - Copied directories update explicitly on the next apply. They are not links and do not propagate edits live.
@@ -20,7 +20,7 @@
 
 ### Scope
 
-This document covers private skill delivery into consumer Git repos, including copy ownership, conflict safety, local Git exclusions, and the optional legacy-compatible alias workflow.
+This document covers private skill delivery into Git and non-Git target directories, including copy ownership, conflict safety, local Git exclusions when available, and the optional advanced alias workflow.
 
 ### Not Here
 
@@ -41,15 +41,17 @@ The checkout location is intentionally not configurable. Authentication comes fr
 
 ### Everyday Use
 
-From any directory inside the target Git worktree:
+To target the current directory exactly:
 
 ```text
-agent-core apply
+agent-core apply --here
 ```
+
+This works in Git and non-Git directories. Plain `agent-core apply` remains available inside a Git worktree and targets the worktree root.
 
 The launcher:
 
-1. confirms the current directory belongs to a Git worktree;
+1. resolves the exact current directory for `--here`, or requires and resolves a Git worktree for plain apply;
 2. confirms `~/.agent-core` is the canonical Git worktree root and contains the package, `skills/`, and `core-skills.toml`;
 3. refuses staged, unstaged, or untracked canonical-checkout changes;
 4. runs `git -C ~/.agent-core pull --ff-only`;
@@ -66,6 +68,7 @@ Pull, authentication, network, or divergence failures stop before project files 
 - `planning`
 - `engineering`
 - `grilling`
+- `approval-gate`
 
 Apply validates the complete list and every source before replacing any configured target. Names must be unique safe directory names, each real source directory must contain a regular `SKILL.md`, and every copied source file must be tracked in the canonical Git commit. Ignored or otherwise uncommitted source files, links, reparse points, and other unsupported entries are rejected rather than copied.
 
@@ -74,18 +77,24 @@ Apply validates the complete list and every source before replacing any configur
 Each configured source is copied to:
 
 ```text
-<project-root>/.agents/skills/<skill>
+<target-root>/.agents/skills/<skill>
 ```
 
 No other project skill surface participates in this workflow.
 
-Ownership state is versioned JSON at:
+Ownership state is versioned JSON. Plain apply stores it at:
 
 ```text
 <actual-git-dir>/agent-core/ownership.json
 ```
 
-The actual Git directory is resolved with Git, so linked worktrees receive their own ownership state. Each record includes the destination, source skill, canonical source commit, and a deterministic fingerprint of installed paths, permissions, and file contents.
+`--here` stores it under the exact target:
+
+```text
+<current-directory>/.agents/.agent-core/ownership.json
+```
+
+This target-local location remains stable if a non-Git directory later becomes a Git repository. Plain apply resolves the actual Git directory, so linked worktrees receive their own ownership state. Each record includes the destination, source skill, canonical source commit, and a deterministic fingerprint of installed paths, permissions, and file contents.
 
 For every configured target, apply fails closed unless it is one of:
 
@@ -93,7 +102,7 @@ For every configured target, apply fails closed unless it is one of:
 - recorded as owned and unchanged;
 - recorded as owned but manually deleted.
 
-A project-tracked target or tracked descendant is always a conflict. Existing unowned content and locally modified managed copies are never overwritten. There is no `--force` option.
+When Git metadata is available, a tracked target or tracked descendant is always a conflict. Existing unowned content and locally modified managed copies are never overwritten. There is no `--force` option. Non-Git `--here` targets skip only tracked-path and Git-exclusion behavior.
 
 Removing a name from `core-skills.toml` does not inspect, update, or delete its prior copy or ownership record. If it is re-added unchanged, it can update normally. If it was modified while absent from configuration, re-adding it exposes the conflict.
 
@@ -101,13 +110,13 @@ Removing a name from `core-skills.toml` does not inspect, update, or delete its 
 
 After full source validation and all-target preflight, apply stages and fingerprints every copy on the project filesystem. It replaces safe targets through temporary backups, rolls replacements back on ordinary failure, and atomically writes ownership state only after successful replacement.
 
-Exact managed destinations are maintained in a tool-owned block in:
+When Git is available, exact managed destinations and target-local `--here` ownership state are maintained in a tool-owned block in:
 
 ```text
 <git-common-dir>/info/exclude
 ```
 
-Unrelated exclusion content is preserved, and the tracked project `.gitignore` is not modified. Retained records keep removed core skills excluded; stale exclusions after manual deletion are harmless.
+Unrelated exclusion content is preserved, and the tracked project `.gitignore` is not modified. Non-Git targets have no Git exclusion file to update. Retained records keep removed core skills excluded; stale exclusions after manual deletion are harmless.
 
 ### Legacy Independence
 

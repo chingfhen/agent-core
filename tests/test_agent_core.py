@@ -267,6 +267,53 @@ class AgentCoreApplyTests(unittest.TestCase):
         self.assertFalse((paths.git_common_dir / apply.STATE_DIRECTORY / apply.STATE_FILENAME).exists())
         self.assertIn("/.agents/skills/demo/", (paths.git_common_dir / "info" / "exclude").read_text())
 
+    def test_here_applies_to_a_non_git_directory(self) -> None:
+        workspace = self.root / "workspace"
+        workspace.mkdir()
+
+        plans = apply.apply_checkout(self.checkout, workspace, here=True)
+        project_paths = apply.resolve_project(workspace, here=True)
+
+        self.assertEqual([plan.classification for plan in plans], ["absent"])
+        self.assertTrue((workspace / ".agents/skills/demo/SKILL.md").is_file())
+        self.assertEqual(
+            apply.state_path(project_paths), workspace.resolve() / ".agents/.agent-core/ownership.json"
+        )
+        self.assertTrue(apply.state_path(project_paths).is_file())
+
+        git(workspace, "init", "-q")
+        git(workspace, "config", "user.name", "Agent Core Tests")
+        git(workspace, "config", "user.email", "agent-core@example.invalid")
+        (workspace / "README.md").write_text("workspace\n", encoding="utf-8")
+        git(workspace, "add", "README.md")
+        git(workspace, "commit", "-q", "-m", "initialize workspace")
+
+        repeated = apply.apply_checkout(self.checkout, workspace, here=True)
+        self.assertEqual([plan.classification for plan in repeated], ["owned-unchanged"])
+        self.assertTrue((workspace / ".agents/.agent-core/ownership.json").is_file())
+        self.assertNotIn(".agents", git(workspace, "status", "--short").stdout)
+
+    def test_here_targets_a_git_subdirectory_and_keeps_git_safety(self) -> None:
+        workspace = self.project / "workspace"
+        workspace.mkdir()
+        apply.apply_checkout(self.checkout, workspace, here=True)
+        project_paths = apply.resolve_project(workspace, here=True)
+
+        self.assertTrue((workspace / ".agents/skills/demo/SKILL.md").is_file())
+        self.assertFalse((self.project / ".agents").exists())
+        self.assertEqual(
+            apply.state_path(project_paths), workspace.resolve() / ".agents/.agent-core/ownership.json"
+        )
+        exclude = project_paths.git_common_dir / "info/exclude"
+        exclusions = exclude.read_text(encoding="utf-8")
+        self.assertIn("/workspace/.agents/skills/demo/", exclusions)
+        self.assertIn("/workspace/.agents/.agent-core/", exclusions)
+
+        git(self.project, "add", "-f", "workspace/.agents/skills/demo/SKILL.md")
+        commit_all(self.project, "track copied skill")
+        with self.assertRaisesRegex(apply.ApplyError, "tracked by project Git"):
+            apply.apply_checkout(self.checkout, workspace, here=True)
+
     def test_legacy_surfaces_are_ignored(self) -> None:
         (self.project / ".agent-os.json").write_text("not json", encoding="utf-8")
         (self.project / ".agent-os-state").mkdir()
@@ -316,9 +363,9 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         implementation = self.upstream / "agent_core" / "apply.py"
         text = implementation.read_text(encoding="utf-8")
         text = text.replace(
-            "        plans = apply_checkout(Path(args.checkout), Path(args.cwd))",
+            "        plans = apply_checkout(Path(args.checkout), Path(args.cwd), here=args.here)",
             '        (Path(args.cwd) / "fresh-process.txt").write_text("fresh", encoding="utf-8")\n'
-            "        plans = apply_checkout(Path(args.checkout), Path(args.cwd))",
+            "        plans = apply_checkout(Path(args.checkout), Path(args.cwd), here=args.here)",
         )
         implementation.write_text(text, encoding="utf-8")
         commit_all(self.upstream, "fresh implementation")
@@ -360,6 +407,23 @@ class AgentCoreBootstrapTests(unittest.TestCase):
             bootstrap.refresh_and_launch(self.checkout, outside)
         self.assertEqual(list(outside.iterdir()), [])
         self.assertEqual(git(self.checkout, "rev-parse", "HEAD").stdout, before)
+
+    def test_here_bootstrap_allows_a_non_git_directory(self) -> None:
+        outside = self.root / "outside-here"
+        outside.mkdir()
+
+        result = bootstrap.refresh_and_launch(self.checkout, outside, here=True)
+
+        self.assertEqual(result, 0)
+        self.assertTrue((outside / ".agents/skills/demo/SKILL.md").is_file())
+        self.assertTrue((outside / ".agents/.agent-core/ownership.json").is_file())
+
+    def test_cli_passes_here_mode(self) -> None:
+        with patch.object(bootstrap, "canonical_checkout", return_value=self.checkout), patch.object(
+            bootstrap, "refresh_and_launch", return_value=0
+        ) as launch:
+            self.assertEqual(bootstrap.main(["apply", "--here"]), 0)
+        launch.assert_called_once_with(self.checkout, Path.cwd(), here=True)
 
 
 if __name__ == "__main__":

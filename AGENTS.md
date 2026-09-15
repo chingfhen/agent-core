@@ -13,7 +13,7 @@
 - You are the steward agent when working in this repo.
 - At the start of every chat, load `agent-os-session` and state `Loaded agent-os-session.`
 - `skills/` is the hand-edited production source for executor agents. Do not change production workflow skills unless the human explicitly approves the skill edit.
-- The simple personal distribution workflow is `agent-core apply`: it refreshes the fixed clean `~/.agent-core` checkout and copies `core-skills.toml` entries only to `.agents/skills/` in the current Git project.
+- The normal personal command is `agent-core apply --here`: it refreshes the fixed clean `~/.agent-core` checkout and copies `core-skills.toml` entries only to `.agents/skills/` in the current directory, with or without Git. Plain `agent-core apply` targets the containing Git root.
 - Do not hand-maintain consumer copies. Apply owns only exact configured destinations that its project-local fingerprint state proves it installed.
 - `scripts/enroll_repo.py` is separate advanced tooling for manifests and live `.claude`/`.opencode` aliases; do not mix its state or behavior into apply.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
@@ -44,7 +44,7 @@ You are a node in an ongoing execution chain. Improve future repository context 
 
 - **Steward agent:** Maintains this canonical repository, package, docs, workflows, and memory tooling.
 - **Executor agent:** Works in another repo using copied or advanced-enrolled Agent Core skills.
-- **Consumer repo:** A Git project receiving simple copied skills or advanced enrollment.
+- **Consumer target:** A directory receiving simple copied skills; advanced enrollment retains its repository-specific contract.
 
 ### Canonical And Generated Boundaries
 
@@ -58,9 +58,9 @@ Canonical surfaces include:
 
 Generated surfaces include:
 
-- simple consumer `.agents/skills/<configured-skill>` copies;
-- simple ownership state under the actual consumer Git directory;
-- simple exact-path entries in the consumer Git common metadata `info/exclude`;
+- simple target `.agents/skills/<configured-skill>` copies;
+- target-local `.agents/.agent-core/ownership.json` for `--here`, or ownership under the actual Git directory for plain apply;
+- simple exact-path entries in Git common metadata `info/exclude` when Git is available;
 - advanced `.agent-os.json`, `.claude/skills/*`, `.opencode/skills/*`, and `.agent-os-state/enrollments.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
@@ -71,9 +71,10 @@ Generated surfaces include:
 - Keep the console launcher small and stable. It must reject a dirty canonical checkout, fast-forward with ordinary authenticated Git, and cross a fresh-process import boundary before apply code runs.
 - Keep the implementation standard-library-only so ordinary source updates do not require reinstalling dependencies.
 - Apply owns only `.agents/skills/<configured-skill>` targets. It must ignore advanced manifests, registries, aliases, and all other skill surfaces.
+- `apply --here` targets the current directory exactly and stores ownership under its `.agents/.agent-core/`. Preserve Git tracked-target and local-exclusion safety when Git is available; skip only those checks that require absent Git metadata.
 - Require every configured source file to be tracked in the canonical commit; never copy ignored or other uncommitted source artifacts.
 - Preflight every configured target before replacing any. Refuse tracked targets or descendants, unrelated existing content, malformed ownership, unsupported filesystem entries, and locally modified managed copies.
-- Store ownership under the actual Git directory and exclusions under the Git common directory so linked worktrees behave correctly.
+- Plain apply stores ownership under the actual Git directory. `--here` stores ownership under the exact target directory. When Git is available, exclusions remain under the Git common directory so linked worktrees behave correctly.
 - Preserve additive removal: unconfigured prior copies, records, and exclusions remain untouched. Do not add automatic removal or force behavior.
 - Stage and fingerprint all copies, replace through backups with rollback, and atomically publish ownership only after successful replacement.
 - Never change the tracked consumer `.gitignore`; preserve unrelated local exclusion content.

@@ -41,8 +41,10 @@ class SourceSkill:
 @dataclass(frozen=True)
 class ProjectPaths:
     root: Path
-    git_dir: Path
-    git_common_dir: Path
+    git_root: Path | None
+    git_dir: Path | None
+    git_common_dir: Path | None
+    state_in_target: bool
 
 
 @dataclass(frozen=True)
@@ -220,20 +222,42 @@ def load_sources(checkout: Path) -> tuple[list[SourceSkill], str]:
     return sources, commit
 
 
-def resolve_project(cwd: Path) -> ProjectPaths:
-    root_text = _git_output(cwd, "rev-parse", "--show-toplevel", context="Current directory is not in a Git worktree")
-    git_dir_text = _git_output(cwd, "rev-parse", "--absolute-git-dir", context="Could not resolve Git metadata directory")
+def resolve_project(cwd: Path, *, here: bool = False) -> ProjectPaths:
+    target = cwd.resolve()
+    if not target.is_dir():
+        raise ApplyError(f"Target directory does not exist: {target}")
+
+    root_result = _run_git(target, "rev-parse", "--show-toplevel")
+    if root_result.returncode != 0:
+        if here:
+            return ProjectPaths(target, None, None, None, True)
+        detail = root_result.stderr.strip() or root_result.stdout.strip() or f"exit code {root_result.returncode}"
+        raise ApplyError(f"Current directory is not in a Git worktree: {detail}")
+
+    git_root = Path(root_result.stdout.strip()).resolve()
+    git_dir_text = _git_output(target, "rev-parse", "--absolute-git-dir", context="Could not resolve Git metadata directory")
     common_text = _git_output(
-        cwd,
+        target,
         "rev-parse",
         "--path-format=absolute",
         "--git-common-dir",
         context="Could not resolve common Git metadata directory",
     )
-    return ProjectPaths(Path(root_text).resolve(), Path(git_dir_text).resolve(), Path(common_text).resolve())
+    root = target if here else git_root
+    return ProjectPaths(
+        root=root,
+        git_root=git_root,
+        git_dir=Path(git_dir_text).resolve(),
+        git_common_dir=Path(common_text).resolve(),
+        state_in_target=here,
+    )
 
 
 def state_path(project: ProjectPaths) -> Path:
+    if project.state_in_target:
+        return project.root / ".agents" / ".agent-core" / STATE_FILENAME
+    if project.git_dir is None:
+        raise ApplyError("Git ownership state is unavailable for this target")
     return project.git_dir / STATE_DIRECTORY / STATE_FILENAME
 
 
@@ -280,8 +304,18 @@ def _ensure_real_target_parents(project_root: Path) -> None:
             raise ApplyError(f"Skill destination parent is not a real directory: {path}")
 
 
-def _target_is_tracked(project_root: Path, destination: str) -> bool:
-    result = _run_git(project_root, "ls-files", "-z", "--", destination)
+def _git_relative_destination(project: ProjectPaths, destination: str) -> str:
+    if project.git_root is None:
+        return destination
+    prefix = project.root.relative_to(project.git_root)
+    return (prefix / destination).as_posix()
+
+
+def _target_is_tracked(project: ProjectPaths, destination: str) -> bool:
+    if project.git_root is None:
+        return False
+    git_destination = _git_relative_destination(project, destination)
+    result = _run_git(project.git_root, "ls-files", "-z", "--", git_destination)
     if result.returncode != 0:
         detail = result.stderr.strip() or result.stdout.strip() or f"exit code {result.returncode}"
         raise ApplyError(f"Could not inspect tracked project paths for {destination}: {detail}")
@@ -301,7 +335,7 @@ def build_plan(
         target = project.root / destination
         record = records.get(destination)
 
-        if _target_is_tracked(project.root, destination):
+        if _target_is_tracked(project, destination):
             errors.append(f"{destination} is tracked by project Git")
             continue
 
@@ -342,7 +376,7 @@ def verify_plan_still_safe(
     _ensure_real_target_parents(project.root)
     errors: list[str] = []
     for plan in plans:
-        if _target_is_tracked(project.root, plan.destination):
+        if _target_is_tracked(project, plan.destination):
             errors.append(f"{plan.destination} became tracked by project Git")
             continue
         exists = _lexists(plan.target)
@@ -376,7 +410,10 @@ def _render_exclusions(existing: str, destinations: list[str]) -> str:
     if len(starts) != len(ends) or len(starts) > 1 or (starts and starts[0] >= ends[0]):
         raise ApplyError("Git local exclude file contains a malformed agent-core managed block")
 
-    block = [EXCLUDE_START, *[f"/{destination}/" for destination in sorted(destinations)], EXCLUDE_END]
+    managed = {f"/{destination}/" for destination in destinations}
+    if starts:
+        managed.update(line for line in lines[starts[0] + 1 : ends[0]] if line)
+    block = [EXCLUDE_START, *sorted(managed), EXCLUDE_END]
     if starts:
         lines[starts[0] : ends[0] + 1] = block
     else:
@@ -401,12 +438,17 @@ def _atomic_write(path: Path, content: str) -> None:
 
 
 def _prepare_exclusions(project: ProjectPaths, records: dict[str, dict[str, str]]) -> None:
+    if project.git_common_dir is None:
+        return
     exclude_path = project.git_common_dir / "info" / "exclude"
     try:
         existing = exclude_path.read_text(encoding="utf-8") if exclude_path.exists() else ""
     except OSError as exc:
         raise ApplyError(f"Could not read Git local exclusions: {exclude_path}: {exc}") from exc
-    rendered = _render_exclusions(existing, list(records))
+    destinations = [_git_relative_destination(project, destination) for destination in records]
+    if project.state_in_target:
+        destinations.append(_git_relative_destination(project, ".agents/.agent-core"))
+    rendered = _render_exclusions(existing, destinations)
     if rendered != existing:
         try:
             _atomic_write(exclude_path, rendered)
@@ -434,10 +476,10 @@ def _cleanup_empty_parents(project_root: Path) -> None:
             pass
 
 
-def apply_checkout(checkout: Path, cwd: Path) -> list[TargetPlan]:
+def apply_checkout(checkout: Path, cwd: Path, *, here: bool = False) -> list[TargetPlan]:
     checkout = checkout.resolve()
     sources, commit = load_sources(checkout)
-    project = resolve_project(cwd)
+    project = resolve_project(cwd, here=here)
     ownership_path = state_path(project)
     records = load_state(ownership_path)
     plans = build_plan(project, sources, records)
@@ -513,13 +555,14 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Internal post-refresh Agent Core apply implementation.")
     parser.add_argument("--checkout", required=True)
     parser.add_argument("--cwd", required=True)
+    parser.add_argument("--here", action="store_true")
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        plans = apply_checkout(Path(args.checkout), Path(args.cwd))
+        plans = apply_checkout(Path(args.checkout), Path(args.cwd), here=args.here)
     except ApplyError as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)
         return 1
