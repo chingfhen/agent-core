@@ -14,7 +14,6 @@
 - `skills/` is the hand-edited production source. Do not edit production skills without explicit human approval.
 - Use `agent-core apply --here` to copy `core-skills.toml` entries into the current directory's `.agents/skills/`, whether or not the directory is a Git worktree. Plain `agent-core apply` retains Git-root targeting.
 - Copied skills update only when apply runs. Project-local ownership fingerprints prevent unrelated or locally modified content from being overwritten.
-- `scripts/enroll_repo.py` is deprecated compatibility tooling. Do not use it for new targets; retain it only for safe maintenance or retirement of existing alias enrollments.
 - `docs/agent-core-operating-manual.md` is the human command reference. `AGENTS.md` is the steward operating contract, and `docs/consumer-repo-enrollment.md` owns the technical distribution contract.
 - `tasks/` holds active execution state, while `docs/`, this README, and `AGENTS.md` hold durable truth.
 
@@ -32,7 +31,7 @@ Detailed implementation tasks, generated consumer output, or session history.
 
 - **Steward agent:** An agent maintaining this canonical repository.
 - **Executor agent:** An agent working in another repo that consumes Agent Core capabilities.
-- **Consumer target:** A directory receiving copied core skills; deprecated alias installations retain a compatibility contract only.
+- **Consumer target:** A directory receiving copied core skills.
 
 ### Canonical Surfaces
 
@@ -55,12 +54,6 @@ Simple apply workflow:
 - target `.agents/skills/<configured-skill>` copies;
 - target-local `.agents/.agent-core/ownership.json` for `--here`, or `<actual-git-dir>/agent-core/ownership.json` for plain apply;
 - a managed exact-path block in `<git-common-dir>/info/exclude` when Git is available.
-
-Deprecated alias compatibility surfaces:
-
-- existing consumer `.agent-os.json`;
-- existing consumer `.claude/skills/*` and `.opencode/skills/*` aliases;
-- device-local `.agent-os-state/enrollments.json`.
 
 Derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md` are generated and disposable.
 
@@ -91,14 +84,6 @@ Only `core-skills.toml` controls the copied set. Removing a configured name is n
 
 See `docs/consumer-repo-enrollment.md` for source validation, tracked-target refusal, linked-worktree metadata, fingerprint, and failure semantics.
 
-### Deprecated Alias Compatibility
-
-Do not use `scripts/enroll_repo.py enroll` or `sync` for new targets. The registry-backed symlink/junction workflow is deprecated and retained only to avoid breaking existing installations.
-
-When an existing alias enrollment must be inspected or retired, use its `verify` and preview-first `unenroll` commands rather than recursively deleting managed alias paths. Real local directories and unexpected aliases remain conflicts.
-
-The normal `agent-core apply --here` workflow ignores all deprecated surfaces outside its exact `.agents/skills/<configured-skill>` targets.
-
 ## Repository Working Surfaces
 
 - `skills/` holds production executor skills and is human-approval-gated.
@@ -114,8 +99,7 @@ The normal `agent-core apply --here` workflow ignores all deprecated surfaces ou
 - `memory/memories.jsonl` is the only tracked memory artifact.
 - Search and index outputs in `memory/memory.sqlite` and `MEMORY_INDEX.md` are disposable and untracked.
 - Steward agents own canonical memory tooling and publication.
-- Executor memory behavior remains available only to existing deprecated manifest enrollments where `memory_enabled` is true; the normal apply workflow does not enable memory.
-- `agent-os-memory` reads manifest context directly and exposes `uv run scripts/memory.py` list, search, write, and reindex flows.
+- Memory tooling is steward-only; simple apply does not configure consumer memory behavior.
 - Creating a new `topic_key` requires explicit human approval; updates within an existing active topic can be autonomous.
 
 ## Dependency Strategy
@@ -131,11 +115,10 @@ The normal `agent-core apply --here` workflow ignores all deprecated surfaces ou
 | ------- | ---- | -------------- |
 | Steward contract | `AGENTS.md` | Governs maintainers and safety boundaries. |
 | Human operating manual | `docs/agent-core-operating-manual.md` | Commands for setup, normal use, skill publication, verification, and recovery. |
-| Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical simple apply and deprecated alias behavior. |
+| Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical simple apply behavior. |
 | Core skill list | `core-skills.toml` | Authoritative copied skill set. |
 | CLI launcher | `agent_core/bootstrap.py` | Owns fixed-checkout refresh and fresh-process handoff. |
 | Apply engine | `agent_core/apply.py` | Owns safe copy, state, exclusions, and rollback. |
-| Deprecated alias tooling | `scripts/enroll_repo.py` | Compatibility maintenance and verified retirement for existing enrollments only. |
 | Memory pilot | `docs/memory-pilot.md` | Canonical ledger and approval contract. |
 | Memory tooling | `scripts/memory.py` | Implements ledger list, search, write, and reindex. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |
@@ -146,6 +129,6 @@ The normal `agent-core apply --here` workflow ignores all deprecated surfaces ou
 | ---- | -------- | --------- |
 | 2026-09-15 | Use `agent-core apply --here` and fixed `~/.agent-core` as the normal private skill workflow. | One exact-directory command works consistently in Git and non-Git targets. |
 | 2026-09-15 | Copy only the manually configured core list to `.agents/skills/` with local ownership fingerprints. | A single destination and fail-closed ownership allow safe explicit updates without overwriting project content. |
-| 2026-09-15 | Deprecate alias enrollment for new targets while retaining compatibility maintenance. | The copy workflow replaces routine symlink/junction enrollment without forcing unsafe cleanup of existing installations. |
+| 2026-09-15 | Retire alias enrollment and manifest-based consumer configuration. | Simple apply is the sole supported skill-distribution workflow. |
 | 2026-06-18 | `skills/` remains the canonical production source. | Cross-project reuse needs one hand-edited authority. |
 | 2026-06-18 | Memory truth remains append-only JSONL. | Immutable truth is easy to synchronize, audit, and regenerate. |

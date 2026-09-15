@@ -15,7 +15,6 @@
 - `skills/` is the hand-edited production source for executor agents. Do not change production workflow skills unless the human explicitly approves the skill edit.
 - The normal personal command is `agent-core apply --here`: it refreshes the fixed clean `~/.agent-core` checkout and copies `core-skills.toml` entries only to `.agents/skills/` in the current directory, with or without Git. Plain `agent-core apply` targets the containing Git root.
 - Do not hand-maintain consumer copies. Apply owns only exact configured destinations that its project-local fingerprint state proves it installed.
-- `scripts/enroll_repo.py` is deprecated compatibility tooling. Do not use enroll or sync for new targets; use it only when explicitly maintaining or safely retiring an existing alias enrollment.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
 - Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits.
@@ -44,8 +43,8 @@ You are a node in an ongoing execution chain. Improve future repository context 
 ### Roles
 
 - **Steward agent:** Maintains this canonical repository, package, docs, workflows, and memory tooling.
-- **Executor agent:** Works in another directory using copied Agent Core skills or a pre-existing deprecated alias enrollment.
-- **Consumer target:** A directory receiving simple copied skills; existing alias enrollments retain a compatibility contract only.
+- **Executor agent:** Works in another directory using copied Agent Core skills.
+- **Consumer target:** A directory receiving simple copied skills.
 
 ### Canonical And Generated Boundaries
 
@@ -62,7 +61,6 @@ Generated surfaces include:
 - simple target `.agents/skills/<configured-skill>` copies;
 - target-local `.agents/.agent-core/ownership.json` for `--here`, or ownership under the actual Git directory for plain apply;
 - simple exact-path entries in Git common metadata `info/exclude` when Git is available;
-- deprecated compatibility `.agent-os.json`, `.claude/skills/*`, `.opencode/skills/*`, and `.agent-os-state/enrollments.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
 ### Simple Apply Rules
@@ -71,7 +69,7 @@ Generated surfaces include:
 - `core-skills.toml` is manually maintained and authoritative; never infer the list from all `skills/` directories.
 - Keep the console launcher small and stable. It must reject a dirty canonical checkout, fast-forward with ordinary authenticated Git, and cross a fresh-process import boundary before apply code runs.
 - Keep the implementation standard-library-only so ordinary source updates do not require reinstalling dependencies.
-- Apply owns only `.agents/skills/<configured-skill>` targets. It must ignore deprecated manifests, registries, aliases, and all other skill surfaces.
+- Apply owns only `.agents/skills/<configured-skill>` targets. It must not alter other skill surfaces.
 - `apply --here` targets the current directory exactly and stores ownership under its `.agents/.agent-core/`. Preserve Git tracked-target and local-exclusion safety when Git is available; skip only those checks that require absent Git metadata.
 - Require every configured source file to be tracked in the canonical commit; never copy ignored or other uncommitted source artifacts.
 - Preflight every configured target before replacing any. Refuse tracked targets or descendants, unrelated existing content, malformed ownership, unsupported filesystem entries, and locally modified managed copies.
@@ -82,26 +80,12 @@ Generated surfaces include:
 
 Canonical details: `docs/consumer-repo-enrollment.md`.
 
-### Deprecated Alias Compatibility Rules
-
-- Do not use `scripts/enroll_repo.py enroll` or `sync` for new targets.
-- Keep the script operational only for compatibility maintenance and safe retirement of existing enrollments.
-- Existing device-local enrolled paths live in `.agent-os-state/enrollments.json`.
-- Keep `.claude/skills/*` and `.opencode/skills/*` aligned only when explicitly repairing an existing enrollment.
-- Prefer directory symlinks and fall back to Windows junctions when symlink privileges are unavailable.
-- Symlinks and junctions satisfy the deprecated workflow's live-update guarantee; copied directories do not.
-- Preflight targets as missing, managed aliases, or conflicts. A real local skill directory is always a conflict.
-- Replace only verified managed aliases. Stop before overwriting unrelated files, directories, broken aliases, or aliases to unexpected sources.
-- Never recursively delete, move, or modify a live alias or its harness parent; edits can reach canonical source.
-- Remove deprecated aliases only through `uv run scripts/enroll_repo.py unenroll --repo <path> --apply` after preview and verification.
-
 ### Memory Rules
 
 - The memory pilot remains append-only; `memory/memories.jsonl` is canonical, and generated search/index artifacts are disposable.
 - Route memory operations through `uv run scripts/memory.py`, not direct ledger edits.
-- Keep executor memory behavior in `agent-os-memory`; do not expand `agent-os-session` into manifest or memory bootstrap behavior.
 - New memory topic creation requires explicit human approval. Existing active topics may be updated autonomously within scope.
-- Existing deprecated manifest enrollments remain the only current mechanism for `memory_enabled`; do not create new alias enrollments for memory. Simple apply does not create or infer memory configuration.
+- Memory tooling is steward-only. Simple apply does not create or infer consumer memory configuration.
 
 ## Steward Rules
 
@@ -113,7 +97,6 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 - Do not rely on checked-in virtual environments or manual `pip install` state.
 - Preserve the canonical/generated boundary when adding cross-harness access.
 - Prefer minimal reversible foundations over speculative automation.
-- Use `uv run scripts/enroll_repo.py verify --repo <path>` only when an existing deprecated enrollment needs confirmation.
 
 ### Related Surfaces
 
@@ -121,12 +104,11 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | Durable repository orientation and boundaries. |
 | Human operating manual | `docs/agent-core-operating-manual.md` | Canonical setup, apply, publication, verification, and recovery commands for the owner. |
-| Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical simple apply and deprecated alias behavior. |
+| Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical simple apply behavior. |
 | Core list | `core-skills.toml` | Authoritative copied skill set. |
 | CLI launcher | `agent_core/bootstrap.py` | Canonical refresh and fresh-process boundary. |
 | Apply engine | `agent_core/apply.py` | Copy ownership, conflict safety, rollback, and exclusions. |
 | Session skill | `skills/agent-os-session/SKILL.md` | Shared session-start routing and visible confirmation. |
-| Deprecated alias tooling | `scripts/enroll_repo.py` | Existing-enrollment compatibility and verified retirement only. |
 | Memory contract | `docs/memory-pilot.md` | Ledger schema, approval boundary, and tooling behavior. |
 | Memory tooling | `scripts/memory.py` | List, search, append, and reindex operations. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |

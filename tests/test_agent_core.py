@@ -314,13 +314,11 @@ class AgentCoreApplyTests(unittest.TestCase):
         with self.assertRaisesRegex(apply.ApplyError, "tracked by project Git"):
             apply.apply_checkout(self.checkout, workspace, here=True)
 
-    def test_legacy_surfaces_are_ignored(self) -> None:
-        (self.project / ".agent-os.json").write_text("not json", encoding="utf-8")
-        (self.project / ".agent-os-state").mkdir()
+    def test_unrelated_harness_skill_surfaces_are_ignored(self) -> None:
         for surface in (".claude", ".opencode"):
-            legacy = self.project / surface / "skills" / "demo"
-            legacy.mkdir(parents=True)
-            (legacy / "keep.txt").write_text("keep", encoding="utf-8")
+            harness_skill = self.project / surface / "skills" / "demo"
+            harness_skill.mkdir(parents=True)
+            (harness_skill / "keep.txt").write_text("keep", encoding="utf-8")
 
         apply.apply_checkout(self.checkout, self.project)
         self.assertTrue((self.target() / "SKILL.md").is_file())

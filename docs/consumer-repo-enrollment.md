@@ -4,9 +4,9 @@
 
 **Status:** Current
 
-**Source Of Truth:** Defines the normal copy-based skill workflow and the deprecated alias compatibility contract for existing consumer repos.
+**Source Of Truth:** Defines the copy-based skill workflow for consumer repos.
 
-**Update When:** The `agent-core apply --here` contract, core skill configuration, ownership model, or deprecated alias compatibility behavior changes.
+**Update When:** The `agent-core apply --here` contract, core skill configuration, or ownership model changes.
 
 ### Read First
 
@@ -16,12 +16,11 @@
 - Copied directories update explicitly on the next apply. They are not links and do not propagate edits live.
 - Apply refuses tracked targets, unrelated existing targets, and managed copies whose installed fingerprint changed.
 - Removing a skill from `core-skills.toml` is additive: its copy, ownership record, and local exclusion remain untouched.
-- `scripts/enroll_repo.py` is deprecated. Do not enroll or sync new targets; retain it only for compatibility maintenance or safe retirement of existing alias enrollments.
 - Human command procedures live in `docs/agent-core-operating-manual.md`.
 
 ### Scope
 
-This document covers private skill delivery into Git and non-Git target directories, including copy ownership, conflict safety, local Git exclusions when available, and deprecated alias compatibility for existing installations.
+This document covers private skill delivery into Git and non-Git target directories, including copy ownership, conflict safety, and local Git exclusions when available.
 
 ### Not Here
 
@@ -119,36 +118,6 @@ When Git is available, exact managed destinations and target-local `--here` owne
 
 Unrelated exclusion content is preserved, and the tracked project `.gitignore` is not modified. Non-Git targets have no Git exclusion file to update. Retained records keep removed core skills excluded; stale exclusions after manual deletion are harmless.
 
-### Deprecated Workflow Independence
-
-`agent-core apply` does not read, write, detect, or migrate:
-
-- `.agent-os.json`;
-- `.agent-os-state/` registries;
-- `.claude/skills/`;
-- `.opencode/skills/`;
-- enrollment symlinks or junctions.
-
-Those surfaces matter only if they independently occupy an exact `.agents/skills/<configured-skill>` target.
-
-## Deprecated Alias Compatibility
-
-Do not run `scripts/enroll_repo.py enroll` or `sync` for new targets. The script remains operational only so existing `.agent-os.json`, registry, memory-enabled, and live alias installations can be inspected, repaired when explicitly required, or safely retired.
-
-- Run it with `uv run scripts/enroll_repo.py` only for an existing enrollment.
-- Existing-enrollment repair preflights exact targets as missing, managed aliases, or conflicts.
-- On Windows, automatic link mode tries a directory symlink and falls back to a junction.
-- Real local skill directories, broken aliases, and aliases to unexpected sources are conflicts.
-- `verify` checks the live-alias guarantee.
-- `unenroll` is preview-first and removes only registry-recorded aliases that still resolve to expected canonical sources.
-- Deprecated generated surfaces remain locally ignored according to that workflow's existing rules.
-
-Never recursively delete or replace a live alias or its harness parent directory; editing through a live alias can modify canonical skill source. Use verified unenrollment or stop on uncertainty.
-
-### Memory Boundary
-
-Existing deprecated `.agent-os.json` enrollments remain the only current workflow carrying `memory_enabled` and other manifest fields. Do not create new alias enrollments for memory. Executor skills needing legacy context read the manifest directly; the normal copy workflow neither creates a manifest nor enables memory implicitly.
-
 ### Related Surfaces
 
 | Surface | Path | Why It Matters |
@@ -158,8 +127,6 @@ Existing deprecated `.agent-os.json` enrollments remain the only current workflo
 | Apply implementation | `agent_core/apply.py` | Implements validation, ownership, copying, rollback, and local exclusions. |
 | Package contract | `pyproject.toml` | Defines the editable `agent-core` console command. |
 | Human operating manual | `docs/agent-core-operating-manual.md` | Owner-facing setup, apply, publication, verification, and recovery procedures. |
-| Deprecated alias tooling | `scripts/enroll_repo.py` | Compatibility maintenance and verified retirement for existing enrollments only. |
-| Manifest schema | `schemas/agent-os-manifest.schema.json` | Defines the deprecated workflow's manifest v1. |
 | Repo architecture | `README.md` | High-level orientation and canonical/generated boundaries. |
 | Steward contract | `AGENTS.md` | Stable maintenance and safety rules. |
 
@@ -168,6 +135,4 @@ Existing deprecated `.agent-os.json` enrollments remain the only current workflo
 | Date | Decision | Rationale |
 | ---- | -------- | --------- |
 | 2026-09-15 | Make `agent-core apply --here` the normal personal workflow, using copied `.agents/skills/*` directories and local ownership fingerprints. | One exact-directory command works consistently across Git and non-Git targets. |
-| 2026-09-15 | Deprecate alias enrollment for new targets while retaining migration-free compatibility maintenance. | The copy workflow replaces routine live-link setup, while existing installations must not be removed unsafely. |
-| 2026-07-18 | Alias enroll and sync fail on real local skill directories; unenroll removes only verified aliases. | Live aliases can resolve into canonical source, so automatic recursive replacement or cleanup is unsafe. |
-| 2026-06-19 | Windows alias enrollment prefers symlinks with junction fallback. | A non-destructive fallback supports devices without symlink privileges. |
+| 2026-09-15 | Retire alias enrollment and manifest-based consumer configuration. | Simple apply is the sole supported skill-distribution workflow. |

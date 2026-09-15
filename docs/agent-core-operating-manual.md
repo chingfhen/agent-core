@@ -255,12 +255,6 @@ git -C "$HOME\.agent-core" pull --ff-only
 
 Fix Git credentials, connectivity, or branch divergence outside Agent Core, then rerun apply.
 
-## Deprecated Alias Workflow
-
-Do not use `scripts/enroll_repo.py enroll` or `sync` for new targets. The symlink/junction workflow is deprecated and retained only to avoid breaking existing enrolled repositories.
-
-`agent-core apply --here` does not inspect, migrate, or remove old `.claude/skills/`, `.opencode/skills/`, `.agent-os.json`, or enrollment registry state. Ask a steward to retire an existing enrollment safely if cleanup is needed.
-
 ## Quick Reference
 
 ```powershell
