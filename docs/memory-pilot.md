@@ -1,6 +1,6 @@
 # Memory Pilot
 
-**Last Updated:** 2026-06-21
+**Last Updated:** 2026-09-15
 
 **Status:** Current
 
@@ -17,7 +17,7 @@
 - Creating a new `topic_key` requires explicit human approval.
 - Executor memory behavior is an active recall and conservative capture layer, not transcript storage or task logging.
 - Source code, tests, docs, and active task files remain the better surfaces when they already own the information.
-- Executor-facing memory behavior lives in `skills/agent-os-memory/SKILL.md`, which reads `.agent-os.json` directly when memory is enabled.
+- Executor-facing memory behavior lives in `skills/agent-os-memory/SKILL.md`, which reads `.agent-os.json` directly for existing deprecated manifest enrollments. The normal `agent-core apply --here` workflow does not enable memory.
 
 ### Scope
 
@@ -76,8 +76,9 @@ Each JSONL row stores one immutable memory revision with these fields:
 
 #### Executor Flow
 
-- Consumer repos opt into memory by setting `memory_enabled` in `.agent-os.json`.
-- Executors should use the separate local `agent-os-memory` skill only when memory is enabled.
+- Existing manifest-enrolled consumer repos opt into memory through `memory_enabled` in `.agent-os.json`.
+- Do not create new deprecated alias enrollments to enable memory; a replacement opt-in path has not been established.
+- Executors should use the separate local `agent-os-memory` skill only in an existing repo where memory is enabled.
 - Executors should proactively recall memory before consequential work when durable user or repo context could affect the task.
 - Executors should discover existing topics through `list` and `search`, not by reading `jsonl` or `sqlite` internals.
 - Executors should pass `scope` and `scope_id` from `.agent-os.json` into `scripts/memory.py`.
@@ -91,7 +92,7 @@ Each JSONL row stores one immutable memory revision with these fields:
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | Top-level orientation and durable system boundaries. |
 | Steward contract | `AGENTS.md` | Governs append-only behavior and human approval rules. |
-| Consumer repo integration | `docs/consumer-repo-enrollment.md` | Defines how consumer repos opt into memory-enabled executor behavior. |
+| Consumer target integration | `docs/consumer-repo-enrollment.md` | Defines the normal copy workflow and the deprecated manifest boundary for existing memory-enabled repos. |
 | Executor memory skill | `skills/agent-os-memory/SKILL.md` | Tells executors how to use memory without direct storage internals. |
 | Steward memory script | `scripts/memory.py` | Implements list/search/write/reindex flows and the topic approval gate. |
 | Active memory task | `tasks/2026-06-19__agent-os-memory-real-repo-validation-bookmark.md` | Tracks the next real enrolled-repo validation pass for the memory pilot. |
@@ -100,6 +101,7 @@ Each JSONL row stores one immutable memory revision with these fields:
 
 | Date | Decision | Rationale |
 | ---- | -------- | --------- |
+| 2026-09-15 | Do not create new deprecated alias enrollments for memory enablement. | The normal copy workflow has replaced enrollment, but it does not yet define a replacement memory opt-in contract. |
 | 2026-06-19 | The first memory pilot ships as `scripts/memory.py` subcommands rather than multiple entry scripts. | One single-file steward tool is the smallest correct implementation while still exposing list/search/write/reindex flows. |
 | 2026-06-19 | The ledger stores immutable revisions without a mutable `status` field. | Active versus superseded state is already a derived concept and should not require rewriting prior rows. |
 | 2026-06-19 | The first new topic in a scope hard-stops unless the human approves it. | The human-in-the-loop boundary is more important than completing a write autonomously. |
