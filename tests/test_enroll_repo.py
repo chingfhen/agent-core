@@ -22,6 +22,7 @@ class EnrollmentAliasSafetyTests(unittest.TestCase):
         (source_dir / "canonical-sentinel.txt").write_text("keep", encoding="utf-8")
 
     def make_enrollment(self, root: Path) -> tuple[Path, Path, Path]:
+        root = root.resolve()
         agent_os_path = root / "agent-os"
         source_dir = agent_os_path / "skills" / "demo"
         self.write_skill(source_dir)

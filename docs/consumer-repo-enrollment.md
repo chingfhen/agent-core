@@ -1,191 +1,162 @@
-# Consumer Repo Enrollment
+# Consumer Repo Skill Distribution
 
-**Last Updated:** 2026-07-18
+**Last Updated:** 2026-09-15
 
 **Status:** Current
 
-**Source Of Truth:** Defines how consumer repos are enrolled into Agent OS v1 and how executor-facing local skill aliases behave.
+**Source Of Truth:** Defines the simple copy-based skill workflow and the separate advanced alias enrollment workflow for consumer repos.
 
-**Update When:** Steward enrollment workflow, repo-local manifest schema, harness alias policy, or manifest-consumer rules change.
+**Update When:** The `agent-core apply` contract, core skill configuration, ownership model, or advanced enrollment behavior changes.
 
 ### Read First
 
-- Consumer repos are enrolled per device by steward workflows, not by manual repo editing.
-- The steward-managed local skill surfaces are `.claude/skills/*` for Claude and `.opencode/skills/*` for OpenCode.
-- New enrollments install the default consumer-repo skill set: `agent-os-session`, `yagni`, `project-docs`, `project-tasks`, `manage-python-uv`, `grilling`, `human-technical-orientation`, and `execution-readiness`. All other canonical skills are opt-in with `--skill`.
-- Executors consume ordinary repo-local skill aliases and do not need to know whether the installed surface is canonical, symlinked, or copied.
-- `.agent-os.json` is generated repo-local state and gitignored by default.
-- On Windows, enrollment prefers symlinks and falls back to directory junctions when symlink privileges are unavailable.
-- Trust the setup only when the selected skills are live aliases; real local skill directories are conflicts that require explicit migration.
-- Consumer repos receive `agent-os-session` as a shared session-start skill; executor skills that need Agent OS context read `.agent-os.json` directly.
+- The normal personal workflow is `agent-core apply` from a Git worktree.
+- The canonical private checkout is fixed at `~/.agent-core`; every apply fast-forwards that clean checkout before touching project skill targets.
+- `core-skills.toml` is the authoritative core list. Apply copies only those skills to `.agents/skills/<skill>`.
+- Copied directories update explicitly on the next apply. They are not links and do not propagate edits live.
+- Apply refuses tracked targets, unrelated existing targets, and managed copies whose installed fingerprint changed.
+- Removing a skill from `core-skills.toml` is additive: its copy, ownership record, and local exclusion remain untouched.
+- `scripts/enroll_repo.py` remains available as separate advanced tooling for manifests and live Claude/OpenCode aliases. Apply does not inspect or migrate that workflow.
 
 ### Scope
 
-This document covers repo-local manifests, local skill surface installs, ignore policy, steward safety rules, and manifest-consumer expectations for consumer repos.
+This document covers private skill delivery into consumer Git repos, including copy ownership, conflict safety, local Git exclusions, and the optional legacy-compatible alias workflow.
 
 ### Not Here
 
 - Canonical skill authoring in `skills/`
-- Live implementation status or open task sequencing
-- Memory ledger internals beyond how consumer repos opt into memory behavior
+- Memory ledger internals
+- Active rollout or implementation task state
 
-### Current Contract
+## Simple Personal Workflow
 
-#### Enrollment Model
+### One-Time Machine Setup
 
-- Each consumer repo is enrolled per device by a steward workflow.
-- Enrollment writes a repo-local `.agent-os.json`, installs local skill aliases, installs the default consumer-repo skill set, updates repo ignore rules for steward-managed outputs, and records device-local steward state.
-- Steward enrollment can skip ignore-rule management with `--no-manage-ignore` when the chosen enrollment folder should not receive a managed `.gitignore` update.
-- Enrollment does not require an existing Git worktree; if `.gitignore` is missing, the steward creates it.
-- Device-local steward state is untracked.
-- This system does not depend on modifying consumer repo `AGENTS.md` files.
-- Enrollment and sync install or repair only verified aliases; they stop on real local skill directories instead of deleting them.
-
-#### Unenrollment Model
-
-- Run `uv run scripts/enroll_repo.py unenroll --repo <path>` to preview an unenrollment. Add `--apply` to proceed.
-- Unenrollment removes only registry-recorded aliases that still resolve to their expected canonical skill directories.
-- It removes a steward-managed `.agent-os.json` and the matching device-local registry entry after alias removal succeeds.
-- It never removes `.claude/skills`, `.opencode/skills`, their parent directories, or `.gitignore` entries.
-- A broken, unexpected, or real-directory target is a conflict. The command stops without deleting it.
-
-#### Default Enrollment Skill Set
-
-- `agent-os-session`
-- `yagni`
-- `project-docs`
-- `project-tasks`
-- `manage-python-uv`
-- `grilling`
-- `human-technical-orientation`
-- `execution-readiness`
-- All other canonical skills install only when explicitly requested with `--skill`.
-
-#### Generated Consumer-Repo Surfaces
-
-- `.agent-os.json`
-- Local skill aliases under `.claude/skills/*`, which are consumed by Claude
-- Local skill aliases under `.opencode/skills/*`, which are consumed by OpenCode
-- Exact managed ignore entries for the generated surfaces above
-
-- Official OpenCode docs confirm project skill discovery for `.opencode/skills/*`.
-- Steward enroll and sync keep the same canonical skill set aligned across both managed surfaces.
-- Codex repo-local skill semantics remain future work.
-- Exact or divergent local copies under those alias paths are not the trusted steady state; they are conflicts on enroll and sync until explicitly migrated.
-
-#### Manifest Schema V1
-
-- `version`
-- `repo_id`
-- `scope`
-- `scope_id`
-- `agent_os_path`
-- `memory_enabled`
-
-Canonical schema: `schemas/agent-os-manifest.schema.json`
-
-Example file: `schemas/examples/consumer-repo.agent-os.example.json`
-
-Example:
-
-```json
-{
-  "version": 1,
-  "repo_id": "consumer-repo",
-  "scope": "repo",
-  "scope_id": "consumer-repo",
-  "agent_os_path": "C:\\Users\\chingfhen\\Documents\\ching\\agent-core\\agent-core",
-  "memory_enabled": false
-}
+```powershell
+git clone <private-gitlab-url> "$HOME\.agent-core"
+uv tool install --editable "$HOME\.agent-core"
 ```
 
-- `agent_os_path` remains in the manifest so future scripts and memory tooling can still locate the canonical repo.
-- `.agent-os.json` is gitignored by default because it carries per-user and per-device integration state.
+The checkout location is intentionally not configurable. Authentication comes from the user's ordinary Git and GitLab configuration; Agent Core does not store or rewrite credentials.
 
-#### Manifest Consumers
+### Everyday Use
 
-- Consumer repos receive `agent-os-session` as a shared session-start skill, not as a manifest bootstrap layer.
-- Executor skills that need repo-local Agent OS context read `.agent-os.json` directly.
-- `agent-os-memory` is the current canonical executor skill that consumes manifest fields.
-- If a future executor skill needs manifest context, keep that read local to the skill instead of reintroducing a separate shared bootstrap step.
-- `uv run scripts/enroll_repo.py sync --repo <path>` removes verified retired `agent-os-bootstrap` aliases while repairing the recorded enrollment.
+From any directory inside the target Git worktree:
 
-#### Link Strategy
+```text
+agent-core apply
+```
 
-- The first installer command is `uv run scripts/enroll_repo.py`.
-- Default link mode is `auto`: try a directory symlink first.
-- On Windows, if symlink creation fails because the current client lacks the required privilege, fall back to a directory junction.
-- The actual link mode used for a repo is recorded in `.agent-os-state/enrollments.json` so repair runs can reuse the same behavior.
-- The local steward registry also remembers the working device link mode so later repo enrollments can skip repeated failed symlink probes.
-- When you already know the machine lacks symlink privileges, use `--link-mode junction` to skip the failed symlink probe and finish faster.
+The launcher:
 
-#### Live Alias Guarantee
+1. confirms the current directory belongs to a Git worktree;
+2. confirms `~/.agent-core` is the canonical Git worktree root and contains the package, `skills/`, and `core-skills.toml`;
+3. refuses staged, unstaged, or untracked canonical-checkout changes;
+4. runs `git -C ~/.agent-core pull --ff-only`;
+5. launches the newly pulled apply implementation in a fresh Python process.
 
-- After a successful enroll or sync, the selected skills should be live aliases to the canonical `~/agent-os/skills/*` directories.
-- For this workflow, both directory symlinks and directory junctions count as live aliases.
-- Exact or divergent copied skill directories do not satisfy the guarantee even if they happen to match the canonical content today.
-- Edits propagate both ways through a live alias: changing the canonical skill updates the consumer repo immediately, and editing through the consumer path edits the canonical source.
-- Never recursively delete, move, or modify a live alias or a harness skill parent directory. Such operations can affect canonical source content.
-- `uv run scripts/enroll_repo.py verify --repo <path>` returns success only when the repo is in that live-alias steady state.
+Pull, authentication, network, or divergence failures stop before project files are changed. The launcher and apply implementation are standard-library-only, so ordinary source updates do not require dependency reinstalls.
 
-#### Ignore Policy
+### Core Skill Configuration
 
-- Gitignore `.agent-os.json` by default.
-- Gitignore exact steward-managed alias paths by default.
-- Use `uv run scripts/enroll_repo.py enroll --repo <path> --no-manage-ignore` when enrolling a parent folder or other location where steward-managed ignore entries should be omitted.
-- If a repo already ignores a broader harness path, reuse that coverage rather than duplicating narrower ignore entries.
-- Do not rely on Git to ignore symlinks or alias installs automatically.
+`core-skills.toml` is manually maintained and authoritative. The current list is:
 
-#### Steward Safety Model
+- `project-tasks`
+- `project-docs`
+- `planning`
+- `engineering`
+- `grilling`
 
-- Preflight every planned target path as `missing`, `managed`, or `conflict`.
-- `managed` means the path is already steward-installed and clearly points at the expected Agent OS skill target.
-- Create `missing` paths automatically.
-- Repair or replace only clearly `managed` live aliases automatically.
-- A local directory, including one that declares the expected skill name, is a `conflict` and must not be overwritten automatically.
-- A broken or unexpected symlink or junction is a `conflict`; link-detection uncertainty must fail closed.
-- Stop and ask before replacing or removing a `conflict` path.
-- Do not wipe whole harness directories when only exact managed alias paths are steward-owned.
+Apply validates the complete list and every source before replacing any configured target. Names must be unique safe directory names, each real source directory must contain a regular `SKILL.md`, and every copied source file must be tracked in the canonical Git commit. Ignored or otherwise uncommitted source files, links, reparse points, and other unsupported entries are rejected rather than copied.
 
-#### Memory Integration Boundary
+### Destination And Ownership
 
-- `memory_enabled` in `.agent-os.json` controls whether memory behavior should be available in that repo.
-- Memory instructions belong in `agent-os-memory`, which reads `.agent-os.json` directly when memory is enabled.
-- Memory remains a pilot; the canonical truth stays append-only in `memory/memories.jsonl`, while generated search state in `memory/memory.sqlite` and `MEMORY_INDEX.md` remains disposable.
-- When `memory_enabled` is true, stewards may also install the local `agent-os-memory` skill so executors can use list/search/write flows without direct knowledge of `jsonl` or `sqlite` internals.
-- Topic discovery should come from generated list/search commands exposed by that skill, not from a hand-maintained registry in consumer repos.
-- Steward agents still own canonical memory tooling and publication in `~/agent-os`; enabling memory in a consumer repo does not make that repo the source of truth.
+Each configured source is copied to:
+
+```text
+<project-root>/.agents/skills/<skill>
+```
+
+No other project skill surface participates in this workflow.
+
+Ownership state is versioned JSON at:
+
+```text
+<actual-git-dir>/agent-core/ownership.json
+```
+
+The actual Git directory is resolved with Git, so linked worktrees receive their own ownership state. Each record includes the destination, source skill, canonical source commit, and a deterministic fingerprint of installed paths, permissions, and file contents.
+
+For every configured target, apply fails closed unless it is one of:
+
+- absent;
+- recorded as owned and unchanged;
+- recorded as owned but manually deleted.
+
+A project-tracked target or tracked descendant is always a conflict. Existing unowned content and locally modified managed copies are never overwritten. There is no `--force` option.
+
+Removing a name from `core-skills.toml` does not inspect, update, or delete its prior copy or ownership record. If it is re-added unchanged, it can update normally. If it was modified while absent from configuration, re-adding it exposes the conflict.
+
+### Transaction And Local Git Protection
+
+After full source validation and all-target preflight, apply stages and fingerprints every copy on the project filesystem. It replaces safe targets through temporary backups, rolls replacements back on ordinary failure, and atomically writes ownership state only after successful replacement.
+
+Exact managed destinations are maintained in a tool-owned block in:
+
+```text
+<git-common-dir>/info/exclude
+```
+
+Unrelated exclusion content is preserved, and the tracked project `.gitignore` is not modified. Retained records keep removed core skills excluded; stale exclusions after manual deletion are harmless.
+
+### Legacy Independence
+
+`agent-core apply` does not read, write, detect, or migrate:
+
+- `.agent-os.json`;
+- `.agent-os-state/` registries;
+- `.claude/skills/`;
+- `.opencode/skills/`;
+- enrollment symlinks or junctions.
+
+Those surfaces matter only if they independently occupy an exact `.agents/skills/<configured-skill>` target.
+
+## Advanced Alias Enrollment
+
+`scripts/enroll_repo.py` remains operational for cases that deliberately need `.agent-os.json`, device-local enrollment records, memory enablement, or live aliases under both `.claude/skills/*` and `.opencode/skills/*`.
+
+- Run it with `uv run scripts/enroll_repo.py`.
+- Enrollment and sync preflight exact targets as missing, managed aliases, or conflicts.
+- On Windows, automatic link mode tries a directory symlink and falls back to a junction.
+- Real local skill directories, broken aliases, and aliases to unexpected sources are conflicts.
+- `verify` checks the live-alias guarantee.
+- `unenroll` is preview-first and removes only registry-recorded aliases that still resolve to expected canonical sources.
+- Advanced generated surfaces remain locally ignored according to that workflow's existing rules.
+
+Never recursively delete or replace a live alias or its harness parent directory; editing through a live alias can modify canonical skill source. Use verified unenrollment or stop on uncertainty.
+
+### Memory Boundary
+
+The advanced `.agent-os.json` workflow remains the only workflow that carries `memory_enabled` and other manifest fields. Executor skills needing that context read the manifest directly. The simple copy workflow neither creates a manifest nor enables memory implicitly.
 
 ### Related Surfaces
 
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
-| Repo architecture | `README.md` | High-level orientation and top-level boundaries for Agent OS. |
-| Steward contract | `AGENTS.md` | Defines steward-agent operating rules and overwrite safety behavior. |
-| Session skill | `skills/agent-os-session/SKILL.md` | Shared session-start routing policy and visible load confirmation. |
-| Memory skill | `skills/agent-os-memory/SKILL.md` | Executor-facing list/search/write memory guidance for memory-enabled repos. |
-| Enrollment script | `scripts/enroll_repo.py` | Implements enrollment, repair, local registry updates, and Windows link fallback behavior. |
-| Memory script | `scripts/memory.py` | Canonical steward memory tooling behind the local memory skill. |
-| Manifest schema | `schemas/agent-os-manifest.schema.json` | Defines the v1 `.agent-os.json` contract. |
-| Verification command | `uv run scripts/enroll_repo.py verify --repo <path>` | Confirms whether a repo is in the trusted live-alias steady state. |
-| Unenrollment command | `uv run scripts/enroll_repo.py unenroll --repo <path> [--apply]` | Previews or removes only verified aliases without touching harness parent directories. |
-| Active memory task | `tasks/2026-06-19__agent-os-memory-real-repo-validation-bookmark.md` | Tracks the next real enrolled-repo validation pass for memory-enabled repos. |
+| Core list | `core-skills.toml` | Authoritative copied skill set. |
+| Stable launcher | `agent_core/bootstrap.py` | Validates and refreshes the fixed checkout before fresh-process handoff. |
+| Apply implementation | `agent_core/apply.py` | Implements validation, ownership, copying, rollback, and local exclusions. |
+| Package contract | `pyproject.toml` | Defines the editable `agent-core` console command. |
+| Advanced enrollment | `scripts/enroll_repo.py` | Optional manifest and live-alias workflow. |
+| Manifest schema | `schemas/agent-os-manifest.schema.json` | Defines advanced workflow manifest v1. |
+| Repo architecture | `README.md` | High-level orientation and canonical/generated boundaries. |
+| Steward contract | `AGENTS.md` | Stable maintenance and safety rules. |
 
 ### Decisions
 
 | Date | Decision | Rationale |
 | ---- | -------- | --------- |
-| 2026-07-18 | Enroll and sync fail on real local skill directories; unenroll is dry-run-first and removes only verified aliases. | A live alias can resolve into canonical source, so recursive cleanup and automatic local-directory replacement are unsafe. |
-| 2026-06-19 | Consumer repos are enrolled per device by steward workflows. | Repo setup should be repeatable and steward-managed rather than relying on manual manifest placement. |
-| 2026-06-19 | Executors consume repo-local skill aliases. | Executor agents should use ordinary local skill names without caring about canonical provenance. |
-| 2026-06-19 | `.agent-os.json` is gitignored by default. | The manifest contains per-user and per-device integration state and should not confuse teammates. |
-| 2026-06-19 | Managed ignore rules default to exact alias paths. | Narrow ignores avoid masking other repo-owned harness files. |
-| 2026-06-21 | Consumer repos do not receive a shared bootstrap skill. | Only `agent-os-memory` currently needs manifest context, so skill-local reads are simpler than a separate bootstrap layer. |
-| 2026-07-09 | Added `agent-os-session` to default enrollment. | Session routing should live in one live-aliased skill with visible load confirmation instead of drifting through pasted `AGENTS.md` snippets. |
-| 2026-07-09 | Removed `yagni-review`, `agent-os-memory`, and `diagram-generation` from the default consumer-repo skill set. | These skills remain available on demand with `--skill`, but new enrollments should start with a smaller default set. |
-| 2026-07-15 | Added `human-technical-orientation` to the default consumer-repo skill set and kept `quick-orientation` opt-in. | New enrollments should provide the deeper human-oriented technical context skill without making the quick orientation skill part of the default surface. |
-| 2026-06-22 | New enrollments install a curated default consumer-repo skill set. | The default set is `yagni-review`, `project-docs`, `project-tasks`, `manage-python-uv`, `agent-os-memory`, and `grilling`; all other skills stay opt-in via `--skill`. |
-| 2026-06-22 | Added `yagni` and `diagram-generation` to the default consumer-repo skill set; re-ran enroll for all four currently enrolled repos to apply it retroactively. | `diagram-generation` is a new canonical skill that should ship by default; `yagni` was added alongside it on the same request. |
-| 2026-06-21 | Shared local project skills sync to both `.claude/skills` and `.opencode/skills`. | Claude and OpenCode should each receive the same canonical skills through their native project-local discovery paths. |
-| 2026-06-19 | Windows enrollment defaults to symlink with junction fallback. | The first pilot lacked symlink privileges, so a non-destructive fallback was required to complete setup. |
-| 2026-06-19 | Device-local enrollment state lives in `.agent-os-state/enrollments.json`. | Repair runs need a local registry without tracked repo noise. |
+| 2026-09-15 | Make `agent-core apply` the simple personal workflow, using copied `.agents/skills/*` directories and local ownership fingerprints. | Explicit per-project refresh is simpler across devices than live links, multiple harness destinations, and a global enrollment registry. |
+| 2026-09-15 | Keep advanced alias enrollment separate and migration-free. | Existing manifest, memory, and live-link use cases remain valid without coupling the simple workflow to legacy state. |
+| 2026-07-18 | Advanced enroll and sync fail on real local skill directories; unenroll removes only verified aliases. | Live aliases can resolve into canonical source, so automatic recursive replacement or cleanup is unsafe. |
+| 2026-06-19 | Advanced Windows enrollment prefers symlinks with junction fallback. | A non-destructive fallback supports devices without symlink privileges. |
