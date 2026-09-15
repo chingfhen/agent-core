@@ -1,4 +1,5 @@
 skills = [
+    "agent-os-session",
     "project-tasks",
     "project-docs",
     "planning",
@@ -6,4 +7,7 @@ skills = [
     "grilling",
     "approval-gate",
     "knowledge-base",
+    "manage-python-uv",
+    "mermaid-markdown",
+    "yagni",
 ]
