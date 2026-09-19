@@ -12,7 +12,6 @@ Maintain a portable, repository-local knowledge system rooted at:
 
 ```text
 knowledge-base/
-├── project-context.md
 ├── inbox/
 ├── evidence/
 │   └── <domain>/
@@ -26,52 +25,13 @@ knowledge-base/
 
 This skill owns **only `knowledge-base/**`**.
 
-Never create, edit, move, delete, stage, or commit files outside that boundary. Reading outside it is not part of normal KB work, except for the lightweight read-only repository inspection used to create `knowledge-base/project-context.md` when that file is missing, or when the user explicitly asks to use other repository material as source/context. Any persisted output still belongs under `knowledge-base/`.
+Never create, edit, move, delete, stage, or commit files outside that boundary. The skill may read the smallest relevant set under `docs/` when project context materially helps review, curation, maintenance, retrieval, or tracing. It may read other repository material outside `knowledge-base/**` only when the user explicitly asks to use it as source/context. These read exceptions do not expand write ownership. Any persisted output still belongs under `knowledge-base/`.
 
 The skill defines the behavior. `knowledge-base/` holds the state. The same contract should work in a dedicated knowledge repository or inside a larger project repository.
 
 ## Core Model
 
-Use only three primary knowledge concepts: Inbox, Evidence, and Knowledge.
-
-`knowledge-base/project-context.md` is lightweight orientation for the KB maintainer. It is not a fourth knowledge layer, evidence, or canonical synthesized knowledge.
-
-### Project Context
-
-`knowledge-base/project-context.md` gives future KB-maintaining agents enough background to understand the project the KB serves. Its effect should be deliberately small: orient the agent, then let the agent make its own judgments about what evidence is useful and what knowledge is durable.
-
-Do not use project context as:
-
-- a whitelist of topics worth retaining;
-- a taxonomy the KB must follow;
-- a rigid relevance or admission rubric;
-- a roadmap, task tracker, changelog, or status file;
-- an architecture inventory;
-- a research summary;
-- another canonical knowledge store.
-
-When the file is missing, create it before continuing with the requested KB operation. Creation is a bootstrap action, not curation or maintenance, and does not require a Curation Proposal or separate human approval. It must still follow Git safety and isolation rules and end in its own isolated commit, except when created as part of initial KB initialization.
-
-When the file already exists, treat it as read-only during ordinary KB operations. Do not silently refresh, expand, or rewrite it because the repository or KB has changed. Update or regenerate it only when the user explicitly requests that.
-
-#### Deriving Project Context
-
-Creating `project-context.md` permits a lightweight read-only inspection outside `knowledge-base/**`. Inspect only enough of the host repository to form a reasonable high-level understanding of the project. Prefer cheap signals such as:
-
-- the top-level repository tree;
-- the main README or equivalent project documentation;
-- obvious manifests or configuration files when useful;
-- obvious top-level application or source directories when the project is still unclear.
-
-Stop once the project can be described coherently. Do not perform an exhaustive codebase analysis, inspect every file, reconstruct the full architecture, or derive speculative product strategy merely to create project context.
-
-There is no mandatory schema beyond a clear `# Project Context` heading. Write concise, relatively stable orientation for a competent future agent encountering the KB. Describe only what is useful to understand what the project broadly is, what it is trying to accomplish, and any essential context or terminology needed to interpret future knowledge. Omit categories that add no value.
-
-Prefer stable descriptions over transient implementation details. For example, describe that a system evaluates generated media when that matters to understanding the project; do not record the currently selected model, current sprint, temporary experiment, or package version merely because it was observed during inspection.
-
-Project context may inform interpretation during review and curation, but it must not override source contents, existing evidence, or the maintainer's independent judgment. Do not force project-specific conclusions from material merely because a connection can be imagined.
-
-Capture remains low-friction and does not require interpreting material through project context. Review / Propose and Curate / Maintain should read `project-context.md` as lightweight orientation. Retrieval and Trace may consult it when it helps interpret project-specific terminology or intent.
+Use only three primary concepts.
 
 ### Inbox
 
@@ -119,18 +79,40 @@ Core invariant:
 
 > **Evidence may accumulate. Knowledge must consolidate.**
 
+## Project Context from Canonical Docs
+
+When the knowledge base lives inside a project repository, use canonical project documentation under `docs/` as the source of project context.
+
+The purpose is not to ingest or duplicate project documentation. It is to let the KB maintainer understand the project well enough to interpret incoming material and existing knowledge in context.
+
+Use this conservatively:
+
+- Capture does not require reading project docs.
+- During Review / Propose, Curate / Maintain, Retrieve, or Trace, read relevant docs only when project context can materially improve interpretation or judgment.
+- Read the **smallest relevant set**. Start from an obvious docs index, overview, or directly relevant page when available; follow references only to resolve concrete uncertainty.
+- Do not sweep all of `docs/` merely because KB work is occurring.
+- Do not copy project docs into the KB merely to make them discoverable there.
+- Do not create a `project-context.md` surrogate or another summary layer by default.
+- `docs/` remains authoritative for documented project architecture, decisions, invariants, contracts, workflows, and implemented intent.
+- `knowledge-base/knowledge/` contains synthesized durable understanding derived from curated evidence. It may inform project work but should not compete with `docs/` as the source of truth for current project state.
+- If KB knowledge conflicts with current project docs or verified repository reality, preserve the evidence honestly, treat the project docs/repository as authoritative for implemented state, and surface the discrepancy when it materially affects curation.
+- If no relevant project docs exist, proceed from the inbox material, existing KB state, and the user's request. Do not invent project context.
+
+Project docs should orient judgment without prescribing what the KB must retain. The maintainer remains responsible for deciding what evidence is useful, what knowledge is durable, and how new material relates to the project.
+
 ## Authority and History
 
 Use repository surfaces for different questions:
 
 ```text
-What has not been processed?       -> inbox/
-What source material do we have?   -> evidence/<domain>/index.md + evidence tree
-What did a source actually say?    -> evidence/*
-What do we currently believe?      -> knowledge/*.md
-What currently supports it?        -> that page's ## Evidence section
-Why/when did it change?            -> Git curation commit
-What exactly changed?              -> Git diff/history
+What is the project's documented current intent/state? -> docs/ + repository
+What has not been processed?                            -> inbox/
+What source material do we have?                        -> evidence/<domain>/index.md + evidence tree
+What did a source actually say?                         -> evidence/*
+What durable understanding has the KB synthesized?     -> knowledge/*.md
+What currently supports it?                             -> that page's ## Evidence section
+Why/when did it change?                                 -> Git curation commit
+What exactly changed?                                   -> Git diff/history
 ```
 
 Evidence indexes are **discovery metadata, not a competing source of truth**. The evidence artifact remains authoritative for its own contents.
@@ -150,7 +132,7 @@ This skill supports six modes:
 5. **Retrieve** — locate preserved evidence or current knowledge using repository search and inspection without changing files.
 6. **Trace** — explain current provenance or historical change using evidence links and Git.
 
-Once `project-context.md` exists, read-only review, retrieval, and tracing do not create commits. If it is missing, bootstrap and commit it first, then continue with the requested mode.
+Read-only review, retrieval, and tracing do not create commits.
 
 **Every mutating operation must end with one isolated Git commit containing only changes from that KB operation, and the skill must not push.**
 
@@ -164,14 +146,11 @@ Create the minimal structure:
 
 ```text
 knowledge-base/
-├── project-context.md
 ├── inbox/
 ├── evidence/
 └── knowledge/
     └── index.md
 ```
-
-Derive `project-context.md` using the lightweight repository inspection contract above. Keep it concise and orienting rather than prescriptive.
 
 Do **not** invent evidence domains or subdomains during initialization. Create `evidence/<domain>/index.md` only when the first curated artifact for that domain is approved.
 
@@ -224,8 +203,8 @@ When the user asks to process, digest, curate, organize, or consider inbox mater
 
 For each relevant inbox item:
 
-1. Read `knowledge-base/project-context.md` as lightweight orientation, not as a relevance rubric.
-2. Read enough of the item to understand its durable contribution and distinctive retrieval terms.
+1. Read enough of the item to understand its durable contribution and distinctive retrieval terms.
+2. When project context can materially affect interpretation, read the smallest relevant set under `docs/`; do not read project docs merely as ceremony.
 3. Inspect `knowledge-base/knowledge/index.md`.
 4. Search relevant existing knowledge before proposing a new canonical page.
 5. Inspect directly relevant evidence when needed to understand provenance, overlap, or contradiction.
@@ -879,30 +858,8 @@ Use:
 kb(curate): <short searchable description>
 kb(maintain): <short searchable description>
 kb(capture): <short searchable description>
-kb(context): initialize project context
-kb(context): refresh project context
 kb(init): initialize knowledge base
 ```
-
-## Project Context Body
-
-For automatic creation of a missing context file:
-
-```text
-Scope:
-- knowledge-base/project-context.md
-
-Source:
-- lightweight read-only inspection of the host repository
-
-Outcome:
-- project context initialized
-
-Rationale:
-- provide stable orientation for future KB-maintaining agents
-```
-
-For an explicitly requested refresh, describe the material change in project orientation and why the existing context was no longer adequate.
 
 ## Curation Body
 
@@ -1139,19 +1096,11 @@ Do not reorganize the whole KB during ordinary curation. Broader reorganization 
 
 Before every mutating commit, verify:
 
-## Project Context
-
-- `knowledge-base/project-context.md` exists;
-- if it was created or explicitly refreshed, repository inspection was lightweight and read-only;
-- the file gives concise high-level orientation rather than an exhaustive repository summary;
-- it does not prescribe a topic whitelist, retention taxonomy, or rigid knowledge-admission rubric;
-- it does not contain transient task/status material merely because it was observed;
-- an existing context file was not modified during an ordinary KB operation;
-- no project-context operation wrote outside `knowledge-base/**`.
-
 ## Boundary
 
 - every changed/staged path is under `knowledge-base/`;
+- any `docs/` consulted for project context remained read-only;
+- no `project-context.md` or equivalent summary layer was created by default;
 - no unrelated repository work is included;
 - no unrelated pre-existing KB work is included.
 
@@ -1221,11 +1170,10 @@ After commit, report the commit identifier and concise summary. Do not push.
 # Non-Negotiables
 
 - This skill owns only `knowledge-base/**`.
-- `knowledge-base/project-context.md` provides lightweight project orientation and is not a fourth knowledge layer.
-- If `project-context.md` is missing, create it before continuing with the requested KB operation using only lightweight read-only repository inspection.
-- Once present, `project-context.md` is read-only during ordinary KB operations and changes only when explicitly requested.
-- Project context must orient judgment, not prescribe a topic whitelist, retention taxonomy, or rigid relevance policy.
-- The project-context bootstrap read exception does not expand write ownership outside `knowledge-base/**`.
+- Use relevant `docs/` as read-only project context when it materially helps KB judgment; do not duplicate project docs into the KB by default.
+- Read the smallest relevant project-doc set; do not sweep `docs/` merely because KB work is occurring.
+- Do not create `knowledge-base/project-context.md` or another project-context surrogate by default.
+- `docs/` and verified repository state remain authoritative for current project implementation and documented project decisions.
 - `inbox/` is the single unprocessed entry point.
 - Capture does not imply curation.
 - Curation and maintenance require explicit human approval before writes.
@@ -1264,8 +1212,8 @@ After commit, report the commit identifier and concise summary. Do not push.
 A healthy KB lets a future human or agent answer without the old conversation:
 
 ```text
-What project is this knowledge base serving?
-    -> knowledge-base/project-context.md
+What is the project's documented current context?
+    -> relevant docs/ + repository
 
 What has not been processed?
     -> knowledge-base/inbox/
@@ -1297,7 +1245,7 @@ What exactly changed?
 
 The system succeeds when:
 
-- future KB maintainers have enough project orientation to exercise good judgment without being constrained by a prescriptive relevance rubric;
+- project context comes from canonical docs rather than a duplicated KB context file;
 - evidence grows without becoming a flat dump;
 - ingestion remains deterministic and cheap;
 - every curated artifact has several independent retrieval signals;

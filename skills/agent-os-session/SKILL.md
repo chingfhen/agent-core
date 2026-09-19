@@ -18,13 +18,31 @@ disable-model-invocation: false
 
 * **`docs/` and `tasks/` are skill-gated.** Reading is unrestricted. Before editing anything under `docs/`, README files, or agent-guidance surfaces such as `AGENTS.md`, load `project-docs`. Before creating or editing anything under `tasks/`, load `project-tasks`. Those skills define the maintenance rules. Stop and raise immediately if the required skill cannot be loaded or found.
 
+* **Knowledge-base maintenance is explicitly invoked, not automatic.**
+  * Reading relevant material under `knowledge-base/knowledge/` or `knowledge-base/evidence/` does not require loading the knowledge-base maintenance skill.
+  * Do not load the knowledge-base skill merely because a knowledge base exists or because repository work may benefit from retained knowledge.
+  * Do not inspect or process `knowledge-base/inbox/` by default. Treat inbox material as unprocessed and outside normal repository reasoning.
+  * Do not create or maintain a `knowledge-base/project-context.md`; use the maintained `docs/` for project context.
+  * Do not curate, organize, move, index, synthesize, maintain, or otherwise mutate `knowledge-base/**` unless the user explicitly asks for knowledge-base work.
+  * When the user explicitly asks to capture, process, curate, maintain, organize, or otherwise modify the knowledge base, load the knowledge-base skill and follow its rules.
+
 * **Repository routing.**
-  * `docs/` — canonical project knowledge: architecture, decisions, invariants, contracts, workflows, and confirmed fixes.
+  * `docs/` — canonical project knowledge and project context: architecture, decisions, invariants, contracts, workflows, and confirmed fixes.
   * `tasks/backlog/` — deferred work items, one file per task (`YYYY-MM-DD__slug.md`), indexed by `tasks/backlog.md`.
   * `tasks/archive/` — completed, cancelled, or superseded tasks kept for historical reference.
-  * `source-material/` — external references, research, specifications, and seed material; not the source of truth.
+  * `knowledge-base/knowledge/` — synthesized durable research, domain understanding, evaluation findings, and other retained knowledge that can improve future project work.
+  * `knowledge-base/evidence/` — preserved supporting sources and research that may be consulted when canonical KB knowledge is insufficient, ambiguous, or needs provenance.
+  * `knowledge-base/inbox/` — unprocessed material; ignore during normal project work unless the user explicitly asks for knowledge-base processing.
 
-* **Read relevant docs first.** Before repository-specific implementation, investigation, guidance, or decisions, read the smallest relevant set under `docs/`. Use docs when the work may depend on architecture, conventions, contracts, invariants, workflows, prior fixes, or design decisions. Skip them for isolated syntax questions, mechanical edits, formatting, typo fixes, straightforward renames, or fully specified work that does not require repository context. Prefer canonical `docs/` over tasks, source material, comments, or historical artifacts. Follow references only to resolve concrete uncertainty, and stop once the relevant constraints are understood. Use docs for intended behavior and rationale; inspect code and tests to verify the current implementation. If no relevant docs exist, proceed from the repository and user request, state material assumptions, and ask only about human-owned gaps that would materially affect the outcome.
+* **Read relevant docs first.** Before repository-specific implementation, investigation, guidance, or decisions, read the smallest relevant set under `docs/`. Use docs as the project's canonical context when the work may depend on product intent, architecture, conventions, contracts, invariants, workflows, prior fixes, or design decisions. Skip them for isolated syntax questions, mechanical edits, formatting, typo fixes, straightforward renames, or fully specified work that does not require repository context. Prefer canonical `docs/` over tasks, comments, historical artifacts, or retained research. Follow references only to resolve concrete uncertainty, and stop once the relevant constraints are understood. Use docs for intended behavior and rationale; inspect code and tests to verify the current implementation. Do not create or expect a separate project-context file in the knowledge base; project context belongs in the maintained project docs. If no relevant docs exist, proceed from the repository and user request, state material assumptions, and ask only about human-owned gaps that would materially affect the outcome.
+
+* **Leverage retained knowledge when it can materially improve the work.** After establishing any needed project context from `docs/`, consult the smallest relevant material under `knowledge-base/knowledge/` when prior research, domain understanding, evaluation findings, provider knowledge, external constraints, or other retained insight could materially improve the answer or implementation.
+  * Start with canonical knowledge rather than preserved evidence.
+  * Read only the knowledge relevant to the current task; do not sweep the knowledge base without a concrete reason.
+  * Use `knowledge-base/evidence/` when the canonical knowledge is insufficient, when a claim needs source-level verification or nuance, or when the task specifically depends on underlying research.
+  * Treat knowledge-base material as supporting context, not as authority over the current repository. Repository documentation, code, tests, configuration, and observed runtime behavior remain authoritative for implemented project state.
+  * If retained knowledge conflicts with current repository reality, follow the current repository for implementation truth and surface the discrepancy when it matters.
+  * Do not turn ordinary project work into knowledge-base maintenance. Reading knowledge or evidence does not authorize changing the KB.
 
 ## Human-Ownable Work
 
@@ -67,7 +85,7 @@ disable-model-invocation: false
 
 * **Prefer progress over ceremony.** Use the smallest amount of process needed to keep the work understandable, safe, verifiable, and aligned. Do not create planning or documentation artifacts merely because a workflow could support them.
 
-Explain the purpose succinctly when deploying subagents and ask for permission. Request permission before deploying subagents. 
+Explain the purpose succinctly when deploying subagents and ask for permission. Request permission before deploying subagents.
 
 ## Writing Style
 
