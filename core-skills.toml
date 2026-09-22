@@ -10,4 +10,6 @@ skills = [
     "manage-python-uv",
     "mermaid-markdown",
     "yagni",
+    "document-text-extraction",
+    "evidence-authoring",
 ]
