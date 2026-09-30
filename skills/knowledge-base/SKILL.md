@@ -1,1256 +1,1773 @@
 ---
 name: knowledge-base
-description: Maintains a portable Git knowledge base rooted at knowledge-base/. Use to initialize it, capture material into the inbox, review or curate inbox material, organize and index preserved evidence for retrieval, synthesize or maintain canonical knowledge, maintain knowledge navigation, retrieve prior evidence, or trace why knowledge changed. Owns only knowledge-base/**. Curation and maintenance are proposal-gated by explicit human approval, and every mutating operation ends with one isolated knowledge-base Git commit; never push as part of this skill.
+description: Maintains a portable human-readable Markdown knowledge base on a configured storage backend. Captures conversation-derived evidence into review-ready Markdown, prepares raw sources, supports explicit human approval, curates approved evidence into durable evidence and current knowledge, retrieves progressively, and maintains structure with low-friction verification. Storage mechanics are delegated to the selected backend adapter.
 disable-model-invocation: false
 ---
 
 # Knowledge Base
 
-## Purpose and Ownership
+## Purpose
 
-Maintain a portable, repository-local knowledge system rooted at:
+Maintain a durable, readable, retrieval-friendly knowledge base under one explicitly configured root.
 
-```text
-knowledge-base/
-├── inbox/
-├── evidence/
-│   └── <domain>/
-│       ├── index.md
-│       └── <subdomain>/
-│           └── [<optional-deeper-path>/]
-│               └── YYYY-MM-DD--description.ext
-└── knowledge/
-    └── index.md
-```
-
-This skill owns **only `knowledge-base/**`**.
-
-Never create, edit, move, delete, stage, or commit files outside that boundary. The skill may read the smallest relevant set under `docs/` when project context materially helps review, curation, maintenance, retrieval, or tracing. It may read other repository material outside `knowledge-base/**` only when the user explicitly asks to use it as source/context. These read exceptions do not expand write ownership. Any persisted output still belongs under `knowledge-base/`.
-
-The skill defines the behavior. `knowledge-base/` holds the state. The same contract should work in a dedicated knowledge repository or inside a larger project repository.
-
-## Core Model
-
-Use only three primary concepts.
-
-### Inbox
-
-`knowledge-base/inbox/` is the single **unprocessed entry point**.
-
-Humans or agents may place material here without deciding its final name, category, evidence location, or knowledge impact.
-
-Anything still in `inbox/` is **not yet curated**.
-
-### Evidence
-
-`knowledge-base/evidence/` contains **processed supporting material preserved for future inspection and retrieval**.
-
-Evidence may be a PDF, Markdown file, report, transcript, research note, conversation-derived artifact, image, personal write-up, or another useful source format.
-
-All evidence follows the same ingestion contract. Do not create evidence classes such as `rich`, `raw`, `primary`, or `processed` merely because some artifacts are more structured than others.
-
-Every newly curated evidence artifact must be discoverable through multiple cheap signals:
+The primary permanent product is:
 
 ```text
-domain
-subdomain
-optional deeper path
-date-prefixed descriptive filename
-domain evidence index entry
-source content when text-searchable
+evidence/
+knowledge/
 ```
 
-Evidence is not automatically canonical truth. Preserve it so future humans and agents can inspect what informed the knowledge base and reconsider conclusions later.
+Everything else exists to safely turn conversations and source material into those two useful surfaces.
 
-### Knowledge
+The system should produce:
 
-`knowledge-base/knowledge/` contains **current human-approved synthesized understanding**.
-
-Knowledge:
-
-- is Markdown only;
-- is revisable as understanding improves;
-- represents current understanding, not historical accumulation;
-- should remain substantially more compact than the evidence base;
-- should update existing canonical pages rather than proliferate overlapping pages;
-- must remain traceable to material supporting or limiting evidence.
+- faithful, readable Markdown evidence;
+- practical current knowledge for human reading;
+- predictable organization;
+- cheap retrieval for future agents;
+- clear provenance from knowledge to evidence and, when needed, to original sources;
+- a structure that remains understandable when browsed directly with ordinary storage tools.
 
 Core invariant:
 
 > **Evidence may accumulate. Knowledge must consolidate.**
 
-## Project Context from Canonical Docs
+Useful distinction:
 
-When the knowledge base lives inside a project repository, use canonical project documentation under `docs/` as the source of project context.
+> **Evidence tells you what was recorded. Knowledge tells you what is useful to understand now.**
 
-The purpose is not to ingest or duplicate project documentation. It is to let the KB maintainer understand the project well enough to interpret incoming material and existing knowledge in context.
+---
 
-Use this conservatively:
+# Runtime Configuration
 
-- Capture does not require reading project docs.
-- During Review / Propose, Curate / Maintain, Retrieve, or Trace, read relevant docs only when project context can materially improve interpretation or judgment.
-- Read the **smallest relevant set**. Start from an obvious docs index, overview, or directly relevant page when available; follow references only to resolve concrete uncertainty.
-- Do not sweep all of `docs/` merely because KB work is occurring.
-- Do not copy project docs into the KB merely to make them discoverable there.
-- Do not create a `project-context.md` surrogate or another summary layer by default.
-- `docs/` remains authoritative for documented project architecture, decisions, invariants, contracts, workflows, and implemented intent.
-- `knowledge-base/knowledge/` contains synthesized durable understanding derived from curated evidence. It may inform project work but should not compete with `docs/` as the source of truth for current project state.
-- If KB knowledge conflicts with current project docs or verified repository reality, preserve the evidence honestly, treat the project docs/repository as authoritative for implemented state, and surface the discrepancy when it materially affects curation.
-- If no relevant project docs exist, proceed from the inbox material, existing KB state, and the user's request. Do not invent project context.
+This skill is canonical and storage-agnostic. Do not hardcode one workspace's knowledge-base root into this file.
 
-Project docs should orient judgment without prescribing what the KB must retain. The maintainer remains responsible for deciding what evidence is useful, what knowledge is durable, and how new material relates to the project.
+## Project Registry Resolution
 
-## Authority and History
-
-Use repository surfaces for different questions:
+On a local machine, use the machine-local project registry when available:
 
 ```text
-What is the project's documented current intent/state? -> docs/ + repository
-What has not been processed?                            -> inbox/
-What source material do we have?                        -> evidence/<domain>/index.md + evidence tree
-What did a source actually say?                         -> evidence/*
-What durable understanding has the KB synthesized?     -> knowledge/*.md
-What currently supports it?                             -> that page's ## Evidence section
-Why/when did it change?                                 -> Git curation commit
-What exactly changed?                                   -> Git diff/history
+~/.agent-core/projects.toml
 ```
 
-Evidence indexes are **discovery metadata, not a competing source of truth**. The evidence artifact remains authoritative for its own contents.
+Example:
 
-Do not create a global curation log, registry, SQLite database, vector database, sidecar metadata system, or other competing source of truth by default. Domain evidence indexes defined by this skill are the only default evidence-discovery layer.
+```toml
+[projects.smart-search]
+description = "OCBC Smart Search"
+root = "/home/cdsw/smart-search-workspace"
+docs = "/home/cdsw/smart-search-workspace/docs"
+tasks = "/home/cdsw/smart-search-workspace/tasks"
+knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
+```
 
-If a richer generated query layer becomes useful later, it must be rebuildable from canonical files and Git history and requires an approved maintenance change.
+For this skill, `root` identifies the active project and `knowledge_base` identifies the exact KB root.
 
-# Operating Modes
+When `~/.agent-core/projects.toml` is available:
 
-This skill supports six modes:
+1. Identify the project whose configured `root` contains the current working directory.
+2. If more than one configured root matches, use the most specific matching root.
+3. If that project defines `knowledge_base`, use that exact value as the active KB root.
+4. Do not substitute another nearby `knowledge-base/` directory merely because one exists.
+5. If the active project is registered but does not define `knowledge_base`, treat the project as having no configured KB and do not invent one. An explicit human-selected KB for the current operation may still be used.
+6. Normal KB operations read the project registry but do not modify it. Modify the registry only when the human explicitly asks to register, remove, or change a project.
 
-1. **Initialize** — create the minimal KB when explicitly requested.
-2. **Capture** — place explicitly requested material in `inbox/` without curating it.
-3. **Review / Propose** — inspect inbox material and existing KB state, then propose curation without changing files.
-4. **Curate / Maintain** — after explicit approval, organize and index evidence, revise knowledge, update navigation, verify, and commit.
-5. **Retrieve** — locate preserved evidence or current knowledge using repository search and inspection without changing files.
-6. **Trace** — explain current provenance or historical change using evidence links and Git.
+The `knowledge_base` value may be any root representation supported by this skill, including a local filesystem path or a supported external backend root such as a Google Drive folder URL.
 
-Read-only review, retrieval, and tracing do not create commits.
+## Other Runtime Configuration
 
-**Every mutating operation must end with one isolated Git commit containing only changes from that KB operation, and the skill must not push.**
+When no applicable machine-local project registry is available, resolve the active knowledge base from an explicit human instruction, the calling project instructions, `AGENTS.md`, equivalent agent configuration, or an explicitly configured backend-supported KB registry.
 
-Before any mutation, confirm the host is a Git work tree and that an isolated KB-only commit can be made safely. If not, stop before writing.
+An explicit human instruction selecting a KB for the current operation takes precedence over ambient configuration.
+
+Recommended explicit configuration:
+
+```text
+Knowledge Base Backend: filesystem | google-drive
+Knowledge Base Root: <exact local path, Drive folder URL, or Drive folder ID>
+Knowledge Base Name: <optional human-readable name>
+Knowledge Base Registry: <optional backend-supported registry location>
+```
+
+`Knowledge Base Root` is mandatory for mutation and ordinary KB retrieval unless the active root has already been resolved unambiguously from the machine-local project registry or other explicit current context.
+
+The backend may be inferred when the root representation makes it unambiguous:
+
+- local filesystem path -> `filesystem`;
+- Google Drive folder URL or ID in a Drive-configured project -> `google-drive`.
+
+Prefer an explicitly configured backend when available.
+
+Do not assume Git or any other version-control system. Git behavior is outside this canonical workflow unless the human explicitly introduces a separate Git-specific extension. Git repository boundaries do not determine the KB root.
+
+## Root Naming Convention
+
+When the environment permits it, prefer a descriptive root name ending in:
+
+```text
+<name>-knowledge-base
+```
+
+Examples:
+
+```text
+ocbc-knowledge-base
+personal-finance-knowledge-base
+adreadyclips-knowledge-base
+```
+
+This is a discovery convention, not an identity or validity requirement. The configured root remains authoritative.
+
+---
+
+# Backend Adapters
+
+Storage semantics live in this file. Storage mechanics live in backend adapters.
+
+Supported adapters:
+
+```text
+backends/filesystem.md
+backends/google-drive.md
+```
+
+Before performing backend-specific reads or mutations, read the adapter matching the active backend unless its rules are already present in current context.
+
+The adapter may define:
+
+- root resolution and identity;
+- safe read/write/move/delete primitives;
+- search behavior;
+- backend-specific version history;
+- raw Markdown integrity requirements;
+- backend-specific verification;
+- optional discovery registries.
+
+The adapter must not redefine the semantic meaning of `raw`, `review`, `approved`, `evidence`, or `knowledge`.
+
+If the configured backend has no available adapter or the required storage operations cannot be performed safely, stop rather than improvising incompatible persistence semantics.
+
+---
+
+# Ownership and Boundary
+
+The active KB root and its descendants are the complete normal namespace owned by this workflow.
+
+When the root comes from `~/.agent-core/projects.toml`, the configured `knowledge_base` value is authoritative for that project. Do not infer a different KB from the current Git repository, sibling folders, parent folders, or nearby directories with similar names.
+
+The skill may read explicitly authorized external source/context material when the human or project configuration supplies it, but this does not expand KB write ownership.
+
+Do not create, edit, move, rename, delete, reorganize, or index KB content outside the active root.
+
+Do not search unrelated storage locations merely because they may contain useful context.
+
+Do not treat workflow files, adapters, registries, or agent configuration as substantive evidence or canonical knowledge.
+
+---
+
+# Knowledge Base Structure
+
+Use:
+
+```text
+<root>/
+├── inbox/
+│   ├── raw/
+│   ├── review/
+│   └── approved/
+├── source-archive/
+├── evidence/
+│   ├── index.md
+│   └── <domain>/
+│       ├── index.md
+│       └── <subdomain>/
+│           └── [<optional-deeper-path>/]
+│               └── YYYY-MM-DD--description.md
+└── knowledge/
+    ├── index.md
+    └── [concept-oriented folders and Markdown pages]
+```
+
+Workflow states:
+
+```text
+inbox/raw/       = genuine raw source material awaiting evidence preparation
+inbox/review/    = authored Markdown evidence awaiting human approval
+inbox/approved/  = human-approved Markdown evidence awaiting automated curation
+source-archive/  = original source material whose approved evidence has been curated
+evidence/        = permanent approved historical grounding
+knowledge/       = practical current synthesized understanding
+```
+
+A file's location is part of the workflow contract.
+
+---
+
+# Core Model
+
+## Raw Sources
+
+`inbox/raw/` is for source material that still needs selection and authoring.
+
+Examples:
+
+- PDFs;
+- screenshots and images;
+- exported emails or messages;
+- copied articles or reports;
+- transcripts;
+- rough notes;
+- source files supplied substantially as-is.
+
+Raw material is not approved evidence and must not become canonical knowledge directly.
+
+## Review Evidence
+
+`inbox/review/` contains complete, readable Markdown evidence awaiting human approval.
+
+Presence here means:
+
+> The evidence has been selected and authored, but the human has not yet approved its substantive contents.
+
+## Approved Evidence
+
+`inbox/approved/` contains Markdown whose substantive contents the human has approved as a faithful evidence record.
+
+Presence here means:
+
+> This evidence is approved and ready for permanent curation.
+
+## Source Archive
+
+`source-archive/` preserves original source material after its corresponding evidence has been approved and curated.
+
+It is a provenance layer, not a second evidence system and not the normal retrieval starting point.
+
+## Evidence
+
+`evidence/` contains permanent human-approved Markdown grounding.
+
+Evidence may include:
+
+- factual records;
+- observations;
+- decisions;
+- research findings;
+- source claims;
+- useful uncertainty;
+- contradictory material;
+- historical understanding.
+
+Evidence is preserved history, not automatically current truth.
+
+## Knowledge
+
+`knowledge/` contains practical current understanding.
+
+Knowledge is:
+
+- Markdown only;
+- concept-oriented rather than source-oriented;
+- current rather than chronological;
+- substantially more compact than evidence;
+- written for fast human reading;
+- rewritten as understanding improves;
+- traceable to relevant evidence.
+
+Knowledge answers:
+
+> **What is useful to understand now?**
+
+---
+
+# Canonical Workflow Cues
+
+Use distinct verbs for distinct workflow stages.
+
+```text
+conversation
+    ↓ capture
+review/
+
+raw/
+    ↓ prepare
+review/
+
+review/
+    ↓ approve
+approved/
+
+approved/
+    ↓ curate
+evidence/ + knowledge/
+```
+
+## `capture this`
+
+Use information already developed in the current conversation as the source.
+
+Perform evidence selection and author clean Markdown directly into:
+
+```text
+inbox/review/
+```
+
+Natural equivalents include:
+
+```text
+capture this to the KB
+save this as evidence
+create evidence from this
+record this in the KB
+```
+
+## `prepare raw inbox`
+
+Operate on in-scope material in:
+
+```text
+inbox/raw/
+```
+
+Perform evidence selection and author clean Markdown into:
+
+```text
+inbox/review/
+```
+
+Leave raw sources in place until the resulting evidence has been approved and curated.
+
+## `review pending evidence`
+
+Inspect or list:
+
+```text
+inbox/review/
+```
+
+This cue does not approve, move, or curate anything.
+
+## `approve <item>`
+
+Move the specified artifact unchanged from:
+
+```text
+inbox/review/
+```
+
+to:
+
+```text
+inbox/approved/
+```
+
+The move is the approval signal.
+
+## `approve all`
+
+Move all in-scope review artifacts unchanged into:
+
+```text
+inbox/approved/
+```
+
+## `curate approved inbox`
+
+Operate on:
+
+```text
+inbox/approved/
+```
+
+Place approved evidence permanently, maintain indexes, update knowledge when useful, reconcile raw sources, and complete routine curation automatically.
+
+Natural equivalents include:
+
+```text
+curate the approved evidence
+process approved evidence
+process the approved inbox
+curate approved
+```
+
+Generic phrases such as `process the inbox` or `handle the inbox` have no canonical meaning. Resolve them from clear immediate context when possible; otherwise ask which workflow stage is intended.
+
+---
 
 # Initialize
 
 Initialize only when explicitly requested.
 
-Create the minimal structure:
+Create:
 
 ```text
-knowledge-base/
+<root>/
 ├── inbox/
+│   ├── raw/
+│   ├── review/
+│   └── approved/
+├── source-archive/
 ├── evidence/
+│   └── index.md
 └── knowledge/
     └── index.md
 ```
 
-Do **not** invent evidence domains or subdomains during initialization. Create `evidence/<domain>/index.md` only when the first curated artifact for that domain is approved.
+Do not invent evidence domains or subdomains during initialization.
 
-Because Git does not track empty directories, minimal placeholders under `inbox/` and `evidence/` are acceptable when needed to preserve the initialized structure.
-
-`knowledge/index.md` starts as a concise navigation page, not a process manual.
-
-Do not create extra schemas, registries, databases, scripts, logs, archives, or workflow files without demonstrated need and human approval.
-
-End with one isolated commit:
-
-```text
-kb(init): initialize knowledge base
-```
-
-# Capture
-
-Capture is deliberately low-friction.
-
-When the user explicitly asks to save, drop, or place material into the KB without curating it:
-
-1. Put it under `knowledge-base/inbox/`.
-2. Preserve supplied format and substantive content.
-3. Avoid semantic classification beyond choosing a collision-safe inbox filename.
-4. Do not change `evidence/`, `knowledge/`, or `knowledge/index.md`.
-5. Do not infer that capture authorizes curation.
-6. Commit only the captured inbox material.
-
-Capture needs no separate curation proposal because canonical knowledge is unchanged; the user's request to capture is the authorization.
-
-Example:
-
-```text
-kb(capture): add experience-to-capability playbook
-
-Inbox:
-- knowledge-base/inbox/Experience-to-Capability-Playbook.md
-
-Outcome:
-- captured-unprocessed
-```
-
-Never overwrite an existing inbox item silently. Use a collision-safe name or ask when identity is ambiguous.
+`evidence/index.md` and `knowledge/index.md` should begin as concise navigation pages.
 
 ---
 
-# Review Before Curation
+# Capture
 
-When the user asks to process, digest, curate, organize, or consider inbox material, **review first and change nothing** unless the user has already explicitly approved a concrete current proposal.
+Capture should place information into the furthest justified workflow state without skipping human approval.
 
-For each relevant inbox item:
+Use two intake paths:
 
-1. Read enough of the item to understand its durable contribution and distinctive retrieval terms.
-2. When project context can materially affect interpretation, read the smallest relevant set under `docs/`; do not read project docs merely as ceremony.
-3. Inspect `knowledge-base/knowledge/index.md`.
-4. Search relevant existing knowledge before proposing a new canonical page.
-5. Inspect directly relevant evidence when needed to understand provenance, overlap, or contradiction.
-6. Inspect existing evidence domain and subdomain directory names so sensible categories are reused rather than duplicated.
-7. Choose an exact proposed evidence destination satisfying the mandatory evidence path contract.
-8. Draft the exact one-line domain evidence-index record that curation will append.
-9. Determine whether the material:
-   - creates genuinely new canonical knowledge;
-   - updates/refines existing knowledge;
-   - both creates and updates knowledge;
-   - or causes **no material knowledge change**.
-10. Determine how affected knowledge provenance should change.
-11. Determine required `knowledge/index.md` changes.
-12. Surface material ambiguity, contradiction, overlap, or structural choices.
-13. Present one authoritative Curation Proposal.
+```text
+genuine raw source
+    → inbox/raw/
+    → prepare raw inbox
+    → inbox/review/
 
-Do not move, rename, edit, delete, create, stage, or commit repository files during review.
+conversation or agent-authored capture
+    → evidence selection + Markdown authoring
+    → inbox/review/
+```
 
-Do not read an entire existing domain evidence index merely to prepare an append. Search it only when needed to check an exact path, investigate possible duplicate evidence, or answer a retrieval question.
+## Capture from the Current Conversation
+
+When the human asks to capture information already developed in the current conversation:
+
+1. identify the intended scope;
+2. perform evidence selection;
+3. write the selected material as clean, self-contained Markdown;
+4. preserve important facts, decisions, conclusions, constraints, assumptions, uncertainty, useful reasoning outcomes, and relevant provenance;
+5. write the artifact directly to `inbox/review/`;
+6. verify the write with the cheapest useful confirmation;
+7. report concisely what was created.
+
+The current conversation acts as the source. A separate raw transcript is not required.
+
+Use work already completed in the conversation. If research, comparison, synthesis, or structuring has already been performed, carry those durable results forward into the evidence artifact.
+
+Do not deliberately reduce already-processed information into an unstructured raw note.
+
+## Raw Capture
+
+Use `inbox/raw/` when the supplied material is itself a source that still needs preparation.
+
+For raw capture:
+
+1. preserve the supplied representation and substantive content;
+2. place it in `inbox/raw/`;
+3. use a collision-safe filename;
+4. retain available source date and provenance;
+5. verify the write with the cheapest useful confirmation.
+
+Raw capture does not require evidence selection or evidence authoring at capture time.
+
+---
+
+# Preparing the Raw Inbox
+
+`prepare raw inbox` operates only on in-scope items in `inbox/raw/`.
+
+For each raw source:
+
+1. determine whether the source can be read faithfully;
+2. identify source date, context, provenance, and uncertainty when available;
+3. check whether the source is already represented in `review/`, `approved/`, or curated evidence;
+4. perform evidence selection: `0 / 1 / N`;
+5. author each selected artifact as clean, self-contained Markdown;
+6. write the artifacts to `inbox/review/`;
+7. leave the raw source in `inbox/raw/` until its resulting evidence has been approved and curated;
+8. report the prepared artifacts concisely.
+
+Do not repeatedly prepare the same raw source merely because it remains in `raw/` awaiting later workflow steps.
+
+Use provenance fields to associate review evidence with its raw source when useful.
+
+---
+
+# Reading Binary, Image, and Difficult Sources
+
+Use document-reading, visual-reading, parsing, or extraction capabilities available in the current runtime when needed.
+
+For PDFs, images, scans, spreadsheets, exported messages, or other non-clean-text sources:
+
+- preserve the original in `raw/` until approved evidence has been curated;
+- extract or inspect only what can be represented faithfully;
+- preserve natural headings, lists, tables, reading order, and document structure when useful;
+- remove obvious extraction-only line wrapping and repeated page furniture;
+- preserve material uncertainty in names, dates, identifiers, amounts, clauses, and table values;
+- distinguish machine-derived text from human verification when that distinction matters.
+
+If the source cannot be read reliably enough to author evidence, leave it in `raw/` and report the limitation.
+
+Do not send source material to an external service without explicit permission.
+
+---
+
+# Evidence Selection
+
+Evidence selection happens before evidence authoring.
+
+The workflow owns:
+
+```text
+source -> 0 / 1 / N evidence artifacts
+```
+
+Preserve material when it has plausible future value as:
+
+- factual reference;
+- a decision or decision context;
+- a durable observation;
+- useful research;
+- an event or conversation record;
+- a meaningful idea;
+- a constraint or assumption that affects future work;
+- supporting or limiting evidence for current knowledge;
+- provenance for a future conclusion.
+
+Favor durable signal over conversational completeness.
+
+Default to one artifact when material shares one coherent source or context.
+
+Split only when distinct subjects are genuinely likely to be retrieved independently later.
+
+Keep this distinction explicit:
+
+```text
+selection = decide what durable material becomes an artifact
+authoring = faithfully represent the selected scope
+```
+
+Selection may exclude irrelevant or non-durable source material.
+
+Once a scope is selected, preserve the substantive information needed to represent that scope faithfully.
+
+A raw source may legitimately produce zero evidence artifacts. In that case, leave the source in `raw/`, report the proposed `0 evidence` outcome, and do not archive or delete it without human acceptance of that disposition.
+
+---
+
+# Evidence Authoring
+
+Evidence authoring turns selected material into a durable record that remains useful after the original conversation or source is forgotten.
+
+The objective is not to reproduce the source. It is to preserve the **durable substance of the selected scope faithfully and clearly**.
+
+A good evidence artifact should let a future reader answer:
+
+- What was learned, observed, decided, or established?
+- What details materially support that understanding?
+- What conditions, exceptions, assumptions, or uncertainty matter?
+- Where did the information come from?
+- What would be lost if the original source were unavailable?
+
+## Authoring from Conversation or Agent Research
+
+When the agent has already discussed, researched, compared, reasoned about, or structured the subject with the human, use that completed work when writing the evidence.
+
+Capture the durable outcome rather than the conversational sequence.
+
+Preserve, when materially useful:
+
+- key facts and findings;
+- decisions and preferences;
+- conclusions reached;
+- comparison outcomes;
+- important reasoning behind a conclusion;
+- conditions and exceptions;
+- assumptions that affect the result;
+- uncertainty or unresolved questions;
+- dates, amounts, thresholds, names, or other details needed for future use;
+- source references used for researched claims.
+
+The artifact should stand on its own without requiring the future reader to reconstruct the chat.
+
+## Information Selection Within an Artifact
+
+Give highest priority to information with future decision or retrieval value:
+
+```text
+conclusion / decision
+        ↓
+important supporting facts
+        ↓
+conditions and exceptions
+        ↓
+reasoning that explains non-obvious conclusions
+        ↓
+uncertainty and unresolved questions
+        ↓
+useful provenance
+```
+
+Compression should remove conversational overhead, not useful substance.
+
+## Structure
+
+Choose structure from the information rather than applying one fixed template.
+
+Useful patterns include:
+
+```markdown
+# Descriptive Title
+
+Recorded: YYYY-MM-DD
+Source: conversation
+
+## Decision
+...
+
+## Basis
+- ...
+
+## Conditions / Exceptions
+- ...
+```
+
+or:
+
+```markdown
+# Descriptive Title
+
+Recorded: YYYY-MM-DD
+Source: research discussion
+
+## Findings
+...
+
+## Practical Takeaways
+- ...
+
+## Caveats
+- ...
+
+## Sources
+- ...
+```
+
+Use only sections that materially improve the record.
+
+## Provenance
+
+Useful provenance fields include:
+
+```markdown
+Recorded: YYYY-MM-DD
+Source: [conversation, owner notes, email, report, extracted document, etc.]
+Source date: [when materially useful]
+Source file: [conceptual KB path when one exists]
+Verification: [awaiting human approval / human-approved / owner-recorded / machine-extracted, as applicable]
+```
+
+Additional provenance may include `Derived from`, `Effective as of`, `Participants`, or `Extraction status` when useful.
+
+Use metadata proportionately. The body remains the primary record.
+
+## Rough Owner Notes
+
+Owner-written rough notes may be normalized aggressively when meaning is clear.
+
+Allowed cleanup includes spelling, grammar, punctuation, ordering, duplicate removal, obvious abbreviation expansion, grouping related statements, and converting fragments into clear sentences, bullets, tables, or sections.
+
+Preserve substantive meaning, meaningful uncertainty, important distinctions, source status, and unresolved ambiguity.
+
+## Fidelity Rules
+
+Preserve fidelity.
+
+Do not invent missing facts, silently resolve meaningful ambiguity, silently resolve contradictions, turn recollections into transcripts, turn proposals into decisions, turn ideas into established facts, present generated paraphrase as quotation, or claim source-level verification that did not occur.
+
+Preserve quotations exactly when quotation matters.
+
+If sources conflict, preserve the conflict rather than choosing one silently.
+
+---
+
+# Review
+
+`inbox/review/` contains authored Markdown evidence awaiting human approval.
+
+A review artifact should already be a complete, readable, self-contained evidence record.
+
+When the agent creates or revises review evidence:
+
+1. write the complete Markdown artifact to `inbox/review/`;
+2. verify the write with the cheapest useful confirmation;
+3. tell the human concisely what was created or changed.
+
+Do not reproduce the full Markdown in chat by default unless the human asks to review it there.
+
+The human may inspect, edit, revise, split, merge, expand, reduce, approve, or reject review artifacts.
+
+---
+
+# Approval
+
+Approval means that the human accepts the current substantive contents of a review artifact as a faithful evidence record.
+
+The transition is:
+
+```text
+inbox/review/
+      ↓
+inbox/approved/
+```
+
+Moving a file into `inbox/approved/` is itself the approval signal.
+
+Approval does not rewrite the artifact.
+
+## Human-Performed Approval
+
+The human may move accepted files directly from `review/` to `approved/` using ordinary storage tools. No additional agent action is required for the evidence to become approved.
+
+## Agent-Performed Approval
+
+When the human asks the agent to approve an artifact:
+
+1. identify the intended review artifact;
+2. move it unchanged from `inbox/review/` to `inbox/approved/`;
+3. confirm the move with the cheapest useful check;
+4. report the completed transition.
+
+If an artifact needs substantive changes, revise it while it remains in `review/` and obtain approval of the revised version afterward.
+
+Associated raw sources remain in `raw/` until approved evidence is successfully curated.
+
+---
+
+# Curating the Approved Inbox
+
+`curate approved inbox` performs the full routine curation of human-approved evidence in:
+
+```text
+inbox/approved/
+```
+
+Human approval of evidence content is the substantive quality gate.
+
+Once an artifact is in `approved/`, the agent should determine permanent placement, maintain indexes, update canonical knowledge when appropriate, reconcile raw sources, and complete routine curation **without requiring another approval round**.
+
+Resolve routine curation decisions autonomously and report the result afterward.
+
+Ask only when execution reveals a genuinely material ambiguity that cannot be resolved faithfully, such as uncertain evidence identity, destructive conflict, or a major structural choice with multiple materially different outcomes.
+
+## Curation Context
+
+Before placing approved evidence, establish the current structure of both permanent KB surfaces.
+
+Read first when relevant structure is not already known:
+
+```text
+evidence/index.md
+knowledge/index.md
+```
+
+Use them to determine:
+
+- which existing evidence domain is the best fit;
+- whether a new evidence domain is genuinely needed;
+- which existing knowledge page owns the concept;
+- whether the approved evidence introduces a genuinely new knowledge scope.
+
+Then read only relevant deeper material:
+
+```text
+evidence/<domain>/index.md
+relevant knowledge page(s)
+relevant existing evidence when needed
+```
+
+Read existing evidence only when necessary to resolve overlap, duplication, contradiction, historical context, provenance, or uncertainty about knowledge impact.
+
+Do not scan the entire KB by default.
 
 ## Curation Outcomes
 
-A fully curated inbox item ends in one of these states:
+An approved artifact may result in:
 
 ```text
-preserve evidence + create knowledge
-preserve evidence + update knowledge
-preserve evidence + create and update knowledge
-preserve evidence only; no material knowledge change
+evidence only
+evidence + existing knowledge update
+evidence + new knowledge page
+evidence + several closely related knowledge updates
 ```
 
-There is no separate `digested but not synthesized` state.
+A knowledge change is not required merely because new evidence exists.
 
-```text
-inbox/          = pending / unprocessed
-outside inbox/  = processed
-```
+## Curation Steps
 
-Do not remove an item from `inbox/` unless its approved curation is completed in the same operation.
+For each approved artifact:
 
-# Mandatory Curation Proposal
+1. determine the most appropriate existing evidence domain and subdomain;
+2. create new structure only when existing structure would materially misrepresent the subject;
+3. move the artifact into its permanent evidence location;
+4. preserve its approved Markdown contents unchanged except for mechanical filename/provenance adjustments required by final placement;
+5. maintain the evidence indexes;
+6. determine and apply useful knowledge changes;
+7. archive any associated raw source after successful curation;
+8. perform proportionate final-state verification;
+9. report the outcome concisely.
 
-Before any curation or maintenance write, present a proposal that lets the human judge **what will move, how the evidence will remain discoverable, what knowledge will change, what provenance will be asserted, and why**.
-
-Use this shape, omitting only genuinely irrelevant sections:
-
-```markdown
-# Curation Proposal
-
-## Input
-
-- `knowledge-base/inbox/<current-file>`
-
-## Summary
-
-[Concise description of the material and why it may matter.]
-
-## Evidence Placement
-
-From:
-`knowledge-base/inbox/<current-file>`
-
-To:
-`knowledge-base/evidence/<domain>/<subdomain>/[<optional-deeper-path>/]<YYYY-MM-DD--name.ext>`
-
-Reason:
-- [why this domain fits]
-- [why this subdomain fits]
-- [why any deeper path is justified]
-- [why this filename/date is appropriate]
-- [which existing directories are reused or why a new domain/subdomain is justified]
-
-## Evidence Discovery
-
-Index:
-`knowledge-base/evidence/<domain>/index.md`
-
-Append record:
-`- YYYY-MM-DD | <subdomain[/deeper-path]> | [<Title>](<relative-path>) | <retrieval-oriented description>`
-
-Retrieval terms:
-- [the distinctive concepts/entities/techniques intentionally represented in the description]
-
-## Knowledge Impact
-
-### Update
-`knowledge-base/knowledge/<existing-page>.md`
-
-Content changes:
-- [specific durable conclusion/change]
-
-Provenance changes:
-- Add `<evidence-file>` as supporting, limiting, or contradictory evidence for [specific conclusion].
-
-Why:
-[Why this belongs in this canonical page.]
-
-### Create
-`knowledge-base/knowledge/<new-page>.md`
-
-Scope:
-[What durable conceptual question this page will own.]
-
-Why a new page is justified:
-[Why existing knowledge cannot coherently absorb it.]
-
-### No Knowledge Change
-
-[Use when applicable.]
-
-Reason:
-[Why the evidence does not materially create, refine, contradict, or limit current understanding.]
-
-## Knowledge Index Impact
-
-- [entries to add/change/remove]
-
-or
-
-- No change.
-
-## Planned Result
-
-- Evidence artifacts preserved: N
-- Evidence-index records appended: N
-- Evidence domain indexes created: N
-- Knowledge documents created: N
-- Knowledge documents updated: N
-- Knowledge documents merged/removed: N
-- Knowledge-index entries changed: N
-
-## Human Attention
-
-[Only genuinely consequential, debatable, uncertain, or structural points.]
-
-## Approval
-
-No repository changes will be made until explicitly approved.
-```
-
-The exact proposed evidence destination and exact discovery record must always be shown. Evidence organization is agent-managed, but the human should know where material will live and how it will be discoverable before approving it.
-
-A good proposal makes clear:
-
-1. what is being processed;
-2. where preserved evidence will live;
-3. which domain index will receive the discovery record;
-4. what retrieval description will be stored;
-5. what current knowledge will change;
-6. whether a new canonical page is justified;
-7. what evidence-to-knowledge relationships will be asserted;
-8. whether the knowledge index changes;
-9. what deserves human judgment;
-10. what the final operation will contain.
-
-Resolve routine choices yourself. Do not hide material alternatives behind `maybe`, `possibly`, or `either`.
-
-# Human Approval Boundary
-
-Curation and maintenance are human-approved operations.
-
-Before approval, the agent may read, search, compare, reason, trace Git history, and revise the proposal.
-
-Before approval, it must not as part of curation or maintenance:
-
-- move/rename inbox material;
-- create/edit/delete/merge/reorganize evidence;
-- create/edit/delete/merge/reorganize knowledge;
-- create or update evidence domain indexes;
-- update the knowledge index;
-- stage or commit curation changes.
-
-Explicit approval means the human unambiguously authorizes the current proposal, for example `proceed`, `approved`, or equivalent language.
-
-If the human changes the proposal, the changed direction becomes authoritative. If the same message both specifies the change and says to proceed, do not require a redundant approval round.
-
-After approval, execute the approved proposal. Routine mechanics are agent-owned.
-
-If execution reveals a **materially different** knowledge change, evidence destination, evidence-index record, merge/split, deletion, contradiction, or structural consequence that was not approved, do not silently expand the operation. Stop the unapproved part and return with a revised proposal.
+Successfully curated artifacts should no longer remain in `inbox/approved/`.
 
 ---
 
 # Evidence Organization
 
-Evidence ingestion is deliberately **strict and cheap**.
+`evidence/` contains permanent human-approved records.
 
-The storage contract should make future retrieval easy without requiring rich metadata, embeddings, a database, or repeated full-corpus analysis.
+Evidence is organized for:
 
-## Mandatory Path Contract
+1. predictable subject-based browsing;
+2. chronological reading within a subject;
+3. efficient retrieval by future agents;
+4. preservation of approved contents.
 
-Every newly curated evidence artifact must live at least two semantic directory levels below `evidence/`:
-
-```text
-knowledge-base/evidence/
-  <domain>/
-    <subdomain>/
-      [<optional-deeper-path>/]
-        YYYY-MM-DD--lowercase-kebab-case.ext
-```
-
-Rules:
-
-- `<domain>` is mandatory.
-- `<subdomain>` is mandatory.
-- Additional semantic directories are optional.
-- Never place curated evidence directly in `evidence/`.
-- Never place curated evidence directly in `evidence/<domain>/`.
-- Reuse an existing domain whenever it reasonably fits.
-- Reuse an existing subdomain whenever it reasonably fits.
-- Create a new domain or subdomain only when existing categories would be materially misleading.
-- Additional nesting should normally reuse an existing useful structure; do not invent deeper paths merely to describe one artifact more precisely.
-- Prefer broad, stable category names that a human would naturally browse or search.
-- Do not use catch-all subdomains such as `misc`, `other`, or `general` merely to satisfy the minimum depth when a meaningful category can be chosen.
-- Do not reorganize unrelated evidence during ordinary curation.
-
-This is a **minimum structure**, not an invitation to build a deep ontology.
-
-Examples:
+Use:
 
 ```text
-evidence/ai/evaluation/2026-09-16--prompt-evaluation-and-optimization.md
-evidence/ai/agents/2026-09-13--agent-tooling-interface-design.md
-evidence/career/compensation/2026-09-10--bank-data-scientist-benchmarking.md
+evidence/
+├── index.md
+└── <domain>/
+    ├── index.md
+    └── <subdomain>/
+        └── [<optional-deeper-path>/]
+            └── YYYY-MM-DD--description.md
 ```
 
-Avoid:
+## Placement
+
+Every curated evidence artifact has one clear primary location.
+
+Before placing evidence:
+
+1. read `evidence/index.md` when the likely domain is not already known;
+2. identify the most likely existing domain;
+3. read that domain's `index.md`;
+4. reuse an existing suitable subdomain when possible;
+5. create new structure only when existing structure would make the evidence difficult or misleading to find.
+
+Placement should reflect the **main subject a future reader would look under**, not every topic mentioned in the artifact.
+
+Do not duplicate one evidence artifact into multiple folders merely for discovery.
+
+## Domains and Subdomains
+
+Domains are broad, durable areas of the knowledge base. Prefer reusing established domains.
+
+Create a new domain only when the material represents a durable area not coherently covered by an existing domain and future evidence is plausibly likely to belong there.
+
+Subdomains provide practical subject grouping within a domain. Use literal names a human would naturally browse.
+
+Subdomains should be broad enough to accumulate related evidence over time but specific enough that their chronological file list remains meaningful.
+
+Avoid catch-all names such as `misc`, `other`, or `general` when a clearer subject exists.
+
+Additional nesting below the subdomain is optional and should arise from repeated organizational need rather than advance ontology design.
+
+## Evidence Filenames
+
+Use:
 
 ```text
-evidence/2026-09-16--prompt-evaluation.md
-evidence/ai/2026-09-16--prompt-evaluation.md
-evidence/ai/llm/prompts/evaluation/pairwise/ranking/2026-09-16--prompt-evaluation.md
+YYYY-MM-DD--lowercase-kebab-case.md
 ```
 
-Before proposing placement, inspect existing domain and subdomain directory names. This should be a cheap structural inspection, not a full evidence audit.
+The date prefix is deliberate. Within a subject folder, filenames should naturally form a chronological record.
 
-## Naming
+Use the source or event date when known and representative; otherwise use the date the evidence entered the KB.
 
-Newly curated evidence uses:
+Choose descriptive terms a future human is likely to remember.
+
+Avoid unnecessary PII in filenames.
+
+## Evidence Preservation
+
+Permanent evidence is an approved historical record.
+
+Routine curation and maintenance may move or rename evidence and repair mechanical links or provenance paths, but substantive Markdown contents remain preserved.
+
+If a genuine capture error or material misrepresentation is discovered, handle it as an explicit evidence correction rather than silently rewriting history.
+
+---
+
+# Evidence Index
+
+Maintain:
 
 ```text
-YYYY-MM-DD--lowercase-kebab-case.ext
+evidence/index.md
 ```
 
-Examples:
+as the high-level map of the evidence base.
 
-```text
-2026-09-07--experience-to-capability-playbook.md
-2026-09-13--karpathy-llm-wiki.pdf
-2026-09-13--agent-tooling-interface-design.md
-```
+Its purpose is to answer:
 
-Rules:
+> Which evidence domain should I inspect?
 
-- ISO `YYYY-MM-DD`;
-- exactly `--` between date and descriptive name;
-- lowercase kebab-case descriptive portion;
-- concise but recognizable in VS Code;
-- preserve useful domain terminology;
-- choose words a future human or agent might plausibly remember;
-- avoid generic names such as `notes.md`, `research.md`, `document.pdf`, or `chatgpt.md`;
-- use the artifact/source date when confidently known and representative;
-- otherwise use the date it entered the KB;
-- do not mass-rename historical evidence merely to enforce newer conventions without an approved maintenance proposal.
+List each domain once with:
 
-## Domain Evidence Index Contract
-
-Each evidence domain has exactly one discovery index:
-
-```text
-knowledge-base/evidence/<domain>/index.md
-```
-
-The domain index covers **all evidence artifacts beneath that domain**, including every subdomain and any deeper approved paths.
-
-Do not create:
-
-```text
-knowledge-base/evidence/index.md
-knowledge-base/evidence/<domain>/<subdomain>/index.md
-```
-
-for ordinary evidence discovery.
-
-Every newly curated evidence artifact receives **exactly one** record in its domain index.
-
-### Record Shape
-
-Each record is exactly one physical Markdown line:
-
-```markdown
-- YYYY-MM-DD | `<subdomain[/deeper-path]>` | [<Descriptive Title>](<relative-path-from-domain>) | <retrieval-oriented description>
-```
+- a human-readable name;
+- a link to its domain index;
+- a concise description of what belongs there.
 
 Example:
 
 ```markdown
-- 2026-09-16 | `evaluation` | [Prompt Evaluation and Optimization](evaluation/2026-09-16--prompt-evaluation-and-optimization.md) | Prompt evaluation, deterministic checks, semantic LLM judges, pairwise comparison, Elo, Bradley-Terry, adaptive sampling.
+# Evidence
+
+- [Finance](finance/index.md) — Banking, payment cards, investments, insurance, personal financial planning, and related research.
+- [Career](career/index.md) — Employment, compensation, workplaces, career decisions, professional development, and work-related records.
 ```
 
-The record must be compact enough for the index to remain useful at scale.
+Keep this index compact. Do not list individual evidence artifacts here.
 
-The retrieval-oriented description must:
+Update it only when a domain is created, renamed, merged, removed, or materially rescoped.
 
-- be a single line;
-- normally be about 8–30 words;
-- state the central subject;
-- include several distinctive terms, entities, techniques, or phrases a future user may remember;
-- prefer terminology actually present in or faithfully describing the evidence;
-- avoid generic wording such as `useful discussion`, `research notes`, or `AI information`;
-- avoid conclusions, provenance narratives, detailed summaries, and information not present in the evidence.
+---
 
-Do not add tags, YAML metadata, aliases, sidecar files, per-artifact summaries, or duplicate catalog records merely for retrieval.
+# Evidence Domain Indexes
 
-### Append-Only Curation Contract
+Every evidence domain maintains:
 
-During ordinary curation, an existing domain index is **append-only**.
-
-To add a record:
-
-1. Construct the complete record from the evidence already reviewed.
-2. If the domain index exists, perform only a cheap exact-path duplicate check as needed; do not read or parse the whole file merely to append.
-3. Append the record as a new line using an append primitive, for example:
-
-```bash
-printf '%s\n' "$record" >> knowledge-base/evidence/<domain>/index.md
+```text
+evidence/<domain>/index.md
 ```
 
-4. Do not rewrite, sort, reformat, regroup, or regenerate existing records during ordinary curation.
-5. Do not use a read-modify-write operation when a direct append will do.
-6. Do not use whole-file write/replace APIs for an existing domain index during ordinary curation; use an append-capable primitive.
-7. If the domain is new, create `index.md` once with a concise heading and the first record:
+The domain index is the discovery surface for all evidence beneath that domain.
+
+Every curated evidence artifact receives exactly one domain-index record.
+
+Use one concise Markdown line:
 
 ```markdown
-# Evidence Index — <Domain>
-
-- ...
+- YYYY-MM-DD | `<subdomain[/deeper-path]>` | [<Title>](<relative-path>) | <retrieval description>
 ```
 
-The exact shell command is not normative; **append semantics are**. Use the safest append mechanism available in the environment.
+Descriptions should help a human or agent decide whether opening the artifact is worthwhile.
 
-A domain index may be rewritten only during an explicitly approved maintenance operation, for example to repair stale paths, remove duplicates, or reflect approved evidence moves/renames.
+Include central subject, distinctive names or terms, major categories covered, and useful decision or research context.
 
-Git preserves index history. Do not turn the index itself into an event log with `added`, `moved`, `deleted`, or `superseded` records.
+Do not reproduce the artifact summary or add unsupported conclusions.
 
-## Preserve Original Representation
+During ordinary curation, preserve unrelated existing index content. Use the backend's cheapest safe update mechanism; do not rewrite unrelated records merely to add one entry.
 
-Preserve source format by default:
+---
 
-```text
-PDF      -> PDF
-Markdown -> Markdown
-image    -> image
-```
+# Knowledge Admission
 
-Moving or renaming evidence must not silently alter substantive source content.
+`knowledge/` contains practical current understanding for human and agent use.
 
-Do not automatically convert PDFs, images, or other original artifacts into Markdown. A derived note may be created only when it has independent durable value and appears in the approved proposal.
-
-Evidence is historical material. Correct its content only when explicitly requested or when an objective capture error is identified and approved.
-
-## Retrieval Design
-
-Evidence is intentionally stored so future agents can recover it through several independent signals:
-
-```text
-domain index records
-domain/subdomain paths
-date-prefixed filenames
-descriptive filenames
-full-text search where supported
-Git history when historical context matters
-```
-
-Retrieval is guidance, not a rigid protocol.
-
-When asked to find remembered evidence, use any efficient combination of:
-
-- searching one likely domain index;
-- searching all `evidence/*/index.md` files;
-- filtering paths or filenames by remembered date, domain, subdomain, or words;
-- grepping/searching text-searchable evidence contents;
-- inspecting likely candidate artifacts;
-- broadening terms, synonyms, or date ranges when the first search is insufficient;
-- using Git when the question is about when, why, or where something moved or changed.
-
-Prefer cheap narrowing before opening many artifacts, but do not require one fixed search order.
-
-The indexes are especially valuable for binary or poorly text-searchable evidence because every curated artifact still receives a compact textual discovery surface.
-
-# Knowledge Admission and Synthesis
-
-Before creating a knowledge document, search existing knowledge.
+Its purpose is to reduce the need to repeatedly read many evidence artifacts.
 
 Ask:
 
-> Does an existing canonical page already own this concept well enough to absorb the new understanding coherently?
+> Would preserving this understanding save meaningful future reading, reconstruction, or decision effort?
 
-Prefer updating that page when yes.
+Good knowledge candidates include:
 
-Create a new page only when the material establishes a distinct durable conceptual scope that would make an existing page incoherent, overly broad, or hard to maintain.
+- current strategies;
+- durable preferences;
+- recurring rules;
+- useful comparisons;
+- important constraints;
+- current plans;
+- stable relationships between facts;
+- conclusions supported across evidence;
+- reusable decision frameworks;
+- practical guidance derived from accumulated evidence.
 
-Do not create a knowledge page merely because:
+Keep information only in evidence when it is primarily historical detail, source-specific wording, a one-off event, low-value chronology, supporting detail unlikely to matter independently, superseded understanding useful only as history, or material already easy to retrieve from evidence when needed.
 
-- a new evidence file exists;
-- the source has a convenient title;
-- it came from a separate conversation/research session;
-- creating another file is easier than synthesizing into an existing one.
+A useful test:
+
+```text
+Would I reasonably want to open a knowledge page for this later?
+
+Yes → consider knowledge
+No  → evidence may be sufficient
+```
+
+---
+
+# Canonical Knowledge Ownership
 
 Each durable concept should have one primary canonical home.
 
-## Maintain Current Understanding
+Before creating a knowledge page:
 
-Canonical knowledge answers:
+1. read `knowledge/index.md` unless the relevant canonical page is already known;
+2. identify the most likely existing page;
+3. read that page;
+4. update it when the new understanding fits its scope coherently;
+5. create a new page only when the concept deserves an independently useful reading surface.
 
-> What should a future human or agent understand now?
+Prefer improving an existing page over creating another related page.
 
-When understanding changes:
+A new page is justified when:
 
-- rewrite affected explanations;
-- remove or replace stale conclusions;
-- consolidate duplicated statements;
-- preserve material uncertainty honestly;
-- keep limiting/contradictory evidence visible when it still affects interpretation;
-- rely on Git for historical versions.
+- the subject is likely to be searched or browsed independently;
+- it has enough durable substance to be useful on its own;
+- placing it elsewhere would make another page confusing or overly broad;
+- it represents a distinct practical concept rather than merely a new source or event.
 
-Do not append `Update`, `Latest`, `Revision`, or dated-history sections merely to preserve old beliefs that Git already retains.
+Do not create pages according to conversation boundaries, evidence filenames, dates, or source documents.
 
-## Distill Evidence
+---
 
-Use this flow:
+# Knowledge Filenames
+
+Knowledge filenames describe durable concepts.
+
+Use stable lowercase kebab-case names without date prefixes.
+
+Examples:
 
 ```text
-preserved evidence
-      ↓
-understanding
-      ↓
-durable current conclusion
-      ↓
-canonical knowledge page
+credit-card-payment-strategy.md
+investment-strategy.md
+housing-strategy.md
+career-development.md
 ```
 
-Persist conclusions, not the reasoning transcript.
+Choose filenames that help a human predict:
 
-A new evidence item may legitimately produce **no knowledge change**. Preserve the evidence and record that outcome in the curation commit rather than manufacturing a conclusion.
+> “This is probably the page I want to read.”
 
-## Contradiction and Uncertainty
+Prefer familiar, literal terms over abstract taxonomy.
 
-Do not silently choose between materially conflicting evidence.
+Do not use dates, temporary states, source names, or suffixes such as `v2`, `new`, or `latest` for ordinary canonical knowledge.
 
-Surface important conflict in the proposal. After approval, canonical knowledge should accurately reflect the current state, such as:
+---
 
-- evidence is mixed;
-- a conclusion applies only under stated conditions;
-- one source limits another;
-- the current interpretation remains uncertain.
+# Knowledge Synthesis
 
-Do not create a separate hypothesis subsystem for ordinary uncertainty.
+Knowledge answers:
+
+> **What is useful to understand now?**
+
+Synthesize across relevant approved evidence rather than summarizing each evidence artifact separately.
+
+The agent should:
+
+1. identify the current useful conclusions;
+2. combine compatible evidence;
+3. remove duplication;
+4. replace stale understanding;
+5. preserve important conditions and exceptions;
+6. preserve uncertainty when it still matters;
+7. keep only reasoning necessary to understand or apply the conclusion;
+8. link back to evidence when deeper detail, chronology, or source verification may be useful.
+
+Knowledge should favor practical understanding over historical completeness.
+
+## Updating Existing Knowledge
+
+Prefer:
+
+```text
+old understanding
+        +
+new evidence
+        ↓
+rewritten current understanding
+```
+
+rather than stacking dated updates.
+
+Remove or rewrite statements that are no longer current.
+
+Keep historical context in knowledge only when that history materially helps explain the current situation.
+
+## Level of Detail
+
+Include details when they materially affect a decision, action, interpretation, important exception, comparison, future planning, or understanding of why a conclusion matters.
+
+Leave deeper source detail in evidence.
+
+Useful division:
+
+```text
+knowledge
+→ conclusions
+→ practical rules
+→ current plans
+→ important conditions
+→ essential rationale
+
+evidence
+→ chronological records
+→ source-specific details
+→ supporting facts
+→ research depth
+→ historical versions
+→ provenance
+```
+
+## Reasoning in Knowledge
+
+Preserve reasoning when it materially improves future judgment, such as why one option is preferred, why an exception exists, what trade-off drives a decision, or what assumption a strategy depends on.
+
+Compress procedural or reconstructable reasoning.
+
+Do not preserve long exploratory chains or abandoned alternatives unless they remain useful to future decisions.
+
+## New Evidence That Does Not Change Knowledge
+
+New evidence may simply reinforce what is already known.
+
+When the canonical page already expresses the useful current understanding accurately, leave the prose unchanged. Add or refresh the evidence relationship only when useful.
+
+## Conflicting Evidence
+
+When approved evidence conflicts:
+
+1. determine whether one record clearly supersedes another;
+2. update current knowledge when newer or stronger evidence resolves the issue;
+3. preserve material unresolved conflict when it remains genuinely unresolved;
+4. keep the underlying records in evidence regardless.
+
+Do not turn disagreement into false certainty.
+
+## Knowledge Page Scope
+
+Each knowledge page should have one coherent practical scope.
+
+A page is too broad when unrelated subjects accumulate, readers cannot predict what belongs there, or sections are independently useful and commonly retrieved separately.
+
+A page is too narrow when it contains only one minor fact or one evidence artifact and naturally belongs inside another page.
+
+Prefer one useful medium-sized canonical page over many tiny pages.
 
 ---
 
 # Knowledge Markdown Contract
 
-Every canonical file under `knowledge-base/knowledge/`, except `index.md`, must be Markdown with minimal frontmatter:
+Every canonical knowledge page except `knowledge/index.md` uses minimal frontmatter:
 
 ```markdown
 ---
 title: [Knowledge Title]
-description: [One sentence defining the document's canonical knowledge boundary.]
+description: [One sentence defining what useful understanding belongs on this page.]
 updated: YYYY-MM-DD
 ---
 ```
 
 Required fields are exactly:
 
-- `title`
-- `description`
-- `updated`
-
-Do not add mandatory metadata without demonstrated need and human approval.
-
-Change `updated` only when durable meaning changes, not for formatting-only edits.
-
-## File Names
-
-Use stable lowercase kebab-case concept names without date prefixes:
-
 ```text
-agent-memory.md
-knowledge-evolution.md
-software-maintainability.md
+title
+description
+updated
 ```
 
-Git owns historical versions. Do not create `v2`, `latest`, or dated duplicates for ordinary evolution.
+Keep metadata minimal.
 
-## Writing Shape
+Change `updated` only when durable meaning changes.
 
-A knowledge document has one coherent durable scope and must be understandable without the old conversation.
+## Default Page Shape
 
-Use only sections that help the topic. A common shape is:
+Use this when it fits:
 
 ```markdown
-# [Title]
+---
+title: [Title]
+description: [Canonical scope.]
+updated: YYYY-MM-DD
+---
+
+# Title
 
 ## Read First
 
-- [highest-signal current conclusion]
-- [important condition or boundary]
+- Highest-value current conclusion.
+- Important practical rule, constraint, or exception.
 
 ## [Topic-specific sections]
 
-[Current synthesized understanding.]
+Current useful understanding.
 
 ## Evidence
 
-### Supporting
-
 - [Evidence title](relative/path)
-  - [What this evidence materially supports.]
-
-### Limiting or Contradictory
-
-- [Evidence title](relative/path)
-  - [What it limits, contradicts, or qualifies.]
+  - What this evidence materially supports or clarifies.
 ```
 
-`Read First` is recommended for substantial pages but optional when it adds no value.
+This is a default, not a mandatory template.
 
-`## Evidence` is required whenever a page contains evidence-derived knowledge; in normal curated knowledge this should almost always be present.
+## Read First
 
-## Evidence Section Rules
+`## Read First` is the fast-reading surface.
 
-The section represents evidence relevant to the **current** knowledge, not every source that ever touched the page.
+It should contain the smallest set of points that gives the reader a useful mental model of the page.
 
-For each listed artifact:
+Prefer current conclusions, practical rules, important preferences or decisions, major constraints, and consequential exceptions.
 
-- use a working relative link to preserved evidence;
-- explain why it matters;
-- distinguish supporting from limiting/contradictory evidence when useful;
-- avoid a flat bibliography with no semantic relationship;
-- remove evidence that no longer materially supports or limits current understanding; Git preserves historical relationships.
+Keep it short and avoid duplicating the entire page.
 
-For especially important or disputed claims, evidence may also be linked near the claim. Do not require inline citations for every sentence.
+## Body Structure
 
-## Writing Rules
+Choose headings based on the subject.
 
-- Prefer rewriting over appending.
-- Replace obsolete explanations instead of stacking updates underneath them.
-- Collapse duplication.
-- Keep the first screen scannable.
-- Use plain language and explicit relationships.
-- Preserve meaningful conditions and boundaries.
-- Do not copy entire evidence artifacts into knowledge.
-- Do not turn knowledge into a transcript, research diary, or chronology.
-- Do not let stored evidence silently become canonical truth.
-- Do not expand ordinary curation into an audit of unrelated knowledge.
+Prefer headings such as:
+
+```text
+Current Strategy
+Payment Routing
+Important Exceptions
+Housing Options
+Decision Criteria
+Current Plan
+Trade-offs
+What to Watch
+```
+
+Avoid generic headings such as `Background`, `Overview`, `Details`, `Miscellaneous`, or `Additional Notes` unless they genuinely describe the content well.
+
+Organize the page around how a future reader is likely to use the information.
+
+## Knowledge Writing Quality
+
+Write for fast human reading first and reliable agent retrieval second.
+
+Prefer:
+
+- direct, literal language;
+- the useful conclusion before supporting explanation;
+- short paragraphs;
+- bullets for rules, preferences, conditions, and parallel facts;
+- tables when comparisons or structured choices are materially easier to scan;
+- explicit numbers, dates, thresholds, and conditions when they affect decisions;
+- concise reasoning when it explains a non-obvious conclusion;
+- clear distinction between confirmed understanding and uncertainty.
+
+Compress repeated facts, source-by-source narration, obsolete chronology, exploratory reasoning, and redundant explanations.
+
+Preserve current conclusions, material rationale, important conditions, uncertainty, trade-offs, reusable rules, and details that change what the reader should do or understand.
+
+## Evidence Section
+
+Include `## Evidence` when the page contains understanding derived from KB evidence.
+
+The purpose is traceability, not citation density.
+
+List evidence that materially supports, qualifies, or contradicts the current page. Explain briefly why each item matters.
+
+Do not list every evidence artifact that merely mentions the topic.
+
+Use `### Supporting` and `### Limiting or Contradictory` only when those distinctions materially help.
+
+## Current Understanding, Not Change Log
+
+Canonical knowledge pages describe the current useful state.
+
+Prefer rewriting the relevant section when understanding changes.
+
+Avoid accumulating `Update`, `Latest Update`, `Revision`, or date-stamped appendices unless the history itself is useful to the concept.
+
+Evidence already preserves chronology.
+
+Knowledge should remain readable as though it had been written correctly in its current form from the beginning.
 
 ---
 
-# Knowledge Index Contract
-
-`knowledge-base/knowledge/index.md` is mandatory.
-
-It is the maintained human-and-agent map of **canonical knowledge**, not an evidence catalog.
-
-Every canonical knowledge document must be reachable from the index.
-
-Use intuitive topical grouping and one-line descriptions:
-
-```markdown
 # Knowledge Index
 
-## AI
-
-### Agents
-
-- [Agent Memory](ai/agents/agent-memory.md)
-  How agents preserve and use information across executions.
-
-- [Knowledge Evolution](ai/agents/knowledge-evolution.md)
-  How evidence is synthesized into maintained knowledge and improved capability.
-```
-
-Update the knowledge index in the same approved operation whenever a knowledge document is created, renamed, moved, merged, deleted, or materially rescoped.
-
-Do not list individual evidence artifacts in `knowledge/index.md`. Evidence discovery belongs in `evidence/<domain>/index.md`.
-
-The knowledge index should support progressive discovery:
+Maintain:
 
 ```text
-broad topic -> canonical knowledge page -> underlying evidence when needed
+knowledge/index.md
 ```
 
-# Apply an Approved Curation
+as the primary navigation map for canonical knowledge.
 
-After explicit approval:
+Its purpose is to help a human or agent quickly identify which knowledge page is likely to contain the useful current understanding they need.
 
-1. Re-check repository status before writing.
-2. Confirm approved targets have not materially changed since review.
-3. Confirm the approved evidence domain/subdomain path still fits the current directory structure.
-4. Move/rename inbox material into the approved evidence location while preserving source content.
-5. Ensure the corresponding `evidence/<domain>/index.md` exists; create it only if this is the first evidence in a new domain.
-6. Append exactly the approved one-line discovery record using append semantics. Do not rewrite an existing domain index merely to add the record.
-7. Create or rewrite approved knowledge pages.
-8. Update affected `## Evidence` sections to express approved provenance relationships.
-9. Repair directly affected knowledge links.
-10. Update `knowledge/index.md` when required.
-11. Ensure successfully curated items no longer remain in `inbox/` as pending copies.
-12. Review the diff for scope, correctness, accidental bloat, and append-only index behavior.
-13. Run the verification contract below.
-14. Stage only approved `knowledge-base/**` changes from this operation.
-15. Create one isolated commit using the required commit contract.
-16. Verify the commit matches the approved proposal and unrelated work remains untouched.
-17. Report the commit identifier and concise result. Do not push.
+The index should answer:
 
-If final inspection shows that an approved semantic change is no longer justified, do not silently substitute another. Return to proposal/discussion when the difference is material.
+> Which page should I open?
 
-If execution requires a materially different evidence domain/subdomain, a different discovery description, or a non-append rewrite of an existing domain index, treat that as a proposal change rather than silently expanding the operation.
+It should not attempt to answer the underlying subject itself.
 
-# Git Safety and Isolation
+Group knowledge pages under intuitive topical headings when that improves browsing.
 
-Git history is the durable curation ledger, so commit quality is part of KB quality.
+Example:
 
-## Hard Rules
+```markdown
+# Knowledge
 
-- Never include files outside `knowledge-base/**` in a KB commit.
-- Never mix unrelated application/project work into a KB commit.
-- Never mix unrelated pre-existing KB changes into the current operation.
-- Never reset, clean, discard, rewrite, or otherwise disturb unrelated work to obtain a clean commit.
-- Do not amend or rewrite previous KB commits unless explicitly requested.
-- Never push as part of this skill.
+## Finance
 
-Before writing or staging, inspect repository status.
+- [Credit Card Payment Strategy](finance/credit-card-payment-strategy.md) — Current routing between cards for local, overseas, recurring, excluded, and special payment categories.
+- [Investment Strategy](finance/investment-strategy.md) — Portfolio structure, allocation principles, DCA approach, and current investment preferences.
+```
 
-If an approved target already has uncommitted changes that cannot be safely attributed to this operation, stop rather than overwrite or combine work.
+Use the smallest hierarchy that keeps navigation clear.
 
-If pre-staged or unrelated changes make an isolated KB-only commit unsafe, stop and ask rather than manipulating unrelated repository state.
+Every canonical knowledge page should have exactly one primary entry in `knowledge/index.md`.
 
-Use path-scoped staging/committing only when it reliably preserves unrelated work untouched.
+Each entry contains page title, relative link, and a short scope description.
+
+Describe page scope, not page contents.
+
+Update the index automatically when curation changes canonical knowledge structure: creation, rename/move, material rescope, merge, removal, or meaningful topical regrouping.
+
+Do not change the index merely because an existing page's contents changed while its scope remained the same.
+
+Do not list evidence, inbox artifacts, source archive files, workflow files, or backend adapters in `knowledge/index.md`.
 
 ---
 
-# Commit Contract
+# Retrieval
 
-The **proposal is temporary**. The **commit is the permanent ledger entry** describing what was actually executed.
+Retrieval should be question-driven, progressive, and economical.
 
-## Titles
+Use indexes and structure to narrow before opening detailed files.
 
-Use:
+Do not scan the entire knowledge base when a small number of targeted reads can answer the question.
 
-```text
-kb(curate): <short searchable description>
-kb(maintain): <short searchable description>
-kb(capture): <short searchable description>
-kb(init): initialize knowledge base
-```
-
-## Curation Body
-
-Use this structure:
+Main retrieval surfaces:
 
 ```text
-Input:
-- knowledge-base/inbox/<original-name>
-
-Evidence:
-- moved to knowledge-base/evidence/<domain>/<subdomain>/<final-path>
-
-Evidence Index:
-- appended one record to knowledge-base/evidence/<domain>/index.md
-  - <short retrieval description>
-- or created knowledge-base/evidence/<domain>/index.md with first record
-
-Knowledge:
-- updated knowledge-base/knowledge/<page>.md
-  - <durable conclusion added, changed, limited, or removed>
-  - <provenance relationship added/changed>
-
-- created knowledge-base/knowledge/<page>.md
-  - <canonical scope introduced>
-
-Knowledge Index:
-- <entries changed, or no change>
-
-Outcome:
-- <outcome token>
-
-Rationale:
-- <why knowledge changed or intentionally did not change>
-- <why a new page was or was not justified>
-- <material structural rationale when useful>
-
-Approval:
-- explicit human approval obtained before curation
+knowledge/index.md
+evidence/index.md
+evidence/<domain>/index.md
+knowledge/<page>.md
+evidence/<domain>/<subdomain>/.../<artifact>.md
+source-archive/
 ```
 
-The body must be rich enough for a future agent to understand the semantic transaction without relying only on filenames.
+## Current Understanding
 
-Always include the original inbox path, final evidence path, and affected evidence domain index so the artifact remains searchable after it moves.
+For questions about what should currently be understood, start with `knowledge/index.md` unless the relevant canonical page is already known.
 
-## Outcome Tokens
-
-Use one or more as applicable:
+Preferred path:
 
 ```text
-evidence-only
-knowledge-created
-knowledge-updated
-knowledge-created-and-updated
-knowledge-restructured
+knowledge/index.md
+      ↓
+likely canonical knowledge page
+      ↓
+relevant section
+      ↓
+evidence only when more detail is needed
 ```
 
-For evidence-only curation, make the deliberate no-change result explicit:
+Do not routinely reread supporting evidence when the canonical page already answers adequately.
+
+## Evidence and Historical Questions
+
+For questions about what was recorded, researched, observed, or decided at a particular point, start from evidence structure.
+
+Preferred path:
 
 ```text
-Outcome:
-- evidence-only
-
-Rationale:
-- evaluated against relevant existing knowledge
-- no material new, contradictory, limiting, or refining conclusion identified
+evidence/index.md
+      ↓
+likely domain
+      ↓
+evidence/<domain>/index.md
+      ↓
+likely dated artifact
+      ↓
+actual evidence Markdown
 ```
 
-This distinguishes `considered and unchanged` from `forgotten or unprocessed`.
+When the likely domain is already obvious, go directly to its domain index.
 
-## Maintenance Body
+An index entry is a discovery aid, not a substitute for evidence itself.
 
-For approved organization/consolidation not driven by a specific inbox item:
+## Mixed Questions
+
+When a question needs both current understanding and historical grounding, start with the surface that best matches the main question.
+
+Usually:
 
 ```text
-Scope:
-- <affected KB paths or topic>
-
-Evidence:
-- <moves/renames, or no change>
-
-Evidence Index:
-- <records repaired/rewritten, domain indexes affected, or no change>
-
-Knowledge:
-- <merged/split/rewritten/moved pages and semantic reason>
-
-Knowledge Index:
-- <changes, or no change>
-
-Outcome:
-- knowledge-restructured
-
-Rationale:
-- <why this reduces duplication, drift, or navigation cost>
-
-Approval:
-- explicit human approval obtained before maintenance
+knowledge page
+      ↓
+its relevant evidence references
+      ↓
+additional domain-index retrieval only if needed
 ```
 
-The Git diff is stronger authority than commit prose if they ever disagree.
+Prefer explicit evidence relationships from the knowledge page before broader search.
+
+## Original Sources
+
+Use `source-archive/` when exact original representation matters.
+
+Preferred path:
+
+```text
+knowledge or evidence
+      ↓
+evidence provenance
+      ↓
+source-archive/
+```
+
+Do not use source archive as the normal starting point for substantive retrieval.
+
+## Workflow-State Retrieval
+
+Use inbox folders when the human explicitly asks about pending KB work:
+
+```text
+inbox/raw/       → unprepared sources
+inbox/review/    → authored evidence awaiting approval
+inbox/approved/  → approved evidence awaiting curation
+```
+
+Do not use raw or review material as canonical knowledge for ordinary substantive answers.
+
+## Progressive Retrieval
+
+Increase retrieval depth only as the question requires:
+
+```text
+index
+  ↓
+likely page or domain index
+  ↓
+relevant artifact
+  ↓
+related evidence
+  ↓
+original source
+```
+
+Stop once enough authoritative information has been found to answer well.
+
+Exploit known verified paths; indexes are navigation aids, not ritual hops.
+
+Do not add embeddings, vector databases, generated catalogs, sidecar databases, or duplicate retrieval registries unless repeated real use demonstrates that the human-readable system is materially insufficient.
+
+---
 
 # Traceability
 
-When asked why knowledge says something, move from current provenance toward deeper history only as needed.
+Knowledge pages should expose evidence relevant to their current claims.
 
-## Evidence Retrieval
+The `## Evidence` section represents current supporting, limiting, or contradictory evidence, not every source that ever touched the page.
 
-When the user remembers a prior discussion, source, report, or artifact rather than a canonical knowledge page, search evidence directly.
+For each listed artifact, identify the evidence and explain briefly why it matters.
 
-Useful search surfaces include:
+For especially important or disputed claims, evidence may also be referenced near the claim when useful.
 
-```text
-evidence/<domain>/index.md
-evidence paths and filenames
-date prefixes
-evidence contents
-Git history
-```
+Do not require inline citation on every sentence.
 
-Examples of useful strategies:
+Historical revision traceability depends on the selected backend. The core workflow guarantees evidence provenance and current relationships; it does not invent a revision ledger when the backend does not provide one.
 
-```text
-remembered topic/entity
-    -> grep likely domain index or all domain indexes
+---
 
-remembered approximate date
-    -> filter YYYY-MM or nearby date-prefixed paths
+# Knowledge Base Maintenance
 
-remembered exact/distinctive phrase
-    -> grep text-searchable evidence contents
+`maintain the knowledge base` keeps the permanent KB coherent, navigable, and consistent over time.
 
-remembered broad area
-    -> narrow to domain/subdomain before wider search
+Maintenance is primarily an automated housekeeping operation.
 
-uncertain memory
-    -> combine index, filename, content, and date searches
-```
+When explicitly invoked, inspect the relevant KB structure, identify meaningful problems, make clear low-risk corrections, verify resulting state proportionately, and report the outcome concisely.
 
-These are suggestions, not a mandatory sequence. A retrieval agent may use better repository tools when available.
+Do not require the human to approve routine repairs individually.
 
-Verify likely candidates by opening enough of the actual evidence to confirm that it matches the user's request. Do not treat an index description as a substitute for the source itself.
+Ask only when the correct durable outcome is materially ambiguous, would discard information, substantively rewrite approved evidence, or substantially restructure the knowledge base.
 
-## Current Provenance
+## Maintenance Scope
 
-Start with the knowledge page's `## Evidence` section.
+Maintenance may inspect and repair:
 
-Answer:
+### Knowledge
 
-> What evidence currently supports, limits, or contradicts this understanding?
-
-Follow linked evidence artifacts when necessary.
-
-## Historical Provenance
-
-When asked when or why a conclusion was introduced, changed, or removed:
-
-1. identify the knowledge file/section;
-2. inspect path-limited Git history;
-3. use blame/history to find the relevant changing commit when useful;
-4. read its structured KB commit body;
-5. inspect the exact diff;
-6. follow the preserved evidence path from the commit or knowledge file.
-
-Intended trace:
-
-```text
-current knowledge claim
-      │
-      ├── ## Evidence ───────> preserved evidence
-      │
-      └── Git history/blame ─> curation commit
-                                  │
-                                  ├── semantic rationale
-                                  ├── evidence placement/index
-                                  ├── other knowledge affected
-                                  └── exact diff
-```
-
-Do not invent missing provenance. If repository evidence cannot establish why a claim exists, say so.
-
-## Cross-KB Questions
-
-To find which knowledge pages use an evidence artifact, search knowledge Markdown for links to its path.
-
-To find evidence by topic, date, filename, remembered wording, or domain, use the evidence retrieval surfaces above.
-
-To find which curation introduced an artifact or changed a page, search Git commit bodies and path history.
-
-Do not add a database merely because a relational question is possible. Add a richer derived query layer only after recurring evidence shows that domain indexes, filesystem/content search, and Git are insufficient.
-
-# Maintenance and Autonomous Organization
-
-The agent is responsible for keeping the KB navigable and compact, but all mutating maintenance remains proposal-gated.
-
-Maintenance may identify:
-
-- duplicate/overlapping knowledge pages;
+- duplicate or overlapping canonical pages;
 - incoherent page scope;
 - stale current conclusions;
-- broken evidence links;
-- canonical pages missing from the knowledge index;
-- stale knowledge-index descriptions;
-- evidence outside the mandatory domain/subdomain path contract;
-- duplicate or near-duplicate domain/subdomain categories;
-- inconsistent evidence naming;
-- poor evidence placement;
-- unnecessary directory proliferation;
-- missing, duplicate, malformed, or stale domain evidence-index records;
-- evidence-domain indexes containing paths that no longer resolve;
-- ordinary curation that previously rewrote/sorted an index instead of appending;
+- obsolete sections left after newer understanding replaced them;
+- pages that clearly should be merged or split;
 - orphaned knowledge pages;
-- Evidence sections that no longer reflect current support;
+- stale or broken evidence references;
+- knowledge pages missing from `knowledge/index.md`;
+- stale knowledge-index descriptions;
 - multiple canonical homes for the same durable concept.
 
-Prefer the smallest coherent correction:
+### Evidence
 
-```text
-duplicate knowledge        -> merge into one canonical page
-oversized mixed scope      -> split only when scopes are genuinely distinct
-stale conclusion           -> rewrite current knowledge
-bad evidence location      -> move/rename and repair links/index record
-category drift             -> consolidate only affected domain/subdomain paths
-broken evidence index      -> rewrite only the affected domain index
-broken knowledge index     -> repair in the same change
-```
+- evidence under an unsuitable domain or subdomain;
+- inconsistent filenames;
+- duplicate or near-duplicate folder structure;
+- unnecessary directory depth;
+- missing or broken provenance paths;
+- evidence missing from its domain index;
+- duplicate or stale evidence-index records;
+- domains missing from `evidence/index.md`;
+- stale domain descriptions.
 
-Evidence-domain indexes are append-only during ordinary curation but **may be rewritten during approved maintenance** when repair requires it.
+### Workflow State
 
-Do not preserve obsolete structure merely because it existed historically; Git preserves history.
+- approved evidence already curated but still remaining in `approved/`;
+- raw sources that should already have moved to `source-archive/`;
+- review artifacts duplicated across workflow states;
+- incomplete mechanical workflow transitions.
 
-Do not reorganize the whole KB during ordinary curation. Broader reorganization requires its own maintenance proposal with affected paths, evidence-index consequences, knowledge consequences, provenance effects, and knowledge-index impact.
+Maintenance must not treat unresolved `raw/` or `review/` material as approved evidence.
 
-# Verification Contract
+## Maintenance Principles
 
-Before every mutating commit, verify:
+Prefer the smallest correction that restores a clear structure.
 
-## Boundary
+Improve existing organization before introducing new structure.
 
-- every changed/staged path is under `knowledge-base/`;
-- any `docs/` consulted for project context remained read-only;
-- no `project-context.md` or equivalent summary layer was created by default;
-- no unrelated repository work is included;
-- no unrelated pre-existing KB work is included.
+Do not redesign unrelated parts of the KB merely because maintenance is running.
 
-## Inbox
+Permanent evidence remains preserved; maintenance may move, rename, or repair mechanical links and indexes without substantively rewriting approved evidence.
 
-- every processed item in scope has left `inbox/`;
-- no unapproved inbox item was altered;
-- no partially curated state remains.
+Knowledge is current understanding and may be rewritten, consolidated, merged, or split when that clearly improves canonical structure.
+
+If the human asks for a general health pass, use `knowledge/index.md` and `evidence/index.md` as the main maps and inspect deeper files only where necessary.
+
+---
+
+# Human Readability
+
+Optimize permanent Markdown for humans as well as agents.
+
+Prefer:
+
+- understandable folder names;
+- shallow useful hierarchy;
+- descriptive dated evidence filenames;
+- stable concept-oriented knowledge filenames;
+- concise headings;
+- scannable lists;
+- well-designed tables;
+- compact practical knowledge pages;
+- evidence that preserves necessary detail without source noise.
+
+Do not introduce complex schemas merely because they are technically possible.
+
+---
+
+# Privacy and Information Security
+
+PII is not categorically excluded.
 
 ## Evidence
 
-- every newly curated artifact is under `evidence/<domain>/<subdomain>/...`;
-- no curated artifact was placed directly in `evidence/` or directly in `evidence/<domain>/`;
-- final paths match the approved proposal;
-- existing sensible domains/subdomains were reused where appropriate;
-- new filenames follow the convention;
-- source format is preserved unless conversion was explicitly approved;
-- substantive source content was not silently rewritten;
-- moves/renames have not broken directly affected links.
+Preserve PII when it is substantively part of the record and removing it would reduce fidelity, retrieval value, or practical usefulness.
 
-## Evidence Index
-
-For each newly curated evidence artifact:
-
-- exactly one discovery record exists in `evidence/<domain>/index.md`;
-- no subdomain index or global `evidence/index.md` was created for ordinary discovery;
-- the record is one physical line;
-- the date, subdomain/deeper path, title, and relative link are correct;
-- the description is concise and retrieval-oriented rather than a full summary;
-- the linked evidence path resolves;
-- ordinary curation changed an existing domain index only by appending the approved record;
-- existing records were not sorted, reformatted, regenerated, or rewritten merely to add the new record;
-- if the domain was new, its index contains only the concise heading and valid records.
+Avoid sensitive values that have no plausible future value.
 
 ## Knowledge
 
-- created/updated canonical files are Markdown;
-- required frontmatter is present and accurate;
-- each page has one coherent scope;
-- existing knowledge was improved rather than duplicated where appropriate;
-- stale superseded wording was removed rather than layered underneath;
-- material uncertainty remains honest;
-- `## Evidence` links resolve and explain why each artifact matters;
-- limiting/contradictory evidence remains visible when relevant.
+Prefer minimizing or abstracting PII when identity itself is not important.
 
-## Knowledge Index
+Retain it when identity materially improves correctness or usefulness.
 
-- every canonical knowledge page is reachable from `knowledge/index.md`;
-- created/moved/merged/rescoped pages are represented correctly;
-- descriptions match current scope;
-- removed pages leave no stale index links;
-- individual evidence artifacts were not added to the knowledge index.
+## High-Exposure Surfaces
 
-## Git Record
+Minimize PII more strongly in filenames, folder names, index descriptions, and high-level summaries.
 
-- staged diff matches the approved operation;
-- commit body names original inbox and final evidence paths for curation;
-- commit body names the affected evidence domain index;
-- semantic knowledge changes are described, not just filenames;
-- rationale explains material decisions and evidence-only outcomes;
-- approval is recorded when required;
-- one isolated KB-only commit succeeds;
-- the final commit contains no path outside `knowledge-base/`.
+## Credentials and Secrets
 
-After commit, report the commit identifier and concise summary. Do not push.
+Never preserve passwords, authentication tokens, recovery codes, private keys, API secrets, or live credentials.
+
+Do not use a personal knowledge base to bypass employer information-security restrictions.
+
+If supplied material appears likely to contain customer data, restricted internal information, security-sensitive material, live credentials, or other information that should not leave its source environment, do not encourage transfer into another environment.
+
+---
+
+# Verification
+
+Verification should provide confidence without materially slowing ordinary KB operations.
+
+Use the **cheapest verification that establishes the intended result**.
+
+Do not perform a full KB audit after routine mutations.
+
+## Routine Mutations
+
+For low-risk operations such as creating a review artifact, moving review evidence to approved, moving approved evidence into permanent evidence, adding a straightforward index entry, updating one knowledge page, or archiving one raw source, verify only the directly affected result.
+
+Examples:
+
+```text
+create file
+→ trust a successful mutation result when it identifies the created target
+
+move file
+→ trust the returned final location when sufficient
+
+edit file
+→ confirm the write succeeded
+
+index update
+→ confirm the expected entry exists when the mutation result alone is insufficient
+```
+
+Avoid rereading complete files when the mutation response already establishes success.
+
+## Compound Curation
+
+When one operation changes several connected surfaces, prefer completing the coherent transaction and then checking resulting state once per changed surface.
+
+Avoid repeated `write → read → write → read` cycles unless a later write depends on the read-back.
+
+## Higher-Risk Changes
+
+Use stronger verification when an operation replaces substantial existing content, merges or splits knowledge pages, moves many files, restructures evidence domains, rewrites a large index, deletes information, or repairs inconsistent state.
+
+Verify enough to ensure unrelated information was not lost or changed.
+
+## Minimum Completion Check
+
+Before reporting a routine operation as complete, establish only that:
+
+1. the intended artifact exists in the intended workflow or permanent location;
+2. any directly required index or knowledge update succeeded;
+3. no known partial workflow transition remains.
+
+Backend adapters may add a small integrity check when the storage mechanism itself can transform content.
+
+Verification is a safeguard, not an audit.
+
+## Mutation Reporting
+
+After creating, editing, moving, renaming, or deleting KB artifacts, report the exact resolved location or locations changed as a cheap human observability check.
+
+For a filesystem backend, report the resolved absolute filesystem path.
+
+For a non-filesystem backend, report the concrete backend location as precisely as the runtime permits, including the KB root and conceptual path when useful. Example:
+
+```text
+Google Drive → OCBC Knowledge Base → inbox/review/2026-09-30--example.md
+```
+
+Do not turn this into a broader verification pass. The purpose is to let the human immediately notice if the workflow touched the wrong KB or path.
+
+---
+
+# Failure Rules
+
+Stop or narrow the operation when:
+
+- the active KB root cannot be identified reliably;
+- the selected backend cannot be resolved or its adapter is unavailable;
+- an operation would leave the active root without explicit source-only authorization;
+- an operation would overwrite unrelated material;
+- a source cannot be read faithfully enough to author evidence;
+- an approved artifact appears corrupted or materially incomplete;
+- required provenance cannot be resolved without guessing when that provenance materially matters;
+- the runtime cannot safely perform the required storage mutation;
+- the requested operation violates the security model.
+
+Prefer partial safe completion over speculative mutation.
+
+Never silently expand scope.
+
+Never claim persistence, movement, deletion, or modification succeeded unless the available mutation result or targeted verification establishes it.
+
+---
 
 # Non-Negotiables
 
-- This skill owns only `knowledge-base/**`.
-- Use relevant `docs/` as read-only project context when it materially helps KB judgment; do not duplicate project docs into the KB by default.
-- Read the smallest relevant project-doc set; do not sweep `docs/` merely because KB work is occurring.
-- Do not create `knowledge-base/project-context.md` or another project-context surrogate by default.
-- `docs/` and verified repository state remain authoritative for current project implementation and documented project decisions.
-- `inbox/` is the single unprocessed entry point.
-- Capture does not imply curation.
-- Curation and maintenance require explicit human approval before writes.
-- Evidence organization, evidence indexing, and knowledge synthesis happen in one approved curation operation.
-- An inbox item leaves `inbox/` only when its curation is complete.
-- Evidence is preserved; knowledge is revised.
-- All evidence is treated under one ingestion model; do not create special evidence classes by richness or format.
-- Preserve original evidence formats by default.
-- Every newly curated evidence artifact must live under `evidence/<domain>/<subdomain>/...`.
-- Domain and subdomain are mandatory; additional nesting is optional and should remain purposeful.
-- Reuse sensible existing domain/subdomain categories before creating new ones.
-- Every evidence domain has exactly one `evidence/<domain>/index.md`.
-- Every newly curated evidence artifact gets exactly one compact discovery record in its domain index.
-- Existing domain evidence indexes are append-only during ordinary curation.
-- Do not read/rewrite an entire domain index merely to append a normal record.
-- Do not create a global evidence index or subdomain indexes by default.
-- Evidence index records are discovery metadata; evidence files remain authoritative.
-- Do not create sidecar metadata, tag systems, per-artifact summaries, databases, or embeddings by default.
-- Canonical knowledge is Markdown only.
-- Search existing knowledge before creating new knowledge.
-- Prefer one canonical home for each durable concept.
-- Maintain `knowledge/index.md` as the map of canonical knowledge.
-- Do not put individual evidence artifacts in `knowledge/index.md`.
-- Knowledge pages expose meaningful current evidence provenance.
-- Git commits are the durable curation ledger.
-- One approved mutating operation produces one isolated KB-only commit.
-- Commit bodies must be rich enough to reconstruct the semantic transaction later.
-- Never silently expand an approved proposal into materially different changes.
-- Never touch unrelated project files or unrelated repository work.
-- Never push as part of this skill.
-- Do not let the KB become a transcript archive disguised as knowledge.
-- Do not preserve historical duplication that Git already preserves better.
+- `evidence/` and `knowledge/` are the useful permanent product.
+- Storage semantics are canonical; backend mechanics are delegated to adapters.
+- Do not assume Git or version control by default.
+- The configured root is authoritative; `*-knowledge-base` is a convention, not a requirement.
+- When an active local project is resolved from `~/.agent-core/projects.toml`, its configured `knowledge_base` value is the authoritative KB root for ordinary operations.
+- Do not infer a KB root from Git boundaries or nearby folders when the project registry provides one.
+- Normal KB operations do not modify the project registry.
+- After KB mutations, report the exact resolved location or locations changed.
+- Raw source material is not approved evidence.
+- Agent-authored capture from an already-developed conversation goes directly to review-ready Markdown.
+- Review Markdown is not approved evidence.
+- Presence in `approved/` means human-approved evidence content.
+- Approval is a state transition, not a rewrite.
+- `prepare raw inbox` operates on `raw/`.
+- `curate approved inbox` operates on `approved/` and completes routine curation automatically.
+- Original raw sources move to `source-archive/` after their approved evidence is successfully curated.
+- Source archive is provenance, not canonical evidence.
+- Evidence selection is deliberate: `0 / 1 / N`.
+- Permanent evidence is faithful, readable, dated Markdown and historically preserved in substance.
+- Knowledge is practical, current, concept-oriented, and substantially more compact than evidence.
+- Search existing knowledge before creating new canonical knowledge.
+- No substantive canonical knowledge claim comes from unapproved raw or review material.
+- `evidence/index.md` maps evidence domains.
+- Evidence domain indexes discover individual evidence artifacts.
+- `knowledge/index.md` maps canonical knowledge pages.
+- Retrieval should narrow cheaply before opening many files.
+- Known verified paths may be accessed directly; indexes are navigation aids, not ritual hops.
+- Routine curation and maintenance should be automated rather than proposal-gated.
+- Verification should be proportionate to risk and should not add unnecessary round trips.
+- Never let the KB become a transcript archive disguised as knowledge.
 
-## Final Test
+---
 
-A healthy KB lets a future human or agent answer without the old conversation:
+# Final Model
 
 ```text
-What is the project's documented current context?
-    -> relevant docs/ + repository
-
-What has not been processed?
-    -> knowledge-base/inbox/
-
-What source material was preserved?
-    -> knowledge-base/evidence/<domain>/index.md + evidence tree
-
-I remember an old discussion/source. Where is it?
-    -> domain indexes, paths/filenames, content search, and date clues
-
-What did the source actually say?
-    -> preserved evidence artifact
-
-What do we currently believe?
-    -> knowledge-base/knowledge/
-
-Where do I start browsing canonical knowledge?
-    -> knowledge-base/knowledge/index.md
-
-What evidence supports this knowledge?
-    -> the page's ## Evidence section
-
-Why did this knowledge change?
-    -> Git curation commit
-
-What exactly changed?
-    -> Git diff/history
+conversation already developed with agent
+                ↓
+           "capture this"
+                ↓
+      select + author Markdown
+                ↓
+          inbox/review/
+                ↓
+          HUMAN APPROVAL
+                ↓
+         inbox/approved/
+                ↓
+       curate approved inbox
+                ↓
+ evidence/ + indexes + useful knowledge updates
 ```
 
-The system succeeds when:
+Raw-source path:
 
-- project context comes from canonical docs rather than a duplicated KB context file;
-- evidence grows without becoming a flat dump;
-- ingestion remains deterministic and cheap;
-- every curated artifact has several independent retrieval signals;
-- retrieval agents can use whatever search strategy is most effective;
-- evidence can grow without causing knowledge to bloat;
-- current understanding remains compact and navigable;
-- humans approve canonical changes before they happen;
-- future agents can trace important conclusions back to preserved evidence and the commits that introduced them.
+```text
+PDF / image / notes / exported source
+                ↓
+           inbox/raw/
+                ↓
+         prepare raw inbox
+                ↓
+      select + author Markdown
+                ↓
+          inbox/review/
+                ↓
+          HUMAN APPROVAL
+                ↓
+         inbox/approved/
+                ↓
+       curate approved inbox
+          ↙             ↘
+ source-archive/     evidence/
+                         ↓
+                  knowledge/ when useful
+```
+
+Retrieval:
+
+```text
+current practical understanding
+    → knowledge/index.md
+    → canonical knowledge page
+    → evidence only when more detail is needed
+
+historical/source evidence
+    → evidence/index.md
+    → domain index
+    → dated evidence artifact
+    → source archive only for exact original fidelity
+```
+
+The system succeeds when noisy inputs become a knowledge base whose evidence is faithful and chronologically useful, whose knowledge is practical and easy to browse, and whose structure is cheap for both humans and agents to navigate and maintain regardless of whether the active backend is a local filesystem or Google Drive.

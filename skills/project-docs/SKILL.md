@@ -1,27 +1,102 @@
 ---
 name: project-docs
-description: Maintains durable project knowledge in docs/ and README, plus durable agent behavior in repository guidance such as AGENTS.md. Load before creating or editing those surfaces; not needed merely to read them. Distills settled, high-leverage knowledge, routes each claim to its canonical authority, rewrites stale material toward simpler current understanding, and avoids documentation bloat.
+description: Maintains durable project knowledge in the active project's configured documentation surface, plus durable agent behavior in explicitly owned project guidance. Load before creating, editing, moving, deleting, or managing those surfaces; not needed merely to read explicitly identified files. Distills settled, high-leverage knowledge, routes each claim to its canonical authority, rewrites stale material toward simpler current understanding, and avoids documentation bloat.
 disable-model-invocation: false
 ---
 
 # Project Docs
 
-Maintain durable project knowledge and agent behavior for future sessions.
+Maintain durable project knowledge and agent behavior for future sessions within the active project's configured documentation boundary.
 
 Documentation is not task state, source material, transcripts, status history, or a record of everything that happened. Preserve only settled, high-leverage knowledge and behavior that future agents should not have to rediscover or relearn.
 
-Follow the repository's existing structure and conventions. Paths in this skill describe common roles, not folders that must exist.
+Follow the active project's configured documentation surface and its established conventions. Paths in this skill describe logical roles, not filesystem locations that should be inferred from a nearby Git repository.
+
+
+## Project Registry and Documentation Surface
+
+This skill writes only to the documentation surface configured for the active project.
+
+Machine-local registry:
+
+```text
+~/.agent-core/projects.toml
+```
+
+Example:
+
+```toml
+[projects.smart-search]
+description = "OCBC Smart Search"
+root = "/home/cdsw/smart-search-workspace"
+docs = "/home/cdsw/smart-search-workspace/docs"
+tasks = "/home/cdsw/smart-search-workspace/tasks"
+knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
+```
+
+For this skill, `root` and `docs` are the relevant registry fields.
+
+Before creating, editing, moving, deleting, or otherwise managing durable project documentation:
+
+1. Read `~/.agent-core/projects.toml` when it exists.
+2. Identify the active project whose configured `root` contains the current working directory.
+3. If more than one configured root contains the current working directory, use the most specific matching root.
+4. Treat that project's exact `docs` value as the writable documentation-surface root.
+5. Perform documentation CRUD only inside that configured documentation surface unless the human explicitly identifies another owned project-guidance file for the operation.
+6. Do not choose or create another nearby `docs/` directory merely because one exists.
+7. Do not infer writable documentation ownership from Git repository boundaries.
+8. If no active project or no `docs` surface can be resolved, do not guess a writable location. Surface the missing project configuration instead.
+9. Normal documentation operations read the registry but do not modify it. Modify the registry only when the human explicitly asks to register, remove, or change a project.
+10. After creating, editing, moving, or deleting documentation files, report the exact resolved filesystem path or paths changed. This is a cheap human observability check, not a request for a broader verification pass.
+
+Within this skill, paths such as:
+
+```text
+docs/architecture.md
+docs/workflows/search.md
+```
+
+are **logical documentation paths**. The configured `docs` value is the physical filesystem root corresponding to logical `docs/`.
+
+For example:
+
+```toml
+docs = "/home/cdsw/smart-search-workspace/docs"
+```
+
+means:
+
+```text
+docs/architecture.md
+→ /home/cdsw/smart-search-workspace/docs/architecture.md
+```
+
+A project's documentation surface may be inside a Git repository, outside it, or elsewhere on the filesystem. The registry is authoritative.
+
+### README and Agent Guidance
+
+`README`, `AGENTS.md`, `CLAUDE.md`, and similar guidance files are not automatically owned merely because they exist in a nearby or nested repository.
+
+This skill may edit such files only when one of the following is true:
+
+- the file is inside the configured `docs` surface and serves that role there;
+- the human explicitly identifies the file as an owned project documentation/guidance target for the operation;
+- project configuration or established project guidance explicitly assigns that file to this project's documentation workflow.
+
+Do not silently edit README or agent-guidance files inside a nested or shared repository just because they are visible from the current working directory.
+
+The configured `docs` surface is the default writable surface. Other project surfaces may be read as context when necessary, but this skill must not silently create or mutate them.
 
 ## Core Model
 
 * **`project-docs` governs the maintenance and routing of durable project knowledge and behavioral guidance.**
 * **Docs answer:** What should future agents understand about the project?
-* **README answers:** How should someone orient themselves to the repository?
+* **README answers:** How should someone orient themselves to the relevant project or repository when that README is an explicitly owned documentation surface?
 * **Agent guidance answers:** How should future agents operate?
 * **Executable surfaces may be the canonical authority** for machine-defined facts or reliably enforced behavior.
 * **Active tasks own execution state** and fresh-session handoff.
 * **Backlog/task systems own deferred work** that is not current project truth.
-* **Source-material areas hold evidence and external inputs**; their presence in the repository does not make them canonical project authority.
+* **Source-material areas hold evidence and external inputs**; their presence near project files does not make them canonical project authority.
 * **Archive material holds history**, not current truth.
 * A document should have **one coherent durable scope** and answer that scope well.
 * Each durable claim should have **one canonical authority**.
@@ -65,17 +140,17 @@ Do not turn one-off mistakes, temporary workarounds, or tentative lessons into p
 
 | Surface | Purpose |
 | --- | --- |
-| `docs/` or repository equivalent | Architecture, interfaces, workflows, product/runtime behavior, durable decisions, invariants, non-obvious constraints |
-| README | Overview, entry points, setup, usage, navigation, onboarding |
-| `AGENTS.md`, `CLAUDE.md`, or repo-defined equivalent | Stable operating rules, validation steps, coding philosophy, recurring mistakes worth preventing |
+| Logical `docs/` surface | Architecture, interfaces, workflows, product/runtime behavior, durable decisions, invariants, non-obvious constraints |
+| Explicitly owned README | Overview, entry points, setup, usage, navigation, onboarding |
+| Explicitly owned `AGENTS.md`, `CLAUDE.md`, or equivalent | Stable operating rules, validation steps, coding philosophy, recurring mistakes worth preventing |
 | Active task system | Current progress, open investigation, work remaining, session handoff |
 | Backlog system | Deferred future work that should survive without becoming current truth |
 | Source-material area | Supporting evidence, logs, imported notes, experiments, external references, one-off artifacts |
 | Archive area | Superseded or historical material retained for reference |
 
-If another skill or repository workflow owns a destination such as `tasks/`, follow that workflow rather than bypassing it.
+If another skill or project workflow owns a destination such as the configured task surface, follow that workflow rather than bypassing it.
 
-Do not create `docs/`, `tasks/`, `source-material/`, `archive/`, or new agent-guidance files merely to satisfy this skill. Create new surfaces only when justified by repository convention and the knowledge being preserved.
+Do not create alternate `docs/`, task, source-material, archive, or agent-guidance surfaces merely to satisfy this skill. Use the configured documentation surface, and create new structures inside it only when justified by established project convention and the knowledge being preserved.
 
 ### Routing Example
 
@@ -90,7 +165,7 @@ Route the result as:
 
 ```text
 docs/queue.md
-→ Explain the queue boundary, idempotency invariant, and durable rationale.
+→ Logical documentation path inside the configured `docs` surface. Explain the queue boundary, idempotency invariant, and durable rationale.
 
 AGENTS.md
 → "When modifying queue publishing, use QueueService and preserve retry idempotency."
@@ -165,7 +240,7 @@ When a canonical document is renamed, moved, split, merged, or materially rescop
 
 ### Markdown Conventions
 
-Follow an established repository documentation convention when one exists.
+Follow an established convention inside the configured documentation surface when one exists.
 
 Otherwise, canonical Markdown docs created or materially maintained by this skill use:
 
@@ -220,11 +295,11 @@ Use when durable project knowledge or behavior changes, or when the user asks to
 
 An explicit request such as `update docs` means: **evaluate the current work for durable knowledge and behavior now**. It does not mean copy everything discussed.
 
-1. **Inspect** the relevant docs, guidance, task context, and authority surfaces.
+1. **Resolve** the active project's configured documentation surface, then inspect the relevant docs, guidance, task context, and authority surfaces.
 2. **Distill** only settled, durable knowledge or behavior; investigate material authority conflicts rather than silently choosing.
 3. **Route** explanatory project knowledge to docs/README, durable behavior to agent guidance, and machine-defined facts to their executable authority; respect other skills and repository workflows.
-4. **Rewrite** all directly affected canonical surfaces and repair affected indexes/links, without expanding into an audit of unrelated areas.
-5. **Report** only material changes, rerouting, or unresolved uncertainty.
+4. **Rewrite** all directly affected owned documentation surfaces and repair affected indexes/links, without expanding into an audit of unrelated areas.
+5. **Report** only material changes, rerouting, or unresolved uncertainty, plus the exact resolved filesystem path or paths mutated.
 
 Self-initiate persistence only when the update is **settled, material, directly related to the current work, and not contrary to repository guidance or another owning workflow**.
 
@@ -241,6 +316,6 @@ Use for an explicitly requested documentation/guidance audit, migration, or scop
 * Choose one canonical authority per durable claim.
 * Replace unnecessary duplication with pointers or concise behavioral guidance where justified.
 * Remove stale implementation chatter and historical residue from current surfaces.
-* Check repository conventions, frontmatter, indexes, links, and orphan docs within the requested scope.
+* Check documentation-surface conventions, frontmatter, indexes, links, and orphan docs within the requested scope.
 * Preserve useful current understanding while reducing maintenance burden.
 * Mark durable unresolved uncertainty as `Needs validation`.

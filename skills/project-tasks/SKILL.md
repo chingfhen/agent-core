@@ -1,6 +1,6 @@
 ---
 name: project-tasks
-description: Maintains shared human-agent execution briefs in tasks/ (including tasks/backlog/ for deferred work) so the human owner can understand and steer the work while a future fresh-session executor can resume without the prior conversation. Load before creating, editing, or managing anything under tasks/; not needed merely to read task files. Rewrites tasks into high-signal control surfaces that preserve execution-critical context and human-control nuances while compressing routine implementation detail and stale history.
+description: Maintains shared human-agent execution briefs in the active project's configured task surface (conventionally tasks/, including tasks/backlog/ for deferred work) so the human owner can understand and steer the work while a future fresh-session executor can resume without the prior conversation. Load before creating, editing, moving, deleting, or managing task files; not needed merely to read an explicitly identified task file. Rewrites tasks into high-signal control surfaces that preserve execution-critical context and human-control nuances while compressing routine implementation detail and stale history.
 disable-model-invocation: false
 ---
 
@@ -8,7 +8,7 @@ disable-model-invocation: false
 
 ## Purpose and Ownership
 
-Maintain task-specific execution briefs, typically in `tasks/`, for work that needs continuity across sessions.
+Maintain task-specific execution briefs in the active project's configured task surface, conventionally represented as `tasks/`, for work that needs continuity across sessions.
 
 A task file is a **shared control surface** serving two purposes:
 
@@ -42,6 +42,68 @@ Approvals and access               Reconstructible technical detail
 
 The human should see anything that could materially change direction, responsibility boundaries, user-visible or failure behavior, security, privacy, data integrity, cost, maintainability, recovery semantics, or confidence in the plan. The agent should own routine mechanics that do not affect those concerns.
 
+
+## Project Registry and Task Surface
+
+This skill writes only to the task surface configured for the active project.
+
+Machine-local registry:
+
+```text
+~/.agent-core/projects.toml
+```
+
+Example:
+
+```toml
+[projects.smart-search]
+description = "OCBC Smart Search"
+root = "/home/cdsw/smart-search-workspace"
+docs = "/home/cdsw/smart-search-workspace/docs"
+tasks = "/home/cdsw/smart-search-workspace/tasks"
+knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
+```
+
+For this skill, only `root` and `tasks` are required.
+
+Before creating, editing, moving, deleting, listing, or otherwise managing task files:
+
+1. Read `~/.agent-core/projects.toml` when it exists.
+2. Identify the active project whose configured `root` contains the current working directory.
+3. If more than one configured root contains the current working directory, use the most specific matching root.
+4. Treat that project's exact `tasks` value as the writable task-surface root.
+5. Perform task CRUD only inside that configured task surface.
+6. Do not choose or create another nearby `tasks/` directory merely because one exists.
+7. If no active project or no `tasks` surface can be resolved, do not guess a writable location. Surface the missing project configuration instead.
+8. Normal task operations read the registry but do not modify it. Modify the registry only when the human explicitly asks to register, remove, or change a project.
+9. After creating, editing, moving, or deleting task files, report the exact resolved filesystem path or paths changed. This is a cheap human observability check, not a request for a broader verification pass.
+
+Within this skill, paths such as:
+
+```text
+tasks/foo.md
+tasks/backlog/foo.md
+```
+
+are **logical task paths**. The configured `tasks` value is the physical filesystem root corresponding to logical `tasks/`.
+
+For example:
+
+```toml
+tasks = "/home/cdsw/smart-search-workspace/tasks"
+```
+
+means:
+
+```text
+tasks/foo.md
+→ /home/cdsw/smart-search-workspace/tasks/foo.md
+```
+
+The task file may continue to record its portable logical `File` path such as `tasks/foo.md`. Mutation reporting to the human should use the resolved physical path.
+
+The task surface is the only normal writable filesystem surface owned by this skill. Other project surfaces such as durable documentation, source material, or archives may be referenced as context, but this skill must not silently create or mutate them outside the configured task surface. Route work to the owning workflow when another surface must change.
+
 ## Core Model
 
 - **`project-tasks` owns active execution state**, the approved or currently authoritative plan, blockers, verification state, and fresh-session handoffs.
@@ -49,8 +111,8 @@ The human should see anything that could materially change direction, responsibi
 - **`engineering` owns implementation and runtime verification.** This skill records execution state and evidence; maintaining a task does not perform the work described by it.
 - **`project-docs` owns durable project knowledge** and absorbs stable truths.
 - **`tasks/backlog/` owns deferred future-work briefs** that should survive without becoming active execution state.
-- **`source-material/` holds supporting artifacts** that may inform work without becoming canonical truth.
-- **`archive/` holds retired historical material** that should not drive current work by default.
+- **Source-material areas may hold supporting artifacts** that inform work without becoming canonical truth; this skill may reference them but does not own their filesystem location.
+- **Archive areas may hold retired historical material** that should not drive current work by default; this skill does not infer or create an archive outside its configured task surface.
 - **Code and tests own exact implementation truth.**
 - **Conversation owns exploration in progress.**
 - Task files preserve current alignment, not archaeological history.
@@ -110,7 +172,7 @@ New standalone tasks use:
 tasks/YYYY-MM-DD__kebab-case-name-bookmark.md
 ```
 
-The date is an **immutable creation date**. Keep standalone tasks flat; use the optional grouping below for related tasks. Follow established repository naming conventions and do not mass-rename historical tasks.
+The date is an **immutable creation date**. Keep standalone tasks flat; use the optional grouping below for related tasks. Follow established task-surface naming conventions and do not mass-rename historical tasks.
 
 ### Related Task Groups
 
@@ -128,7 +190,7 @@ tasks/
 Use the effort's immutable creation date for the folder. Child task dates remain in their metadata; numeric prefixes indicate intended reading/execution order, not readiness or dependency enforcement.
 
 - **Overview:** shared outcome, constraints, links to tasks, dependency/handoff map, and recommended starting point. No task dashboard or duplicate progress tracking.
-- **Individual task:** its normal dashboard, outcome, inputs/outputs, specific decisions, state, blockers, next action, and verification. Set `File` to its actual path and link required shared context and predecessor tasks explicitly.
+- **Individual task:** its normal dashboard, outcome, inputs/outputs, specific decisions, state, blockers, next action, and verification. Set `File` to its logical path within the configured task surface and link required shared context and predecessor tasks explicitly.
 - Make the first actionable task concrete. Later tasks retain meaningful direction and completion criteria, with decisions dependent on earlier results assigned to those results rather than guessed.
 - Keep shared facts authoritative in the overview and task-specific facts in the task. Update affected downstream assumptions after upstream results; do not reopen the whole plan.
 
@@ -495,7 +557,7 @@ The task should reflect current understanding, not archaeological layers.
 
 ## Lifecycle
 
-All lifecycle operations must preserve dashboard/body consistency, rewrite stale understanding, and update the Execution Gate truthfully.
+All lifecycle operations must preserve dashboard/body consistency, rewrite stale understanding, update the Execution Gate truthfully, and obey the configured task-surface boundary and mutation-reporting rules.
 
 ### Create / Persist Plan
 
@@ -558,7 +620,7 @@ Done when the fresh executor has the context to take the next permitted action, 
 - Closed tasks are not automatically deleted.
 - `Target Docs` are routing hints, not contracts.
 - Preserve uncertainty honestly.
-- Move durable truth to `docs/`, deferred work to `tasks/backlog/`, supporting artifacts to `source-material/`, and retired history to `archive/`.
+- Route durable truth through the owning project-documentation workflow; keep deferred work in logical `tasks/backlog/`; reference supporting or archive surfaces without silently creating or mutating them outside the configured task surface.
 - Blockers must state both the obstacle and required action.
 - Do not declare readiness when the next meaningful action is vague, contradictory, blocked, dependent on the old chat, or requires an unresolved material choice without a prior investigation or approval gate.
 - Do not hide product or architecture decisions inside implementation discretion.
