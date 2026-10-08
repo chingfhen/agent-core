@@ -82,6 +82,7 @@ def refresh_and_launch(
     command: str = "sync",
     here: bool = False,
     home: Path | None = None,
+    no_pull: bool = False,
 ) -> int:
     if command in {"apply", "retire-local"}:
         if here:
@@ -92,10 +93,13 @@ def refresh_and_launch(
     _validate_checkout(checkout)
     _ensure_clean(checkout)
 
-    pull = _git(checkout, "pull", "--ff-only")
-    if pull.returncode != 0:
-        detail = pull.stderr.strip() or pull.stdout.strip() or f"exit code {pull.returncode}"
-        raise AgentCoreError(f"Could not refresh canonical checkout: {detail}")
+    if no_pull and command != "sync":
+        raise AgentCoreError("--no-pull is supported only for sync")
+    if not no_pull:
+        pull = _git(checkout, "pull", "--ff-only")
+        if pull.returncode != 0:
+            detail = pull.stderr.strip() or pull.stdout.strip() or f"exit code {pull.returncode}"
+            raise AgentCoreError(f"Could not refresh canonical checkout: {detail}")
 
     _validate_checkout(checkout)
     if command == "sync":
@@ -128,7 +132,14 @@ def build_parser() -> argparse.ArgumentParser:
         description="Refresh the private Agent Core checkout and publish personal agent resources.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
-    subparsers.add_parser("sync", help="Publish personal skills and global guidance for all supported harnesses.")
+    sync_parser = subparsers.add_parser(
+        "sync", help="Publish personal skills and global guidance for all supported harnesses."
+    )
+    sync_parser.add_argument(
+        "--no-pull",
+        action="store_true",
+        help="Skip the remote refresh and publish from the current clean committed checkout.",
+    )
     apply_parser = subparsers.add_parser(
         "apply", help="Deprecated: copy configured skills into one project or directory."
     )
@@ -162,6 +173,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             Path.cwd(),
             command=args.command,
             here=getattr(args, "here", False),
+            no_pull=getattr(args, "no_pull", False),
         )
     except AgentCoreError as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)

@@ -59,7 +59,7 @@ Installed or generated surfaces include:
 - `personal-skills.toml` is manually maintained and authoritative. Never infer publication from all `skills/` directories.
 - Keep the console launcher and CMD installer small and stable. The normal Windows path must not require PowerShell, `uv`, `pip`, elevation, or downloaded packages.
 - Require Python 3.10+ and keep runtime code standard-library-only.
-- The launcher must reject a dirty checkout, fast-forward with ordinary authenticated Git, and cross a fresh-process boundary before sync code runs.
+- The launcher must reject a dirty checkout and cross a fresh-process boundary before sync code runs. Ordinary sync fast-forwards with authenticated Git; explicit `sync --no-pull` skips only that refresh and publishes the current clean committed checkout without silent fallback.
 - Require every configured source and the global guidance source to match tracked committed content.
 - Preflight every configured skill, Claude alias, guidance file, and ownership record before replacing any target.
 - Refuse unowned collisions, malformed ownership, unsupported entries, and locally modified managed content. Empty unowned guidance files may be initialized.

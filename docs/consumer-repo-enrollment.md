@@ -90,7 +90,7 @@ The installed command shim invokes `~/.agent-core/agent_core/bootstrap.py` with 
 4. validates the refreshed checkout again;
 5. starts `agent_core.sync` in a fresh Python process from the checkout.
 
-Pull, authentication, network, or divergence failures stop before installed files change. The launcher and sync implementation use only Python 3.10+ standard-library APIs.
+Pull, authentication, network, certificate, or divergence failures stop before installed files change. The explicit `agent-core sync --no-pull` variant skips step 3 only. It still requires a clean fixed checkout, validates committed sources, crosses the same fresh-process boundary, and reports the exact current commit. It is intended for a checkout already updated through another trusted Git client such as GitHub Desktop; ordinary sync never silently falls back to it. The launcher and sync implementation use only Python 3.10+ standard-library APIs.
 
 The Windows CMD installer locates `py -3` or `python`, creates `%LOCALAPPDATA%\AgentCore\bin\agent-core.cmd`, and updates the user PATH through `HKCU\Environment`. It does not invoke PowerShell, `setx`, `uv`, `pip`, elevation, or a package download.
 

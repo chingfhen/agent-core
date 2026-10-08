@@ -57,13 +57,13 @@ agent-core sync
 
 The installer uses `py` or `python`, creates a small user-owned command shim, and safely updates the user PATH through the Windows user environment registry. It does not require PowerShell, `uv`, `pip`, elevation, or downloaded Python packages. A new terminal is required when the PATH changed.
 
-After setup, the only normal update command is:
+After setup, the normal update command is:
 
 ```text
 agent-core sync
 ```
 
-The launcher refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the newly pulled implementation in a fresh Python process. Sync validates committed sources and every destination before mutation, stages and fingerprints copies, replaces all changed skills, aliases, and guidance as one rollback-capable operation, and publishes ownership state last.
+When another trusted Git client has already updated the clean canonical checkout and command-line Git cannot reach the remote, `agent-core sync --no-pull` explicitly skips only the fast-forward pull. The launcher otherwise refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. Sync validates committed sources and every destination before mutation, stages and fingerprints copies, replaces all changed skills, aliases, and guidance as one rollback-capable operation, and publishes ownership state last.
 
 Removing a name from `personal-skills.toml` is non-destructive. Existing installed copies, aliases, and ownership records remain until an explicit future prune or manual resolution. The manifest is never inferred from every directory under `skills/`.
 

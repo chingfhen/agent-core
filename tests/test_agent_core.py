@@ -380,16 +380,44 @@ class AgentCoreBootstrapTests(unittest.TestCase):
             bootstrap.refresh_and_launch(self.checkout, self.project, command="sync", home=self.home)
         self.assertFalse((self.home / ".agents").exists())
 
+    def test_no_pull_uses_current_clean_commit_without_remote_access(self) -> None:
+        self.remote.rename(self.root / "unavailable.git")
+
+        result = bootstrap.refresh_and_launch(
+            self.checkout,
+            self.project,
+            command="sync",
+            home=self.home,
+            no_pull=True,
+        )
+
+        self.assertEqual(result, 0)
+        self.assertIn("remote one", (self.home / ".agents/skills/demo/SKILL.md").read_text())
+
+    def test_no_pull_still_refuses_a_dirty_checkout(self) -> None:
+        (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
+        with self.assertRaisesRegex(bootstrap.AgentCoreError, "staged, unstaged, or untracked"):
+            bootstrap.refresh_and_launch(
+                self.checkout,
+                self.project,
+                command="sync",
+                home=self.home,
+                no_pull=True,
+            )
+        self.assertFalse((self.home / ".agents").exists())
+
     def test_cli_routes_sync_apply_and_retire(self) -> None:
         with patch.object(bootstrap, "canonical_checkout", return_value=self.checkout), patch.object(
             bootstrap, "refresh_and_launch", return_value=0
         ) as launch:
-            self.assertEqual(bootstrap.main(["sync"]), 0)
+            self.assertEqual(bootstrap.main(["sync", "--no-pull"]), 0)
             self.assertEqual(bootstrap.main(["apply", "--here"]), 0)
             self.assertEqual(bootstrap.main(["retire-local", "--here"]), 0)
         self.assertEqual(launch.call_count, 3)
         self.assertEqual(launch.call_args_list[0].kwargs["command"], "sync")
+        self.assertTrue(launch.call_args_list[0].kwargs["no_pull"])
         self.assertEqual(launch.call_args_list[1].kwargs["command"], "apply")
+        self.assertFalse(launch.call_args_list[1].kwargs["no_pull"])
         self.assertEqual(launch.call_args_list[2].kwargs["command"], "retire-local")
 
 

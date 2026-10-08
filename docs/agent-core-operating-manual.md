@@ -53,7 +53,13 @@ If the installer changed PATH, close CMD and open a new one. Then run:
 agent-core sync
 ```
 
-After setup, this is the only normal update command.
+After setup, this is the normal update command. If command-line Git cannot access the remote but the checkout was already updated through GitHub Desktop, use the explicit offline-refresh variant:
+
+```cmd
+agent-core sync --no-pull
+```
+
+`--no-pull` skips only `git pull --ff-only`. It still requires the fixed checkout to be clean, validates committed source content, and publishes from its current checked-out commit. Sync reports that commit so the owner can verify what was installed.
 
 ## What Sync Installs
 
@@ -203,13 +209,20 @@ git -C "%USERPROFILE%\.agent-core" status --short
 
 Commit and push intended canonical changes or resolve unwanted changes manually. Agent Core never stashes, resets, or cleans the checkout.
 
-### Pull or authentication fails
+### Pull, authentication, or certificate validation fails
 
 ```cmd
 git -C "%USERPROFILE%\.agent-core" pull --ff-only
 ```
 
-Fix ordinary Git credentials, connectivity, or divergence outside Agent Core, then rerun sync.
+Prefer fixing ordinary Git credentials, connectivity, or certificate trust. Do not disable SSL verification. If GitHub Desktop can safely update the canonical checkout while command-line Git cannot access the remote, pull that checkout in GitHub Desktop, confirm it is clean, then publish its current commit without another network operation:
+
+```cmd
+git -C "%USERPROFILE%\.agent-core" status --short
+agent-core sync --no-pull
+```
+
+The status command must print nothing. `--no-pull` is explicit and never silently falls back when an ordinary sync pull fails.
 
 ### A managed global target was modified
 
@@ -253,6 +266,9 @@ Sync fails closed rather than adopting existing content. Keep installed files in
 ```cmd
 :: Normal update
 agent-core sync
+
+:: Publish a clean checkout already updated through GitHub Desktop
+agent-core sync --no-pull
 
 :: Verify Pi guidance and shared skills
 dir "%USERPROFILE%\.agents\skills"
