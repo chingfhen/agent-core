@@ -1,281 +1,267 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-09-15
+**Last Updated:** 2026-10-08
 
 **Status:** Current
 
-**Source Of Truth:** Defines the commands the owner follows to install, apply, update, and troubleshoot private Agent Core skills.
+**Source Of Truth:** Defines the commands the owner follows to install, sync, publish, verify, migrate, and troubleshoot private Agent Core skills and guidance.
 
-**Update When:** Machine setup, the normal apply command, core-skill publication, or common recovery steps change.
+**Update When:** Machine setup, the normal sync command, publication targets, or recovery steps change.
 
 ## Use This Command Normally
 
-Move to the exact directory that should receive `.agents/skills/`, then run:
-
-```powershell
-Set-Location "<target-directory>"
-agent-core apply --here
+```cmd
+agent-core sync
 ```
 
-Always use `--here` for normal personal use. It targets the current directory exactly and works whether or not that directory is a Git repository.
+Run it from any directory. It refreshes the fixed `~/.agent-core` checkout and safely publishes the configured personal skills and global guidance for Pi, Codex, OpenCode, and Claude Code.
 
-Do not manually copy core skills into targets. `agent-core apply --here` pulls the latest canonical checkout and safely creates or updates the configured copies.
+Do not manually copy managed skills or guidance. Do not run the deprecated project-local `apply` command for normal personal use.
 
-## New Computer Setup
+## New Windows Computer Setup
 
 ### Prerequisites
 
-Confirm that Git and `uv` are installed and that normal private GitLab authentication works:
+Use CMD to confirm Git and Python 3.10 or newer are available:
 
-```powershell
+```cmd
 git --version
-uv --version
+py -3 --version
 ```
+
+If the Python launcher is unavailable, `python --version` is sufficient. Configure ordinary private-repository Git authentication separately; Agent Core does not store credentials.
 
 ### Install Agent Core
 
-Run once on the new computer:
-
-```powershell
-git clone https://gitlab.com/chingfhen/agent-core.git "$HOME\.agent-core"
-uv tool install --editable "$HOME\.agent-core"
+```cmd
+git clone <private-repo-url> "%USERPROFILE%\.agent-core"
+"%USERPROFILE%\.agent-core\scripts\install-agent-core.cmd"
 ```
 
-Confirm the command is available:
+The installer:
 
-```powershell
-agent-core apply --help
+1. finds a supported interpreter through `py -3` or `python`;
+2. creates `%LOCALAPPDATA%\AgentCore\bin\agent-core.cmd`;
+3. adds that directory to the current user's PATH through the Windows user environment registry;
+4. reports whether a new terminal is required.
+
+It does not use PowerShell, `setx`, `uv`, `pip`, elevation, or downloaded Python packages.
+
+If the installer changed PATH, close CMD and open a new one. Then run:
+
+```cmd
+agent-core sync
 ```
 
-The help output should include `--here`.
+After setup, this is the only normal update command.
 
-If PowerShell cannot find `agent-core`, run:
+## What Sync Installs
 
-```powershell
-uv tool update-shell
-```
+### Personal skills
 
-Then close and reopen PowerShell.
-
-## Apply Skills To A Directory
-
-Example:
-
-```powershell
-Set-Location "C:\Users\TanChingFhen\Documents\ching\aws-codecommit-einstein-deepfake-detection-dev\gitlab-deepfake-detection-development"
-agent-core apply --here
-```
-
-The result is:
+Real managed copies are installed at:
 
 ```text
-<current-directory>/.agents/skills/<core-skill>/
+%USERPROFILE%\.agents\skills\<personal-skill>\
 ```
 
-The command automatically:
-
-1. checks that `~/.agent-core` is clean;
-2. runs a fast-forward-only Git pull;
-3. reads `core-skills.toml`;
-4. validates all sources and destinations;
-5. safely copies or updates each configured skill.
-
-Successful output lists every configured skill and whether it was `added`, `replaced`, or `recreated`.
-
-For `--here`, ownership metadata is stored at:
+Pi, Codex, and OpenCode discover this portable Agent Skills location. Claude Code receives directory junctions at:
 
 ```text
-<current-directory>/.agents/.agent-core/ownership.json
+%USERPROFILE%\.claude\skills\<personal-skill>
+    -> %USERPROFILE%\.agents\skills\<personal-skill>
 ```
 
-When the target is inside Git, Agent Core also refuses tracked skill targets and locally excludes managed private copies. Non-Git targets skip only those Git-specific checks.
+There is one installed content authority. **Skills are not copied into `%USERPROFILE%\.pi\agent\skills`.** Pi loads them from `%USERPROFILE%\.agents\skills`.
 
-### Verify The Result
+### Global guidance
 
-```powershell
-Get-ChildItem ".agents\skills"
-Test-Path ".agents\skills\approval-gate\SKILL.md"
-```
-
-In a Git target, managed files should not appear in ordinary status output:
-
-```powershell
-git status --short
-```
-
-## Publish A New Core Skill
-
-A skill must be committed to the private Agent Core repository and listed in `core-skills.toml` before other computers can receive it.
-
-### 1. Create The Skill
-
-Under the canonical checkout, create:
+The complete canonical `global/AGENTS.md` is published to:
 
 ```text
-$HOME/.agent-core/skills/<skill-name>/SKILL.md
+%USERPROFILE%\.pi\agent\AGENTS.md
+%USERPROFILE%\.codex\AGENTS.md
+%USERPROFILE%\.config\opencode\AGENTS.md
+%USERPROFILE%\.claude\CLAUDE.md
 ```
 
-The file needs valid skill frontmatter, including `name` and `description`.
+Thus Pi's `.pi` directory receives the global `AGENTS.md`; the shared skills remain under `.agents`.
 
-### 2. Add It To The Core List
+### Ownership
+
+Machine-local state is stored outside the Git checkout:
+
+```text
+%USERPROFILE%\.agent-core-state\ownership.json
+```
+
+It records exact destinations, source commits, fingerprints, and alias targets. Do not edit it manually. On successful sync, the output reports the checkout commit, manifest count, changed skills, alias status, every guidance destination, and this ownership path.
+
+## Verify The Result
+
+In CMD:
+
+```cmd
+dir "%USERPROFILE%\.agents\skills"
+dir "%USERPROFILE%\.claude\skills"
+type "%USERPROFILE%\.pi\agent\AGENTS.md"
+type "%USERPROFILE%\.agent-core-state\ownership.json"
+```
+
+For Pi, run `/reload` in an active session or start a new session. The skill command menu should expose configured names, and Pi should load `%USERPROFILE%\.pi\agent\AGENTS.md` as user guidance. Restart active Codex, OpenCode, and Claude Code sessions after changed resources.
+
+OpenCode provides a cheap discovery check:
+
+```cmd
+opencode debug skill
+```
+
+A configured personal skill should appear once with a location under `%USERPROFILE%\.agents\skills`.
+
+File existence and successful sync output prove publication, not model compliance. For consequential guidance changes, verify behavior in the relevant harness.
+
+## Publish A Personal Skill
+
+A skill is published only when it is committed under `skills/` and listed in `personal-skills.toml`.
+
+### Add or update the source
+
+```text
+%USERPROFILE%\.agent-core\skills\<skill-name>\SKILL.md
+```
+
+Include valid Agent Skills frontmatter and any committed supporting files. Edit only the canonical source, never an installed copy.
+
+### Maintain the authoritative list
 
 Edit:
 
 ```text
-$HOME/.agent-core/core-skills.toml
+%USERPROFILE%\.agent-core\personal-skills.toml
 ```
 
-Example:
+The file intentionally contains only one string array:
 
 ```toml
 skills = [
     "project-tasks",
     "project-docs",
     "planning",
-    "engineering",
-    "grilling",
-    "approval-gate",
-    "<new-skill-name>",
+    "<skill-name>",
 ]
 ```
 
-Adding a skill here means every later `agent-core apply --here` installs it in that command's target directory.
+The list is manual. Not every repository skill is necessarily personal.
 
-### 3. Commit And Push
+### Commit and publish
 
-```powershell
-Set-Location "$HOME\.agent-core"
+```cmd
+cd /d "%USERPROFILE%\.agent-core"
 git status --short
-git add "skills\<skill-name>\SKILL.md" core-skills.toml
-git commit -m "Add <skill-name> to core skills"
+git add "skills\<skill-name>" personal-skills.toml
+git commit -m "Publish <skill-name> as a personal skill"
 git push origin main
+agent-core sync
 ```
 
-Include any tracked helper files belonging to the skill in `git add`. Agent Core refuses ignored or otherwise uncommitted files inside configured source skills.
+Agent Core refuses ignored, untracked, missing, linked, or uncommitted files inside configured sources.
 
-### 4. Apply It Where Needed
+Removing a name from `personal-skills.toml` stops future updates but does not delete its existing copy, Claude alias, or ownership record. This additive behavior avoids surprise deletion. Resolve obsolete retained entries deliberately; there is no default global force or prune command.
 
-```powershell
-Set-Location "<target-directory>"
-agent-core apply --here
-```
+## Update Global Guidance
 
-Repeat only in directories that should receive the update.
-
-## Update An Existing Core Skill
-
-Edit the canonical source, not a copied target:
+Edit only:
 
 ```text
-$HOME/.agent-core/skills/<skill-name>/
+%USERPROFILE%\.agent-core\global\AGENTS.md
 ```
 
-Then commit and push:
+Commit and push it, then run `agent-core sync`. Sync updates all four owned destinations together. It refuses a non-empty unowned destination and refuses any managed guidance file changed after installation. An absent or empty unowned destination may be initialized.
 
-```powershell
-Set-Location "$HOME\.agent-core"
-git status --short
-git add "skills\<skill-name>"
-git commit -m "Update <skill-name>"
-git push origin main
+## Retire Old Project-Local Copies
+
+The former workflow installed copies into each project's `.agents/skills/`. Migrate one exact directory at a time:
+
+```cmd
+cd /d "<old-target-directory>"
+agent-core retire-local --here
 ```
 
-Apply the update in each desired target:
+The command reads prior ownership state and preflights every recorded destination. It removes only unchanged managed copies, the exact obsolete ownership state, and exact Agent Core entries in Git's local exclude file. It preserves unrelated `.agents` content and unrelated exclusion rules.
 
-```powershell
-Set-Location "<target-directory>"
-agent-core apply --here
-```
+It refuses the whole operation if a managed copy was modified, is tracked by Git, or cannot be safely identified. It never scans other repositories. After retiring desired old targets, use only global `agent-core sync`.
 
-This replaces the target copy only when Agent Core still owns it and it has not been edited locally. A local edit to any configured target stops the entire apply before any skill is changed or newly added. Preserve any target-local edits you need, delete only the affected skill directory, and rerun apply to restore that canonical skill and apply the remaining configured skills.
+`agent-core apply [--here]` remains temporarily available only for compatibility and prints a deprecation warning. It still targets project-local `.agents/skills/`; it is not an alias for global sync.
 
-## Stop Distributing A Skill
-
-Remove its name from `core-skills.toml`, then commit and push that configuration change.
-
-This does **not** remove copies already present in target directories. It only stops future updates from treating that skill as currently configured.
-
-If a retained copy is no longer wanted, delete that exact target directory manually:
-
-```powershell
-Remove-Item -Recurse -Force ".agents\skills\<skill-name>"
-```
-
-Do not delete the whole `.agents` directory when it may contain other skills or ownership state.
-
-## Troubleshooting
-
-### `unrecognized arguments: --here`
-
-The installed launcher predates `--here` and rejects the option before it can update itself. Perform this one-time update:
-
-```powershell
-git -C "$HOME\.agent-core" pull --ff-only
-agent-core apply --help
-```
-
-If `--here` still does not appear:
-
-```powershell
-uv tool install --editable "$HOME\.agent-core" --reinstall
-```
-
-Ordinary future applies update automatically; reinstalls are not normally needed.
+## Safety And Recovery
 
 ### Canonical checkout is dirty
 
-Inspect it:
-
-```powershell
-git -C "$HOME\.agent-core" status --short
+```cmd
+git -C "%USERPROFILE%\.agent-core" status --short
 ```
 
-Commit and push intentional canonical changes before applying. Resolve unwanted changes manually. Agent Core intentionally does not stash, reset, or clean them.
+Commit and push intended canonical changes or resolve unwanted changes manually. Agent Core never stashes, resets, or cleans the checkout.
 
-### A managed target was locally modified
+### Pull or authentication fails
 
-Do not force an overwrite. If the target edits matter, copy them somewhere safe first. To discard the target edits and restore the canonical skill, delete only that skill directory and apply again:
-
-```powershell
-Remove-Item -Recurse -Force ".agents\skills\<skill-name>"
-agent-core apply --here
+```cmd
+git -C "%USERPROFILE%\.agent-core" pull --ff-only
 ```
 
-### A target exists but is not owned by Agent Core
+Fix ordinary Git credentials, connectivity, or divergence outside Agent Core, then rerun sync.
 
-Inspect it before doing anything. If it is safe to replace, move or delete that exact skill directory manually, then rerun apply. Agent Core will not decide this destructively.
+### A managed global target was modified
 
-### A target is tracked by Git
+The error names the exact path. Preserve any desired local edit elsewhere, then restore the recorded content or delete only that managed destination and rerun sync. A missing owned destination is safely recreated. There is no default force overwrite.
 
-Agent Core will not manage or overwrite it. Decide whether the repository-owned version or the private Agent Core copy should be authoritative before changing Git tracking.
+### An unowned target already exists
 
-### Pull or authentication failure
+Inspect the exact conflict. If the existing content should remain authoritative, do not enroll that name or guidance path. If Agent Core should own it, move or remove that exact entry manually and rerun sync. Never delete an entire parent directory that may contain unrelated user content.
 
-Confirm normal GitLab access:
+### A Claude alias is broken
 
-```powershell
-git -C "$HOME\.agent-core" pull --ff-only
+If its shared managed skill was deleted, sync recreates the skill and alias. If the alias was redirected or replaced, sync refuses it as a local modification; inspect and resolve that exact alias manually.
+
+### Existing installation rejects `sync`
+
+A launcher installed before this migration cannot update itself because it rejects the new subcommand before pulling. After these repository changes are committed and pushed, run this one-time migration in CMD:
+
+```cmd
+git -C "%USERPROFILE%\.agent-core" pull --ff-only
+"%USERPROFILE%\.agent-core\scripts\install-agent-core.cmd"
 ```
 
-Fix Git credentials, connectivity, or branch divergence outside Agent Core, then rerun apply.
+Open a new terminal if instructed, then run `agent-core sync`. Future syncs refresh themselves normally.
+
+### Command is not found after installation
+
+Open a new terminal. The installer reports the shim path, normally:
+
+```text
+%LOCALAPPDATA%\AgentCore\bin\agent-core.cmd
+```
+
+Run the installer again if the shim is missing. It updates the user PATH without `setx`.
+
+### Ownership state is malformed or lost
+
+Sync fails closed rather than adopting existing content. Keep installed files in place, inspect `%USERPROFILE%\.agent-core-state\ownership.json`, and restore a valid backup if available. If no trustworthy state exists, move the exact managed-looking destinations aside, remove the malformed state, and rerun sync so ownership can be established without overwriting unknown content.
 
 ## Quick Reference
 
-```powershell
-# Normal use
-Set-Location "<target-directory>"
-agent-core apply --here
+```cmd
+:: Normal update
+agent-core sync
 
-# Verify
-Get-ChildItem ".agents\skills"
+:: Verify Pi guidance and shared skills
+dir "%USERPROFILE%\.agents\skills"
+type "%USERPROFILE%\.pi\agent\AGENTS.md"
 
-# Inspect canonical checkout problems
-git -C "$HOME\.agent-core" status --short
+:: Inspect canonical checkout problems
+git -C "%USERPROFILE%\.agent-core" status --short
 
-# Publish canonical changes
-Set-Location "$HOME\.agent-core"
-git status --short
-git add <exact-paths>
-git commit -m "Describe the Agent Core change"
-git push origin main
+:: Retire one old project-local installation
+cd /d "<old-target-directory>"
+agent-core retire-local --here
 ```

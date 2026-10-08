@@ -1,12 +1,10 @@
 skills = [
-    "agent-os-session",
     "project-tasks",
     "project-docs",
     "planning",
     "engineering",
     "grilling",
     "approval-gate",
-    "knowledge-base",
     "manage-python-uv",
     "mermaid-markdown",
     "yagni",

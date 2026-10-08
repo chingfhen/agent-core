@@ -1,41 +1,30 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-09-15
+**Last Updated:** 2026-10-08
 
 **Status:** Current
 
 **Source Of Truth:** Defines how steward agents maintain the private Agent Core repository.
 
-**Update When:** Steward/executor roles, canonical surfaces, distribution, or integration rules change.
+**Update When:** Steward roles, canonical surfaces, distribution, or integration rules change.
 
 ### Read First
 
-- You are the steward agent when working in this repo.
-- At the start of every chat, load `agent-os-session` and state `Loaded agent-os-session.`
-- `skills/` is the hand-edited production source for executor agents. Do not change production workflow skills unless the human explicitly approves the skill edit.
-- The normal personal command is `agent-core apply --here`: it refreshes the fixed clean `~/.agent-core` checkout and copies `core-skills.toml` entries only to `.agents/skills/` in the current directory, with or without Git. Plain `agent-core apply` targets the containing Git root.
-- Do not hand-maintain consumer copies. Apply owns only exact configured destinations that its project-local fingerprint state proves it installed.
+- You are the steward agent when working in this repository.
+- `skills/` is the hand-edited production source. Do not change production workflow skills unless the human explicitly approves the skill edit.
+- The normal personal command is `agent-core sync`. It refreshes the fixed clean `~/.agent-core` checkout and publishes `personal-skills.toml` entries plus canonical global guidance to user-global harness locations.
+- Do not hand-maintain installed copies or aliases. Sync owns only exact destinations recorded in `~/.agent-core-state/ownership.json`.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
-- Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits.
-
-### Scope
-
-This file governs steward agents maintaining this repository.
-
-### Not Here
-
-Consumer-repo-local instructions, generated output, runtime task state, or detailed implementation contracts.
+- Prefer durable guidance updates in `AGENTS.md`, `docs/`, `global/`, and `prompts/` over production skill edits.
 
 ## Autonomous State And Memory Routing
 
-You are a node in an ongoing execution chain. Improve future repository context while preserving the boundary between active execution state and durable memory.
-
 - **Read-only execution state by default:** The human architect manages `tasks/`. Read tasks for current state, but do not create, edit, or manage them unless explicitly instructed.
-- **Route stable truth to `docs/`:** Preserve decisions, invariants, contracts, workflows, and confirmed fixes that future agents would otherwise have to rediscover.
+- **Route stable truth to `docs/`:** Preserve decisions, invariants, contracts, workflows, and confirmed fixes that future agents would otherwise rediscover.
 - **Route external evidence to `source-material/`:** Keep third-party references, research, and seed inputs non-canonical.
 - **Route superseded material to `archive/`:** Move content only when a newer canonical source clearly replaces it.
-- **Use docs first:** Check relevant docs before source when understanding architecture or contracts. Inspect implementation when docs are incomplete or current code behavior must be verified.
+- **Use docs first:** Check relevant docs before source when understanding architecture or contracts; inspect implementation when current behavior must be verified.
 - **Keep quality high:** Do not promote transient notes, tentative hypotheses, or session-local debugging artifacts.
 
 ## Current Contract
@@ -43,59 +32,69 @@ You are a node in an ongoing execution chain. Improve future repository context 
 ### Roles
 
 - **Steward agent:** Maintains this canonical repository, package, docs, workflows, and memory tooling.
-- **Executor agent:** Works in another directory using copied Agent Core skills.
-- **Consumer target:** A directory receiving simple copied skills.
+- **Executor agent:** Works in any directory using globally installed personal skills plus project-owned instructions and skills.
+- **Managed global destination:** An exact user-home path published by Agent Core and fingerprinted in machine-local ownership state.
 
-### Canonical And Generated Boundaries
+### Canonical And Installed Boundaries
 
 Canonical surfaces include:
 
-- `skills/`;
-- `core-skills.toml`;
-- `agent_core/` and `pyproject.toml`;
+- `skills/` and `personal-skills.toml`;
+- `global/AGENTS.md`;
+- `agent_core/`, `pyproject.toml`, and installer scripts;
 - `README.md`, `AGENTS.md`, `docs/`, and `prompts/`;
-- `scripts/`, schemas, and the append-only `memory/memories.jsonl` ledger.
+- schemas, steward scripts, and the append-only `memory/memories.jsonl` ledger.
 
-Generated surfaces include:
+Installed or generated surfaces include:
 
-- simple target `.agents/skills/<configured-skill>` copies;
-- target-local `.agents/.agent-core/ownership.json` for `--here`, or ownership under the actual Git directory for plain apply;
-- simple exact-path entries in Git common metadata `info/exclude` when Git is available;
+- real skill copies under `~/.agents/skills/<personal-skill>/`;
+- Claude aliases under `~/.claude/skills/<personal-skill>`;
+- complete guidance files at Pi, Codex, OpenCode, and Claude global instruction paths;
+- `~/.agent-core-state/ownership.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
-### Simple Apply Rules
+### Global Sync Rules
 
 - `~/.agent-core` is the fixed canonical checkout. Do not add configurable checkout paths, credential handling, or another bootstrap package.
-- `core-skills.toml` is manually maintained and authoritative; never infer the list from all `skills/` directories.
-- Keep the console launcher small and stable. It must reject a dirty canonical checkout, fast-forward with ordinary authenticated Git, and cross a fresh-process import boundary before apply code runs.
-- Keep the implementation standard-library-only so ordinary source updates do not require reinstalling dependencies.
-- Apply owns only `.agents/skills/<configured-skill>` targets. It must not alter other skill surfaces.
-- `apply --here` targets the current directory exactly and stores ownership under its `.agents/.agent-core/`. Preserve Git tracked-target and local-exclusion safety when Git is available; skip only those checks that require absent Git metadata.
-- Require every configured source file to be tracked in the canonical commit; never copy ignored or other uncommitted source artifacts.
-- Preflight every configured target before replacing any. Refuse tracked targets or descendants, unrelated existing content, malformed ownership, unsupported filesystem entries, and locally modified managed copies.
-- Plain apply stores ownership under the actual Git directory. `--here` stores ownership under the exact target directory. When Git is available, exclusions remain under the Git common directory so linked worktrees behave correctly.
-- Preserve additive removal: unconfigured prior copies, records, and exclusions remain untouched. Do not add automatic removal or force behavior.
-- Stage and fingerprint all copies, replace through backups with rollback, and atomically publish ownership only after successful replacement.
-- Never change the tracked consumer `.gitignore`; preserve unrelated local exclusion content.
+- `personal-skills.toml` is manually maintained and authoritative. Never infer publication from all `skills/` directories.
+- Keep the console launcher and CMD installer small and stable. The normal Windows path must not require PowerShell, `uv`, `pip`, elevation, or downloaded packages.
+- Require Python 3.10+ and keep runtime code standard-library-only.
+- The launcher must reject a dirty checkout, fast-forward with ordinary authenticated Git, and cross a fresh-process boundary before sync code runs.
+- Require every configured source and the global guidance source to match tracked committed content.
+- Preflight every configured skill, Claude alias, guidance file, and ownership record before replacing any target.
+- Refuse unowned collisions, malformed ownership, unsupported entries, and locally modified managed content. Empty unowned guidance files may be initialized.
+- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default.
+- Stage and fingerprint copies, replace through backups with rollback, and atomically publish ownership only after all output succeeds.
+- Use real copies only under `~/.agents/skills/`. Claude receives links or Windows directory junctions to those copies, never independent duplicates.
+- Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
+- Report the checkout commit, manifest count, changed skill names, alias status, every guidance status, ownership path, and reload requirement.
 
 Canonical details: `docs/consumer-repo-enrollment.md`.
+
+### Legacy Migration Rules
+
+- `agent-core apply [--here]` is deprecated compatibility and must continue targeting project-local `.agents/skills/`; never silently retarget it globally.
+- `agent-core retire-local --here` may remove only fingerprint-matching managed copies and exact legacy state and exclusion entries.
+- Refuse tracked or locally modified legacy copies before mutation and preserve unrelated `.agents` and Git exclusion content.
+- Do not scan arbitrary repositories for old installations.
 
 ### Memory Rules
 
 - The memory pilot remains append-only; `memory/memories.jsonl` is canonical, and generated search/index artifacts are disposable.
 - Route memory operations through `uv run scripts/memory.py`, not direct ledger edits.
 - New memory topic creation requires explicit human approval. Existing active topics may be updated autonomously within scope.
-- Memory tooling is steward-only. Simple apply does not create or infer consumer memory configuration.
+- Memory tooling is steward-only. Global sync does not create or infer project memory configuration.
+- Knowledge-base work uses the canonical Google Drive workflow identified in `global/AGENTS.md`; do not restore the retired repository-local workflow.
 
 ## Steward Rules
 
 - Keep `skills/` production-ready and hand-edited.
 - Do not edit production workflow skills autonomously.
 - Keep durable architecture in `README.md` and detailed stable contracts in focused docs.
-- Use `tasks/` only for active execution handoff, under the `project-tasks` workflow.
-- Prefer `uv`; use the packaged project for `agent-core` and PEP 723 single-file scripts for standalone steward tools.
+- Use `tasks/` only for active execution handoff under `project-tasks`.
+- Prefer `uv` for maintainer workflows, while preserving the dependency-free installed runtime.
 - Do not rely on checked-in virtual environments or manual `pip install` state.
-- Preserve the canonical/generated boundary when adding cross-harness access.
+- Preserve the canonical/installed boundary when adding cross-harness access.
 - Prefer minimal reversible foundations over speculative automation.
 
 ### Related Surfaces
@@ -103,12 +102,12 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
 | Repo architecture | `README.md` | Durable repository orientation and boundaries. |
-| Human operating manual | `docs/agent-core-operating-manual.md` | Canonical setup, apply, publication, verification, and recovery commands for the owner. |
-| Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical simple apply behavior. |
-| Core list | `core-skills.toml` | Authoritative copied skill set. |
+| Human operating manual | `docs/agent-core-operating-manual.md` | Canonical setup, sync, publication, migration, verification, and recovery commands. |
+| Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical global sync and legacy retirement behavior. |
+| Personal list | `personal-skills.toml` | Authoritative copied skill set. |
+| Global guidance | `global/AGENTS.md` | Automatically loaded personal behavior for supported harnesses. |
 | CLI launcher | `agent_core/bootstrap.py` | Canonical refresh and fresh-process boundary. |
-| Apply engine | `agent_core/apply.py` | Copy ownership, conflict safety, rollback, and exclusions. |
-| Session skill | `skills/agent-os-session/SKILL.md` | Shared session-start routing and visible confirmation. |
+| Sync engine | `agent_core/sync.py` | Copy ownership, conflict safety, rollback, aliases, and guidance. |
+| Legacy retirement | `agent_core/retire.py` | Safe cleanup of prior project-local installations. |
 | Memory contract | `docs/memory-pilot.md` | Ledger schema, approval boundary, and tooling behavior. |
-| Memory tooling | `scripts/memory.py` | List, search, append, and reindex operations. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |

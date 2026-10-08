@@ -1,17 +1,21 @@
 from __future__ import annotations
 
+import ast
+import importlib.util
 import json
+import os
 import shutil
 import stat
 import subprocess
 import tempfile
-import tomllib
+import types
 import unittest
 from io import StringIO
 from pathlib import Path
 from unittest.mock import patch
 
-from agent_core import apply, bootstrap
+from agent_core import apply, bootstrap, retire, sync
+from agent_core.manifest import MANIFEST_FILENAME, ManifestError, load_skill_names
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -51,10 +55,36 @@ def write_skill(checkout: Path, name: str, content: str) -> None:
 
 def write_config(checkout: Path, names: list[str]) -> None:
     rendered = "skills = [\n" + "".join(f'    "{name}",\n' for name in names) + "]\n"
-    (checkout / "core-skills.toml").write_text(rendered, encoding="utf-8")
+    (checkout / MANIFEST_FILENAME).write_text(rendered, encoding="utf-8")
 
 
-class AgentCoreApplyTests(unittest.TestCase):
+def write_guidance(checkout: Path, content: str = "# Global guidance\n") -> None:
+    path = checkout / sync.GUIDANCE_SOURCE
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def load_installer_module():
+    path = REPOSITORY_ROOT / "scripts" / "install_agent_core.py"
+    spec = importlib.util.spec_from_file_location("install_agent_core", path)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class ManifestTests(unittest.TestCase):
+    def test_strict_manifest_parser(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / MANIFEST_FILENAME
+            path.write_text('skills = [\n  "one",\n  "two",\n]\n', encoding="utf-8")
+            self.assertEqual(load_skill_names(path), ["one", "two"])
+            path.write_text('[other]\nskills = ["one"]\n', encoding="utf-8")
+            with self.assertRaisesRegex(ManifestError, "must contain only"):
+                load_skill_names(path)
+
+
+class AgentCoreSyncTests(unittest.TestCase):
     def setUp(self) -> None:
         self.temporary = tempfile.TemporaryDirectory()
         self.root = Path(self.temporary.name)
@@ -62,305 +92,237 @@ class AgentCoreApplyTests(unittest.TestCase):
         initialize_repo(self.checkout)
         write_skill(self.checkout, "demo", "version one")
         write_config(self.checkout, ["demo"])
+        write_guidance(self.checkout)
         commit_all(self.checkout, "initial canonical")
-
-        self.project = self.root / "project"
-        initialize_repo(self.project)
-        (self.project / "README.md").write_text("project\n", encoding="utf-8")
-        commit_all(self.project, "initial project")
+        self.home = self.root / "home"
+        self.home.mkdir()
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
-    def target(self, name: str = "demo") -> Path:
-        return self.project / ".agents" / "skills" / name
+    def skill(self, name: str = "demo") -> Path:
+        return self.home / ".agents" / "skills" / name
 
-    def ownership_path(self, project: Path | None = None) -> Path:
-        paths = apply.resolve_project(project or self.project)
-        return apply.state_path(paths)
+    def alias(self, name: str = "demo") -> Path:
+        return self.home / ".claude" / "skills" / name
 
-    def test_first_apply_records_ownership_and_is_idempotent(self) -> None:
-        first = apply.apply_checkout(self.checkout, self.project)
-        second = apply.apply_checkout(self.checkout, self.project)
+    def test_first_sync_and_repeat_no_op_publish_all_targets(self) -> None:
+        first = sync.sync_checkout(self.checkout, self.home)
+        second = sync.sync_checkout(self.checkout, self.home)
 
-        self.assertEqual([plan.classification for plan in first], ["absent"])
-        self.assertEqual([plan.classification for plan in second], ["owned-unchanged"])
-        self.assertIn("version one", (self.target() / "SKILL.md").read_text(encoding="utf-8"))
-        state = json.loads(self.ownership_path().read_text(encoding="utf-8"))
-        record = state["destinations"][".agents/skills/demo"]
-        self.assertEqual(record["source_skill"], "demo")
-        self.assertEqual(record["fingerprint"], apply.fingerprint_directory(self.target()))
-        self.assertRegex(record["source_commit"], r"^[0-9a-f]{40,64}$")
+        self.assertEqual([plan.classification for plan in first.skills], ["added"])
+        self.assertEqual([plan.classification for plan in second.skills], ["unchanged"])
+        self.assertTrue(os.path.samefile(self.skill(), self.alias()))
+        for relative in sync.GUIDANCE_DESTINATIONS.values():
+            self.assertEqual((self.home / relative).read_text(encoding="utf-8"), "# Global guidance\n")
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertEqual(state["version"], sync.STATE_VERSION)
+        self.assertIn("demo", state["skills"])
+        self.assertEqual(set(state["guidance"]), set(sync.GUIDANCE_DESTINATIONS))
+        self.assertTrue(all(plan.classification == "unchanged" for plan in second.guidance))
 
-    def test_adding_and_cleanly_readding_a_configured_skill(self) -> None:
-        apply.apply_checkout(self.checkout, self.project)
-        write_skill(self.checkout, "second", "second one")
-        write_config(self.checkout, ["demo", "second"])
-        commit_all(self.checkout, "add second")
-        apply.apply_checkout(self.checkout, self.project)
-
-        write_config(self.checkout, ["demo"])
-        commit_all(self.checkout, "remove second from config")
-        before = (self.target("second") / "SKILL.md").read_text(encoding="utf-8")
-        apply.apply_checkout(self.checkout, self.project)
-        self.assertEqual((self.target("second") / "SKILL.md").read_text(encoding="utf-8"), before)
-        self.assertIn(".agents/skills/second", json.loads(self.ownership_path().read_text())["destinations"])
-
-        write_skill(self.checkout, "second", "second two")
-        write_config(self.checkout, ["demo", "second"])
-        commit_all(self.checkout, "readd second")
-        apply.apply_checkout(self.checkout, self.project)
-        self.assertIn("second two", (self.target("second") / "SKILL.md").read_text(encoding="utf-8"))
-
-    def test_manual_deletion_is_safely_recreated(self) -> None:
-        apply.apply_checkout(self.checkout, self.project)
-        shutil.rmtree(self.target())
-        plans = apply.apply_checkout(self.checkout, self.project)
-        self.assertEqual(plans[0].classification, "owned-missing")
-        self.assertTrue((self.target() / "SKILL.md").is_file())
-
-    def test_locally_modified_removed_skill_is_refused_when_readded(self) -> None:
-        apply.apply_checkout(self.checkout, self.project)
-        write_config(self.checkout, [])
-        commit_all(self.checkout, "remove demo")
-        (self.target() / "SKILL.md").write_text("local while removed", encoding="utf-8")
-        apply.apply_checkout(self.checkout, self.project)
-
-        write_config(self.checkout, ["demo"])
-        commit_all(self.checkout, "readd demo")
-        with self.assertRaisesRegex(apply.ApplyError, "locally modified"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertEqual((self.target() / "SKILL.md").read_text(), "local while removed")
-
-    def test_refuses_unowned_or_locally_modified_target(self) -> None:
-        self.target().mkdir(parents=True)
-        (self.target() / "local.txt").write_text("private", encoding="utf-8")
-        with self.assertRaisesRegex(apply.ApplyError, "not provably owned"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertEqual((self.target() / "local.txt").read_text(), "private")
-
-        shutil.rmtree(self.target())
-        apply.apply_checkout(self.checkout, self.project)
-        (self.target() / "SKILL.md").write_text("local edit", encoding="utf-8")
-        with self.assertRaisesRegex(apply.ApplyError, "locally modified"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertEqual((self.target() / "SKILL.md").read_text(), "local edit")
-
-    def test_refuses_tracked_target_and_tracked_descendant(self) -> None:
-        for relative in (Path(".agents/skills/demo"), Path(".agents/skills/demo/child.txt")):
-            with self.subTest(relative=relative):
-                isolated = self.root / ("tracked-" + str(len(relative.parts)))
-                initialize_repo(isolated)
-                path = isolated / relative
-                path.parent.mkdir(parents=True)
-                path.write_text("tracked", encoding="utf-8")
-                commit_all(isolated, "tracked target")
-                with self.assertRaisesRegex(apply.ApplyError, "tracked by project Git"):
-                    apply.apply_checkout(self.checkout, isolated)
-
-    def test_missing_or_invalid_sources_fail_before_project_mutation(self) -> None:
-        write_config(self.checkout, ["missing"])
-        commit_all(self.checkout, "missing source")
-        with self.assertRaisesRegex(apply.ApplyError, "not a real directory"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertFalse(self.target().exists())
-
-        write_config(self.checkout, ["demo", "Demo"])
-        commit_all(self.checkout, "duplicate source")
-        with self.assertRaisesRegex(apply.ApplyError, "duplicate"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertFalse((self.project / ".agents").exists())
-
-    def test_ignored_untracked_source_file_is_not_copied(self) -> None:
-        (self.checkout / ".gitignore").write_text("*.private\n", encoding="utf-8")
-        commit_all(self.checkout, "ignore private artifacts")
-        (self.checkout / "skills/demo/local.private").write_text("not committed", encoding="utf-8")
-        self.assertEqual(git(self.checkout, "status", "--porcelain").stdout, "")
-
-        with self.assertRaisesRegex(apply.ApplyError, "not tracked"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertFalse(self.target().exists())
-
-    def test_fingerprint_includes_permission_changes(self) -> None:
-        skill_file = self.checkout / "skills/demo/SKILL.md"
-        original_mode = stat.S_IMODE(skill_file.stat().st_mode)
-        original_fingerprint = apply.fingerprint_directory(skill_file.parent)
-        try:
-            skill_file.chmod(original_mode ^ stat.S_IWUSR)
-            changed_mode = stat.S_IMODE(skill_file.stat().st_mode)
-            if changed_mode == original_mode:
-                self.skipTest("filesystem does not expose chmod changes")
-            self.assertNotEqual(original_fingerprint, apply.fingerprint_directory(skill_file.parent))
-        finally:
-            skill_file.chmod(original_mode)
-
-    def test_malformed_ownership_state_fails_closed(self) -> None:
-        path = self.ownership_path()
-        path.parent.mkdir(parents=True)
-        path.write_text('{"version": 1, "destinations": {"bad": {}}}', encoding="utf-8")
-        with self.assertRaisesRegex(apply.ApplyError, "invalid"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertFalse(self.target().exists())
-
-    def test_all_target_preflight_prevents_partial_update(self) -> None:
-        apply.apply_checkout(self.checkout, self.project)
-        original = (self.target() / "SKILL.md").read_text(encoding="utf-8")
+    def test_updates_recreates_and_keeps_removed_config_additively(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
         write_skill(self.checkout, "demo", "version two")
         write_skill(self.checkout, "second", "second")
         write_config(self.checkout, ["demo", "second"])
-        commit_all(self.checkout, "two skill update")
-        self.target("second").mkdir()
-        (self.target("second") / "local.txt").write_text("keep", encoding="utf-8")
+        commit_all(self.checkout, "update and add")
+        shutil.rmtree(self.skill())
 
-        with self.assertRaisesRegex(apply.ApplyError, "not provably owned"):
-            apply.apply_checkout(self.checkout, self.project)
-        self.assertEqual((self.target() / "SKILL.md").read_text(encoding="utf-8"), original)
+        result = sync.sync_checkout(self.checkout, self.home)
+        classes = {plan.source.name: plan.classification for plan in result.skills}
+        self.assertEqual(classes, {"demo": "recreated", "second": "added"})
+        self.assertIn("version two", (self.skill() / "SKILL.md").read_text(encoding="utf-8"))
 
-    def test_replacement_failure_rolls_back_and_does_not_write_state(self) -> None:
-        write_skill(self.checkout, "second", "second")
-        write_config(self.checkout, ["demo", "second"])
-        commit_all(self.checkout, "two skills")
-        original_move = apply._move_path
-        calls = 0
+        write_config(self.checkout, ["demo"])
+        commit_all(self.checkout, "remove second")
+        sync.sync_checkout(self.checkout, self.home)
+        self.assertTrue((self.skill("second") / "SKILL.md").is_file())
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertIn("second", state["skills"])
+        self.assertIn("second", state["aliases"])
 
-        def fail_second(source: Path, destination: Path) -> None:
-            nonlocal calls
-            calls += 1
-            if calls == 2:
-                raise OSError("injected replacement failure")
-            original_move(source, destination)
+    def test_committed_skill_and_guidance_updates_are_reported(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        write_skill(self.checkout, "demo", "version two")
+        write_guidance(self.checkout, "# Changed guidance\n")
+        commit_all(self.checkout, "update published sources")
 
-        with patch.object(apply, "_move_path", side_effect=fail_second):
-            with self.assertRaisesRegex(apply.ApplyError, "injected replacement failure"):
-                apply.apply_checkout(self.checkout, self.project)
-
-        self.assertFalse(self.target().exists())
-        self.assertFalse(self.target("second").exists())
-        self.assertFalse(self.ownership_path().exists())
-        artifacts = list((self.project / ".agents").glob(".agent-core-*") if (self.project / ".agents").exists() else [])
-        self.assertEqual(artifacts, [])
-
-    def test_apply_cli_reports_each_skill_action(self) -> None:
-        fingerprint = "a" * 64
-        plans = [
-            apply.TargetPlan(
-                apply.SourceSkill("added", Path("source"), fingerprint),
-                ".agents/skills/added",
-                Path("target"),
-                "absent",
-            ),
-            apply.TargetPlan(
-                apply.SourceSkill("recreated", Path("source"), fingerprint),
-                ".agents/skills/recreated",
-                Path("target"),
-                "owned-missing",
-            ),
-            apply.TargetPlan(
-                apply.SourceSkill("replaced", Path("source"), fingerprint),
-                ".agents/skills/replaced",
-                Path("target"),
-                "owned-unchanged",
-            ),
-        ]
-
-        with patch.object(apply, "apply_checkout", return_value=plans), patch(
-            "sys.stdout", new_callable=StringIO
-        ) as stdout:
-            self.assertEqual(apply.main(["--checkout", "canonical", "--cwd", "project"]), 0)
-
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.skills[0].classification, "updated")
+        self.assertTrue(all(plan.classification == "updated" for plan in result.guidance))
+        self.assertIn("version two", (self.skill() / "SKILL.md").read_text(encoding="utf-8"))
         self.assertEqual(
-            stdout.getvalue(),
-            "Applied 3 configured skills:\n"
-            "- added: added\n"
-            "- recreated: recreated\n"
-            "- replaced: replaced\n",
+            (self.home / ".pi/agent/AGENTS.md").read_text(encoding="utf-8"),
+            "# Changed guidance\n",
         )
 
-    def test_exclusions_are_idempotent_and_preserve_unrelated_content(self) -> None:
-        project_paths = apply.resolve_project(self.project)
-        exclude = project_paths.git_common_dir / "info" / "exclude"
-        exclude.write_text("# local rule\n/cache/\n", encoding="utf-8")
-        apply.apply_checkout(self.checkout, self.project)
-        first = exclude.read_text(encoding="utf-8")
-        apply.apply_checkout(self.checkout, self.project)
-        second = exclude.read_text(encoding="utf-8")
+    def test_modified_target_refuses_all_changes(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        original_guidance = (self.home / ".pi/agent/AGENTS.md").read_text(encoding="utf-8")
+        (self.skill() / "SKILL.md").write_text("local edit", encoding="utf-8")
+        write_guidance(self.checkout, "# Changed guidance\n")
+        commit_all(self.checkout, "change guidance")
 
-        self.assertEqual(first, second)
-        self.assertIn("# local rule\n/cache/", second)
-        self.assertEqual(second.count(apply.EXCLUDE_START), 1)
-        self.assertIn("/.agents/skills/demo/", second)
-        self.assertFalse((self.project / ".gitignore").exists())
-        status = git(self.project, "status", "--short").stdout
-        self.assertNotIn(".agents/skills/demo", status)
+        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual((self.home / ".pi/agent/AGENTS.md").read_text(), original_guidance)
 
-    def test_linked_worktree_uses_actual_git_dir_and_common_exclude(self) -> None:
-        linked = self.root / "linked"
-        git(self.project, "worktree", "add", "-q", "-b", "linked-test", str(linked))
-        apply.apply_checkout(self.checkout, linked)
-        paths = apply.resolve_project(linked)
+    def test_unowned_collisions_and_empty_guidance_rules(self) -> None:
+        unrelated = self.home / ".agents/skills/third-party"
+        unrelated.mkdir(parents=True)
+        (unrelated / "SKILL.md").write_text("third party", encoding="utf-8")
+        pi_guidance = self.home / sync.GUIDANCE_DESTINATIONS["pi"]
+        pi_guidance.parent.mkdir(parents=True)
+        pi_guidance.write_text("", encoding="utf-8")
+        claude_guidance = self.home / sync.GUIDANCE_DESTINATIONS["claude"]
+        claude_guidance.parent.mkdir(parents=True)
+        claude_guidance.write_text("unowned", encoding="utf-8")
 
-        self.assertNotEqual(paths.git_dir, paths.git_common_dir)
-        self.assertTrue(apply.state_path(paths).is_file())
-        self.assertFalse((paths.git_common_dir / apply.STATE_DIRECTORY / apply.STATE_FILENAME).exists())
-        self.assertIn("/.agents/skills/demo/", (paths.git_common_dir / "info" / "exclude").read_text())
+        with self.assertRaisesRegex(sync.SyncError, "non-empty"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual((unrelated / "SKILL.md").read_text(), "third party")
+        self.assertEqual(pi_guidance.read_text(), "")
 
-    def test_here_applies_to_a_non_git_directory(self) -> None:
-        workspace = self.root / "workspace"
-        workspace.mkdir()
+        claude_guidance.unlink()
+        sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(pi_guidance.read_text(), "# Global guidance\n")
+        self.assertEqual((unrelated / "SKILL.md").read_text(), "third party")
 
-        plans = apply.apply_checkout(self.checkout, workspace, here=True)
-        project_paths = apply.resolve_project(workspace, here=True)
+    def test_guidance_modified_and_missing_states(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        pi = self.home / sync.GUIDANCE_DESTINATIONS["pi"]
+        pi.write_text("local", encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
+            sync.sync_checkout(self.checkout, self.home)
+        pi.write_text("# Global guidance\n", encoding="utf-8")
+        pi.unlink()
+        result = sync.sync_checkout(self.checkout, self.home)
+        statuses = {plan.harness: plan.classification for plan in result.guidance}
+        self.assertEqual(statuses["pi"], "recreated")
 
-        self.assertEqual([plan.classification for plan in plans], ["absent"])
-        self.assertTrue((workspace / ".agents/skills/demo/SKILL.md").is_file())
-        self.assertEqual(
-            apply.state_path(project_paths), workspace.resolve() / ".agents/.agent-core/ownership.json"
-        )
-        self.assertTrue(apply.state_path(project_paths).is_file())
+    def test_alias_collision_and_broken_alias_recovery(self) -> None:
+        collision = self.alias()
+        collision.mkdir(parents=True)
+        (collision / "keep.txt").write_text("keep", encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "not owned"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual((collision / "keep.txt").read_text(), "keep")
 
-        git(workspace, "init", "-q")
-        git(workspace, "config", "user.name", "Agent Core Tests")
-        git(workspace, "config", "user.email", "agent-core@example.invalid")
-        (workspace / "README.md").write_text("workspace\n", encoding="utf-8")
-        git(workspace, "add", "README.md")
-        git(workspace, "commit", "-q", "-m", "initialize workspace")
+        shutil.rmtree(collision)
+        sync.sync_checkout(self.checkout, self.home)
+        shutil.rmtree(self.skill())
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.aliases[0].classification, "recreated")
+        self.assertTrue(os.path.samefile(self.skill(), self.alias()))
 
-        repeated = apply.apply_checkout(self.checkout, workspace, here=True)
-        self.assertEqual([plan.classification for plan in repeated], ["owned-unchanged"])
-        self.assertTrue((workspace / ".agents/.agent-core/ownership.json").is_file())
-        self.assertNotIn(".agents", git(workspace, "status", "--short").stdout)
+    def test_rollback_spans_skills_guidance_aliases_and_state(self) -> None:
+        with patch.object(sync, "_create_directory_alias", side_effect=sync.SyncError("injected alias failure")):
+            with self.assertRaisesRegex(sync.SyncError, "injected alias failure"):
+                sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.skill().exists())
+        self.assertFalse(sync.global_state_path(self.home).exists())
+        for relative in sync.GUIDANCE_DESTINATIONS.values():
+            self.assertFalse((self.home / relative).exists())
 
-    def test_here_targets_a_git_subdirectory_and_keeps_git_safety(self) -> None:
-        workspace = self.project / "workspace"
-        workspace.mkdir()
-        apply.apply_checkout(self.checkout, workspace, here=True)
-        project_paths = apply.resolve_project(workspace, here=True)
+    def test_state_publication_failure_rolls_back(self) -> None:
+        original = apply._atomic_write
 
-        self.assertTrue((workspace / ".agents/skills/demo/SKILL.md").is_file())
-        self.assertFalse((self.project / ".agents").exists())
-        self.assertEqual(
-            apply.state_path(project_paths), workspace.resolve() / ".agents/.agent-core/ownership.json"
-        )
-        exclude = project_paths.git_common_dir / "info/exclude"
+        def fail_state(path: Path, content: str) -> None:
+            if path == sync.global_state_path(self.home):
+                raise OSError("injected state failure")
+            original(path, content)
+
+        with patch.object(apply, "_atomic_write", side_effect=fail_state):
+            with self.assertRaisesRegex(sync.SyncError, "injected state failure"):
+                sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.skill().exists())
+        self.assertFalse(sync.global_state_path(self.home).exists())
+
+    def test_uncommitted_sources_and_manifest_are_refused(self) -> None:
+        (self.checkout / "skills/demo/local.txt").write_text("untracked", encoding="utf-8")
+        with self.assertRaisesRegex(apply.ApplyError, "not tracked"):
+            sync.sync_checkout(self.checkout, self.home)
+        (self.checkout / "skills/demo/local.txt").unlink()
+        write_config(self.checkout, [])
+        with self.assertRaisesRegex(apply.ApplyError, "must match committed"):
+            sync.sync_checkout(self.checkout, self.home)
+
+    def test_result_output_is_concise_and_complete(self) -> None:
+        result = sync.sync_checkout(self.checkout, self.home)
+        with patch("sys.stdout", new_callable=StringIO) as stdout:
+            sync.print_result(result)
+        output = stdout.getvalue()
+        self.assertIn("Canonical checkout:", output)
+        self.assertIn("1 configured skills", output)
+        self.assertIn("Changed skills: demo", output)
+        self.assertIn("Guidance pi:", output)
+        self.assertIn("Ownership state:", output)
+        self.assertIn("Reload or restart", output)
+
+
+class LegacyApplyAndRetirementTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.checkout = self.root / "canonical"
+        initialize_repo(self.checkout)
+        write_skill(self.checkout, "demo", "version one")
+        write_config(self.checkout, ["demo"])
+        commit_all(self.checkout, "canonical")
+        self.project = self.root / "project"
+        initialize_repo(self.project)
+        (self.project / "README.md").write_text("project\n", encoding="utf-8")
+        commit_all(self.project, "project")
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def test_legacy_apply_still_uses_project_destination(self) -> None:
+        plans = apply.apply_checkout(self.checkout, self.project, here=True)
+        self.assertEqual(plans[0].classification, "absent")
+        self.assertTrue((self.project / ".agents/skills/demo/SKILL.md").is_file())
+        self.assertFalse((self.root / ".agents").exists())
+
+    def test_retire_here_removes_only_owned_content_and_exact_metadata(self) -> None:
+        apply.apply_checkout(self.checkout, self.project, here=True)
+        unrelated = self.project / ".agents/skills/unrelated"
+        unrelated.mkdir()
+        (unrelated / "keep.txt").write_text("keep", encoding="utf-8")
+        paths = apply.resolve_project(self.project, here=True)
+        exclude = paths.git_common_dir / "info/exclude"
+        with exclude.open("a", encoding="utf-8") as stream:
+            stream.write("/unrelated-rule/\n")
+
+        result = retire.retire_local(self.project, here=True)
+        self.assertEqual(result.removed, ["demo"])
+        self.assertFalse((self.project / ".agents/skills/demo").exists())
+        self.assertEqual((unrelated / "keep.txt").read_text(), "keep")
+        self.assertFalse((self.project / ".agents/.agent-core/ownership.json").exists())
         exclusions = exclude.read_text(encoding="utf-8")
-        self.assertIn("/workspace/.agents/skills/demo/", exclusions)
-        self.assertIn("/workspace/.agents/.agent-core/", exclusions)
+        self.assertIn("/unrelated-rule/", exclusions)
+        self.assertNotIn("agent-core managed skills", exclusions)
 
-        git(self.project, "add", "-f", "workspace/.agents/skills/demo/SKILL.md")
-        commit_all(self.project, "track copied skill")
-        with self.assertRaisesRegex(apply.ApplyError, "tracked by project Git"):
-            apply.apply_checkout(self.checkout, workspace, here=True)
+    def test_retire_refuses_modified_or_tracked_content_before_mutation(self) -> None:
+        apply.apply_checkout(self.checkout, self.project, here=True)
+        target = self.project / ".agents/skills/demo/SKILL.md"
+        target.write_text("local", encoding="utf-8")
+        with self.assertRaisesRegex(retire.RetireError, "locally modified"):
+            retire.retire_local(self.project, here=True)
+        self.assertTrue(target.exists())
 
-    def test_unrelated_harness_skill_surfaces_are_ignored(self) -> None:
-        for surface in (".claude", ".opencode"):
-            harness_skill = self.project / surface / "skills" / "demo"
-            harness_skill.mkdir(parents=True)
-            (harness_skill / "keep.txt").write_text("keep", encoding="utf-8")
+        target.write_text((self.checkout / "skills/demo/SKILL.md").read_text(), encoding="utf-8")
+        git(self.project, "add", "-f", ".agents/skills/demo/SKILL.md")
+        commit_all(self.project, "track legacy copy")
+        with self.assertRaisesRegex(retire.RetireError, "tracked by Git"):
+            retire.retire_local(self.project, here=True)
+        self.assertTrue(target.exists())
 
+    def test_retire_here_recognizes_prior_plain_apply_at_git_root(self) -> None:
         apply.apply_checkout(self.checkout, self.project)
-        self.assertTrue((self.target() / "SKILL.md").is_file())
-        self.assertEqual((self.project / ".claude/skills/demo/keep.txt").read_text(), "keep")
-        self.assertEqual((self.project / ".opencode/skills/demo/keep.txt").read_text(), "keep")
+        result = retire.retire_local(self.project, here=True)
+        self.assertEqual(result.removed, ["demo"])
+        self.assertFalse((self.project / ".agents/skills/demo").exists())
 
 
 class AgentCoreBootstrapTests(unittest.TestCase):
@@ -373,92 +335,135 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         shutil.copy2(REPOSITORY_ROOT / "pyproject.toml", self.upstream / "pyproject.toml")
         write_skill(self.upstream, "demo", "remote one")
         write_config(self.upstream, ["demo"])
+        write_guidance(self.upstream)
         commit_all(self.upstream, "initial")
-
         self.remote = self.root / "remote.git"
         git(self.root, "init", "-q", "--bare", str(self.remote))
         git(self.upstream, "remote", "add", "origin", str(self.remote))
         branch = git(self.upstream, "branch", "--show-current").stdout.strip()
         git(self.upstream, "push", "-q", "-u", "origin", branch)
-
-        self.checkout = self.root / "home" / ".agent-core"
-        self.checkout.parent.mkdir()
+        self.home = self.root / "home"
+        self.home.mkdir()
+        self.checkout = self.home / ".agent-core"
         git(self.root, "clone", "-q", str(self.remote), str(self.checkout))
-
         self.project = self.root / "project"
-        initialize_repo(self.project)
-        (self.project / "README.md").write_text("project\n", encoding="utf-8")
-        commit_all(self.project, "initial")
+        self.project.mkdir()
 
     def tearDown(self) -> None:
         self.temporary.cleanup()
 
-    def test_fast_forward_uses_freshly_pulled_apply_implementation(self) -> None:
-        write_skill(self.upstream, "demo", "remote two")
-        implementation = self.upstream / "agent_core" / "apply.py"
+    def test_fast_forward_uses_fresh_sync_implementation(self) -> None:
+        implementation = self.upstream / "agent_core" / "sync.py"
         text = implementation.read_text(encoding="utf-8")
-        text = text.replace(
-            "        plans = apply_checkout(Path(args.checkout), Path(args.cwd), here=args.here)",
-            '        (Path(args.cwd) / "fresh-process.txt").write_text("fresh", encoding="utf-8")\n'
-            "        plans = apply_checkout(Path(args.checkout), Path(args.cwd), here=args.here)",
-        )
+        marker = '    Path(args.home, "fresh-process.txt").write_text("fresh", encoding="utf-8")\n'
+        text = text.replace("    try:\n        result = sync_checkout", marker + "    try:\n        result = sync_checkout")
         implementation.write_text(text, encoding="utf-8")
+        write_skill(self.upstream, "demo", "remote two")
         commit_all(self.upstream, "fresh implementation")
         git(self.upstream, "push", "-q")
 
-        result = bootstrap.refresh_and_launch(self.checkout, self.project)
-
+        result = bootstrap.refresh_and_launch(
+            self.checkout, self.project, command="sync", home=self.home
+        )
         self.assertEqual(result, 0)
-        self.assertEqual((self.project / "fresh-process.txt").read_text(), "fresh")
-        self.assertIn("remote two", (self.project / ".agents/skills/demo/SKILL.md").read_text())
+        self.assertEqual((self.home / "fresh-process.txt").read_text(), "fresh")
+        self.assertIn("remote two", (self.home / ".agents/skills/demo/SKILL.md").read_text())
 
-    def test_dirty_checkout_is_refused_before_project_mutation(self) -> None:
-        (self.checkout / "untracked.txt").write_text("dirty", encoding="utf-8")
+    def test_dirty_checkout_and_pull_failure_are_refused(self) -> None:
+        (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
         with self.assertRaisesRegex(bootstrap.AgentCoreError, "staged, unstaged, or untracked"):
-            bootstrap.refresh_and_launch(self.checkout, self.project)
-        self.assertFalse((self.project / ".agents").exists())
-
-    def test_pull_failure_is_refused_before_project_mutation(self) -> None:
-        unavailable = self.root / "unavailable.git"
-        self.remote.rename(unavailable)
+            bootstrap.refresh_and_launch(self.checkout, self.project, command="sync", home=self.home)
+        self.assertFalse((self.home / ".agents").exists())
+        (self.checkout / "dirty.txt").unlink()
+        self.remote.rename(self.root / "unavailable.git")
         with self.assertRaisesRegex(bootstrap.AgentCoreError, "Could not refresh"):
-            bootstrap.refresh_and_launch(self.checkout, self.project)
-        self.assertFalse((self.project / ".agents").exists())
+            bootstrap.refresh_and_launch(self.checkout, self.project, command="sync", home=self.home)
+        self.assertFalse((self.home / ".agents").exists())
 
-    def test_cli_and_entry_point_smoke_contract(self) -> None:
-        config = tomllib.loads((REPOSITORY_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
-        self.assertEqual(config["project"]["scripts"]["agent-core"], "agent_core.bootstrap:main")
+    def test_cli_routes_sync_apply_and_retire(self) -> None:
         with patch.object(bootstrap, "canonical_checkout", return_value=self.checkout), patch.object(
             bootstrap, "refresh_and_launch", return_value=0
         ) as launch:
-            self.assertEqual(bootstrap.main(["apply"]), 0)
-        launch.assert_called_once()
-
-    def test_non_git_directory_fails_without_writes(self) -> None:
-        outside = self.root / "outside"
-        outside.mkdir()
-        before = git(self.checkout, "rev-parse", "HEAD").stdout
-        with self.assertRaisesRegex(bootstrap.AgentCoreError, "not in a Git worktree"):
-            bootstrap.refresh_and_launch(self.checkout, outside)
-        self.assertEqual(list(outside.iterdir()), [])
-        self.assertEqual(git(self.checkout, "rev-parse", "HEAD").stdout, before)
-
-    def test_here_bootstrap_allows_a_non_git_directory(self) -> None:
-        outside = self.root / "outside-here"
-        outside.mkdir()
-
-        result = bootstrap.refresh_and_launch(self.checkout, outside, here=True)
-
-        self.assertEqual(result, 0)
-        self.assertTrue((outside / ".agents/skills/demo/SKILL.md").is_file())
-        self.assertTrue((outside / ".agents/.agent-core/ownership.json").is_file())
-
-    def test_cli_passes_here_mode(self) -> None:
-        with patch.object(bootstrap, "canonical_checkout", return_value=self.checkout), patch.object(
-            bootstrap, "refresh_and_launch", return_value=0
-        ) as launch:
+            self.assertEqual(bootstrap.main(["sync"]), 0)
             self.assertEqual(bootstrap.main(["apply", "--here"]), 0)
-        launch.assert_called_once_with(self.checkout, Path.cwd(), here=True)
+            self.assertEqual(bootstrap.main(["retire-local", "--here"]), 0)
+        self.assertEqual(launch.call_count, 3)
+        self.assertEqual(launch.call_args_list[0].kwargs["command"], "sync")
+        self.assertEqual(launch.call_args_list[1].kwargs["command"], "apply")
+        self.assertEqual(launch.call_args_list[2].kwargs["command"], "retire-local")
+
+
+class InstallerAndCompatibilityTests(unittest.TestCase):
+    def test_installer_writes_cmd_shim_and_requests_path_update(self) -> None:
+        installer = load_installer_module()
+        with tempfile.TemporaryDirectory() as directory:
+            home = Path(directory) / "home"
+            checkout = home / ".agent-core"
+            checkout.mkdir(parents=True)
+            local = Path(directory) / "local"
+            with patch.object(installer, "add_to_user_path", return_value=True) as add:
+                shim, bin_directory, changed = installer.install(
+                    checkout=checkout,
+                    home=home,
+                    local_app_data=local,
+                    python_executable=Path("C:/Python310/python.exe"),
+                )
+            self.assertTrue(changed)
+            self.assertEqual(bin_directory, local / "AgentCore/bin")
+            self.assertIn("bootstrap.py", shim.read_text(encoding="utf-8"))
+            self.assertIn(str(Path("C:/Python310/python.exe")), shim.read_text(encoding="utf-8"))
+            add.assert_called_once_with(bin_directory)
+
+    def test_user_path_update_preserves_long_existing_value(self) -> None:
+        installer = load_installer_module()
+        captured: dict[str, object] = {}
+        existing = ";".join(["C:/existing/" + ("x" * 4000), "C:/other"])
+
+        class Key:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+        fake_winreg = types.SimpleNamespace(
+            HKEY_CURRENT_USER=object(),
+            REG_EXPAND_SZ=2,
+            CreateKey=lambda *_: Key(),
+            QueryValueEx=lambda *_: (existing, 2),
+            SetValueEx=lambda _key, name, _reserved, kind, value: captured.update(
+                name=name, kind=kind, value=value
+            ),
+        )
+        fake_ctypes = types.SimpleNamespace(
+            c_ulong=lambda: object(),
+            byref=lambda value: value,
+            windll=types.SimpleNamespace(
+                user32=types.SimpleNamespace(SendMessageTimeoutW=lambda *args: 1)
+            ),
+        )
+        with patch.dict("sys.modules", {"winreg": fake_winreg}), patch.object(
+            installer, "ctypes", fake_ctypes
+        ):
+            changed = installer.add_to_user_path(Path("C:/AgentCore/bin"))
+        self.assertTrue(changed)
+        self.assertEqual(captured["kind"], 2)
+        self.assertTrue(str(captured["value"]).startswith(str(Path("C:/AgentCore/bin")) + ";"))
+        self.assertIn(existing, str(captured["value"]))
+
+    def test_cmd_installer_has_no_forbidden_dependency(self) -> None:
+        content = (REPOSITORY_ROOT / "scripts/install-agent-core.cmd").read_text(encoding="utf-8").lower()
+        for forbidden in ("powershell", "setx", "pip", "uv "):
+            self.assertNotIn(forbidden, content)
+        self.assertIn("py -3", content)
+        self.assertIn("python", content)
+
+    def test_runtime_sources_parse_as_python_310(self) -> None:
+        paths = list((REPOSITORY_ROOT / "agent_core").glob("*.py"))
+        paths.append(REPOSITORY_ROOT / "scripts/install_agent_core.py")
+        for path in paths:
+            with self.subTest(path=path):
+                ast.parse(path.read_text(encoding="utf-8"), filename=str(path), feature_version=(3, 10))
 
 
 if __name__ == "__main__":

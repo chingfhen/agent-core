@@ -76,7 +76,7 @@ Each JSONL row stores one immutable memory revision with these fields:
 #### Access Boundary
 
 - Only stewards use `scripts/memory.py`.
-- Simple apply does not configure memory for consumer targets.
+- Global personal-skill sync does not configure project memory or replace the canonical Google Drive knowledge-base workflow.
 
 ### Related Surfaces
 

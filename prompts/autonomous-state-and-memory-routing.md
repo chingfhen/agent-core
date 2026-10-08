@@ -6,7 +6,7 @@ Depreciated for a skill instead.
 
 **Purpose:** Historical prompt snippet for repos that use `tasks/`, `docs/`, `source-material/`, and `archive/`.
 
-Use `skills/agent-os-session/SKILL.md` as the canonical live policy. This prompt remains only as source material for the wording that was promoted into the skill.
+Use `global/AGENTS.md` as the canonical live policy. This prompt remains only as source material for wording distilled into automatically loaded global guidance.
 
 ## Canonical Snippet
 

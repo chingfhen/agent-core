@@ -42,9 +42,13 @@ def _validate_checkout(checkout: Path) -> None:
 
     required_files = (
         checkout / "pyproject.toml",
+        checkout / "personal-skills.toml",
+        checkout / "global" / "AGENTS.md",
         checkout / "agent_core" / "bootstrap.py",
         checkout / "agent_core" / "apply.py",
-        checkout / "core-skills.toml",
+        checkout / "agent_core" / "sync.py",
+        checkout / "agent_core" / "retire.py",
+        checkout / "agent_core" / "manifest.py",
     )
     required_directories = (checkout / "agent_core", checkout / "skills")
     missing = [str(path) for path in required_files if not path.is_file()]
@@ -71,12 +75,20 @@ def _ensure_clean(checkout: Path) -> None:
         raise AgentCoreError("Canonical checkout has staged, unstaged, or untracked changes; refusing to pull")
 
 
-def refresh_and_launch(checkout: Path, project_cwd: Path, *, here: bool = False) -> int:
-    if here:
-        if not project_cwd.is_dir():
-            raise AgentCoreError(f"Target directory does not exist: {project_cwd}")
-    else:
-        _ensure_project_worktree(project_cwd)
+def refresh_and_launch(
+    checkout: Path,
+    project_cwd: Path,
+    *,
+    command: str = "sync",
+    here: bool = False,
+    home: Path | None = None,
+) -> int:
+    if command in {"apply", "retire-local"}:
+        if here:
+            if not project_cwd.is_dir():
+                raise AgentCoreError(f"Target directory does not exist: {project_cwd}")
+        else:
+            _ensure_project_worktree(project_cwd)
     _validate_checkout(checkout)
     _ensure_clean(checkout)
 
@@ -86,34 +98,52 @@ def refresh_and_launch(checkout: Path, project_cwd: Path, *, here: bool = False)
         raise AgentCoreError(f"Could not refresh canonical checkout: {detail}")
 
     _validate_checkout(checkout)
-    implementation = checkout / "agent_core" / "apply.py"
-    command = [
-        sys.executable,
-        str(implementation),
-        "--checkout",
-        str(checkout),
-        "--cwd",
-        str(project_cwd),
-    ]
-    if here:
-        command.append("--here")
-    result = subprocess.run(command, check=False)
+    if command == "sync":
+        module = "agent_core.sync"
+        arguments = ["--checkout", str(checkout), "--home", str(home or Path.home())]
+    elif command == "apply":
+        module = "agent_core.apply"
+        arguments = ["--checkout", str(checkout), "--cwd", str(project_cwd)]
+        if here:
+            arguments.append("--here")
+    elif command == "retire-local":
+        module = "agent_core.retire"
+        arguments = ["--cwd", str(project_cwd)]
+        if here:
+            arguments.append("--here")
+    else:
+        raise AgentCoreError(f"Unsupported internal command: {command}")
+
+    result = subprocess.run(
+        [sys.executable, "-m", module, *arguments],
+        cwd=checkout,
+        check=False,
+    )
     return result.returncode
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="agent-core",
-        description="Refresh the private Agent Core checkout and apply configured skills.",
+        description="Refresh the private Agent Core checkout and publish personal agent resources.",
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
+    subparsers.add_parser("sync", help="Publish personal skills and global guidance for all supported harnesses.")
     apply_parser = subparsers.add_parser(
-        "apply", help="Refresh and safely copy core skills into a project or the current directory."
+        "apply", help="Deprecated: copy configured skills into one project or directory."
     )
     apply_parser.add_argument(
         "--here",
         action="store_true",
         help="Use the current directory exactly, whether or not it is a Git worktree.",
+    )
+    retire_parser = subparsers.add_parser(
+        "retire-local", help="Safely remove a legacy project-local Agent Core installation."
+    )
+    retire_parser.add_argument(
+        "--here",
+        action="store_true",
+        help="Use the current directory exactly; also recognizes prior plain-apply state at a Git root.",
     )
     return parser
 
@@ -121,11 +151,18 @@ def build_parser() -> argparse.ArgumentParser:
 def main(argv: Sequence[str] | None = None) -> int:
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.command != "apply":
-        parser.error(f"unsupported command: {args.command}")
-
+    if args.command == "apply":
+        print(
+            "agent-core: warning: 'apply' is deprecated; use 'agent-core sync' for personal skills",
+            file=sys.stderr,
+        )
     try:
-        return refresh_and_launch(canonical_checkout(), Path.cwd(), here=args.here)
+        return refresh_and_launch(
+            canonical_checkout(),
+            Path.cwd(),
+            command=args.command,
+            here=getattr(args, "here", False),
+        )
     except AgentCoreError as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)
         return 1

@@ -9,11 +9,12 @@ import shutil
 import stat
 import subprocess
 import sys
-import tomllib
 import uuid
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Sequence
+
+from agent_core.manifest import MANIFEST_FILENAME, ManifestError, load_skill_names
 
 STATE_VERSION = 1
 STATE_DIRECTORY = "agent-core"
@@ -180,29 +181,35 @@ def _validate_committed_source(checkout: Path, source: Path) -> None:
             f"Configured skill source must match committed Git files ({relative_source}): "
             + "; ".join(details)
         )
+    changed = _run_git(checkout, "diff", "--quiet", "HEAD", "--", relative_source)
+    if changed.returncode not in {0, 1}:
+        detail = changed.stderr.strip() or changed.stdout.strip() or f"exit code {changed.returncode}"
+        raise ApplyError(f"Could not compare configured skill source with the canonical commit: {detail}")
+    if changed.returncode == 1:
+        raise ApplyError(f"Configured skill source must match committed Git content: {relative_source}")
 
 
 def load_sources(checkout: Path) -> tuple[list[SourceSkill], str]:
-    config_path = checkout / "core-skills.toml"
+    config_path = checkout / MANIFEST_FILENAME
     try:
-        with config_path.open("rb") as stream:
-            config = tomllib.load(stream)
-    except FileNotFoundError as exc:
-        raise ApplyError(f"Core skill configuration is missing: {config_path}") from exc
-    except tomllib.TOMLDecodeError as exc:
-        raise ApplyError(f"Core skill configuration is invalid: {exc}") from exc
+        names = load_skill_names(config_path)
+    except ManifestError as exc:
+        raise ApplyError(str(exc)) from exc
 
-    if "core-skills.toml" not in _tracked_paths(checkout, "core-skills.toml"):
-        raise ApplyError("core-skills.toml must be tracked by the canonical Git checkout")
+    if MANIFEST_FILENAME not in _tracked_paths(checkout, MANIFEST_FILENAME):
+        raise ApplyError(f"{MANIFEST_FILENAME} must be tracked by the canonical Git checkout")
+    changed = _run_git(checkout, "diff", "--quiet", "HEAD", "--", MANIFEST_FILENAME)
+    if changed.returncode not in {0, 1}:
+        detail = changed.stderr.strip() or changed.stdout.strip() or f"exit code {changed.returncode}"
+        raise ApplyError(f"Could not compare {MANIFEST_FILENAME} with the canonical commit: {detail}")
+    if changed.returncode == 1:
+        raise ApplyError(f"{MANIFEST_FILENAME} must match committed Git content")
 
-    names = config.get("skills") if isinstance(config, dict) else None
-    if not isinstance(names, list):
-        raise ApplyError("core-skills.toml must define a 'skills' array")
     if any(not _safe_skill_name(name) for name in names):
-        raise ApplyError("core-skills.toml contains an unsafe or non-string skill name")
+        raise ApplyError(f"{MANIFEST_FILENAME} contains an unsafe or non-string skill name")
     normalized_names = [name.casefold() for name in names]
     if len(set(normalized_names)) != len(normalized_names):
-        raise ApplyError("core-skills.toml contains duplicate skill names")
+        raise ApplyError(f"{MANIFEST_FILENAME} contains duplicate skill names")
 
     commit = _git_output(checkout, "rev-parse", "HEAD", context="Could not identify canonical source commit")
     if not HEX_SHA.fullmatch(commit):
