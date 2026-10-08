@@ -83,6 +83,29 @@ Do not silently edit guidance in a nested or shared repository. Other project su
 
 One durable claim should have one primary authority. Other surfaces may link to it or state a concise consequence when needed rather than maintain competing full explanations.
 
+## Optional Project North Star
+
+A project may designate a canonical `north-star.md` within its
+configured documentation surface, or an equivalent existing document.
+
+The north star preserves the project's long-term purpose, intended
+outcomes, strategic direction, guiding principles, and boundaries.
+It describes what the project aims to become, not necessarily what
+the current implementation does.
+
+- Do not create a north star automatically. Use one only when the
+  project or human explicitly establishes it.
+- Treat an established north star as the canonical authority for
+  strategic intent. Avoid competing vision or direction documents.
+- Consult it when evaluating significant product or architectural
+  decisions. Surface material conflicts rather than silently
+  changing the project's direction.
+- Do not substantively change the north star's strategic direction
+  through routine documentation sync without explicit human approval.
+- Where agent guidance is owned by this workflow, maintain a concise
+  reference encouraging agents to consult the north star when relevant.
+  Do not require reading it for unrelated routine work.
+
 ## Admission and Routing
 
 Before writing, determine whether the work produced settled project understanding, stable operating behavior, or neither.
