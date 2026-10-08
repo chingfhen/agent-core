@@ -6,79 +6,119 @@
 **Priority:** Later  
 **Status:** On Hold
 
-**Goal:** Decide whether to keep personal and project knowledge bases on Google Drive or migrate some or all content to GitHub, and whether the canonical `knowledge-base` skill should be maintained in Agent Core instead of Google Drive.
+**Goal:** Choose the best long-term home for Markdown knowledge-base content, its review/approval workflow, and the canonical `knowledge-base` skill.
 
-**Why:** GitHub's direct links, readable rendered Markdown, version history and connected-agent edits feel substantially better for opening a known page. Google Drive was chosen for discoverable files, folder moves as human approval signals, and convenient everyday file management.
+**Why:** GitHub provides excellent clickable, rendered Markdown and agent-accessible files. The existing Drive choice was driven by filename search and moving review files to approved, but both requirements may be met by a Git-backed KB with agent search and VS Code.
 
-**Success Bar:** A deliberate, evidence-backed choice for **(a) KB content storage** and **(b) canonical skill source**, with a tested capture → review → approve → curate → retrieve workflow, clear access/security boundaries, and a reversible migration plan if anything moves.
+**Success Bar:** Evaluate reading, search, approval, multi-device synchronization, authorized agent operations, privacy, and recovery; select a storage architecture and canonical skill source; retain the existing capture → review → approve → curate semantics; document a safe pilot/migration plan if warranted.
 
-**Chosen Direction:** **No migration approved.** Current recommendation: **keep KB contents on Drive; eventually consider Agent Core as the canonical *skill-source* repository**. Do not make `agent-core` the KB data store.
+**Chosen Direction:** **Not selected. No migration is approved.** Revised recommendation: **a separate private Git-backed Markdown KB is now a serious contender, potentially preferable for a Markdown-first workflow**. Do not presume Drive remains the better content backend merely because it supports searching and folder moves. A hybrid may still win.
 
-**Current State:** Comparative analysis captured. The Drive KB workflow and adapter remain canonical. Agent Core contains a noncanonical copy at `skills/knowledge-base/SKILL.md` for portability. No Google Drive KB files, registry, or global routing instructions have been changed.
+**Current State:** Comparative analysis updated following the owner's actual Drive and VS Code experience. The current canonical KB workflow and Google Drive adapter remain on Drive; the Agent Core repository contains a noncanonical copy. No KB files or global routing were migrated.
 
-**Next Action:** When revisiting, run a small *read-only* comparison of the same Markdown artifact on Drive and GitHub, then decide whether to (1) keep the hybrid, (2) make GitHub canonical for skill code only, or (3) pilot a **separate private** Git repo for a nonsensitive KB subset. Require new approval before any migration or changes to canonical routing.
+**Next Action:** When resuming, use a few *synthetic, nonsensitive* Markdown files to compare: (1) actual reading on phone and desktop, (2) filename and content retrieval by agent, VS Code and GitHub, (3) review → approved via VS Code or agent, including commit/push, (4) evidence curation and link maintenance, (5) backup and conflict recovery. Choose the backend only after a small end-to-end trial.
 
-**Blockers:** Design decision deferred; also evaluate write capabilities and identity/permissions in the intended agent harnesses. **Safety boundary:** `chingfhen/agent-core` is currently reported by GitHub as **public** (verified 2026-10-08). Do not commit private KB evidence, personal information, workplace content, or other confidential material there.
+**Blockers / Constraints:** The decision is deferred. GitHub currently reports `chingfhen/agent-core` as **public** (checked 2026-10-08); it must not contain personal KB evidence or company-confidential content. A **private, separate repository** is required for an ordinary personal Git KB. A private repository is not automatically an authorized storage destination for workplace data; employer policy remains controlling.
 
-**Human Attention:** Follow the two sample links below on mobile and desktop; compare rendered reading, search, and moving an item through review/approval. Do not grant repository access or change visibility automatically.
+**Human Attention:** No action now. When revisiting, check the GitHub file view and the exact Drive behavior observed on your devices rather than relying on feature claims from vendor documentation. Confirm whether access works in the actual personal agent environments before selecting a new backend.
 
-## Short Recommendation
+## Revised Finding: Reading Markdown Is Not Equivalent on Drive
 
-Separate **skill definition**, **knowledge content**, and **storage adapter**:
+**Owner's observed behavior on 2026-10-08:** On both Google Drive mobile and web, opening `.md` files still requires handing them to **OpenNote**. The earlier claim that Drive provides an equally convenient native formatted Markdown preview was **not true in the owner's actual setup**. Do not repeat it or instruct the owner to switch to a Preview mode as though that resolves the issue.
 
-| Layer | Preferred home | Why |
+This materially strengthens GitHub for **reading**: an ordinary GitHub file URL opens the rendered Markdown, and VS Code can also preview Markdown in a locally cloned repository (`Ctrl+Shift+V` on Windows).
+
+Reading is a daily task; moving files for approval may be comparatively rare. Optimize for the **real frequency and effort of each operation**, not abstract feature availability.
+
+## Finding: Git Search Has Several Good Paths
+
+| Who is searching? | Practical method | Notes |
 | --- | --- | --- |
-| Agent Core skills and distribution | `agent-core` (GitHub) | One versioned source with `agent-core sync`, clear code review and direct links |
-| Canonical KB skill, **eventually** | `agent-core/skills/knowledge-base/` with adapter references, **if explicitly migrated** | Makes the workflow portable to personal agents; avoid two competing SKILL.md sources |
-| KB evidence, knowledge, raw files, inbox/review/approved | Existing per-KB Google Drive roots | Easy file browsing, metadata search, direct moves, and independent private access boundaries |
-| Other future KBs if Git-backed storage genuinely wins | **Separate private KB repo(s)**, not `agent-core` | Separation of concerns, privacy and different retention/versioning needs |
+| **Human in VS Code (local clone)** | `Ctrl+P` to open a filename; `Ctrl+Shift+F` for text across files. | Fast, local and works offline after cloning. VS Code search respects exclusions; check search settings if a file is missing. |
+| **Human on GitHub web** | Repository file finder and GitHub Code Search. | GitHub search supports `repo:OWNER/KB-REPO`, `path:`, and `content:` filters. Requires appropriate repository access; search indexing/coverage may differ from local search. |
+| **Human in terminal** | `rg -n "phrase" .` for full text; `rg --files | rg "part-of-name"` for filenames. | Optional power-user route; ripgrep ignores hidden/ignored files by default. `git grep -n "phrase"` is another option for tracked content. |
+| **Agent with GitHub connector** | Ask the agent to find files, search contents, inspect a result, and return the exact clickable GitHub file link. | This already works for the connected `agent-core` repo. For a new **private** KB repo, verify the specific connector/agent has search and read permission. |
+| **Agent with local checkout** | Agent searches filenames/content with filesystem tools or `rg`, then opens the relevant Markdown. | Needs an accessible checkout and current sync. No dependency on GitHub code-search indexing. |
 
-**Important:** Moving the *skill code* to Agent Core does **not** grant an agent access to Drive. The agent still needs an authorized Drive tool with raw Markdown read/upload/move/replace capabilities; otherwise the correct response is an access limitation, not a workaround. A local filesystem adapter remains independently useful. Keep approval and curation semantics stable across backends.
+**New principle:** The owner does **not** need to be their KB's primary search engine. Asking a connected agent *"find my note about X and link the relevant file"* can be the default discovery path, supplemented by VS Code for direct self-service.
 
-## Content Storage Comparison
+However, **agent-mediated retrieval must not be the only search path**. A straightforward manual fallback (VS Code or GitHub) matters when the connector is unavailable or the agent is wrong. Prefer linkable canonical files, descriptive filenames, and concise `knowledge/index.md` / `evidence/index.md`; don't build a separate vector database or search application before evidence of need.
 
-| Need | Google Drive | GitHub repository |
-| --- | --- | --- |
-| Open a specific Markdown file | Direct file link; Google now supports formatted Markdown preview and .md editing | Excellent rendered Markdown page and permanent version links |
-| Find by name/content | Drive UI search and folder browsing | Repository finder/code search and paths; search/indexing and access rules differ |
-| Human approval by moving a file | Natural Drive file move `inbox/review/ → inbox/approved/` | Feasible by renaming/moving a path, but creates a Git commit; less natural as a lightweight approval gesture |
-| Automated approval/curation | Drive adapter supports raw file operations if the connected agent exposes writes | Possible via Git operations and commits; requires implementing and testing a Git backend adapter, permissions and concurrency handling |
-| Edit history/recovery | Drive revisions | Git commit history, diff and blame |
-| Mobile/nontechnical use | Strong everyday file/folder UI | Strong reading links; moving, committing and conflict resolution more technical |
-| PDFs, images and binary originals | Comfortable general-purpose storage | Possible, but potentially awkward for repository size/history, mobile use and binary lifecycle |
-| Privacy | Per-folder/file permissions | Per-repository access model; cloned local copies and git history need explicit consideration |
+### Example GitHub searches
 
-GitHub *can* support the existing approval workflow; moving a Markdown file to a subfolder via its web editor is documented by GitHub. However, easy **individual** file moves in Drive were an intentional product requirement, not incidental implementation detail. Do not infer that GitHub is better simply because direct reading links are attractive.
+Inside GitHub's code search, substitute the actual **private KB** repository name:
 
-**Security finding:** This Agent Core repository is **public**, despite some internal docs describing it as private. Verify actual visibility before any future KB decision, and never rely on a README claim as access control. Making Agent Core private could affect distribution/access; evaluate separately, not as a side effect of KB planning. For a Git-backed personal KB, use a private, distinct repository and test permissions.
+```text
+repo:OWNER/KB-REPO path:credit-card
+repo:OWNER/KB-REPO content:"investment strategy"
+repo:OWNER/KB-REPO path:knowledge/ "decision rule"
+```
 
-## Three Real Options
+The examples show repository-scoped filename/path and content search; verify coverage against real notes instead of assuming indexing is instant or exhaustive.
 
-1. **Drive content + Drive canonical skill (no change)** — lowest risk and maintenance; distribution of the skill to environments without Drive access remains inconvenient.
-2. **Drive content + Agent Core canonical skill (preferred potential improvement)** — resolves dual skill-source maintenance while retaining Drive approval/file browsing. Requires deliberate migration of the *complete* canonical skill, backend references and adapter contract; update `global/AGENTS.md`, `personal-skills.toml`, and other links together; test Pi/other harness read/write before retiring the Drive skill source.
-3. **Separate private Git-backed KB (pilot only)** — improved code-style reviewing, links and branching. Requires a new Git backend adapter, migration plan, review-approval UX validation, binary handling, and safe treatment of secrets/private records. Keep `agent-core` out of the data storage role.
+## Finding: VS Code Can Preserve the Approval Mechanism
 
-**Not recommended:** Use the public `agent-core` repository itself as a personal/work KB, or put evidence and operational skill code together merely for convenience. Agent Core should distribute the tools/workflows, not own all personal knowledge.
+Existing semantic workflow:
 
-## When This Resumes: Small Experiment
+```text
+inbox/review/ --human approves--> inbox/approved/ --agent curates--> evidence/ + knowledge/
+```
 
-1. Open the same real `.md` file through Drive preview (switch to **Preview**) and a GitHub rendered Markdown link; compare readability on Android and desktop.
-2. Find a file by partial filename and content; measure whether both feel natural without agent help.
-3. In a test area with **nonsensitive synthetic files**, perform review → approved → curated moves using each UI and agent connector. Verify Markdown text is preserved; test recovery and bulk changes. Do not use real evidence as a test.
-4. Confirm the exact integration available to Pi and work environments. A connector that only reads does not make a writable workflow.
-5. If the hybrid wins, request approval for **skill-source canonicalization only**. Keep the Drive KB root/format untouched, then validate installation and one safe read/write cycle before changing canonical pointers.
+A Git-backed folder structure can keep **the same paths and approval rules**:
 
-## Evidence and Links
+1. Human reads `inbox/review/example.md` in rendered GitHub or VS Code Markdown preview.
+2. **Approval signal:** Human explicitly moves the file to `inbox/approved/` in VS Code Explorer, **or** explicitly instructs an authorized agent to approve that particular item. The agent must not infer approval from merely seeing a review file.
+3. For an agent using **remote GitHub**, the approved move is visible after it is **committed and pushed**. VS Code has built-in staging, committing and pushing; just dragging a file locally is not enough to publish a durable cross-device approval.
+4. The curation workflow detects approved material, moves it into permanent `evidence/`, updates `knowledge/` when justified, maintains indexes/links, and commits/pushes the result. It must not skip or forge human approval.
 
-- [Example real Drive Markdown review artifact — OCBC CML work notes](https://drive.google.com/file/d/1G3AKeA_PlYISARf_4TvgwGbMehbmEhav/view) (personal, may require sign-in; do not copy to public GitHub).
-- [Canonical KB skill on Drive](https://drive.google.com/file/d/1S6Y_RIRZUkxcY59v_XuRrVIi6LHYCubX/view) and [Drive backend adapter](https://drive.google.com/file/d/1fyZMXQq7YTm_X8fphdprjIl6BmXwZu1f/view).
+**Potential UX:** In VS Code this can be an ordinary drag-and-drop move followed by a short Git commit and push. It is more work than a Drive move, but may be worth it if the reading/search experience is consistently superior. On mobile, the GitHub web file editor can change a Markdown file's path and commit it; test whether that workflow feels acceptable.
+
+**Important engineering distinction:** The current KB skill has a **filesystem adapter**. With a local Git checkout, that may already handle the file/folder operations, leaving commit/push as a distinct layer. But a cloud-only agent with only a GitHub connector needs an explicitly supported remote Git workflow (new backend adapter or carefully specified integration) to safely create, move, curate and verify files. Do not assume a read-only connector can write or a local move has synchronized.
+
+**Multi-agent caveat:** Concurrent writers can conflict. Plan for latest-head checks, narrowly scoped commits and honest conflict handling. Don't let two agents silently overwrite the same `knowledge/` page or double-curate an approval. Git history enables recovery, but secrets remain in history after deletion unless explicitly remediated.
+
+## Architectural Options, Updated
+
+| Option | Assessment |
+| --- | --- |
+| **A. Drive KB content + Drive canonical skill** | No change or migration risk; useful for raw documents and general Drive organization. Owner's actual Markdown reading experience is weak. |
+| **B. Drive KB content + Agent Core canonical skill** | Good intermediate housekeeping: one distributable skill source while preserving Drive storage. Does **not** fix the Drive Markdown-reading friction. |
+| **C. Separate private Git repo(s) for Markdown-first KB + Agent Core canonical skill** | **Now the leading option to test**, not an approved decision. Strong rendered links, VS Code/terminal/web/agent search, Git history, and possible approval moves via VS Code. Requires proper privacy, connector writes, synchronization, and an end-to-end curation trial. |
+| **D. Hybrid: Git for Markdown evidence/knowledge, Drive for raw documents/images** | Potential best of both if binary handling is important; creates cross-storage references and more operational complexity. Avoid unless a pilot shows clear benefit. |
+
+**Recommendation after the correction:** Stop assuming Google Drive wins on search/approval. For **Markdown-heavy personal knowledge**, seriously pilot Option C. Keep Google Drive available for raw documents, where its strengths remain material. Compare Option C with B only after experiencing a full approval/curation cycle, not just the rendered GitHub page.
+
+### Where should the canonical skill live?
+
+**Preferred long-term direction (separate decision):** Agent Core should be the canonical *distribution/source* for the portable `knowledge-base` skill and its backend adapters. That aligns with `agent-core sync` and reduces a confusing second source of truth.
+
+**But Agent Core itself should NOT be the KB content repository.** Separate executable workflows from personal evidence and records:
+- `agent-core/skills/knowledge-base/`: workflow + adapter definitions, **only after a separately authorized canonical-source change**;
+- `personal-knowledge-base` (example name): **private Git repository** containing `inbox/`, `evidence/`, `knowledge/`, and appropriately governed source records;
+- further per-project/private roots when confidentiality or ownership demands isolation.
+
+Moving the canonical skill from Drive is **not** approved in this task and would require validating the complete backend guidance, updating canonical pointers in `global/AGENTS.md`, registering the new active root(s), and testing the intended agents' read/write and approval support. The existing Drive KB and its adapter remain canonical until explicitly changed.
+
+## Future Pilot (Small, Reversible)
+
+1. **Use nonsensitive test files:** Create a separate private repository or scratch space; do not import real personal or OCBC material.
+2. **Read/search:** Test GitHub rendered Markdown on Android and desktop; `Ctrl+P` filename search, `Ctrl+Shift+F` content search, `Ctrl+Shift+V` preview in VS Code; agent connector search returning direct links.
+3. **Human approval:** Move one Markdown file `review/ → approved/` in VS Code, then commit/push it. Repeat approval by an explicit human chat instruction to an agent that has verified GitHub write tools.
+4. **Curate:** Use a compatible workflow to move approved material into `evidence/`, consolidate `knowledge/`, update indexes and links, and verify the remote commit.
+5. **Check failure cases:** Missing connector permissions, unsynced local move, concurrent updates, rejected push, and restoration from Git history.
+6. **Choose the architecture:** Decide whether Git's day-to-day reading advantage outweighs added commit/push steps. Only then consider migration and canonical skill-source changes.
+
+## Sources and Links
+
+- [Current canonical KB workflow on Google Drive](https://drive.google.com/file/d/1S6Y_RIRZUkxcY59v_XuRrVIi6LHYCubX/view) and [Drive adapter](https://drive.google.com/file/d/1fyZMXQq7YTm_X8fphdprjIl6BmXwZu1f/view).
 - [Agent Core's noncanonical KB skill copy](https://github.com/chingfhen/agent-core/blob/main/skills/knowledge-base/SKILL.md) and [global routing](https://github.com/chingfhen/agent-core/blob/main/global/AGENTS.md).
-- [Google: Preview and edit raw .md in Drive](https://support.google.com/docs/answer/18289341?hl=en).
-- [GitHub: Move a file in the browser](https://docs.github.com/en/repositories/working-with-files/managing-files/moving-a-file-to-a-new-location).
-- [GitHub: Search files and code](https://docs.github.com/en/get-started/learning-to-code/finding-and-understanding-example-code).
+- [VS Code: Find files and search across files](https://code.visualstudio.com/docs/editing/codebasics); [VS Code: Source control](https://code.visualstudio.com/docs/sourcecontrol/overview); [VS Code: Commit and push](https://code.visualstudio.com/docs/sourcecontrol/staging-commits).
+- [GitHub: Code search syntax](https://docs.github.com/en/search-github/github-code-search/understanding-github-code-search-syntax); [GitHub: Moving files](https://docs.github.com/en/repositories/working-with-files/managing-files/moving-a-file-to-a-new-location).
+- [ripgrep](https://github.com/BurntSushi/ripgrep).
+- **Observed user evidence:** On 2026-10-08, opening Drive Markdown files on the owner's mobile and web required OpenNote. This firsthand behavior overrides assumptions about how Drive documentation describes preview support.
 
 ## Permission and Closure
 
-This document records a **deferred decision**, not permission to replatform, edit the canonical KB workflow, change visibility, migrate files, grant connectors, or modify other repositories.
+This is a **deferred architecture task only**. No implementation or migration is authorized by saving these findings. Do not edit Drive KB content, change canonical skill pointers, create a real KB repo, move private material, or grant new app access without separate authorization.
 
-Close this task only after confirming the chosen storage/canonical skill arrangement, validating the required workflow, and syncing relevant durable Agent Core docs and guidance.
+Close only after selecting and validating the intended content backend and skill source, and ensuring durable Agent Core documentation matches the decision.
