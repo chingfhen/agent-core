@@ -14,13 +14,41 @@
 
 **Chosen Direction:** **Not selected. No migration is approved.** Revised recommendation: **a separate private Git-backed Markdown KB is now a serious contender, potentially preferable for a Markdown-first workflow**. Do not presume Drive remains the better content backend merely because it supports searching and folder moves. A hybrid may still win.
 
-**Current State:** Comparative analysis updated following the owner's actual Drive and VS Code experience. The current canonical KB workflow and Google Drive adapter remain on Drive; the Agent Core repository contains a noncanonical copy. No KB files or global routing were migrated.
+**Current State:** Comparative analysis updated following the owner's actual Drive and VS Code experience. **An existing private GitHub KB repository has now been located**: `chingfhen/knowledge-base` (default branch `main`, not archived). This is a stale earlier KB implementation, not a hypothetical new repo. Its last visible commit was on 2026-09-22. Current canonical KB workflow and Google Drive adapter remain on Drive; Agent Core contains a noncanonical copy. No KB files or global routing were migrated.
 
-**Next Action:** When resuming, use a few *synthetic, nonsensitive* Markdown files to compare: (1) actual reading on phone and desktop, (2) filename and content retrieval by agent, VS Code and GitHub, (3) review → approved via VS Code or agent, including commit/push, (4) evidence curation and link maintenance, (5) backup and conflict recovery. Choose the backend only after a small end-to-end trial.
+**Next Action:** When resuming, **first investigate the existing private `chingfhen/knowledge-base` repository and reconstruct why it was replaced by Google Drive**; compare old and current workflows before proposing a migration. Then use a few *synthetic, nonsensitive* Markdown files to compare: (1) actual reading on phone and desktop, (2) filename and content retrieval by agent, VS Code and GitHub, (3) review → approved via VS Code or agent, including commit/push, (4) evidence curation and link maintenance, (5) backup and conflict recovery. Choose the backend only after a small end-to-end trial.
 
 **Blockers / Constraints:** The decision is deferred. GitHub currently reports `chingfhen/agent-core` as **public** (checked 2026-10-08); it must not contain personal KB evidence or company-confidential content. A **private, separate repository** is required for an ordinary personal Git KB. A private repository is not automatically an authorized storage destination for workplace data; employer policy remains controlling.
 
 **Human Attention:** No action now. When revisiting, check the GitHub file view and the exact Drive behavior observed on your devices rather than relying on feature claims from vendor documentation. Confirm whether access works in the actual personal agent environments before selecting a new backend.
+
+## Important Newly Located Predecessor: Existing GitHub KB
+
+**Confirmed repository:** [`chingfhen/knowledge-base`](https://github.com/chingfhen/knowledge-base) — **private**, default branch `main`, not archived; latest visible commit on **2026-09-22** (`remove skills`). Its content is an **older/stale implementation**, not the canonical current KB. Do not overwrite or treat it as current.
+
+[Open its `AGENTS.md`](https://github.com/chingfhen/knowledge-base/blob/main/AGENTS.md) and [old KB root](https://github.com/chingfhen/knowledge-base/tree/main/knowledge-base).
+
+Observed older layout:
+
+```text
+knowledge-base/
+  inbox/       (unprocessed material)
+  evidence/    (processed records, including original formats)
+  knowledge/   (current synthesis)
+  index.md
+```
+
+The older `AGENTS.md` describes a Git-backed approval/capture workflow, confidentiality, no pushing without explicit permission, and one isolated commit per approved KB mutation. Its old `inbox/` and source handling differ from the current Drive workflow's explicit `inbox/raw/`, `inbox/review/`, `inbox/approved/`, and `source-archive/`; **do not naively restore the old repo and assume semantic compatibility**.
+
+**Owner recollection:** This GitHub KB was abandoned in favor of Google Drive, but the **specific reason for the migration is not remembered**. This missing decision rationale is a key investigation objective. Avoid rewriting history with an assumed explanation such as “Drive search and file moves were definitely the sole reason.”
+
+**Before a new Git migration or private repo is created:**
+1. Inspect old repo's relevant commits, docs, past KB skill decisions, and any retained task/evidence describing the move to Drive. Look for concrete pain points (agent access, GitHub read/write tools, approval UX, search, files/binary handling, sync conflicts, device access).
+2. Compare the old repository **against the *current* Drive KB**. Determine what material is unique or stale and whether any historical records need preservation. Never treat the old snapshot as the source of truth merely because it is in Git.
+3. Test an end-to-end workflow in a **separate test branch or synthetic test files**, preserving historical content. The existing private repository may be a suitable pilot rather than creating yet another repository, but **no cleanup/reuse is approved** until its state and history are understood.
+4. Capture the actual reasons for the prior migration as confirmed or unresolved. The decision to return to Git should specifically address the original failure modes.
+
+**Revised recommendation:** Prefer evaluating and potentially **reusing the already-existing private `chingfhen/knowledge-base`** over creating another KB repo. This reduces proliferation while retaining clean separation from the public `agent-core`. Whether to reuse it remains undecided.
 
 ## Revised Finding: Reading Markdown Is Not Equivalent on Drive
 
@@ -101,7 +129,7 @@ Moving the canonical skill from Drive is **not** approved in this task and would
 
 ## Future Pilot (Small, Reversible)
 
-1. **Use nonsensitive test files:** Create a separate private repository or scratch space; do not import real personal or OCBC material.
+1. **Investigate the existing KB first:** Inspect the already-existing private `chingfhen/knowledge-base` repository and investigate why Google Drive replaced it. Use nonsensitive test files in an isolated test branch or other scratch space; do not import real personal or OCBC material.
 2. **Read/search:** Test GitHub rendered Markdown on Android and desktop; `Ctrl+P` filename search, `Ctrl+Shift+F` content search, `Ctrl+Shift+V` preview in VS Code; agent connector search returning direct links.
 3. **Human approval:** Move one Markdown file `review/ → approved/` in VS Code, then commit/push it. Repeat approval by an explicit human chat instruction to an agent that has verified GitHub write tools.
 4. **Curate:** Use a compatible workflow to move approved material into `evidence/`, consolidate `knowledge/`, update indexes and links, and verify the remote commit.
@@ -110,6 +138,7 @@ Moving the canonical skill from Drive is **not** approved in this task and would
 
 ## Sources and Links
 
+- [Existing private GitHub KB (historical)](https://github.com/chingfhen/knowledge-base), [old guidance](https://github.com/chingfhen/knowledge-base/blob/main/AGENTS.md), and [prior KB tree](https://github.com/chingfhen/knowledge-base/tree/main/knowledge-base).
 - [Current canonical KB workflow on Google Drive](https://drive.google.com/file/d/1S6Y_RIRZUkxcY59v_XuRrVIi6LHYCubX/view) and [Drive adapter](https://drive.google.com/file/d/1fyZMXQq7YTm_X8fphdprjIl6BmXwZu1f/view).
 - [Agent Core's noncanonical KB skill copy](https://github.com/chingfhen/agent-core/blob/main/skills/knowledge-base/SKILL.md) and [global routing](https://github.com/chingfhen/agent-core/blob/main/global/AGENTS.md).
 - [VS Code: Find files and search across files](https://code.visualstudio.com/docs/editing/codebasics); [VS Code: Source control](https://code.visualstudio.com/docs/sourcecontrol/overview); [VS Code: Commit and push](https://code.visualstudio.com/docs/sourcecontrol/staging-commits).
