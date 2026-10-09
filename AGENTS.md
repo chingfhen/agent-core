@@ -1,22 +1,22 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-08
+**Last Updated:** 2026-10-09
 
 **Status:** Current
 
 **Source Of Truth:** Defines how steward agents maintain the private Agent Core repository.
 
-**Update When:** Steward roles, canonical surfaces, distribution, or integration rules change.
+**Update When:** Steward roles, canonical surfaces, skill distribution, or integration rules change.
 
 ### Read First
 
 - You are the steward agent when working in this repository.
 - `skills/` is the hand-edited production source. Do not change production workflow skills unless the human explicitly approves the skill edit.
-- The normal personal command is `agent-core sync`. It refreshes the fixed clean `~/.agent-core` checkout and publishes `personal-skills.toml` entries plus canonical global guidance to user-global harness locations.
+- The normal personal command is `agent-core sync`. It refreshes the fixed clean `~/.agent-core` checkout and publishes `personal-skills.toml` entries and Claude skill aliases. Global prompts are user-managed.
 - Do not hand-maintain installed copies or aliases. Sync owns only exact destinations recorded in `~/.agent-core-state/ownership.json`.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
-- Prefer durable guidance updates in `AGENTS.md`, `docs/`, `global/`, and `prompts/` over production skill edits.
+- Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits. `global/AGENTS.md` is retained but no longer published by sync.
 
 ## Autonomous State And Memory Routing
 
@@ -40,7 +40,6 @@
 Canonical surfaces include:
 
 - `skills/` and `personal-skills.toml`;
-- `global/AGENTS.md`;
 - `agent_core/`, `pyproject.toml`, and installer scripts;
 - `README.md`, `AGENTS.md`, `docs/`, and `prompts/`;
 - schemas, steward scripts, and the append-only `memory/memories.jsonl` ledger.
@@ -49,7 +48,6 @@ Installed or generated surfaces include:
 
 - real skill copies under `~/.agents/skills/<personal-skill>/`;
 - Claude aliases under `~/.claude/skills/<personal-skill>`;
-- complete guidance files at Pi, Codex, OpenCode, and Claude global instruction paths;
 - `~/.agent-core-state/ownership.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
@@ -60,14 +58,14 @@ Installed or generated surfaces include:
 - Keep the console launcher and CMD installer small and stable. The normal Windows path must not require PowerShell, `uv`, `pip`, elevation, or downloaded packages.
 - Require Python 3.10+ and keep runtime code standard-library-only.
 - The launcher must reject a dirty checkout and cross a fresh-process boundary before sync code runs. Ordinary sync fast-forwards with authenticated Git; explicit `sync --no-pull` skips only that refresh and publishes the current clean committed checkout without silent fallback.
-- Require every configured source and the global guidance source to match tracked committed content.
-- Preflight every configured skill, Claude alias, guidance file, and ownership record before replacing any target.
-- Refuse unowned collisions, malformed ownership, unsupported entries, and locally modified managed content. Empty unowned guidance files may be initialized.
+- Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
+- Preflight every configured skill, Claude alias, and ownership record before replacing any target. Preserve existing global prompt files without inspecting them.
+- Refuse unowned skill collisions, malformed ownership, unsupported entries, and locally modified managed skills. Do not inspect or initialize global prompt files.
 - Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default.
-- Stage and fingerprint copies, replace through backups with rollback, and atomically publish ownership only after all output succeeds.
+- Stage and fingerprint skill copies, replace through backups with rollback, and atomically publish skill and alias ownership only after all output succeeds. Clear former guidance ownership without altering the prompt files.
 - Use real copies only under `~/.agents/skills/`. Claude receives links or Windows directory junctions to those copies, never independent duplicates.
 - Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
-- Report the checkout commit, manifest count, changed skill names, alias status, every guidance status, ownership path, and reload requirement.
+- Report the checkout commit, manifest count, changed skill names, alias status, confirmation that guidance is unmanaged, ownership path, and reload requirement.
 
 Canonical details: `docs/consumer-repo-enrollment.md`.
 
@@ -105,9 +103,8 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 | Human operating manual | `docs/agent-core-operating-manual.md` | Canonical setup, sync, publication, migration, verification, and recovery commands. |
 | Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical global sync and legacy retirement behavior. |
 | Personal list | `personal-skills.toml` | Authoritative copied skill set. |
-| Global guidance | `global/AGENTS.md` | Automatically loaded personal behavior for supported harnesses. |
 | CLI launcher | `agent_core/bootstrap.py` | Canonical refresh and fresh-process boundary. |
-| Sync engine | `agent_core/sync.py` | Copy ownership, conflict safety, rollback, aliases, and guidance. |
+| Sync engine | `agent_core/sync.py` | Skill ownership, conflict safety, rollback, aliases, and legacy guidance ownership release. |
 | Legacy retirement | `agent_core/retire.py` | Safe cleanup of prior project-local installations. |
 | Memory contract | `docs/memory-pilot.md` | Ledger schema, approval boundary, and tooling behavior. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |

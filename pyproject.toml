@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "agent-core"
 version = "0.2.0"
-description = "Private personal skill and global guidance sync CLI"
+description = "Private personal skill sync CLI"
 requires-python = ">=3.10"
 dependencies = []
 

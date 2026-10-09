@@ -1,12 +1,12 @@
-# Personal Skill And Guidance Distribution
+# Personal Skill Distribution
 
-**Last Updated:** 2026-10-08
+**Last Updated:** 2026-10-09
 
 **Status:** Current
 
-**Source Of Truth:** Defines global personal-skill publication, harness guidance installation, ownership safety, and legacy project-copy retirement.
+**Source Of Truth:** Defines global personal-skill publication, ownership safety, and legacy project-copy retirement.
 
-**Update When:** The `agent-core sync` contract, personal manifest, global targets, ownership model, or migration behavior changes.
+**Update When:** The `agent-core sync` contract, personal manifest, ownership model, or migration behavior changes.
 
 ### Read First
 
@@ -14,17 +14,17 @@
 - The fixed canonical checkout is `~/.agent-core`; every sync fast-forwards that clean checkout before touching installed targets.
 - `personal-skills.toml` is the authoritative manual list. It is never inferred from all `skills/` directories.
 - Real copies live under `~/.agents/skills/`. Claude Code receives aliases under `~/.claude/skills/` that resolve to those copies.
-- Pi discovers the shared `~/.agents/skills/` entries. Only Pi's global guidance file is under `~/.pi/agent/`.
-- `global/AGENTS.md` is published as complete managed files to each harness's native global instruction path.
-- Sync refuses unowned collisions and locally modified managed targets, and preserves unrelated user and project content.
+- Pi discovers the shared `~/.agents/skills/` entries; its global prompt is not part of skill sync.
+- Global prompts are user-owned: sync does not read, create, overwrite, or delete them. The first skills-only sync releases old guidance ownership records without touching existing files.
+- Sync refuses unowned collisions and locally modified managed skill targets, and preserves unrelated user and project content.
 - Removing a manifest entry is additive and non-destructive.
 - Human commands live in `docs/agent-core-operating-manual.md`.
 
 ## Scope
 
-This document covers private personal-skill and global-guidance publication plus explicit retirement of the former project-local copies.
+This document covers private personal-skill publication, the transition away from managed global guidance, and explicit retirement of former project-local copies.
 
-It does not cover production skill authoring, project-owned skills, harness credentials, MCP configuration, security policy, the memory ledger, or active task state.
+It does not cover production skill authoring, project-owned skills, user-authored global prompts, harness credentials, MCP configuration, security policy, the memory ledger, or active task state.
 
 ## Publication Layout
 
@@ -53,18 +53,11 @@ Windows uses unprivileged directory junctions. Other platforms use directory sym
 
 Pi, Codex, and OpenCode use the shared Agent Skills location directly. Pi 1.0.4 was checked through RPC `get_commands` in an isolated Windows home; it returned a synthetic `~/.agents/skills/` skill once with user scope. OpenCode 1.18.11 was checked with both the shared skill and Claude junction present; `opencode debug skill` returned the test skill once at its shared location. Pi's discovery documentation does not identify `~/.claude/skills/` as a Pi location.
 
-### Guidance
+### Global Guidance
 
-| Harness | Managed destination |
-| --- | --- |
-| Pi | `~/.pi/agent/AGENTS.md` |
-| Codex | `~/.codex/AGENTS.md` |
-| OpenCode | `~/.config/opencode/AGENTS.md` |
-| Claude Code | `~/.claude/CLAUDE.md` |
+Sync no longer manages `~/.pi/agent/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`, or `~/.claude/CLAUDE.md`. Existing files remain unchanged, including local edits; absent files stay absent. Their contents and availability are now the user's responsibility.
 
-All four receive the complete canonical `global/AGENTS.md`. Project-specific instructions continue to layer through each harness's project mechanisms.
-
-An absent or empty unowned guidance destination may be initialized. A non-empty unowned destination is a conflict. Once owned, a missing file is recreated, an unchanged file is updated as needed, and a locally modified file stops the whole sync before mutation.
+The first successful skills-only sync validates old guidance ownership records, then clears those records in the atomically published ownership state. It does not inspect the current prompt contents. `global/AGENTS.md` remains in the checkout but is not required or published by sync.
 
 ### Machine-Local Ownership
 
@@ -76,7 +69,7 @@ This versioned JSON file is outside the tracked checkout. It records:
 
 - each managed shared skill destination, source commit, and deterministic directory fingerprint;
 - each Claude alias destination and expected shared target;
-- each guidance destination, source commit, and file fingerprint.
+- an empty `guidance` collection retained for state-version compatibility after the first skills-only sync.
 
 The state retains records for names removed from the current manifest. It is published atomically only after all changed outputs succeed.
 
@@ -105,14 +98,13 @@ Before publication, Agent Core requires:
 - every regular source file to be tracked;
 - no missing tracked file, untracked file, symlink, reparse point, or unsupported entry in the source;
 - source content and permissions to match committed content;
-- `global/AGENTS.md` to be a tracked regular file matching `HEAD`;
 - a full canonical commit ID.
 
 The launcher's clean-checkout check and the sync engine's committed-source checks are separate defenses.
 
 ## Destination And Transaction Contract
 
-Before any replacement, sync validates every configured skill, Claude alias, guidance file, parent path, and ownership record.
+Before any replacement, sync validates every configured skill, Claude alias, managed parent path, and ownership record. Former guidance records are validated as historical state, but the associated files are not checked.
 
 A configured shared skill is safe only when it is:
 
@@ -131,17 +123,17 @@ All other entries are conflicts. There is no default force option.
 
 After preflight, sync:
 
-1. stages and fingerprints every configured skill copy and guidance file;
+1. stages and fingerprints every configured skill copy;
 2. repeats state and target safety checks immediately before replacement;
-3. moves changed existing targets to transaction backups;
-4. publishes changed skills and guidance;
+3. moves changed existing skill targets to transaction backups;
+4. publishes changed skills;
 5. creates or recreates Claude aliases and verifies their identity;
-6. atomically writes prospective ownership state;
+6. atomically writes prospective ownership state with guidance ownership cleared;
 7. removes transaction artifacts.
 
-Any ordinary failure before ownership publication rolls back every changed skill, guidance file, and alias. If rollback itself is incomplete, the error lists exact affected paths.
+Any ordinary failure before ownership publication rolls back changed skills and aliases. If rollback itself is incomplete, the error lists exact affected paths.
 
-Parent directories may be created when absent but must otherwise be real directories, not links or unsupported entries. Unrelated entries under `.agents`, `.claude`, `.pi`, `.codex`, and `.config/opencode` are not inspected or changed beyond exact preflight needs.
+Managed parent directories may be created when absent but must otherwise be real directories, not links or unsupported entries. Unrelated entries under `.agents` and `.claude` are preserved; global guidance locations are never inspected or changed.
 
 ## Additive Manifest Changes
 
@@ -160,7 +152,7 @@ Successful sync output reports:
 - shared destination with added, updated, recreated, and unchanged counts;
 - changed skill names;
 - Claude alias destination, count, and statuses;
-- every guidance destination and status;
+- confirmation that global guidance is not managed;
 - ownership-state location;
 - the need to reload or restart active harness sessions.
 
@@ -201,7 +193,6 @@ Missing managed copies do not block exact metadata cleanup. Any unsafe remaining
 | Surface | Path | Why It Matters |
 | ------- | ---- | -------------- |
 | Personal list | `personal-skills.toml` | Authoritative publication set. |
-| Global guidance | `global/AGENTS.md` | Canonical cross-harness instructions. |
 | Stable launcher | `agent_core/bootstrap.py` | Refresh and fresh-process handoff. |
 | Sync implementation | `agent_core/sync.py` | Global ownership, copying, aliases, and rollback. |
 | Legacy apply | `agent_core/apply.py` | Deprecated project-local compatibility. |
@@ -219,6 +210,7 @@ Missing managed copies do not block exact metadata cleanup. Any unsafe remaining
 | 2026-10-08 | Replace normal per-project apply with machine-level global sync. | Personal workflows should remain current across projects without duplicate managed copies. |
 | 2026-10-08 | Keep one real installed copy under `~/.agents/skills/` and alias it for Claude. | This serves the portable harnesses and Claude without independent content authorities. |
 | 2026-10-08 | Store ownership under `~/.agent-core-state/`. | Runtime state must not dirty the canonical checkout. |
-| 2026-10-08 | Initialize only absent or empty unowned guidance destinations. | Complete-file publication remains safe without merging or overwriting personal content. |
+| 2026-10-08 | Initialize only absent or empty unowned guidance destinations (superseded). | Complete-file publication avoided overwriting personal content while guidance was managed. |
+| 2026-10-09 | Stop publishing global guidance and release its ownership on the next sync. | Global prompt files remain untouched and can be maintained independently of personal skills. |
 | 2026-10-08 | Keep removal additive and provide exact legacy retirement separately. | Destructive cleanup must be explicit and fingerprint-proven. |
 | 2026-10-08 | Set the minimum runtime to Python 3.10. | Removing `tomllib` is small and dependency-free; lowering further is unnecessary. |

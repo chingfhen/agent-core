@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-08
+updated: 2026-10-09
 ---
 
 # Skills Catalogue
@@ -32,7 +32,7 @@ updated: 2026-10-08
 | Skill | Reach for it when… | Note |
 | --- | --- | --- |
 | [document-text-extraction](../skills/document-text-extraction/SKILL.md) | Explicitly extract a named PDF/image locally. | Temporary extraction only; independent of KB and `evidence-authoring`. |
-| [knowledge-base](../skills/knowledge-base/SKILL.md) | Consult the **repo copy** of the KB workflow. | **Not canonical.** Current authority is the separately maintained Google Drive workflow named in `global/AGENTS.md`. Do not silently switch it or modify Drive through this repo. |
+| [knowledge-base](../skills/knowledge-base/SKILL.md) | Consult the **repo copy** of the KB workflow. | **Not installed by sync.** Agent Core's steward guidance identifies a separate Google Drive workflow; `global/AGENTS.md` is no longer published to user prompts. |
 | [repo-audit](../skills/repo-audit/SKILL.md) | Request a dedicated whole-repository risk/bloat audit. | Specialized full-repo report, not routine code review. |
 | [ml-architecture-review](../skills/ml-architecture-review/SKILL.md) | Explicitly request focused ML architecture decision analysis. | Specialized investigation; planning remains general-purpose. |
 | [humanize-spoken-output](../skills/humanize-spoken-output/SKILL.md) | Rewrite spoken scripts, narration, and interview answers naturally. | Content editing, not technical teaching. |

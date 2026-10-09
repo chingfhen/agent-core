@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import argparse
-import hashlib
 import json
 import os
 import shutil
@@ -21,8 +20,7 @@ STATE_DIRECTORY = ".agent-core-state"
 STATE_FILENAME = "ownership.json"
 SHARED_SKILL_BASE = Path(".agents/skills")
 CLAUDE_SKILL_BASE = Path(".claude/skills")
-GUIDANCE_SOURCE = Path("global/AGENTS.md")
-GUIDANCE_DESTINATIONS = {
+LEGACY_GUIDANCE_DESTINATIONS = {
     "pi": Path(".pi/agent/AGENTS.md"),
     "codex": Path(".codex/AGENTS.md"),
     "opencode": Path(".config/opencode/AGENTS.md"),
@@ -52,15 +50,6 @@ class AliasPlan:
 
 
 @dataclass(frozen=True)
-class GuidancePlan:
-    harness: str
-    source: Path
-    fingerprint: str
-    target: Path
-    classification: str
-
-
-@dataclass(frozen=True)
 class SyncResult:
     checkout: Path
     commit: str
@@ -70,7 +59,6 @@ class SyncResult:
     claude_base: Path
     skills: list[SkillPlan]
     aliases: list[AliasPlan]
-    guidance: list[GuidancePlan]
 
 
 def global_state_path(home: Path) -> Path:
@@ -79,32 +67,6 @@ def global_state_path(home: Path) -> Path:
 
 def _path_text(path: Path) -> str:
     return str(path.resolve(strict=False))
-
-
-def _file_fingerprint(path: Path) -> str:
-    try:
-        metadata = path.stat(follow_symlinks=False)
-        if not stat.S_ISREG(metadata.st_mode):
-            raise SyncError(f"Expected a regular file: {path}")
-        content = path.read_bytes()
-    except OSError as exc:
-        raise SyncError(f"Could not read file {path}: {exc}") from exc
-    digest = hashlib.sha256(b"agent-core-file-v1\0")
-    digest.update(content)
-    return digest.hexdigest()
-
-
-def _validate_committed_file(checkout: Path, relative: Path) -> None:
-    relative_text = relative.as_posix()
-    tracked = apply._tracked_paths(checkout, relative_text)
-    if tracked != {relative_text}:
-        raise SyncError(f"Canonical source file must be tracked exactly once: {relative_text}")
-    changed = apply._run_git(checkout, "diff", "--quiet", "HEAD", "--", relative_text)
-    if changed.returncode not in {0, 1}:
-        detail = changed.stderr.strip() or changed.stdout.strip() or f"exit code {changed.returncode}"
-        raise SyncError(f"Could not compare {relative_text} with the canonical commit: {detail}")
-    if changed.returncode == 1:
-        raise SyncError(f"Canonical source file must match committed Git content: {relative_text}")
 
 
 def _empty_state() -> dict[str, object]:
@@ -162,12 +124,12 @@ def load_global_state(path: Path, home: Path) -> dict[str, object]:
             raise SyncError(f"Global ownership state has an invalid alias record for {name!r}")
 
     for harness, raw in payload["guidance"].items():
-        if harness not in GUIDANCE_DESTINATIONS:
+        if harness not in LEGACY_GUIDANCE_DESTINATIONS:
             raise SyncError(f"Global ownership state has an unknown guidance target: {harness!r}")
         record = _expect_record(
             raw, {"destination", "source_commit", "fingerprint"}, f"guidance {harness!r}"
         )
-        expected = home / GUIDANCE_DESTINATIONS[harness]
+        expected = home / LEGACY_GUIDANCE_DESTINATIONS[harness]
         if (
             Path(record["destination"]).resolve(strict=False) != expected.resolve(strict=False)
             or not apply.HEX_SHA.fullmatch(record["source_commit"])
@@ -223,16 +185,12 @@ def _alias_matches(alias: Path, target: Path) -> bool:
 def _build_plans(
     home: Path,
     sources: list[apply.SourceSkill],
-    guidance_source: Path,
-    guidance_fingerprint: str,
     state: dict[str, object],
-) -> tuple[list[SkillPlan], list[AliasPlan], list[GuidancePlan]]:
+) -> tuple[list[SkillPlan], list[AliasPlan]]:
     skill_records = state["skills"]
     alias_records = state["aliases"]
-    guidance_records = state["guidance"]
     assert isinstance(skill_records, dict)
     assert isinstance(alias_records, dict)
-    assert isinstance(guidance_records, dict)
 
     errors: list[str] = []
     skill_plans: list[SkillPlan] = []
@@ -286,44 +244,9 @@ def _build_plans(
             continue
         alias_plans.append(AliasPlan(source.name, target, alias, classification, replace_existing))
 
-    guidance_plans: list[GuidancePlan] = []
-    for harness, relative in GUIDANCE_DESTINATIONS.items():
-        target = home / relative
-        record = guidance_records.get(harness)
-        exists = apply._lexists(target)
-        if record is None:
-            if not exists:
-                classification = "added"
-            else:
-                try:
-                    kind = apply._entry_kind(target)
-                    is_empty = kind == "file" and target.stat().st_size == 0
-                except (apply.ApplyError, OSError) as exc:
-                    errors.append(f"Could not inspect unowned guidance destination {target}: {exc}")
-                    continue
-                if not is_empty:
-                    errors.append(f"{target} is non-empty and is not owned by Agent Core")
-                    continue
-                classification = "added"
-        elif not exists:
-            classification = "recreated"
-        else:
-            try:
-                installed = _file_fingerprint(target)
-            except SyncError as exc:
-                errors.append(str(exc))
-                continue
-            if installed != record["fingerprint"]:
-                errors.append(f"{target} was locally modified")
-                continue
-            classification = "unchanged" if installed == guidance_fingerprint else "updated"
-        guidance_plans.append(
-            GuidancePlan(harness, guidance_source, guidance_fingerprint, target, classification)
-        )
-
     if errors:
         raise SyncError("Preflight refused global changes:\n- " + "\n- ".join(errors))
-    return skill_plans, alias_plans, guidance_plans
+    return skill_plans, alias_plans
 
 
 def _remove_path(path: Path) -> None:
@@ -373,20 +296,14 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
     checkout = checkout.resolve()
     home = home.resolve()
     sources, commit = apply.load_sources(checkout)
-    guidance_source = checkout / GUIDANCE_SOURCE
-    _validate_committed_file(checkout, GUIDANCE_SOURCE)
-    guidance_fingerprint = _file_fingerprint(guidance_source)
 
     ownership_path = global_state_path(home)
     state = load_global_state(ownership_path, home)
     destinations = [home / SHARED_SKILL_BASE / source.name for source in sources]
     destinations.extend(home / CLAUDE_SKILL_BASE / source.name for source in sources)
-    destinations.extend(home / relative for relative in GUIDANCE_DESTINATIONS.values())
     destinations.append(ownership_path)
     _ensure_real_parents(home, destinations)
-    skill_plans, alias_plans, guidance_plans = _build_plans(
-        home, sources, guidance_source, guidance_fingerprint, state
-    )
+    skill_plans, alias_plans = _build_plans(home, sources, state)
 
     prospective = json.loads(json.dumps(state))
     for plan in skill_plans:
@@ -400,12 +317,7 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
             "destination": _path_text(plan.alias),
             "target": _path_text(plan.target),
         }
-    for plan in guidance_plans:
-        prospective["guidance"][plan.harness] = {
-            "destination": _path_text(plan.target),
-            "source_commit": commit,
-            "fingerprint": plan.fingerprint,
-        }
+    prospective["guidance"] = {}
 
     state_directory = ownership_path.parent
     state_directory.mkdir(parents=True, exist_ok=True)
@@ -415,24 +327,18 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
     completed: list[tuple[Path, Path | None]] = []
     try:
         (stage / "skills").mkdir(parents=True)
-        (stage / "guidance").mkdir(parents=True)
         backup.mkdir(parents=True)
         for plan in skill_plans:
             staged = stage / "skills" / plan.source.name
             shutil.copytree(plan.source.path, staged, symlinks=True)
             if apply.fingerprint_directory(staged) != plan.source.fingerprint:
                 raise SyncError(f"Staged skill fingerprint mismatch: {plan.source.name}")
-        for plan in guidance_plans:
-            staged = stage / "guidance" / plan.harness
-            shutil.copy2(plan.source, staged)
-            if _file_fingerprint(staged) != plan.fingerprint:
-                raise SyncError(f"Staged guidance fingerprint mismatch: {plan.harness}")
 
         # Repeat all safety checks immediately before the first replacement.
         current_state = load_global_state(ownership_path, home)
         if current_state != state:
             raise SyncError(f"Global ownership state changed after preflight: {ownership_path}")
-        _build_plans(home, sources, guidance_source, guidance_fingerprint, state)
+        _build_plans(home, sources, state)
 
         for plan in skill_plans:
             if plan.classification == "unchanged":
@@ -445,18 +351,6 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
                 os.replace(plan.target, saved)
             completed.append((plan.target, saved))
             os.replace(stage / "skills" / plan.source.name, plan.target)
-
-        for plan in guidance_plans:
-            if plan.classification == "unchanged":
-                continue
-            plan.target.parent.mkdir(parents=True, exist_ok=True)
-            saved = None
-            if apply._lexists(plan.target):
-                saved = backup / "guidance" / plan.harness
-                saved.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(plan.target, saved)
-            completed.append((plan.target, saved))
-            os.replace(stage / "guidance" / plan.harness, plan.target)
 
         for plan in alias_plans:
             if plan.classification == "unchanged":
@@ -506,7 +400,6 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
         home / CLAUDE_SKILL_BASE,
         skill_plans,
         alias_plans,
-        guidance_plans,
     )
 
 
@@ -530,10 +423,9 @@ def print_result(result: SyncResult) -> None:
         + ", ".join(alias_statuses)
         + ")"
     )
-    for plan in result.guidance:
-        print(f"Guidance {plan.harness}: {plan.target} ({plan.classification})")
+    print("Global guidance: not managed (existing files preserved)")
     print(f"Ownership state: {result.state_path}")
-    print("Reload or restart active harness sessions to use changed skills or guidance.")
+    print("Reload or restart active harness sessions to use changed skills.")
 
 
 def build_parser() -> argparse.ArgumentParser:

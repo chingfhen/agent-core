@@ -58,12 +58,6 @@ def write_config(checkout: Path, names: list[str]) -> None:
     (checkout / MANIFEST_FILENAME).write_text(rendered, encoding="utf-8")
 
 
-def write_guidance(checkout: Path, content: str = "# Global guidance\n") -> None:
-    path = checkout / sync.GUIDANCE_SOURCE
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(content, encoding="utf-8")
-
-
 def load_installer_module():
     path = REPOSITORY_ROOT / "scripts" / "install_agent_core.py"
     spec = importlib.util.spec_from_file_location("install_agent_core", path)
@@ -92,7 +86,6 @@ class AgentCoreSyncTests(unittest.TestCase):
         initialize_repo(self.checkout)
         write_skill(self.checkout, "demo", "version one")
         write_config(self.checkout, ["demo"])
-        write_guidance(self.checkout)
         commit_all(self.checkout, "initial canonical")
         self.home = self.root / "home"
         self.home.mkdir()
@@ -106,20 +99,19 @@ class AgentCoreSyncTests(unittest.TestCase):
     def alias(self, name: str = "demo") -> Path:
         return self.home / ".claude" / "skills" / name
 
-    def test_first_sync_and_repeat_no_op_publish_all_targets(self) -> None:
+    def test_first_sync_and_repeat_no_op_publish_only_skills(self) -> None:
         first = sync.sync_checkout(self.checkout, self.home)
         second = sync.sync_checkout(self.checkout, self.home)
 
         self.assertEqual([plan.classification for plan in first.skills], ["added"])
         self.assertEqual([plan.classification for plan in second.skills], ["unchanged"])
         self.assertTrue(os.path.samefile(self.skill(), self.alias()))
-        for relative in sync.GUIDANCE_DESTINATIONS.values():
-            self.assertEqual((self.home / relative).read_text(encoding="utf-8"), "# Global guidance\n")
+        for relative in sync.LEGACY_GUIDANCE_DESTINATIONS.values():
+            self.assertFalse((self.home / relative).exists())
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertEqual(state["version"], sync.STATE_VERSION)
         self.assertIn("demo", state["skills"])
-        self.assertEqual(set(state["guidance"]), set(sync.GUIDANCE_DESTINATIONS))
-        self.assertTrue(all(plan.classification == "unchanged" for plan in second.guidance))
+        self.assertEqual(state["guidance"], {})
 
     def test_updates_recreates_and_keeps_removed_config_additively(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
@@ -142,64 +134,61 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertIn("second", state["skills"])
         self.assertIn("second", state["aliases"])
 
-    def test_committed_skill_and_guidance_updates_are_reported(self) -> None:
+    def test_committed_skill_updates_are_reported(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
         write_skill(self.checkout, "demo", "version two")
-        write_guidance(self.checkout, "# Changed guidance\n")
-        commit_all(self.checkout, "update published sources")
+        commit_all(self.checkout, "update published source")
 
         result = sync.sync_checkout(self.checkout, self.home)
         self.assertEqual(result.skills[0].classification, "updated")
-        self.assertTrue(all(plan.classification == "updated" for plan in result.guidance))
         self.assertIn("version two", (self.skill() / "SKILL.md").read_text(encoding="utf-8"))
-        self.assertEqual(
-            (self.home / ".pi/agent/AGENTS.md").read_text(encoding="utf-8"),
-            "# Changed guidance\n",
-        )
 
     def test_modified_target_refuses_all_changes(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
-        original_guidance = (self.home / ".pi/agent/AGENTS.md").read_text(encoding="utf-8")
         (self.skill() / "SKILL.md").write_text("local edit", encoding="utf-8")
-        write_guidance(self.checkout, "# Changed guidance\n")
-        commit_all(self.checkout, "change guidance")
 
         with self.assertRaisesRegex(sync.SyncError, "locally modified"):
             sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual((self.home / ".pi/agent/AGENTS.md").read_text(), original_guidance)
 
-    def test_unowned_collisions_and_empty_guidance_rules(self) -> None:
+    def test_unowned_guidance_and_other_skills_are_preserved(self) -> None:
         unrelated = self.home / ".agents/skills/third-party"
         unrelated.mkdir(parents=True)
         (unrelated / "SKILL.md").write_text("third party", encoding="utf-8")
-        pi_guidance = self.home / sync.GUIDANCE_DESTINATIONS["pi"]
-        pi_guidance.parent.mkdir(parents=True)
-        pi_guidance.write_text("", encoding="utf-8")
-        claude_guidance = self.home / sync.GUIDANCE_DESTINATIONS["claude"]
-        claude_guidance.parent.mkdir(parents=True)
-        claude_guidance.write_text("unowned", encoding="utf-8")
+        claude = self.home / ".claude/CLAUDE.md"
+        claude.parent.mkdir(parents=True)
+        claude.write_text("my prompt\n", encoding="utf-8")
 
-        with self.assertRaisesRegex(sync.SyncError, "non-empty"):
-            sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual((unrelated / "SKILL.md").read_text(), "third party")
-        self.assertEqual(pi_guidance.read_text(), "")
-
-        claude_guidance.unlink()
         sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual(pi_guidance.read_text(), "# Global guidance\n")
         self.assertEqual((unrelated / "SKILL.md").read_text(), "third party")
-
-    def test_guidance_modified_and_missing_states(self) -> None:
+        self.assertEqual(claude.read_text(encoding="utf-8"), "my prompt\n")
+        claude.write_text("updated prompt\n", encoding="utf-8")
         sync.sync_checkout(self.checkout, self.home)
-        pi = self.home / sync.GUIDANCE_DESTINATIONS["pi"]
-        pi.write_text("local", encoding="utf-8")
-        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
-            sync.sync_checkout(self.checkout, self.home)
-        pi.write_text("# Global guidance\n", encoding="utf-8")
-        pi.unlink()
-        result = sync.sync_checkout(self.checkout, self.home)
-        statuses = {plan.harness: plan.classification for plan in result.guidance}
-        self.assertEqual(statuses["pi"], "recreated")
+        self.assertEqual(claude.read_text(encoding="utf-8"), "updated prompt\n")
+
+    def test_sync_releases_legacy_guidance_without_changing_files(self) -> None:
+        guidance = {}
+        for harness, relative in sync.LEGACY_GUIDANCE_DESTINATIONS.items():
+            target = self.home / relative
+            target.parent.mkdir(parents=True, exist_ok=True)
+            target.write_text(f"{harness} prompt\n", encoding="utf-8")
+            guidance[harness] = {
+                "destination": str(target),
+                "source_commit": "0" * 40,
+                "fingerprint": "0" * 64,
+            }
+        state_path = sync.global_state_path(self.home)
+        state_path.parent.mkdir(parents=True)
+        state_path.write_text(
+            json.dumps({"version": sync.STATE_VERSION, "skills": {}, "aliases": {}, "guidance": guidance}),
+            encoding="utf-8",
+        )
+
+        sync.sync_checkout(self.checkout, self.home)
+        for harness, relative in sync.LEGACY_GUIDANCE_DESTINATIONS.items():
+            self.assertEqual((self.home / relative).read_text(encoding="utf-8"), f"{harness} prompt\n")
+        state = json.loads(state_path.read_text(encoding="utf-8"))
+        self.assertEqual(state["guidance"], {})
+        self.assertTrue(self.skill().is_dir())
 
     def test_alias_collision_and_broken_alias_recovery(self) -> None:
         collision = self.alias()
@@ -216,14 +205,12 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertEqual(result.aliases[0].classification, "recreated")
         self.assertTrue(os.path.samefile(self.skill(), self.alias()))
 
-    def test_rollback_spans_skills_guidance_aliases_and_state(self) -> None:
+    def test_rollback_spans_skills_aliases_and_state(self) -> None:
         with patch.object(sync, "_create_directory_alias", side_effect=sync.SyncError("injected alias failure")):
             with self.assertRaisesRegex(sync.SyncError, "injected alias failure"):
                 sync.sync_checkout(self.checkout, self.home)
         self.assertFalse(self.skill().exists())
         self.assertFalse(sync.global_state_path(self.home).exists())
-        for relative in sync.GUIDANCE_DESTINATIONS.values():
-            self.assertFalse((self.home / relative).exists())
 
     def test_state_publication_failure_rolls_back(self) -> None:
         original = apply._atomic_write
@@ -256,7 +243,7 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertIn("Canonical checkout:", output)
         self.assertIn("1 configured skills", output)
         self.assertIn("Changed skills: demo", output)
-        self.assertIn("Guidance pi:", output)
+        self.assertIn("Global guidance: not managed", output)
         self.assertIn("Ownership state:", output)
         self.assertIn("Reload or restart", output)
 
@@ -335,7 +322,6 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         shutil.copy2(REPOSITORY_ROOT / "pyproject.toml", self.upstream / "pyproject.toml")
         write_skill(self.upstream, "demo", "remote one")
         write_config(self.upstream, ["demo"])
-        write_guidance(self.upstream)
         commit_all(self.upstream, "initial")
         self.remote = self.root / "remote.git"
         git(self.root, "init", "-q", "--bare", str(self.remote))
