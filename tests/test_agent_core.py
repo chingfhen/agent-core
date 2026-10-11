@@ -110,7 +110,7 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.temporary.cleanup()
 
     def skill(self, name: str = "demo") -> Path:
-        return self.home / ".agents" / "skills" / name
+        return self.home / ".pi" / "agent" / "skills" / name
 
     def alias(self, name: str = "demo") -> Path:
         return self.home / ".claude" / "skills" / name
@@ -246,11 +246,11 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertIn("agent-core sync: OK (", output)
         self.assertIn("Skills (1): demo", output)
         agent_names = [plan.source.name for plan in result.pi_resources if plan.source.category == "agents"]
-        self.assertIn(f"Pi agents ({len(agent_names)}): " + (", ".join(agent_names) or "none"), output)
-        self.assertIn("Installed root: ~/.agents/", output)
+        self.assertIn(f"Agents ({len(agent_names)}): " + (", ".join(agent_names) or "none"), output)
+        self.assertIn("Verified: ~/.pi/agent/{skills,agents,prompts}", output)
         self.assertNotIn("Claude aliases:", output)
         prompt_names = [plan.source.name for plan in result.pi_resources if plan.source.category == "prompts"]
-        self.assertIn(f"Pi prompts ({len(prompt_names)}): " + (", ".join(prompt_names) or "none"), output)
+        self.assertIn(f"Prompts ({len(prompt_names)}): " + (", ".join(prompt_names) or "none"), output)
 
 
 
@@ -274,10 +274,10 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         commit_all(self.checkout, "configure Pi resources")
 
     def agent(self) -> Path:
-        return self.home / ".agents/agents/commit-agent.md"
+        return self.home / ".pi/agent/agents/commit-agent.md"
 
     def prompt(self) -> Path:
-        return self.home / ".agents/prompts/commit-with-subagent.md"
+        return self.home / ".pi/agent/prompts/commit-with-subagent.md"
 
     def test_pi_publish_idempotent_and_guidance_untouched(self) -> None:
         pi_guidance = self.home / ".pi/agent/AGENTS.md"
@@ -290,7 +290,7 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         self.assertTrue(self.agent().is_file())
         self.assertTrue(self.prompt().is_file())
         self.assertEqual(pi_guidance.read_text(encoding="utf-8"), "user instructions\n")
-        self.assertFalse((self.home / ".pi/agent/agents/commit-agent.md").exists())
+        self.assertFalse((self.home / ".agents/agents/commit-agent.md").exists())
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertIn("commit-agent", state["pi_agents"])
         self.assertIn("commit-with-subagent", state["pi_prompts"])
@@ -453,7 +453,7 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         )
         self.assertEqual(result, 0)
         self.assertEqual((self.home / "fresh-process.txt").read_text(), "fresh")
-        self.assertIn("remote two", (self.home / ".agents/skills/demo/SKILL.md").read_text())
+        self.assertIn("remote two", (self.home / ".pi/agent/skills/demo/SKILL.md").read_text())
 
     def test_dirty_checkout_and_pull_failure_are_refused(self) -> None:
         (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
@@ -478,7 +478,7 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         )
 
         self.assertEqual(result, 0)
-        self.assertIn("remote one", (self.home / ".agents/skills/demo/SKILL.md").read_text())
+        self.assertIn("remote one", (self.home / ".pi/agent/skills/demo/SKILL.md").read_text())
 
     def test_no_pull_still_refuses_a_dirty_checkout(self) -> None:
         (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
