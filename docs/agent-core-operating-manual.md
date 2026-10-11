@@ -77,7 +77,7 @@ Two allowlists select what is published:
 
 Pi discovers all three native locations automatically. No extra `settings.json` entries or manual copies are required. Install `pi-subagents` and set up any specialized model credentials separately; sync never installs extensions or edits settings.
 
-The first sync upgrades older ownership records (version 2 or 3). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Locally modified managed files or conflicting files already in Pi's native folders cause the entire sync to refuse instead of replacing anyone's work. Identical native files can be adopted safely. Unselected or unowned old resources are preserved.
+The first sync upgrades older ownership records (version 2 or 3). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
 
 ### Global guidance
 
@@ -202,9 +202,9 @@ agent-core sync --no-pull
 
 The status command must print nothing. `--no-pull` is explicit and never silently falls back when an ordinary sync pull fails.
 
-### An unowned target already exists
+### An installed Pi resource differs from the canonical source
 
-Inspect the exact conflicting Pi-native skill, agent or prompt. If the local file must remain authoritative, keep it; otherwise compare it against the canonical source and deliberately move or rename only that file before rerunning sync. Never delete whole parent directories.
+For any declared skill, agent or prompt, `agent-core sync` installs the committed canonical version automatically, replacing differing Pi-native content without user-created backups. The transactional rollback area is temporary and exists only to recover from a failed sync. If the installed target is a symlink, directory where a Markdown file belongs, or another unsupported object, sync refuses it instead of following or deleting it. Unselected resources stay untouched.
 
 ### Previously installed Claude alias
 

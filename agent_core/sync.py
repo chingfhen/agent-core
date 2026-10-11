@@ -265,16 +265,12 @@ def _build_skill_plans(
             except apply.ApplyError as exc:
                 errors.append(f"Pi skill {target} is not a regular directory: {exc}")
                 continue
-            if record is not None and not legacy:
-                if installed != record["fingerprint"]:
-                    errors.append(f"{target} was locally modified")
-                    continue
-                classification = "unchanged" if installed == source.fingerprint else "updated"
-            elif installed == source.fingerprint:
-                classification = "adopted"
+            if installed == source.fingerprint:
+                classification = "unchanged" if record is not None and not legacy else "adopted"
             else:
-                errors.append(f"{target} exists but is not owned by Agent Core and differs from source")
-                continue
+                # The declared canonical resource is authoritative, even if
+                # the installed directory was manually created or edited.
+                classification = "updated" if record is not None and not legacy else "replaced"
         plans.append(SkillPlan(source, target, classification))
 
     if errors:
@@ -364,16 +360,10 @@ def _build_pi_plans(
             if installed is None:
                 errors.append(f"{target} is not a regular file")
                 continue
-            if record is not None and not legacy:
-                if installed != record["fingerprint"]:
-                    errors.append(f"{target} was locally modified")
-                    continue
-                classification = "unchanged" if installed == source.fingerprint else "updated"
-            elif installed == source.fingerprint:
-                classification = "adopted"
+            if installed == source.fingerprint:
+                classification = "unchanged" if record is not None and not legacy else "adopted"
             else:
-                errors.append(f"{target} exists but is not owned by Agent Core and differs from source")
-                continue
+                classification = "updated" if record is not None and not legacy else "replaced"
         plans.append(PiPlan(source, target, classification))
 
     if errors:

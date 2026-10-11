@@ -63,7 +63,7 @@ When another trusted Git client has already updated the clean canonical checkout
 
 Removing a name from either manifest is non-destructive. Sync migrates **selected** legacy `.agents/` copies and registered Claude aliases only when their ownership fingerprints/targets are verified, with rollback on failure. Unselected and unowned files remain untouched.
 
-Pi discovers the native installed paths directly; no additional discovery configuration or duplicate copies are needed. A pre-existing Pi-native file is adopted if its contents match the committed source, otherwise sync refuses the conflict without overwriting local work. If Pi previously had extra `~/.agents` scan directories configured, those settings remain yours to adjust; sync does not touch them.
+Pi discovers the native installed paths directly; no additional discovery configuration or duplicate copies are needed. For every **declared** Pi-native resource, the committed repository version replaces any differing installed copy (including previously unmanaged or locally edited files). Unsupported file types are still refused. If Pi previously had extra `~/.agents` scan directories configured, those settings remain yours to adjust; sync does not touch them.
 
 Legacy `agent-core apply [--here]` remains temporarily available and deprecated; it still targets project-local `.agents/skills/` and is not retargeted globally. Use `agent-core retire-local --here` in each old target to remove only unchanged managed copies and exact legacy metadata.
 
