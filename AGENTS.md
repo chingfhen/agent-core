@@ -60,7 +60,7 @@ Installed or generated surfaces include:
 - The launcher must reject a dirty checkout and cross a fresh-process boundary before sync code runs. Ordinary sync fast-forwards with authenticated Git; explicit `sync --no-pull` skips only that refresh and publishes the current clean committed checkout without silent fallback.
 - Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
 - Preflight each configured skill, Pi agent/template, and ownership record. Do not inspect or modify global system guidance or harness settings.
-- Refuse unsafe collisions, malformed ownership, unsupported entries, and locally modified managed resources. Adopt existing Pi skills and files only when identical to canonical source; migrate only fingerprint-verified legacy-owned files.
+- The committed manifest is authoritative for exactly declared Pi-native skills, agents and prompts: overwrite different installed files/directories, even if unmanaged or locally edited. Refuse unsupported file types and unsafe parents. Legacy `.agents/` migration still requires verified fingerprints.
 - Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default.
 - Stage, fingerprint and verify selected resources; migrate verified legacy-owned copies and registered aliases through the same rollback transaction; atomically publish ownership last. Preserve unrelated, unowned and unselected resources.
 - Publish selected files only under `~/.pi/agent/{skills,agents,prompts}/`. Never create copies or aliases for Codex, Claude or other harnesses by default.
