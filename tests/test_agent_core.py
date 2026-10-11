@@ -16,6 +16,7 @@ from unittest.mock import patch
 
 from agent_core import apply, bootstrap, retire, sync
 from agent_core.manifest import MANIFEST_FILENAME, ManifestError, load_skill_names
+from agent_core.pi_manifest import PI_MANIFEST_FILENAME, PiManifestError, load_pi_names
 
 
 REPOSITORY_ROOT = Path(__file__).resolve().parents[1]
@@ -56,6 +57,21 @@ def write_skill(checkout: Path, name: str, content: str) -> None:
 def write_config(checkout: Path, names: list[str]) -> None:
     rendered = "skills = [\n" + "".join(f'    "{name}",\n' for name in names) + "]\n"
     (checkout / MANIFEST_FILENAME).write_text(rendered, encoding="utf-8")
+
+
+def write_pi_config(checkout: Path, agents: list[str], prompts: list[str]) -> None:
+    content = ""
+    for category, names in (("agents", agents), ("prompts", prompts)):
+        content += category + " = [\n"
+        content += "".join(f'    "{name}",\n' for name in names)
+        content += "]\n"
+    (checkout / PI_MANIFEST_FILENAME).write_text(content, encoding="utf-8")
+
+
+def write_pi_resource(checkout: Path, category: str, name: str, content: str) -> None:
+    path = checkout / "pi" / category / f"{name}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
 
 
 def load_installer_module():
@@ -105,7 +121,7 @@ class AgentCoreSyncTests(unittest.TestCase):
 
         self.assertEqual([plan.classification for plan in first.skills], ["added"])
         self.assertEqual([plan.classification for plan in second.skills], ["unchanged"])
-        self.assertTrue(os.path.samefile(self.skill(), self.alias()))
+        self.assertFalse(self.alias().exists())
         for relative in sync.LEGACY_GUIDANCE_DESTINATIONS.values():
             self.assertFalse((self.home / relative).exists())
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
@@ -132,7 +148,7 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertTrue((self.skill("second") / "SKILL.md").is_file())
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertIn("second", state["skills"])
-        self.assertIn("second", state["aliases"])
+        self.assertNotIn("second", state["aliases"])
 
     def test_committed_skill_updates_are_reported(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
@@ -179,7 +195,7 @@ class AgentCoreSyncTests(unittest.TestCase):
         state_path = sync.global_state_path(self.home)
         state_path.parent.mkdir(parents=True)
         state_path.write_text(
-            json.dumps({"version": sync.STATE_VERSION, "skills": {}, "aliases": {}, "guidance": guidance}),
+            json.dumps({"version": 2, "skills": {}, "aliases": {}, "guidance": guidance}),
             encoding="utf-8",
         )
 
@@ -190,27 +206,15 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertEqual(state["guidance"], {})
         self.assertTrue(self.skill().is_dir())
 
-    def test_alias_collision_and_broken_alias_recovery(self) -> None:
-        collision = self.alias()
-        collision.mkdir(parents=True)
-        (collision / "keep.txt").write_text("keep", encoding="utf-8")
-        with self.assertRaisesRegex(sync.SyncError, "not owned"):
-            sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual((collision / "keep.txt").read_text(), "keep")
-
-        shutil.rmtree(collision)
-        sync.sync_checkout(self.checkout, self.home)
-        shutil.rmtree(self.skill())
+    def test_existing_claude_alias_is_unmanaged_and_preserved(self) -> None:
+        alias = self.alias()
+        alias.mkdir(parents=True)
+        (alias / "keep.txt").write_text("user-owned", encoding="utf-8")
         result = sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual(result.aliases[0].classification, "recreated")
-        self.assertTrue(os.path.samefile(self.skill(), self.alias()))
-
-    def test_rollback_spans_skills_aliases_and_state(self) -> None:
-        with patch.object(sync, "_create_directory_alias", side_effect=sync.SyncError("injected alias failure")):
-            with self.assertRaisesRegex(sync.SyncError, "injected alias failure"):
-                sync.sync_checkout(self.checkout, self.home)
-        self.assertFalse(self.skill().exists())
-        self.assertFalse(sync.global_state_path(self.home).exists())
+        self.assertEqual(result.aliases, [])
+        self.assertEqual((alias / "keep.txt").read_text(encoding="utf-8"), "user-owned")
+        sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual((alias / "keep.txt").read_text(encoding="utf-8"), "user-owned")
 
     def test_state_publication_failure_rolls_back(self) -> None:
         original = apply._atomic_write
@@ -241,11 +245,106 @@ class AgentCoreSyncTests(unittest.TestCase):
             sync.print_result(result)
         output = stdout.getvalue()
         self.assertIn("Canonical checkout:", output)
-        self.assertIn("1 configured skills", output)
-        self.assertIn("Changed skills: demo", output)
-        self.assertIn("Global guidance: not managed", output)
-        self.assertIn("Ownership state:", output)
-        self.assertIn("Reload or restart", output)
+        self.assertIn("Skills (1): demo", output)
+        self.assertIn("Pi agents (0): none", output)
+        self.assertIn("Installed root: ~/.agents/", output)
+        self.assertNotIn("Claude aliases:", output)
+        self.assertIn("Pi prompts (0): none", output)
+
+
+
+class PiManifestTests(unittest.TestCase):
+    def test_strict_pi_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / PI_MANIFEST_FILENAME
+            path.write_text('agents = [\n  "commit-agent",\n]\nprompts = [\n]\n', encoding="utf-8")
+            self.assertEqual(load_pi_names(path), {"agents": ["commit-agent"], "prompts": []})
+            path.write_text('agents = ["one"]\nprompts = []\n', encoding="utf-8")
+            with self.assertRaises(PiManifestError):
+                load_pi_names(path)
+
+
+class PiResourceSyncTests(AgentCoreSyncTests):
+    def setUp(self) -> None:
+        super().setUp()
+        write_pi_config(self.checkout, agents=["commit-agent"], prompts=["commit-with-subagent"])
+        write_pi_resource(self.checkout, "agents", "commit-agent", "---\nname: commit-agent\n---\n")
+        write_pi_resource(self.checkout, "prompts", "commit-with-subagent", "---\ndescription: commit\n---\n")
+        commit_all(self.checkout, "configure Pi resources")
+
+    def agent(self) -> Path:
+        return self.home / ".agents/agents/commit-agent.md"
+
+    def prompt(self) -> Path:
+        return self.home / ".agents/prompts/commit-with-subagent.md"
+
+    def test_pi_publish_idempotent_and_guidance_untouched(self) -> None:
+        pi_guidance = self.home / ".pi/agent/AGENTS.md"
+        pi_guidance.parent.mkdir(parents=True, exist_ok=True)
+        pi_guidance.write_text("user instructions\n", encoding="utf-8")
+        first = sync.sync_checkout(self.checkout, self.home)
+        second = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual([p.classification for p in first.pi_resources], ["added", "added"])
+        self.assertEqual([p.classification for p in second.pi_resources], ["unchanged", "unchanged"])
+        self.assertTrue(self.agent().is_file())
+        self.assertTrue(self.prompt().is_file())
+        self.assertEqual(pi_guidance.read_text(encoding="utf-8"), "user instructions\n")
+        self.assertFalse((self.home / ".pi/agent/agents/commit-agent.md").exists())
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertIn("commit-agent", state["pi_agents"])
+        self.assertIn("commit-with-subagent", state["pi_prompts"])
+
+    def test_existing_identical_is_adopted_without_overwrite(self) -> None:
+        self.agent().parent.mkdir(parents=True)
+        self.agent().write_bytes((self.checkout / "pi/agents/commit-agent.md").read_bytes())
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.pi_resources[0].classification, "adopted")
+        self.assertTrue(self.prompt().is_file())
+        repeat = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(repeat.pi_resources[0].classification, "unchanged")
+
+    def test_unowned_conflicting_pi_file_blocks_all_publication(self) -> None:
+        self.agent().parent.mkdir(parents=True)
+        self.agent().write_text("custom local agent", encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "not owned"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.skill().exists())
+        self.assertFalse(self.prompt().exists())
+        self.assertEqual(self.agent().read_text(), "custom local agent")
+
+    def test_modified_owned_pi_file_is_refused(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        self.prompt().write_text("local changes", encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
+            sync.sync_checkout(self.checkout, self.home)
+
+    def test_update_recreate_and_remove_are_non_destructive(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        write_pi_resource(self.checkout, "agents", "commit-agent", "---\nname: commit-agent\n---\nchanged\n")
+        commit_all(self.checkout, "update agent")
+        self.prompt().unlink()
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual([p.classification for p in result.pi_resources], ["updated", "recreated"])
+        write_pi_config(self.checkout, agents=[], prompts=[])
+        commit_all(self.checkout, "remove Pi selections")
+        sync.sync_checkout(self.checkout, self.home)
+        self.assertTrue(self.agent().exists())
+        self.assertTrue(self.prompt().exists())
+
+    def test_uncommitted_pi_source_fails_before_installation(self) -> None:
+        write_pi_resource(self.checkout, "agents", "commit-agent", "uncommitted edit")
+        with self.assertRaisesRegex(sync.SyncError, "must match the canonical commit"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.prompt().exists())
+
+    def test_state_failure_rolls_back_pi_and_skill_installs(self) -> None:
+        with patch.object(apply, "_atomic_write", side_effect=OSError("test state failure")):
+            with self.assertRaisesRegex(sync.SyncError, "test state failure"):
+                sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.skill().exists())
+        self.assertFalse(self.agent().exists())
+        self.assertFalse(self.prompt().exists())
+        self.assertFalse(sync.global_state_path(self.home).exists())
 
 
 class LegacyApplyAndRetirementTests(unittest.TestCase):
