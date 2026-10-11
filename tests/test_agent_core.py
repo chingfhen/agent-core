@@ -219,7 +219,7 @@ class AgentCoreSyncTests(unittest.TestCase):
         original = apply._atomic_write
 
         def fail_state(path: Path, content: str) -> None:
-            if path == sync.global_state_path(self.home):
+            if path.name == sync.STATE_FILENAME and path.parent.name == sync.STATE_DIRECTORY:
                 raise OSError("injected state failure")
             original(path, content)
 
