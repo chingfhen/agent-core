@@ -11,8 +11,8 @@
 ### Read First
 
 - `~/.agent-core` is the fixed canonical private checkout.
-- `personal-skills.toml` is the manual authoritative list of personal skills published by `agent-core sync`.
-- Sync installs real skill copies under `~/.agents/skills/` and creates Claude aliases under `~/.claude/skills/`. It does not create or update global prompt files.
+- `personal-skills.toml` selects shared skills; `personal-pi.toml` selects global Pi agents and prompt templates.
+- Sync publishes declared resources exclusively under `~/.agents/` and does not manage Claude aliases or global system guidance.
 - Pi discovers the shared skills in `~/.agents/skills/`; no additional skill copy is placed in Pi's directory.
 - `skills/` is hand-edited production source. Do not edit production skills without explicit human approval.
 - `docs/agent-core-operating-manual.md` is the human command reference. `docs/consumer-repo-enrollment.md` owns the detailed distribution and migration contract.
@@ -23,7 +23,7 @@
 ### Canonical Surfaces
 
 - `skills/**/SKILL.md`
-- `personal-skills.toml`
+- `personal-skills.toml` and `personal-pi.toml`
 - `agent_core/*.py`
 - `pyproject.toml`
 - `scripts/install-agent-core.cmd` and `scripts/install_agent_core.py`
@@ -35,12 +35,13 @@
 A successful global sync manages only exact declared destinations:
 
 - `~/.agents/skills/<personal-skill>/` — real copied skill directories;
-- `~/.claude/skills/<personal-skill>` — links or Windows directory junctions to the shared copies;
-- `~/.agent-core-state/ownership.json` — machine-local fingerprints and ownership of skills and aliases.
+- `~/.agents/agents/<name>.md` — selected Pi subagent definitions;
+- `~/.agents/prompts/<name>.md` — selected Pi prompt templates;
+- `~/.agent-core-state/ownership.json` — machine-local resource ownership, including retained historical alias records.
 
 Existing global guidance files remain in place but are no longer managed by sync. The first skills-only sync releases their old ownership records without reading or editing the files. Derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md` are generated and disposable.
 
-## Personal Skill Sync
+## Personal Resource Sync
 
 One-time Windows setup uses CMD and an installed Python 3.10 or newer:
 
@@ -60,7 +61,9 @@ agent-core sync
 
 When another trusted Git client has already updated the clean canonical checkout and command-line Git cannot reach the remote, `agent-core sync --no-pull` explicitly skips only the fast-forward pull. The launcher otherwise refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. Sync validates committed skill sources and managed destinations before mutation, stages and fingerprints copies, replaces changed skills and aliases as one rollback-capable operation, and publishes ownership state last.
 
-Removing a name from `personal-skills.toml` is non-destructive. Existing installed copies, aliases, and ownership records remain until an explicit future prune or manual resolution. The manifest is never inferred from every directory under `skills/`.
+Removing a name from either manifest is non-destructive. Existing copies and ownership remain until explicitly resolved. Previously created Claude aliases are preserved, but are no longer created or maintained.
+
+Pi discovers `~/.agents/skills/` directly. For global `~/.agents/agents/` and `~/.agents/prompts/`, configure its user `settings.json` once with `subagents.agentScanDirs` and `prompts`; these settings remain user-managed. Existing old Pi-native files can shadow shared definitions until removed deliberately.
 
 Legacy `agent-core apply [--here]` remains temporarily available and deprecated; it still targets project-local `.agents/skills/` and is not retargeted globally. Use `agent-core retire-local --here` in each old target to remove only unchanged managed copies and exact legacy metadata.
 
@@ -70,7 +73,7 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 
 - `skills/` holds production executor skills and is human-approval-gated.
 - `global/AGENTS.md` is retained as a former guidance source; sync no longer publishes it.
-- `prompts/` holds reusable prompt and policy source material.
+- `prompts/` holds reusable non-installed source material; `pi/` holds explicitly selected Pi agent and prompt sources.
 - `docs/`, `README.md`, and `AGENTS.md` hold durable repository truth and behavior.
 - `tasks/` holds active execution handoff and fresh-session continuity.
 - `source-material/` holds non-canonical seed inputs and supporting artifacts.
@@ -98,6 +101,7 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 | Human operating manual | `docs/agent-core-operating-manual.md` | Setup, sync, publication, verification, migration, and recovery commands. |
 | Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical global publication and legacy retirement behavior. |
 | Personal skill list | `personal-skills.toml` | Authoritative copied skill set. |
+| Pi resource list | `personal-pi.toml` | Authoritative Pi agent and prompt allowlist. |
 | CLI launcher | `agent_core/bootstrap.py` | Fixed-checkout refresh and fresh-process handoff. |
 | Sync engine | `agent_core/sync.py` | Global publication, ownership, aliases, and rollback. |
 | Legacy engine | `agent_core/apply.py` | Deprecated project-local compatibility. |
@@ -111,6 +115,7 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 | 2026-10-08 | Make `agent-core sync` the sole normal personal update command. | Personal workflows should be globally available without stale copies in every project. |
 | 2026-10-08 | Use `~/.agents/skills/` as the shared skill authority and Claude links as compatibility aliases. | Pi, Codex, and OpenCode share one portable location while Claude sees the same content without a second copy. |
 | 2026-10-08 | Publish one canonical `global/AGENTS.md` to native harness guidance files (superseded). | This coupled office and non-office global instructions. |
-| 2026-10-09 | Sync only personal skills and Claude skill aliases. | Global prompts are user-owned; existing files are preserved and former guidance ownership is released. |
+| 2026-10-09 | Stop managing global system guidance. | Existing `AGENTS.md` and `CLAUDE.md` remain user-owned. |
+| 2026-10-11 | Publish selected resources only under `~/.agents/`. | One managed resource root; Pi discovery settings and legacy Claude aliases remain outside sync. |
 | 2026-10-08 | Require Python 3.10+ with no runtime dependencies. | Python 3.10 is practical with a small manifest parser and avoids introducing a TOML package. |
 | 2026-09-15 | Retain the prior project-local apply design only as explicit migration compatibility. | Existing managed copies need a safe retirement path and must not be silently retargeted. |
