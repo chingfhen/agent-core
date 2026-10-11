@@ -5,8 +5,8 @@ import re
 from pathlib import Path
 
 PI_MANIFEST_FILENAME = "personal-pi.toml"
-_ARRAY_START = re.compile(r"^(agents|prompts)\\s*=\\s*\\[$")
-_STRING_ITEM = re.compile(r'^("(?:[^"\\\\]|\\\\.)*")\\s*,?$')
+_ARRAY_START = re.compile(r"^(agents|prompts)\s*=\s*\[$")
+_STRING_ITEM = re.compile(r'^("(?:[^"\\]|\\.)*")\s*,?$')
 
 
 class PiManifestError(ValueError):

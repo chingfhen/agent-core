@@ -23,7 +23,7 @@ STATE_DIRECTORY = ".agent-core-state"
 STATE_FILENAME = "ownership.json"
 SHARED_SKILL_BASE = Path(".agents/skills")
 CLAUDE_SKILL_BASE = Path(".claude/skills")
-PI_BASES = {"agents": Path(".pi/agent/agents"), "prompts": Path(".pi/agent/prompts")}
+PI_BASES = {"agents": Path(".agents/agents"), "prompts": Path(".agents/prompts")}
 LEGACY_GUIDANCE_DESTINATIONS = {
     "pi": Path(".pi/agent/AGENTS.md"),
     "codex": Path(".codex/AGENTS.md"),
@@ -221,15 +221,13 @@ def _alias_matches(alias: Path, target: Path) -> bool:
         return False
 
 
-def _build_plans(
+def _build_skill_plans(
     home: Path,
     sources: list[apply.SourceSkill],
     state: dict[str, object],
-) -> tuple[list[SkillPlan], list[AliasPlan]]:
+) -> list[SkillPlan]:
     skill_records = state["skills"]
-    alias_records = state["aliases"]
     assert isinstance(skill_records, dict)
-    assert isinstance(alias_records, dict)
 
     errors: list[str] = []
     skill_plans: list[SkillPlan] = []
@@ -256,36 +254,9 @@ def _build_plans(
             classification = "unchanged" if installed == source.fingerprint else "updated"
         skill_plans.append(SkillPlan(source, target, classification))
 
-    alias_plans: list[AliasPlan] = []
-    for source in sources:
-        target = home / SHARED_SKILL_BASE / source.name
-        alias = home / CLAUDE_SKILL_BASE / source.name
-        record = alias_records.get(source.name)
-        exists = apply._lexists(alias)
-        if record is None:
-            if exists:
-                errors.append(f"{alias} exists but is not owned by Agent Core")
-                continue
-            classification = "added"
-            replace_existing = False
-        elif not exists:
-            classification = "recreated"
-            replace_existing = False
-        elif _alias_matches(alias, target):
-            classification = "unchanged"
-            replace_existing = False
-        elif not apply._lexists(target) and _is_alias_entry(alias):
-            # A managed alias can be temporarily broken when its managed skill copy was deleted.
-            classification = "recreated"
-            replace_existing = True
-        else:
-            errors.append(f"{alias} no longer points to the managed shared skill {target}")
-            continue
-        alias_plans.append(AliasPlan(source.name, target, alias, classification, replace_existing))
-
     if errors:
         raise SyncError("Preflight refused global changes:\n- " + "\n- ".join(errors))
-    return skill_plans, alias_plans
+    return skill_plans
 
 
 def _file_fingerprint(path: Path) -> str:
@@ -307,13 +278,17 @@ def _load_pi_sources(checkout: Path) -> list[PiSource]:
     except PiManifestError as exc:
         raise SyncError(str(exc)) from exc
 
+    for category, names in configured.items():
+        if len(set(name.casefold() for name in names)) != len(names):
+            raise SyncError(f"Duplicate Pi {category} names in {PI_MANIFEST_FILENAME}")
+        for name in names:
+            if not apply._safe_skill_name(name):
+                raise SyncError(f"Unsafe Pi {category} name: {name!r}")
     for path in [manifest] + [
         checkout / "pi" / category / f"{name}.md"
         for category, names in configured.items()
         for name in names
     ]:
-        if path != manifest and not apply._safe_skill_name(path.stem):
-            raise SyncError(f"Unsafe Pi resource name: {path.stem!r}")
         if not apply._lexists(path) or apply._entry_kind(path) != "file":
             raise SyncError(f"Configured Pi source is not a regular file: {path}")
         relative = path.relative_to(checkout).as_posix()
@@ -325,11 +300,7 @@ def _load_pi_sources(checkout: Path) -> list[PiSource]:
 
     sources: list[PiSource] = []
     for category, names in configured.items():
-        if len(set(name.casefold() for name in names)) != len(names):
-            raise SyncError(f"Duplicate Pi {category} names in {PI_MANIFEST_FILENAME}")
         for name in names:
-            if not apply._safe_skill_name(name):
-                raise SyncError(f"Unsafe Pi {category} name: {name!r}")
             path = checkout / "pi" / category / f"{name}.md"
             sources.append(PiSource(category, name, path, _file_fingerprint(path)))
     return sources
@@ -370,7 +341,7 @@ def _build_pi_plans(
                 classification = "unchanged" if installed == source.fingerprint else "updated"
         plans.append(PiPlan(source, target, classification))
     if errors:
-        raise SyncError("Preflight refused Pi changes:\\n- " + "\\n- ".join(errors))
+        raise SyncError("Preflight refused Pi changes:\n- " + "\n- ".join(errors))
     return plans
 
 
@@ -428,11 +399,11 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
     ownership_path = global_state_path(home)
     state = load_global_state(ownership_path, home)
     destinations = [home / SHARED_SKILL_BASE / source.name for source in sources]
-    destinations.extend(home / CLAUDE_SKILL_BASE / source.name for source in sources)
-    destinations.extend(home / PI_BASES[src.category] / f"{src.name}.md" for src in pi_sources)
+     destinations.extend(home / PI_BASES[src.category] / f"{src.name}.md" for src in pi_sources)
     destinations.append(ownership_path)
     _ensure_real_parents(home, destinations)
-    skill_plans, alias_plans = _build_plans(home, sources, state)
+    skill_plans = _build_skill_plans(home, sources, state)
+    alias_plans: list[AliasPlan] = []  # Historical ownership retained; no Claude mutations.
     pi_plans = _build_pi_plans(home, pi_sources, state)
 
     prospective = json.loads(json.dumps(state))
@@ -480,7 +451,7 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
         current_state = load_global_state(ownership_path, home)
         if current_state != state:
             raise SyncError(f"Global ownership state changed after preflight: {ownership_path}")
-        _build_plans(home, sources, state)
+        _build_skill_plans(home, sources, state)
         _build_pi_plans(home, pi_sources, state)
 
         for plan in skill_plans:
@@ -494,20 +465,6 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
                 os.replace(plan.target, saved)
             completed.append((plan.target, saved))
             os.replace(stage / "skills" / plan.source.name, plan.target)
-
-        for plan in alias_plans:
-            if plan.classification == "unchanged":
-                continue
-            plan.alias.parent.mkdir(parents=True, exist_ok=True)
-            saved = None
-            if apply._lexists(plan.alias):
-                saved = backup / "aliases" / plan.name
-                saved.parent.mkdir(parents=True, exist_ok=True)
-                os.replace(plan.alias, saved)
-            completed.append((plan.alias, saved))
-            _create_directory_alias(plan.alias, plan.target)
-            if not _alias_matches(plan.alias, plan.target):
-                raise SyncError(f"Created Claude alias does not resolve to its shared skill: {plan.alias}")
 
         for plan in pi_plans:
             if plan.classification in {"unchanged", "adopted"}:
@@ -570,24 +527,12 @@ def _counts(items: Sequence[object]) -> str:
 
 def print_result(result: SyncResult) -> None:
     changed = [plan.source.name for plan in result.skills if plan.classification != "unchanged"]
-    print(f"Canonical checkout: {result.checkout}")
-    print(f"Canonical commit: {result.commit}")
-    print(f"Manifest: {result.manifest} ({len(result.skills)} configured skills)")
-    print(f"Shared skills: {result.shared_base} ({_counts(result.skills)})")
-    print("Changed skills: " + (", ".join(changed) if changed else "none"))
-    alias_statuses = sorted({plan.classification for plan in result.aliases})
-    print(
-        f"Claude aliases: {result.claude_base} ({len(result.aliases)} aliases; "
-        + ", ".join(alias_statuses)
-        + ")"
-    )
+    print(f"agent-core sync: OK ({result.commit[:12]})")
+    print(f"Skills ({len(result.skills)}): " + (", ".join(p.source.name for p in result.skills) or "none"))
     for category in ("agents", "prompts"):
         plans = [p for p in result.pi_resources if p.source.category == category]
-        print(f"Pi {category}: {len(plans)} configured ({_counts(plans)}"
-              + f", adopted={sum(p.classification == 'adopted' for p in plans)})")
-    print("Global guidance: not managed (existing files preserved)")
-    print(f"Ownership state: {result.state_path}")
-    print("Reload or restart active harness sessions to use changed skills and Pi resources.")
+        print(f"Pi {category} ({len(plans)}): " + (", ".join(p.source.name for p in plans) or "none"))
+    print("Installed root: ~/.agents/ (global guidance unchanged)")
 
 
 def build_parser() -> argparse.ArgumentParser:
