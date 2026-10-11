@@ -458,8 +458,8 @@ class PiMigrationTests(unittest.TestCase):
 
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertEqual(state["version"], 4)
-        self.assertEqual(Path(state["skills"]["demo"]["destination"]), self.pi_skill())
-        self.assertEqual(Path(state["pi_agents"]["commit-agent"]["destination"]), self.pi_agent())
+        self.assertEqual(Path(state["skills"]["demo"]["destination"]).resolve(), self.pi_skill().resolve())
+        self.assertEqual(Path(state["pi_agents"]["commit-agent"]["destination"]).resolve(), self.pi_agent().resolve())
         self.assertEqual(sync.sync_checkout(self.checkout, self.home).legacy, [])
 
     def test_native_identical_copies_adopted_during_migration(self) -> None:
