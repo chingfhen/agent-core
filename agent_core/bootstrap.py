@@ -132,7 +132,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     sync_parser = subparsers.add_parser(
-        "sync", help="Publish personal skills for all supported harnesses."
+        "sync", help="Publish declared skills, agents and prompts to the native Pi installation."
     )
     sync_parser.add_argument(
         "--no-pull",
