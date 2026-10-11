@@ -1,10 +1,10 @@
 # Personal Skill Distribution
 
-**Last Updated:** 2026-10-09
+**Last Updated:** 2026-10-11
 
 **Status:** Current
 
-**Source Of Truth:** Defines global personal-skill publication, ownership safety, and legacy project-copy retirement.
+**Source Of Truth:** Defines global personal resource publication, ownership safety, and legacy project-copy retirement.
 
 **Update When:** The `agent-core sync` contract, personal manifest, ownership model, or migration behavior changes.
 
@@ -12,46 +12,55 @@
 
 - The normal workflow is machine-level `agent-core sync`, runnable from any directory.
 - The fixed canonical checkout is `~/.agent-core`; every sync fast-forwards that clean checkout before touching installed targets.
-- `personal-skills.toml` is the authoritative manual list. It is never inferred from all `skills/` directories.
-- Real copies live under `~/.agents/skills/`. Claude Code receives aliases under `~/.claude/skills/` that resolve to those copies.
-- Pi discovers the shared `~/.agents/skills/` entries; its global prompt is not part of skill sync.
-- Global prompts are user-owned: sync does not read, create, overwrite, or delete them. The first skills-only sync releases old guidance ownership records without touching existing files.
+- `personal-skills.toml` and `personal-pi.toml` are explicit allowlists; repository contents are never automatically enrolled.
+- All new installed resource files live only under `~/.agents/`. Claude aliases are no longer created or updated.
+- Pi discovers shared skills natively; shared global agents and templates require one-time Pi settings configuration.
+- Global `AGENTS.md`, `CLAUDE.md`, Pi settings, and extension installations are user-managed and untouched.
 - Sync refuses unowned collisions and locally modified managed skill targets, and preserves unrelated user and project content.
 - Removing a manifest entry is additive and non-destructive.
 - Human commands live in `docs/agent-core-operating-manual.md`.
 
 ## Scope
 
-This document covers private personal-skill publication, the transition away from managed global guidance, and explicit retirement of former project-local copies.
+This document covers personal skill, Pi-agent, and prompt-template publication, the unmanaged global-guidance boundary, and explicit retirement of old project-local copies.
 
 It does not cover production skill authoring, project-owned skills, user-authored global prompts, harness credentials, MCP configuration, security policy, the memory ledger, or active task state.
 
 ## Publication Layout
 
-### Skills
+Both lists are authoritative and opt-in:
 
-Configured sources:
+- `personal-skills.toml` selects `skills/<name>/`.
+- `personal-pi.toml` selects `pi/agents/<name>.md` and `pi/prompts/<name>.md`.
 
-```text
-~/.agent-core/skills/<personal-skill>/
-```
-
-Shared installed authority:
+All installed resource files have exactly one managed root:
 
 ```text
-~/.agents/skills/<personal-skill>/
+~/.agents/
+├── skills/<name>/SKILL.md
+├── agents/<name>.md
+└── prompts/<name>.md
 ```
 
-Claude compatibility alias:
+Pi, Codex, and OpenCode can discover shared skills directly. Global Pi
+agents and command templates need one-time explicit user settings:
 
-```text
-~/.claude/skills/<personal-skill>
-    -> ~/.agents/skills/<personal-skill>
+```json
+{
+  "prompts": ["~/.agents/prompts"],
+  "subagents": {"agentScanDirs": ["~/.agents/agents"]}
+}
 ```
 
-Windows uses unprivileged directory junctions. Other platforms use directory symlinks. Agent Core never silently creates a second Claude content copy.
+Merge these properties into `~/.pi/agent/settings.json`. Sync never alters
+that file. The `pi-subagents` extension and the chosen model's credentials
+must be installed/configured separately. Existing Pi-native definitions
+can take precedence over shared ones and should be compared and retired
+manually after installation.
 
-Pi, Codex, and OpenCode use the shared Agent Skills location directly. Pi 1.0.4 was checked through RPC `get_commands` in an isolated Windows home; it returned a synthetic `~/.agents/skills/` skill once with user scope. OpenCode 1.18.11 was checked with both the shared skill and Claude junction present; `opencode debug skill` returned the test skill once at its shared location. Pi's discovery documentation does not identify `~/.claude/skills/` as a Pi location.
+Claude Code may require its own global skill alias for discovery. Sync
+deliberately does **not** create or update `~/.claude/skills/`. Previously
+created aliases are left untouched rather than silently pruned.
 
 ### Global Guidance
 
@@ -68,8 +77,8 @@ The first successful skills-only sync validates old guidance ownership records, 
 This versioned JSON file is outside the tracked checkout. It records:
 
 - each managed shared skill destination, source commit, and deterministic directory fingerprint;
-- each Claude alias destination and expected shared target;
-- an empty `guidance` collection retained for state-version compatibility after the first skills-only sync.
+- historical Claude alias metadata for compatibility, not active publication;
+- an empty `guidance` collection and selected Pi agent/template fingerprints in state version 3 (older state version 2 is upgraded).
 
 The state retains records for names removed from the current manifest. It is published atomically only after all changed outputs succeed.
 
@@ -89,12 +98,12 @@ The Windows CMD installer locates `py -3` or `python`, creates `%LOCALAPPDATA%\A
 
 ## Source Contract
 
-`personal-skills.toml` accepts a deliberately narrow dependency-free TOML subset: one top-level `skills = [...]` array of quoted strings. Names must be unique under case-folding and safe as one directory component.
+The manifests use narrow, dependency-free TOML string arrays: `skills = [...]` in `personal-skills.toml` and `agents = [...]` plus `prompts = [...]` in `personal-pi.toml`. All names must be safe, distinct under case-folding, and manually selected.
 
 Before publication, Agent Core requires:
 
 - the manifest to be tracked and match `HEAD`;
-- every configured source to be a real directory with a regular `SKILL.md`;
+- every configured skill to be a real directory with `SKILL.md`, and every Pi source to be a regular Markdown file;
 - every regular source file to be tracked;
 - no missing tracked file, untracked file, symlink, reparse point, or unsupported entry in the source;
 - source content and permissions to match committed content;
@@ -104,59 +113,47 @@ The launcher's clean-checkout check and the sync engine's committed-source check
 
 ## Destination And Transaction Contract
 
-Before any replacement, sync validates every configured skill, Claude alias, managed parent path, and ownership record. Former guidance records are validated as historical state, but the associated files are not checked.
+Before any mutation, sync validates selected skills, Pi files, their managed
+parent paths, and ownership state. It never opens or edits global system
+guidance, Pi settings, Claude aliases, or unrelated files.
 
-A configured shared skill is safe only when it is:
+A shared skill is accepted if absent and unowned, or if previously
+owned and fingerprint-unchanged or missing. An unowned shared skill collision
+is refused.
 
-- absent and unowned;
-- owned and fingerprint-unchanged;
-- owned but missing.
+A selected Pi file is accepted if absent, if owned and unchanged or
+missing, or if unowned but **byte-identical to canonical source** (safe
+adoption). A changed unowned file, modified owned file, unsupported
+link/reparse point, or malformed record causes a whole-sync refusal.
 
-A Claude alias is safe only when it is:
+Sync stages and fingerprints selected resources, repeats preflight checks,
+publishes changed outputs through backups, and atomically updates the
+ownership state last. Failures before state publication roll back changed
+resources. Removed allowlist entries are not pruned; older Claude aliases
+and associated ownership metadata remain unchanged and are not synchronized.
 
-- absent and unowned;
-- owned and resolves to its exact shared skill;
-- owned but missing;
-- an owned broken alias whose exact managed shared target is also missing and will be recreated.
-
-All other entries are conflicts. There is no default force option.
-
-After preflight, sync:
-
-1. stages and fingerprints every configured skill copy;
-2. repeats state and target safety checks immediately before replacement;
-3. moves changed existing skill targets to transaction backups;
-4. publishes changed skills;
-5. creates or recreates Claude aliases and verifies their identity;
-6. atomically writes prospective ownership state with guidance ownership cleared;
-7. removes transaction artifacts.
-
-Any ordinary failure before ownership publication rolls back changed skills and aliases. If rollback itself is incomplete, the error lists exact affected paths.
-
-Managed parent directories may be created when absent but must otherwise be real directories, not links or unsupported entries. Unrelated entries under `.agents` and `.claude` are preserved; global guidance locations are never inspected or changed.
+Managed parent paths must be real directories and remain within the user
+home. Sync never creates or updates installed resource files outside
+`~/.agents/` (apart from its machine-local ownership/transaction state).
 
 ## Additive Manifest Changes
 
 Adding a name publishes it at the next successful sync. Updating a committed source updates its unchanged owned copy. Manually deleting an owned copy recreates it.
 
-Removing a name does not inspect, update, or delete its prior shared copy, alias, or ownership record. Re-adding an unchanged retained name resumes normal updates; a locally modified retained copy is a conflict when re-added.
+Removing a name does not inspect, update, or delete its installed copy or ownership record. Re-adding an unchanged retained name resumes normal updates; a locally modified retained copy is a conflict when re-added.
 
 Automatic pruning is intentionally absent. A future explicit prune operation would need its own human-visible contract.
 
 ## Observability
 
-Successful sync output reports:
+Successful sync prints only the canonical commit, exact selected names and
+counts for skills, Pi agents, and Pi prompt templates, and the single
+`~/.agents/` install root. The output is an installation report, not a
+claim that Pi has loaded the resources or the model executed them.
 
-- canonical checkout and commit;
-- selected manifest and configured count;
-- shared destination with added, updated, recreated, and unchanged counts;
-- changed skill names;
-- Claude alias destination, count, and statuses;
-- confirmation that global guidance is not managed;
-- ownership-state location;
-- the need to reload or restart active harness sessions.
-
-A refusal identifies exact conflicting destinations and why they are unsafe. Output proves completed filesystem operations, not that a model followed the installed instructions.
+Detailed ownership fingerprints remain in
+`~/.agent-core-state/ownership.json`. Failures still report the exact
+blocking destination and reason.
 
 ## Legacy Project-Local Compatibility
 
