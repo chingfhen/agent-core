@@ -4,3 +4,5 @@ __pycache__/
 *.py[cod]
 /MEMORY_INDEX.md
 /memory/memory.sqlite
+projects.toml
+pi-session-*.html
