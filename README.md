@@ -59,7 +59,7 @@ After setup, the normal update command is:
 agent-core sync
 ```
 
-When another trusted Git client has already updated the clean canonical checkout and command-line Git cannot reach the remote, `agent-core sync --no-pull` explicitly skips only the fast-forward pull. The launcher otherwise refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. Sync validates committed skill sources and managed destinations before mutation, stages and fingerprints copies, replaces changed skills and aliases as one rollback-capable operation, and publishes ownership state last.
+When another trusted Git client has already updated the clean canonical checkout and command-line Git cannot reach the remote, `agent-core sync --no-pull` explicitly skips only the fast-forward pull. The launcher otherwise refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. Sync validates committed manifests and selected resources before mutation, stages and fingerprints the copies, publishes changed shared files through a rollback-capable transaction, and atomically writes ownership state last.
 
 Removing a name from either manifest is non-destructive. Existing copies and ownership remain until explicitly resolved. Previously created Claude aliases are preserved, but are no longer created or maintained.
 
