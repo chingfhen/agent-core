@@ -399,7 +399,7 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
     ownership_path = global_state_path(home)
     state = load_global_state(ownership_path, home)
     destinations = [home / SHARED_SKILL_BASE / source.name for source in sources]
-     destinations.extend(home / PI_BASES[src.category] / f"{src.name}.md" for src in pi_sources)
+    destinations.extend(home / PI_BASES[src.category] / f"{src.name}.md" for src in pi_sources)
     destinations.append(ownership_path)
     _ensure_real_parents(home, destinations)
     skill_plans = _build_skill_plans(home, sources, state)
