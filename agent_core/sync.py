@@ -292,8 +292,7 @@ def _file_fingerprint(path: Path) -> str:
 def _load_pi_sources(checkout: Path) -> list[PiSource]:
     manifest = checkout / PI_MANIFEST_FILENAME
     if not apply._lexists(manifest):
-        # Allow historical skills-only checkouts and existing fixtures.
-        return []
+        raise SyncError(f"Required Pi manifest is missing: {manifest}")
     if apply._entry_kind(manifest) != "file":
         raise SyncError(f"Pi manifest is not a regular file: {manifest}")
     try:
