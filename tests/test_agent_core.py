@@ -160,7 +160,8 @@ class AgentCoreSyncTests(unittest.TestCase):
         pi_manifest.unlink()
         with self.assertRaisesRegex(sync.SyncError, "Required Pi manifest is missing"):
             sync.sync_checkout(self.checkout, self.home)
-        pi_manifest.write_text('agents = []\nprompts = []\n', encoding="utf-8")
+        committed = git(self.checkout, "show", f"HEAD:{PI_MANIFEST_FILENAME}").stdout
+        pi_manifest.write_text(committed + "# uncommitted edit\n", encoding="utf-8")
         with self.assertRaisesRegex(sync.SyncError, "must match the canonical commit"):
             sync.sync_checkout(self.checkout, self.home)
         self.assertFalse(self.skill().exists())
