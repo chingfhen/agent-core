@@ -142,7 +142,7 @@ def load_global_state(path: Path, home: Path) -> dict[str, object]:
             raise SyncError(f"Global ownership state has an invalid alias name: {name!r}")
         record = _expect_record(raw, {"destination", "target"}, f"alias {name!r}")
         expected_alias = home / CLAUDE_SKILL_BASE / name
-        expected_target = home / SHARED_SKILL_BASE / name
+        expected_target = home / LEGACY_SKILL_BASE / name
         if (
             Path(record["destination"]).resolve(strict=False) != expected_alias.resolve(strict=False)
             or Path(record["target"]).resolve(strict=False) != expected_target.resolve(strict=False)
