@@ -175,12 +175,22 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertEqual(result.skills[0].classification, "updated")
         self.assertIn("version two", (self.skill() / "SKILL.md").read_text(encoding="utf-8"))
 
-    def test_modified_target_refuses_all_changes(self) -> None:
+    def test_modified_owned_skill_is_replaced_by_canonical(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
         (self.skill() / "SKILL.md").write_text("local edit", encoding="utf-8")
+        (self.skill() / "extra.md").write_text("manual extra", encoding="utf-8")
 
-        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
-            sync.sync_checkout(self.checkout, self.home)
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.skills[0].classification, "updated")
+        self.assertIn("version one", (self.skill() / "SKILL.md").read_text(encoding="utf-8"))
+        self.assertFalse((self.skill() / "extra.md").exists())
+
+    def test_unowned_differing_skill_is_replaced_by_canonical(self) -> None:
+        self.skill().mkdir(parents=True)
+        (self.skill() / "SKILL.md").write_text("custom skill", encoding="utf-8")
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.skills[0].classification, "replaced")
+        self.assertIn("version one", (self.skill() / "SKILL.md").read_text(encoding="utf-8"))
 
     def test_unowned_guidance_and_other_skills_are_preserved(self) -> None:
         unrelated = self.home / ".agents/skills/third-party"
@@ -320,20 +330,30 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         repeat = sync.sync_checkout(self.checkout, self.home)
         self.assertEqual(repeat.pi_resources[0].classification, "unchanged")
 
-    def test_unowned_conflicting_pi_file_blocks_all_publication(self) -> None:
+    def test_unowned_differing_agent_and_prompt_are_replaced(self) -> None:
         self.agent().parent.mkdir(parents=True)
+        self.prompt().parent.mkdir(parents=True)
         self.agent().write_text("custom local agent", encoding="utf-8")
-        with self.assertRaisesRegex(sync.SyncError, "not owned"):
-            sync.sync_checkout(self.checkout, self.home)
-        self.assertFalse(self.skill().exists())
-        self.assertFalse(self.prompt().exists())
-        self.assertEqual(self.agent().read_text(), "custom local agent")
+        self.prompt().write_text("custom local prompt", encoding="utf-8")
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual([p.classification for p in result.pi_resources], ["replaced", "replaced"])
+        self.assertEqual(self.agent().read_bytes(), (self.checkout / "pi/agents/commit-agent.md").read_bytes())
+        self.assertEqual(self.prompt().read_bytes(), (self.checkout / "pi/prompts/commit-with-subagent.md").read_bytes())
 
-    def test_modified_owned_pi_file_is_refused(self) -> None:
+    def test_modified_owned_pi_file_is_replaced_by_canonical(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
+        self.agent().write_text("local changes", encoding="utf-8")
         self.prompt().write_text("local changes", encoding="utf-8")
-        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual([p.classification for p in result.pi_resources], ["updated", "updated"])
+        self.assertEqual(self.agent().read_bytes(), (self.checkout / "pi/agents/commit-agent.md").read_bytes())
+        self.assertEqual(self.prompt().read_bytes(), (self.checkout / "pi/prompts/commit-with-subagent.md").read_bytes())
+
+    def test_unowned_non_regular_agent_refuses_unsafe_replacement(self) -> None:
+        self.agent().mkdir(parents=True)
+        with self.assertRaisesRegex(sync.SyncError, "not a regular file"):
             sync.sync_checkout(self.checkout, self.home)
+        self.assertTrue(self.agent().is_dir())
 
     def test_update_recreate_and_remove_are_non_destructive(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
@@ -490,17 +510,15 @@ class PiMigrationTests(unittest.TestCase):
         self.assertEqual([p.classification for p in result.pi_resources], ["adopted", "adopted"])
         self.assertFalse(self.legacy_skill().exists())
 
-    def test_conflicting_native_file_fails_without_retiring_old(self) -> None:
+    def test_differing_native_file_is_overwritten_during_legacy_migration(self) -> None:
         self.seed_legacy()
         self.pi_agent().parent.mkdir(parents=True)
         self.pi_agent().write_text("my custom agent\n", encoding="utf-8")
-        old_state = sync.global_state_path(self.home).read_bytes()
-        with self.assertRaisesRegex(sync.SyncError, "not owned"):
-            sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual(old_state, sync.global_state_path(self.home).read_bytes())
-        self.assertTrue(self.legacy_skill().exists())
-        self.assertFalse(self.pi_skill().exists())
-        self.assertEqual(self.pi_agent().read_text(), "my custom agent\n")
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.pi_resources[0].classification, "replaced")
+        self.assertFalse(self.legacy_skill().exists())
+        self.assertTrue(self.pi_skill().exists())
+        self.assertEqual(self.pi_agent().read_text(), "canonical agent\n")
 
     def test_modified_managed_legacy_skill_blocks_migration(self) -> None:
         self.seed_legacy()
