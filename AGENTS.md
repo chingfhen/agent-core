@@ -12,8 +12,8 @@
 
 - You are the steward agent when working in this repository.
 - `skills/` is the hand-edited production source. Do not change production workflow skills unless the human explicitly approves the skill edit.
-- The normal personal command is `agent-core sync`. It refreshes the fixed clean `~/.agent-core` checkout and publishes `personal-skills.toml` entries and Claude skill aliases. Global prompts are user-managed.
-- Do not hand-maintain installed copies or aliases. Sync owns only exact destinations recorded in `~/.agent-core-state/ownership.json`.
+- `agent-core sync` publishes declared skills, Pi agents, and Pi prompt templates only under `~/.agents/`. Global system guidance, harness settings, and former Claude aliases are not synced.
+- Do not hand-maintain managed copies. Sync owns only exact `.agents/` destinations recorded in `~/.agent-core-state/ownership.json`; historical Claude aliases remain untouched.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
 - Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits. `global/AGENTS.md` is retained but no longer published by sync.
@@ -39,7 +39,7 @@
 
 Canonical surfaces include:
 
-- `skills/` and `personal-skills.toml`;
+- `skills/`, `pi/`, `personal-skills.toml`, and `personal-pi.toml`;
 - `agent_core/`, `pyproject.toml`, and installer scripts;
 - `README.md`, `AGENTS.md`, `docs/`, and `prompts/`;
 - schemas, steward scripts, and the append-only `memory/memories.jsonl` ledger.
@@ -47,25 +47,25 @@ Canonical surfaces include:
 Installed or generated surfaces include:
 
 - real skill copies under `~/.agents/skills/<personal-skill>/`;
-- Claude aliases under `~/.claude/skills/<personal-skill>`;
+- declared Pi agents and templates under `~/.agents/agents/*.md` and `~/.agents/prompts/*.md`;
 - `~/.agent-core-state/ownership.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
 ### Global Sync Rules
 
 - `~/.agent-core` is the fixed canonical checkout. Do not add configurable checkout paths, credential handling, or another bootstrap package.
-- `personal-skills.toml` is manually maintained and authoritative. Never infer publication from all `skills/` directories.
+- Both personal manifests are manual allowlists. Never infer publication by scanning `skills/` or `pi/`.
 - Keep the console launcher and CMD installer small and stable. The normal Windows path must not require PowerShell, `uv`, `pip`, elevation, or downloaded packages.
 - Require Python 3.10+ and keep runtime code standard-library-only.
 - The launcher must reject a dirty checkout and cross a fresh-process boundary before sync code runs. Ordinary sync fast-forwards with authenticated Git; explicit `sync --no-pull` skips only that refresh and publishes the current clean committed checkout without silent fallback.
 - Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
-- Preflight every configured skill, Claude alias, and ownership record before replacing any target. Preserve existing global prompt files without inspecting them.
-- Refuse unowned skill collisions, malformed ownership, unsupported entries, and locally modified managed skills. Do not inspect or initialize global prompt files.
+- Preflight each configured skill, Pi agent/template, and ownership record. Do not inspect or modify global system guidance or harness settings.
+- Refuse unsafe collisions, malformed ownership, unsupported entries, and locally modified managed resources. Adopt a Pi file only when byte-identical to its canonical source.
 - Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default.
-- Stage and fingerprint skill copies, replace through backups with rollback, and atomically publish skill and alias ownership only after all output succeeds. Clear former guidance ownership without altering the prompt files.
-- Use real copies only under `~/.agents/skills/`. Claude receives links or Windows directory junctions to those copies, never independent duplicates.
+- Stage and fingerprint selected resources, replace through backups with rollback, and atomically publish ownership only after all output succeeds. Preserve historical Claude alias records without modifying their paths.
+- Publish files only under `~/.agents/skills/`, `~/.agents/agents/`, and `~/.agents/prompts/`. Never create Claude aliases or duplicate Pi-native copies.
 - Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
-- Report the checkout commit, manifest count, changed skill names, alias status, confirmation that guidance is unmanaged, ownership path, and reload requirement.
+- Successful sync output stays concise: exact declared names and counts, source commit, and the single install root. Failures still identify precise conflicts.
 
 Canonical details: `docs/consumer-repo-enrollment.md`.
 
