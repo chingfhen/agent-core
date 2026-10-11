@@ -243,12 +243,14 @@ class AgentCoreSyncTests(unittest.TestCase):
         with patch("sys.stdout", new_callable=StringIO) as stdout:
             sync.print_result(result)
         output = stdout.getvalue()
-        self.assertIn("Canonical checkout:", output)
+        self.assertIn("agent-core sync: OK (", output)
         self.assertIn("Skills (1): demo", output)
-        self.assertIn("Pi agents (0): none", output)
+        agent_names = [plan.source.name for plan in result.pi_resources if plan.source.category == "agents"]
+        self.assertIn(f"Pi agents ({len(agent_names)}): " + (", ".join(agent_names) or "none"), output)
         self.assertIn("Installed root: ~/.agents/", output)
         self.assertNotIn("Claude aliases:", output)
-        self.assertIn("Pi prompts (0): none", output)
+        prompt_names = [plan.source.name for plan in result.pi_resources if plan.source.category == "prompts"]
+        self.assertIn(f"Pi prompts ({len(prompt_names)}): " + (", ".join(prompt_names) or "none"), output)
 
 
 
