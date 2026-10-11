@@ -1,6 +1,6 @@
 # Agent Core
 
-**Last Updated:** 2026-10-09
+**Last Updated:** 2026-10-11
 
 **Status:** Current
 
@@ -11,9 +11,9 @@
 ### Read First
 
 - `~/.agent-core` is the fixed canonical private checkout.
-- `personal-skills.toml` selects shared skills; `personal-pi.toml` selects global Pi agents and prompt templates.
-- Sync publishes declared resources exclusively under `~/.agents/` and does not manage Claude aliases or global system guidance.
-- Pi discovers the shared skills in `~/.agents/skills/`; no additional skill copy is placed in Pi's directory.
+- `personal-skills.toml` selects skills; `personal-pi.toml` selects Pi subagents and prompt templates.
+- `agent-core sync` is Pi-first: it publishes all declared resources under `~/.pi/agent/` and never changes global system guidance.
+- Pi discovers native skills, agents and prompts without edits to `settings.json`. No other harness is targeted by default.
 - `skills/` is hand-edited production source. Do not edit production skills without explicit human approval.
 - `docs/agent-core-operating-manual.md` is the human command reference. `docs/consumer-repo-enrollment.md` owns the detailed distribution and migration contract.
 - `tasks/` holds active execution state; docs and agent guidance hold durable truth.
@@ -34,10 +34,10 @@
 
 A successful global sync manages only exact declared destinations:
 
-- `~/.agents/skills/<personal-skill>/` — real copied skill directories;
-- `~/.agents/agents/<name>.md` — selected Pi subagent definitions;
-- `~/.agents/prompts/<name>.md` — selected Pi prompt templates;
-- `~/.agent-core-state/ownership.json` — machine-local resource ownership, including retained historical alias records.
+- `~/.pi/agent/skills/<personal-skill>/` — real copied skill directories;
+- `~/.pi/agent/agents/<name>.md` — selected Pi subagent definitions;
+- `~/.pi/agent/prompts/<name>.md` — selected Pi prompt templates;
+- `~/.agent-core-state/ownership.json` — machine-local ownership, fingerprints and safe legacy-migration state.
 
 Existing global guidance files remain in place but are no longer managed by sync. The first skills-only sync releases their old ownership records without reading or editing the files. Derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md` are generated and disposable.
 
@@ -61,9 +61,9 @@ agent-core sync
 
 When another trusted Git client has already updated the clean canonical checkout and command-line Git cannot reach the remote, `agent-core sync --no-pull` explicitly skips only the fast-forward pull. The launcher otherwise refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. Sync validates committed manifests and selected resources before mutation, stages and fingerprints the copies, publishes changed shared files through a rollback-capable transaction, and atomically writes ownership state last.
 
-Removing a name from either manifest is non-destructive. Existing copies and ownership remain until explicitly resolved. Previously created Claude aliases are preserved, but are no longer created or maintained.
+Removing a name from either manifest is non-destructive. Sync migrates **selected** legacy `.agents/` copies and registered Claude aliases only when their ownership fingerprints/targets are verified, with rollback on failure. Unselected and unowned files remain untouched.
 
-Pi discovers `~/.agents/skills/` directly. For global `~/.agents/agents/` and `~/.agents/prompts/`, configure its user `settings.json` once with `subagents.agentScanDirs` and `prompts`; these settings remain user-managed. Existing old Pi-native files can shadow shared definitions until removed deliberately.
+Pi discovers the native installed paths directly; no additional discovery configuration or duplicate copies are needed. A pre-existing Pi-native file is adopted if its contents match the committed source, otherwise sync refuses the conflict without overwriting local work. If Pi previously had extra `~/.agents` scan directories configured, those settings remain yours to adjust; sync does not touch them.
 
 Legacy `agent-core apply [--here]` remains temporarily available and deprecated; it still targets project-local `.agents/skills/` and is not retargeted globally. Use `agent-core retire-local --here` in each old target to remove only unchanged managed copies and exact legacy metadata.
 
@@ -103,7 +103,7 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 | Personal skill list | `personal-skills.toml` | Authoritative copied skill set. |
 | Pi resource list | `personal-pi.toml` | Authoritative Pi agent and prompt allowlist. |
 | CLI launcher | `agent_core/bootstrap.py` | Fixed-checkout refresh and fresh-process handoff. |
-| Sync engine | `agent_core/sync.py` | Global publication, ownership, aliases, and rollback. |
+| Sync engine | `agent_core/sync.py` | Pi-native publication, safe legacy migration, ownership and rollback. |
 | Legacy engine | `agent_core/apply.py` | Deprecated project-local compatibility. |
 | Retirement engine | `agent_core/retire.py` | Safe removal of old managed project copies. |
 | Memory pilot | `docs/memory-pilot.md` | Canonical ledger and approval contract. |
@@ -116,6 +116,7 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 | 2026-10-08 | Use `~/.agents/skills/` as the shared skill authority and Claude links as compatibility aliases. | Pi, Codex, and OpenCode share one portable location while Claude sees the same content without a second copy. |
 | 2026-10-08 | Publish one canonical `global/AGENTS.md` to native harness guidance files (superseded). | This coupled office and non-office global instructions. |
 | 2026-10-09 | Stop managing global system guidance. | Existing `AGENTS.md` and `CLAUDE.md` remain user-owned. |
-| 2026-10-11 | Publish selected resources only under `~/.agents/`. | One managed resource root; Pi discovery settings and legacy Claude aliases remain outside sync. |
+| 2026-10-11 | Publish selected resources only under `~/.agents/` (superseded). | Previous shared-root attempt. |
+| 2026-10-11 | Default to Pi-native `~/.pi/agent/` paths. | Pi is the current active harness; native discovery needs no manual settings or duplicate resources. |
 | 2026-10-08 | Require Python 3.10+ with no runtime dependencies. | Python 3.10 is practical with a small manifest parser and avoids introducing a TOML package. |
 | 2026-09-15 | Retain the prior project-local apply design only as explicit migration compatibility. | Existing managed copies need a safe retirement path and must not be silently retargeted. |

@@ -43,6 +43,7 @@ def _validate_checkout(checkout: Path) -> None:
     required_files = (
         checkout / "pyproject.toml",
         checkout / "personal-skills.toml",
+        checkout / "personal-pi.toml",
         checkout / "agent_core" / "bootstrap.py",
         checkout / "agent_core" / "apply.py",
         checkout / "agent_core" / "sync.py",
@@ -132,7 +133,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     sync_parser = subparsers.add_parser(
-        "sync", help="Publish personal skills for all supported harnesses."
+        "sync", help="Publish declared skills, agents and prompts to the native Pi installation."
     )
     sync_parser.add_argument(
         "--no-pull",

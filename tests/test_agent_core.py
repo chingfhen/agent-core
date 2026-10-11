@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import hashlib
 import importlib.util
 import json
 import os
@@ -57,6 +58,10 @@ def write_skill(checkout: Path, name: str, content: str) -> None:
 def write_config(checkout: Path, names: list[str]) -> None:
     rendered = "skills = [\n" + "".join(f'    "{name}",\n' for name in names) + "]\n"
     (checkout / MANIFEST_FILENAME).write_text(rendered, encoding="utf-8")
+    # Both manifests are mandatory for sync. Legacy apply ignores the Pi list.
+    pi_manifest = checkout / PI_MANIFEST_FILENAME
+    if not pi_manifest.exists():
+        write_pi_config(checkout, agents=[], prompts=[])
 
 
 def write_pi_config(checkout: Path, agents: list[str], prompts: list[str]) -> None:
@@ -110,7 +115,7 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.temporary.cleanup()
 
     def skill(self, name: str = "demo") -> Path:
-        return self.home / ".agents" / "skills" / name
+        return self.home / ".pi" / "agent" / "skills" / name
 
     def alias(self, name: str = "demo") -> Path:
         return self.home / ".claude" / "skills" / name
@@ -149,6 +154,17 @@ class AgentCoreSyncTests(unittest.TestCase):
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertIn("second", state["skills"])
         self.assertNotIn("second", state["aliases"])
+
+    def test_missing_or_untracked_pi_manifest_is_refused(self) -> None:
+        pi_manifest = self.checkout / PI_MANIFEST_FILENAME
+        pi_manifest.unlink()
+        with self.assertRaisesRegex(sync.SyncError, "Required Pi manifest is missing"):
+            sync.sync_checkout(self.checkout, self.home)
+        committed = git(self.checkout, "show", f"HEAD:{PI_MANIFEST_FILENAME}").stdout
+        pi_manifest.write_text(committed + "# uncommitted edit\n", encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "must match the canonical commit"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.skill().exists())
 
     def test_committed_skill_updates_are_reported(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
@@ -246,11 +262,11 @@ class AgentCoreSyncTests(unittest.TestCase):
         self.assertIn("agent-core sync: OK (", output)
         self.assertIn("Skills (1): demo", output)
         agent_names = [plan.source.name for plan in result.pi_resources if plan.source.category == "agents"]
-        self.assertIn(f"Pi agents ({len(agent_names)}): " + (", ".join(agent_names) or "none"), output)
-        self.assertIn("Installed root: ~/.agents/", output)
+        self.assertIn(f"Agents ({len(agent_names)}): " + (", ".join(agent_names) or "none"), output)
+        self.assertIn("Verified: ~/.pi/agent/{skills,agents,prompts}", output)
         self.assertNotIn("Claude aliases:", output)
         prompt_names = [plan.source.name for plan in result.pi_resources if plan.source.category == "prompts"]
-        self.assertIn(f"Pi prompts ({len(prompt_names)}): " + (", ".join(prompt_names) or "none"), output)
+        self.assertIn(f"Prompts ({len(prompt_names)}): " + (", ".join(prompt_names) or "none"), output)
 
 
 
@@ -274,10 +290,10 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         commit_all(self.checkout, "configure Pi resources")
 
     def agent(self) -> Path:
-        return self.home / ".agents/agents/commit-agent.md"
+        return self.home / ".pi/agent/agents/commit-agent.md"
 
     def prompt(self) -> Path:
-        return self.home / ".agents/prompts/commit-with-subagent.md"
+        return self.home / ".pi/agent/prompts/commit-with-subagent.md"
 
     def test_pi_publish_idempotent_and_guidance_untouched(self) -> None:
         pi_guidance = self.home / ".pi/agent/AGENTS.md"
@@ -290,7 +306,7 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         self.assertTrue(self.agent().is_file())
         self.assertTrue(self.prompt().is_file())
         self.assertEqual(pi_guidance.read_text(encoding="utf-8"), "user instructions\n")
-        self.assertFalse((self.home / ".pi/agent/agents/commit-agent.md").exists())
+        self.assertFalse((self.home / ".agents/agents/commit-agent.md").exists())
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertIn("commit-agent", state["pi_agents"])
         self.assertIn("commit-with-subagent", state["pi_prompts"])
@@ -346,6 +362,185 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         self.assertFalse(self.agent().exists())
         self.assertFalse(self.prompt().exists())
         self.assertFalse(sync.global_state_path(self.home).exists())
+
+
+
+class PiMigrationTests(unittest.TestCase):
+    """Simulate an existing version-3 machine without modifying real user files."""
+
+    def setUp(self) -> None:
+        self.temporary = tempfile.TemporaryDirectory()
+        self.root = Path(self.temporary.name)
+        self.checkout = self.root / "canonical"
+        initialize_repo(self.checkout)
+        write_skill(self.checkout, "demo", "canonical skill")
+        write_config(self.checkout, ["demo"])
+        write_pi_config(self.checkout, agents=["commit-agent"], prompts=["commit-with-subagent"])
+        write_pi_resource(self.checkout, "agents", "commit-agent", "canonical agent\n")
+        write_pi_resource(self.checkout, "prompts", "commit-with-subagent", "canonical prompt\n")
+        commit_all(self.checkout, "canonical resources")
+        self.home = self.root / "home"
+        self.home.mkdir()
+        self.commit = git(self.checkout, "rev-parse", "HEAD").stdout.strip()
+
+    def tearDown(self) -> None:
+        self.temporary.cleanup()
+
+    def legacy_skill(self) -> Path:
+        return self.home / ".agents/skills/demo"
+
+    def pi_skill(self) -> Path:
+        return self.home / ".pi/agent/skills/demo"
+
+    def pi_agent(self) -> Path:
+        return self.home / ".pi/agent/agents/commit-agent.md"
+
+    def pi_prompt(self) -> Path:
+        return self.home / ".pi/agent/prompts/commit-with-subagent.md"
+
+    def seed_legacy(self, *, with_alias: bool = False) -> None:
+        source_skill = self.checkout / "skills/demo"
+        old_skill = self.legacy_skill()
+        old_skill.parent.mkdir(parents=True, exist_ok=True)
+        shutil.copytree(source_skill, old_skill)
+
+        state = {
+            "version": 3,
+            "skills": {
+                "demo": {
+                    "destination": str(old_skill.resolve()),
+                    "source_commit": self.commit,
+                    "fingerprint": apply.fingerprint_directory(old_skill),
+                }
+            },
+            "aliases": {},
+            "guidance": {},
+            "pi_agents": {},
+            "pi_prompts": {},
+        }
+        for category, name in (("agents", "commit-agent"), ("prompts", "commit-with-subagent")):
+            source = self.checkout / "pi" / category / f"{name}.md"
+            target = self.home / ".agents" / category / f"{name}.md"
+            target.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, target)
+            state["pi_" + category][name] = {
+                "destination": str(target.resolve()),
+                "source_commit": self.commit,
+                "fingerprint": hashlib.sha256(target.read_bytes()).hexdigest(),
+            }
+
+        if with_alias:
+            alias = self.home / ".claude/skills/demo"
+            alias.parent.mkdir(parents=True)
+            if os.name == "nt":
+                result = subprocess.run(
+                    ["cmd.exe", "/d", "/c", "mklink", "/J", str(alias), str(old_skill)],
+                    capture_output=True, text=True, check=False,
+                )
+                self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+            else:
+                alias.symlink_to(old_skill, target_is_directory=True)
+            state["aliases"]["demo"] = {
+                "destination": str(alias),
+                "target": str(old_skill),
+            }
+        state_path = sync.global_state_path(self.home)
+        state_path.parent.mkdir(parents=True)
+        state_path.write_text(json.dumps(state), encoding="utf-8")
+
+    def test_migration_moves_only_owned_resources_to_pi(self) -> None:
+        self.seed_legacy()
+        unrelated = self.home / ".agents/skills/unrelated"
+        unrelated.mkdir()
+        (unrelated / "SKILL.md").write_text("keep", encoding="utf-8")
+        guidance = self.home / ".pi/agent/AGENTS.md"
+        guidance.parent.mkdir(parents=True)
+        guidance.write_text("keep guidance", encoding="utf-8")
+        settings = guidance.parent / "settings.json"
+        settings.write_text('{"theme":"custom"}', encoding="utf-8")
+
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertTrue(self.pi_skill().is_dir())
+        self.assertEqual(self.pi_agent().read_text(), "canonical agent\n")
+        self.assertEqual(self.pi_prompt().read_text(), "canonical prompt\n")
+        self.assertEqual(len(result.legacy), 3)
+        self.assertFalse(self.legacy_skill().exists())
+        self.assertFalse((self.home / ".agents/agents/commit-agent.md").exists())
+        self.assertFalse((self.home / ".agents/prompts/commit-with-subagent.md").exists())
+        self.assertEqual((unrelated / "SKILL.md").read_text(), "keep")
+        self.assertEqual(guidance.read_text(), "keep guidance")
+        self.assertEqual(settings.read_text(), '{"theme":"custom"}')
+
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertEqual(state["version"], 4)
+        self.assertEqual(Path(state["skills"]["demo"]["destination"]).resolve(), self.pi_skill().resolve())
+        self.assertEqual(Path(state["pi_agents"]["commit-agent"]["destination"]).resolve(), self.pi_agent().resolve())
+        self.assertEqual(sync.sync_checkout(self.checkout, self.home).legacy, [])
+
+    def test_native_identical_copies_adopted_during_migration(self) -> None:
+        self.seed_legacy()
+        shutil.copytree(self.checkout / "skills/demo", self.pi_skill())
+        self.pi_agent().parent.mkdir(parents=True)
+        self.pi_prompt().parent.mkdir(parents=True)
+        shutil.copy2(self.checkout / "pi/agents/commit-agent.md", self.pi_agent())
+        shutil.copy2(self.checkout / "pi/prompts/commit-with-subagent.md", self.pi_prompt())
+
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(result.skills[0].classification, "adopted")
+        self.assertEqual([p.classification for p in result.pi_resources], ["adopted", "adopted"])
+        self.assertFalse(self.legacy_skill().exists())
+
+    def test_conflicting_native_file_fails_without_retiring_old(self) -> None:
+        self.seed_legacy()
+        self.pi_agent().parent.mkdir(parents=True)
+        self.pi_agent().write_text("my custom agent\n", encoding="utf-8")
+        old_state = sync.global_state_path(self.home).read_bytes()
+        with self.assertRaisesRegex(sync.SyncError, "not owned"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(old_state, sync.global_state_path(self.home).read_bytes())
+        self.assertTrue(self.legacy_skill().exists())
+        self.assertFalse(self.pi_skill().exists())
+        self.assertEqual(self.pi_agent().read_text(), "my custom agent\n")
+
+    def test_modified_managed_legacy_skill_blocks_migration(self) -> None:
+        self.seed_legacy()
+        (self.legacy_skill() / "SKILL.md").write_text("local edit", encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.pi_skill().exists())
+
+    def test_rollback_restores_old_files_and_state(self) -> None:
+        self.seed_legacy(with_alias=True)
+        old_state = sync.global_state_path(self.home).read_bytes()
+        alias = self.home / ".claude/skills/demo"
+        with patch.object(apply, "_atomic_write", side_effect=OSError("injected state failure")):
+            with self.assertRaisesRegex(sync.SyncError, "injected state failure"):
+                sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(old_state, sync.global_state_path(self.home).read_bytes())
+        self.assertTrue(self.legacy_skill().is_dir())
+        self.assertTrue(alias.exists())
+        self.assertTrue(sync._alias_matches(alias, self.legacy_skill()))
+        self.assertTrue((self.home / ".agents/agents/commit-agent.md").is_file())
+        self.assertFalse(self.pi_skill().exists())
+        self.assertFalse(self.pi_agent().exists())
+
+    def test_verified_legacy_claude_junction_retired(self) -> None:
+        self.seed_legacy(with_alias=True)
+        alias = self.home / ".claude/skills/demo"
+        result = sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(len(result.legacy), 4)
+        self.assertFalse(alias.exists())
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertEqual(state["aliases"], {})
+        self.assertTrue(self.pi_skill().exists())
+
+    def test_unowned_claude_alias_is_preserved(self) -> None:
+        self.seed_legacy()
+        alias = self.home / ".claude/skills/demo"
+        alias.mkdir(parents=True)
+        (alias / "keep.txt").write_text("keep", encoding="utf-8")
+        sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual((alias / "keep.txt").read_text(), "keep")
 
 
 class LegacyApplyAndRetirementTests(unittest.TestCase):
@@ -453,7 +648,7 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         )
         self.assertEqual(result, 0)
         self.assertEqual((self.home / "fresh-process.txt").read_text(), "fresh")
-        self.assertIn("remote two", (self.home / ".agents/skills/demo/SKILL.md").read_text())
+        self.assertIn("remote two", (self.home / ".pi/agent/skills/demo/SKILL.md").read_text())
 
     def test_dirty_checkout_and_pull_failure_are_refused(self) -> None:
         (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
@@ -478,7 +673,7 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         )
 
         self.assertEqual(result, 0)
-        self.assertIn("remote one", (self.home / ".agents/skills/demo/SKILL.md").read_text())
+        self.assertIn("remote one", (self.home / ".pi/agent/skills/demo/SKILL.md").read_text())
 
     def test_no_pull_still_refuses_a_dirty_checkout(self) -> None:
         (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
