@@ -251,11 +251,11 @@ def _build_skill_plans(
 
         if legacy and source.name in aliases:
             alias = home / CLAUDE_SKILL_BASE / source.name
-            if apply._lexists(alias):
-                if not _alias_matches(alias, old_target):
-                    errors.append(f"Legacy Claude alias {alias} differs or cannot be verified; resolve manually")
-                    continue
-                retired.append(LegacyPlan(alias, "aliases", source.name, "link"))
+            if apply._lexists(alias) and not _alias_matches(alias, old_target):
+                errors.append(f"Legacy Claude alias {alias} differs or cannot be verified; resolve manually")
+                continue
+            # Include missing historical aliases so their ownership is cleared.
+            retired.append(LegacyPlan(alias, "aliases", source.name, "link"))
 
         if not apply._lexists(target):
             classification = "migrated" if legacy else ("added" if record is None else "recreated")
