@@ -43,6 +43,7 @@ def _validate_checkout(checkout: Path) -> None:
     required_files = (
         checkout / "pyproject.toml",
         checkout / "personal-skills.toml",
+        checkout / "personal-pi.toml",
         checkout / "agent_core" / "bootstrap.py",
         checkout / "agent_core" / "apply.py",
         checkout / "agent_core" / "sync.py",
