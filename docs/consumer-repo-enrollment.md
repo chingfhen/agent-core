@@ -16,7 +16,7 @@
 - All new installed resources are published only under `~/.pi/agent/`; no other harness is targeted by the default command.
 - Pi discovers skills, agents and templates at their native locations without any additional discovery settings.
 - Global `AGENTS.md`, `CLAUDE.md`, Pi settings, and extension installations are user-managed and untouched.
-- Sync refuses unsafe collisions and edited managed files; selected verified legacy copies/aliases are retired with rollback. Unowned and unselected resources are untouched.
+- Declared Pi-native resources are authoritative and replace differing installed content, even locally edited or previously unowned copies; unsafe file types are refused. Verified selected legacy copies/aliases migrate with rollback; unselected resources remain untouched.
 - Removing a manifest entry is additive and non-destructive.
 - Human commands live in `docs/agent-core-operating-manual.md`.
 
@@ -46,7 +46,7 @@ The default target is Pi's native resource layout:
 
 Native Pi discovery requires no `settings.json` changes. The `pi-subagents` extension and model credentials are outside sync's responsibility. Cross-harness publication is not implemented; a future explicit harness option should publish only resources actually supported by that harness, without translating Pi-specific agents or templates.
 
-Migration reads existing version-2/version-3 ownership state. For currently selected resources, sync compares the existing `~/.agents/` copy with its recorded fingerprint, publishes the canonical copy to Pi and retires the old copy. If a recorded Claude alias points to the selected old skill, that exact verified alias is also retired. Unselected, unowned, or ambiguous legacy paths remain untouched. Pre-existing native Pi files are adopted only when byte-identical to canonical source. A conflict blocks the whole transaction rather than overwriting a local variant.
+Migration reads existing version-2/version-3 ownership state. For currently selected resources, sync compares the existing `~/.agents/` copy with its recorded fingerprint, publishes the canonical copy to Pi and retires the old copy. If a recorded Claude alias points to the selected old skill, that exact verified alias is also retired. Unselected, unowned, or ambiguous legacy paths remain untouched. Pre-existing native Pi files are adopted if identical; if their content differs, the declared canonical version replaces them. This is intentional: declaration grants sync authority over those exact destinations.
 
 ### Global Guidance
 
@@ -99,11 +99,11 @@ The launcher's clean-checkout check and the sync engine's committed-source check
 
 ## Destination And Transaction Contract
 
-Before any mutation, sync validates the committed allowlists, canonical source files, ownership records, managed parents, and new Pi-native destinations. It refuses any managed resource whose current fingerprint differs from recorded ownership. An existing *unowned* Pi-native skill directory or agent/template file may be adopted only when identical to canonical source; any other collision fails closed.
+Before any mutation, sync validates the committed allowlists, canonical source files, ownership records, managed parents, and new Pi-native destinations. For exact declared Pi-native destinations, the committed canonical resource wins: an identical target is reused, while differing content (owned or unowned) is replaced. Unsafe file types, symlinks, reparse points and unsafe parents are refused rather than traversed.
 
 For selected resources with historical ownership under `~/.agents/`, the old copy must match the recorded fingerprint. Recorded Claude aliases are removed only when they can be verified as links to the selected old managed skill; altered aliases block the migration. Previous ownership versions are accepted and normalized before any file changes.
 
-Resources are staged and fingerprinted, preflight is repeated, new Pi destinations are published, selected legacy paths are moved to transaction backups, and all installed outputs are fingerprint-verified. Only then is version-4 ownership atomically written. A failure restores the earlier files and any retired legacy resources. Removal from either manifest is non-destructive, and no unowned or unrelated directories are scanned.
+Resources are staged and fingerprinted, preflight is repeated, changed Pi destinations are published using temporary transaction backups, selected verified legacy paths are retired, and all installed outputs are fingerprint-verified. Only then is version-4 ownership atomically written. A failure restores the earlier files and any retired legacy resources. Removal from either manifest is non-destructive, and no unowned or unrelated directories are scanned.
 
 Default sync publishes no resource files outside `~/.pi/agent/` except for removal of explicitly verified selected legacy-owned resources and aliases during this one-time migration. The ownership and transaction state remain in `~/.agent-core-state/`. Global `AGENTS.md`, `CLAUDE.md`, Pi settings and credential files remain untouched.
 
@@ -111,7 +111,7 @@ Default sync publishes no resource files outside `~/.pi/agent/` except for remov
 
 Adding a name publishes it at the next successful sync. Updating a committed source updates its unchanged owned copy. Manually deleting an owned copy recreates it.
 
-Removing a name does not inspect, update, or delete its installed copy or ownership record. Re-adding an unchanged retained name resumes normal updates; a locally modified retained copy is a conflict when re-added.
+Removing a name does not inspect, update, or delete its installed copy or ownership record. Re-adding a retained name makes its current installed Pi-native destination authoritative again, replacing local edits when necessary.
 
 Automatic pruning is intentionally absent. A future explicit prune operation would need its own human-visible contract.
 
