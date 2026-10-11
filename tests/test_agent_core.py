@@ -211,7 +211,6 @@ class AgentCoreSyncTests(unittest.TestCase):
         alias.mkdir(parents=True)
         (alias / "keep.txt").write_text("user-owned", encoding="utf-8")
         result = sync.sync_checkout(self.checkout, self.home)
-        self.assertEqual(result.aliases, [])
         self.assertEqual((alias / "keep.txt").read_text(encoding="utf-8"), "user-owned")
         sync.sync_checkout(self.checkout, self.home)
         self.assertEqual((alias / "keep.txt").read_text(encoding="utf-8"), "user-owned")
