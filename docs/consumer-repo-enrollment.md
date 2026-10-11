@@ -1,4 +1,4 @@
-# Personal Skill Distribution
+# Personal Resource Distribution — Pi-First
 
 **Last Updated:** 2026-10-11
 
@@ -13,10 +13,10 @@
 - The normal workflow is machine-level `agent-core sync`, runnable from any directory.
 - The fixed canonical checkout is `~/.agent-core`; every sync fast-forwards that clean checkout before touching installed targets.
 - `personal-skills.toml` and `personal-pi.toml` are explicit allowlists; repository contents are never automatically enrolled.
-- All new installed resource files live only under `~/.agents/`. Claude aliases are no longer created or updated.
-- Pi discovers shared skills natively; shared global agents and templates require one-time Pi settings configuration.
+- All new installed resources are published only under `~/.pi/agent/`; no other harness is targeted by the default command.
+- Pi discovers skills, agents and templates at their native locations without any additional discovery settings.
 - Global `AGENTS.md`, `CLAUDE.md`, Pi settings, and extension installations are user-managed and untouched.
-- Sync refuses unowned collisions and locally modified managed skill targets, and preserves unrelated user and project content.
+- Sync refuses unsafe collisions and edited managed files; selected verified legacy copies/aliases are retired with rollback. Unowned and unselected resources are untouched.
 - Removing a manifest entry is additive and non-destructive.
 - Human commands live in `docs/agent-core-operating-manual.md`.
 
@@ -28,45 +28,31 @@ It does not cover production skill authoring, project-owned skills, user-authore
 
 ## Publication Layout
 
-Both lists are authoritative and opt-in:
-
-- `personal-skills.toml` selects `skills/<name>/`.
-- `personal-pi.toml` selects `pi/agents/<name>.md` and `pi/prompts/<name>.md`.
-
-All installed resource files have exactly one managed root:
+Canonical sources are selected only by the two committed manifests:
 
 ```text
-~/.agents/
+personal-skills.toml            skills/<name>/SKILL.md
+personal-pi.toml               pi/agents/<name>.md, pi/prompts/<name>.md
+```
+
+The default target is Pi's native resource layout:
+
+```text
+~/.pi/agent/
 ├── skills/<name>/SKILL.md
 ├── agents/<name>.md
 └── prompts/<name>.md
 ```
 
-Pi, Codex, and OpenCode can discover shared skills directly. Global Pi
-agents and command templates need one-time explicit user settings:
+Native Pi discovery requires no `settings.json` changes. The `pi-subagents` extension and model credentials are outside sync's responsibility. Cross-harness publication is not implemented; a future explicit harness option should publish only resources actually supported by that harness, without translating Pi-specific agents or templates.
 
-```json
-{
-  "prompts": ["~/.agents/prompts"],
-  "subagents": {"agentScanDirs": ["~/.agents/agents"]}
-}
-```
-
-Merge these properties into `~/.pi/agent/settings.json`. Sync never alters
-that file. The `pi-subagents` extension and the chosen model's credentials
-must be installed/configured separately. Existing Pi-native definitions
-can take precedence over shared ones and should be compared and retired
-manually after installation.
-
-Claude Code may require its own global skill alias for discovery. Sync
-deliberately does **not** create or update `~/.claude/skills/`. Previously
-created aliases are left untouched rather than silently pruned.
+Migration reads existing version-2/version-3 ownership state. For currently selected resources, sync compares the existing `~/.agents/` copy with its recorded fingerprint, publishes the canonical copy to Pi and retires the old copy. If a recorded Claude alias points to the selected old skill, that exact verified alias is also retired. Unselected, unowned, or ambiguous legacy paths remain untouched. Pre-existing native Pi files are adopted only when byte-identical to canonical source. A conflict blocks the whole transaction rather than overwriting a local variant.
 
 ### Global Guidance
 
 Sync no longer manages `~/.pi/agent/AGENTS.md`, `~/.codex/AGENTS.md`, `~/.config/opencode/AGENTS.md`, or `~/.claude/CLAUDE.md`. Existing files remain unchanged, including local edits; absent files stay absent. Their contents and availability are now the user's responsibility.
 
-The first successful skills-only sync validates old guidance ownership records, then clears those records in the atomically published ownership state. It does not inspect the current prompt contents. `global/AGENTS.md` remains in the checkout but is not required or published by sync.
+The sync validates historical guidance ownership metadata and clears former records without ever inspecting the guidance files. It does not inspect the current prompt contents. `global/AGENTS.md` remains in the checkout but is not required or published by sync.
 
 ### Machine-Local Ownership
 
@@ -77,8 +63,8 @@ The first successful skills-only sync validates old guidance ownership records, 
 This versioned JSON file is outside the tracked checkout. It records:
 
 - each managed shared skill destination, source commit, and deterministic directory fingerprint;
-- historical Claude alias metadata for compatibility, not active publication;
-- an empty `guidance` collection and selected Pi agent/template fingerprints in state version 3 (older state version 2 is upgraded).
+- prior Claude alias metadata, used only to verify and safely retire selected legacy-owned links;
+- an empty `guidance` collection and selected Pi agent/template fingerprints in state version 4 (versions 2 and 3 migrate automatically).
 
 The state retains records for names removed from the current manifest. It is published atomically only after all changed outputs succeed.
 
@@ -113,28 +99,13 @@ The launcher's clean-checkout check and the sync engine's committed-source check
 
 ## Destination And Transaction Contract
 
-Before any mutation, sync validates selected skills, Pi files, their managed
-parent paths, and ownership state. It never opens or edits global system
-guidance, Pi settings, Claude aliases, or unrelated files.
+Before any mutation, sync validates the committed allowlists, canonical source files, ownership records, managed parents, and new Pi-native destinations. It refuses any managed resource whose current fingerprint differs from recorded ownership. An existing *unowned* Pi-native skill directory or agent/template file may be adopted only when identical to canonical source; any other collision fails closed.
 
-A shared skill is accepted if absent and unowned, or if previously
-owned and fingerprint-unchanged or missing. An unowned shared skill collision
-is refused.
+For selected resources with historical ownership under `~/.agents/`, the old copy must match the recorded fingerprint. Recorded Claude aliases are removed only when they can be verified as links to the selected old managed skill; altered aliases block the migration. Previous ownership versions are accepted and normalized before any file changes.
 
-A selected Pi file is accepted if absent, if owned and unchanged or
-missing, or if unowned but **byte-identical to canonical source** (safe
-adoption). A changed unowned file, modified owned file, unsupported
-link/reparse point, or malformed record causes a whole-sync refusal.
+Resources are staged and fingerprinted, preflight is repeated, new Pi destinations are published, selected legacy paths are moved to transaction backups, and all installed outputs are fingerprint-verified. Only then is version-4 ownership atomically written. A failure restores the earlier files and any retired legacy resources. Removal from either manifest is non-destructive, and no unowned or unrelated directories are scanned.
 
-Sync stages and fingerprints selected resources, repeats preflight checks,
-publishes changed outputs through backups, and atomically updates the
-ownership state last. Failures before state publication roll back changed
-resources. Removed allowlist entries are not pruned; older Claude aliases
-and associated ownership metadata remain unchanged and are not synchronized.
-
-Managed parent paths must be real directories and remain within the user
-home. Sync never creates or updates installed resource files outside
-`~/.agents/` (apart from its machine-local ownership/transaction state).
+Default sync publishes no resource files outside `~/.pi/agent/` except for removal of explicitly verified selected legacy-owned resources and aliases during this one-time migration. The ownership and transaction state remain in `~/.agent-core-state/`. Global `AGENTS.md`, `CLAUDE.md`, Pi settings and credential files remain untouched.
 
 ## Additive Manifest Changes
 
@@ -146,14 +117,9 @@ Automatic pruning is intentionally absent. A future explicit prune operation wou
 
 ## Observability
 
-Successful sync prints only the canonical commit, exact selected names and
-counts for skills, Pi agents, and Pi prompt templates, and the single
-`~/.agents/` install root. The output is an installation report, not a
-claim that Pi has loaded the resources or the model executed them.
+Successful sync prints the source commit, exact selected resource names and counts from both manifests, the verified native Pi destination, and a brief legacy-migration count when applicable. It does not print transaction internals, aliases or ownership JSON locations during normal runs. Failures identify exact conflicts and do not claim partial success.
 
-Detailed ownership fingerprints remain in
-`~/.agent-core-state/ownership.json`. Failures still report the exact
-blocking destination and reason.
+Verification means filesystem content matches the committed source, not that Pi has loaded the files or that an agent obeyed them.
 
 ## Legacy Project-Local Compatibility
 
@@ -209,5 +175,6 @@ Missing managed copies do not block exact metadata cleanup. Any unsafe remaining
 | 2026-10-08 | Store ownership under `~/.agent-core-state/`. | Runtime state must not dirty the canonical checkout. |
 | 2026-10-08 | Initialize only absent or empty unowned guidance destinations (superseded). | Complete-file publication avoided overwriting personal content while guidance was managed. |
 | 2026-10-09 | Stop publishing global guidance and release its ownership on the next sync. | Global prompt files remain untouched and can be maintained independently of personal skills. |
+| 2026-10-11 | Default to Pi native resource locations. | Avoid extra discovery configuration, preserve opt-in manifests and safely migrate verified previous installations. |
 | 2026-10-08 | Keep removal additive and provide exact legacy retirement separately. | Destructive cleanup must be explicit and fingerprint-proven. |
 | 2026-10-08 | Set the minimum runtime to Python 3.10. | Removing `tomllib` is small and dependency-free; lowering further is unnecessary. |
