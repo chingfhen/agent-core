@@ -58,6 +58,10 @@ def write_skill(checkout: Path, name: str, content: str) -> None:
 def write_config(checkout: Path, names: list[str]) -> None:
     rendered = "skills = [\n" + "".join(f'    "{name}",\n' for name in names) + "]\n"
     (checkout / MANIFEST_FILENAME).write_text(rendered, encoding="utf-8")
+    # Both manifests are mandatory for sync. Legacy apply ignores the Pi list.
+    pi_manifest = checkout / PI_MANIFEST_FILENAME
+    if not pi_manifest.exists():
+        write_pi_config(checkout, agents=[], prompts=[])
 
 
 def write_pi_config(checkout: Path, agents: list[str], prompts: list[str]) -> None:
@@ -150,6 +154,16 @@ class AgentCoreSyncTests(unittest.TestCase):
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
         self.assertIn("second", state["skills"])
         self.assertNotIn("second", state["aliases"])
+
+    def test_missing_or_untracked_pi_manifest_is_refused(self) -> None:
+        pi_manifest = self.checkout / PI_MANIFEST_FILENAME
+        pi_manifest.unlink()
+        with self.assertRaisesRegex(sync.SyncError, "Required Pi manifest is missing"):
+            sync.sync_checkout(self.checkout, self.home)
+        pi_manifest.write_text('agents = []\\nprompts = []\\n', encoding="utf-8")
+        with self.assertRaisesRegex(sync.SyncError, "must match the canonical commit"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertFalse(self.skill().exists())
 
     def test_committed_skill_updates_are_reported(self) -> None:
         sync.sync_checkout(self.checkout, self.home)
