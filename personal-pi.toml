@@ -1,0 +1,9 @@
+# Explicit Pi-only resources published by agent-core sync.
+# Global AGENTS.md and CLAUDE.md are never managed.
+agents = [
+    "commit-agent",
+]
+
+prompts = [
+    "commit-with-subagent",
+]
