@@ -45,15 +45,6 @@ class SkillPlan:
 
 
 @dataclass(frozen=True)
-class AliasPlan:
-    name: str
-    target: Path
-    alias: Path
-    classification: str
-    replace_existing: bool
-
-
-@dataclass(frozen=True)
 class PiSource:
     category: str
     name: str
@@ -75,9 +66,7 @@ class SyncResult:
     manifest: Path
     state_path: Path
     shared_base: Path
-    claude_base: Path
     skills: list[SkillPlan]
-    aliases: list[AliasPlan]
     pi_resources: list[PiPlan]
 
 
@@ -202,23 +191,6 @@ def _ensure_real_parents(home: Path, destinations: list[Path]) -> None:
                 errors.append(f"managed destination parent is not a real directory: {parent} ({kind})")
     if errors:
         raise SyncError("Preflight refused global changes:\n- " + "\n- ".join(errors))
-
-
-def _is_alias_entry(path: Path) -> bool:
-    try:
-        metadata = path.stat(follow_symlinks=False)
-    except OSError:
-        return False
-    return stat.S_ISLNK(metadata.st_mode) or apply._is_reparse(metadata)
-
-
-def _alias_matches(alias: Path, target: Path) -> bool:
-    if not _is_alias_entry(alias):
-        return False
-    try:
-        return alias.is_dir() and target.is_dir() and os.path.samefile(alias, target)
-    except OSError:
-        return False
 
 
 def _build_skill_plans(
@@ -360,24 +332,6 @@ def _remove_path(path: Path) -> None:
         path.unlink()
 
 
-def _create_directory_alias(alias: Path, target: Path) -> None:
-    if os.name == "nt":
-        result = subprocess.run(
-            ["cmd.exe", "/d", "/c", "mklink", "/J", str(alias), str(target)],
-            capture_output=True,
-            text=True,
-            check=False,
-        )
-        if result.returncode != 0:
-            detail = result.stderr.strip() or result.stdout.strip() or f"exit code {result.returncode}"
-            raise SyncError(f"Could not create Claude directory junction {alias}: {detail}")
-    else:
-        try:
-            alias.symlink_to(target, target_is_directory=True)
-        except OSError as exc:
-            raise SyncError(f"Could not create Claude skill symlink {alias}: {exc}") from exc
-
-
 def _render_state(state: dict[str, object]) -> str:
     ordered = {
         "version": STATE_VERSION,
@@ -403,7 +357,6 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
     destinations.append(ownership_path)
     _ensure_real_parents(home, destinations)
     skill_plans = _build_skill_plans(home, sources, state)
-    alias_plans: list[AliasPlan] = []  # Historical ownership retained; no Claude mutations.
     pi_plans = _build_pi_plans(home, pi_sources, state)
 
     prospective = json.loads(json.dumps(state))
@@ -412,11 +365,6 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
             "destination": _path_text(plan.target),
             "source_commit": commit,
             "fingerprint": plan.source.fingerprint,
-        }
-    for plan in alias_plans:
-        prospective["aliases"][plan.name] = {
-            "destination": _path_text(plan.alias),
-            "target": _path_text(plan.target),
         }
     for plan in pi_plans:
         prospective[f"pi_{plan.source.category}"][plan.source.name] = {
@@ -511,22 +459,12 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
         checkout / MANIFEST_FILENAME,
         ownership_path,
         home / SHARED_SKILL_BASE,
-        home / CLAUDE_SKILL_BASE,
         skill_plans,
-        alias_plans,
         pi_plans,
     )
 
 
-def _counts(items: Sequence[object]) -> str:
-    classifications = [getattr(item, "classification") for item in items]
-    return ", ".join(
-        f"{name}={classifications.count(name)}" for name in ("added", "updated", "recreated", "unchanged")
-    )
-
-
 def print_result(result: SyncResult) -> None:
-    changed = [plan.source.name for plan in result.skills if plan.classification != "unchanged"]
     print(f"agent-core sync: OK ({result.commit[:12]})")
     print(f"Skills ({len(result.skills)}): " + (", ".join(p.source.name for p in result.skills) or "none"))
     for category in ("agents", "prompts"):
