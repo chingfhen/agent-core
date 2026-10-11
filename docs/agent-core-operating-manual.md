@@ -14,7 +14,7 @@
 agent-core sync
 ```
 
-Run it from any directory. It refreshes the fixed `~/.agent-core` checkout and safely publishes configured personal skills for Pi, Codex, OpenCode, and Claude Code. It does not publish global prompt files.
+Run it from any directory. It refreshes the fixed `~/.agent-core` checkout and safely publishes configured personal skills for Pi, Codex, OpenCode, and Claude Code. It does not publish global system guidance; explicitly selected Pi command templates are a separate managed resource.
 
 Do not manually copy managed skills. Maintain global prompts yourself. Do not run the deprecated project-local `apply` command for normal personal use.
 
@@ -71,14 +71,9 @@ Real managed copies are installed at:
 %USERPROFILE%\.agents\skills\<personal-skill>\
 ```
 
-Pi, Codex, and OpenCode discover this portable Agent Skills location. Claude Code receives directory junctions at:
+Pi, Codex, and OpenCode discover this shared skills location. Claude aliases are no longer created or maintained; any existing ones are preserved without changes. New Claude installations may need separate configuration.
 
-```text
-%USERPROFILE%\.claude\skills\<personal-skill>
-    -> %USERPROFILE%\.agents\skills\<personal-skill>
-```
 
-There is one installed content authority. **Skills are not copied into `%USERPROFILE%\.pi\agent\skills`.** Pi loads them from `%USERPROFILE%\.agents\skills`.
 
 ### Global guidance
 
@@ -92,7 +87,7 @@ Machine-local state is stored outside the Git checkout:
 %USERPROFILE%\.agent-core-state\ownership.json
 ```
 
-It records managed skill destinations, source commits, fingerprints, and alias targets. Do not edit it manually. On successful sync, the output reports the checkout commit, manifest count, changed skills, alias status, confirmation that guidance is unmanaged, and this ownership path.
+It records managed resource fingerprints, plus historical alias records left untouched for compatibility. Do not edit it manually. On successful sync, the output reports the checkout commit, manifest count, changed skills, alias status, confirmation that guidance is unmanaged, and this ownership path.
 
 ## Verify The Result
 
@@ -261,3 +256,47 @@ git -C "%USERPROFILE%\.agent-core" status --short
 cd /d "<old-target-directory>"
 agent-core retire-local --here
 ```
+
+
+## Pi Agents And Templates (One Managed Resource Root)
+
+Alongside `personal-skills.toml`, the explicit `personal-pi.toml` allowlist selects
+subagents and slash-command prompt templates:
+
+```toml
+agents = ["commit-agent"]
+prompts = ["commit-with-subagent"]
+```
+
+Sync copies the committed source files from `pi/agents/` and `pi/prompts/`
+exclusively to `~/.agents/agents/` and `~/.agents/prompts/`, alongside
+`~/.agents/skills/`. It does **not** modify global `AGENTS.md`, `CLAUDE.md`,
+Pi settings, or installed extensions.
+
+Pi needs a **one-time** discovery setting for the latter two folders.
+Merge the following properties into the existing
+`~/.pi/agent/settings.json`, keeping all unrelated keys:
+
+```json
+{
+  "prompts": ["~/.agents/prompts"],
+  "subagents": {"agentScanDirs": ["~/.agents/agents"]}
+}
+```
+
+Install the `pi-subagents` extension and configure model access separately.
+Reload Pi after the paths are added.
+
+Existing definitions under `~/.pi/agent/agents/` or
+`~/.pi/agent/prompts/` can shadow shared files. Compare those files
+against the canonical shared copies and manually retire each old file
+after verifying they match. Do not delete entire Pi directories.
+
+On first sync, a new shared Pi resource can be adopted if its content
+already matches the committed source exactly. Unowned conflicting files
+and locally modified managed resources stop the sync without overwriting.
+Removing a name from either manifest is non-destructive.
+
+Normal success output is deliberately short: commit, selected skill names,
+agent names, template names, and shared install root. Details remain
+available in `~/.agent-core-state/ownership.json`.
