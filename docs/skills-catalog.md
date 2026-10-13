@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-09
+updated: 2026-10-13
 ---
 
 # Skills Catalogue
@@ -17,7 +17,7 @@ updated: 2026-10-09
 | [project-tasks](../skills/project-tasks/SKILL.md) | You need to save, resume, checkpoint, or hand off unfinished work. | Execution continuity, not project truth. |
 | [project-docs](../skills/project-docs/SKILL.md) | You want to maintain durable project decisions, contracts, or guidance. | Settled understanding, not an active backlog. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
-| [engineering](../skills/engineering/SKILL.md) | You want the agent to implement, fix, refactor, or review code. | Execute the approved scope. |
+| [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
 | [explain-tech](../skills/explain-tech/SKILL.md) | "Explain this error/architecture/change" or "debrief what we built." | Quick by default; Deep and Debrief modes. |
 | [human-unblock](../skills/human-unblock/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
 | [learning-markdown](../skills/learning-markdown/SKILL.md) | You want a reusable Markdown lesson from material or a conversation. | Teaching artifact; not automatic KB capture. |
