@@ -23,6 +23,7 @@ updated: 2026-10-09
 | [learning-markdown](../skills/learning-markdown/SKILL.md) | You want a reusable Markdown lesson from material or a conversation. | Teaching artifact; not automatic KB capture. |
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
 | [approval-gate](../skills/approval-gate/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
+| [commit-with-subagent](../skills/commit-with-subagent/SKILL.md) | Explicitly create local commits through the configured commit-agent specialist. | User-triggered only; never pushes. |
 | [manage-python-uv](../skills/manage-python-uv/SKILL.md) | Set up, run, or maintain a **Windows uv** Python environment. | Do not apply to corporate CML/Mamba by default. |
 | [mermaid-markdown](../skills/mermaid-markdown/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |

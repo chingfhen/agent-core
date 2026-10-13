@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-11
+**Last Updated:** 2026-10-13
 
 **Status:** Current
 
@@ -12,8 +12,8 @@
 
 - You are the steward agent when working in this repository.
 - `skills/` is the hand-edited production source. Do not change production workflow skills unless the human explicitly approves the skill edit.
-- `agent-core sync` publishes declared skills, Pi agents and Pi prompt templates under Pi-native `~/.pi/agent/`. No other harness is targeted by default; global guidance and harness settings stay unmanaged.
-- Do not hand-maintain managed copies. Sync owns exact declared Pi resources recorded in `~/.agent-core-state/ownership.json`; verified previously managed `.agents/` copies and registered Claude aliases are safely retired during migration.
+- `agent-core sync` defaults to Pi-native publication. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents under `%APPDATA%\devin\`; global guidance and harness settings stay unmanaged.
+- Do not hand-maintain managed copies. Sync owns exact declared per-harness resources recorded in `~/.agent-core-state/ownership.json`; verified previously managed `.agents/` copies and registered Claude aliases are safely retired only by Pi migration.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
 - Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits. `global/AGENTS.md` is retained but no longer published by sync.
@@ -39,7 +39,7 @@
 
 Canonical surfaces include:
 
-- `skills/`, `pi/`, `personal-skills.toml`, and `personal-pi.toml`;
+- `skills/`, `pi/`, `devin/`, `personal-skills.toml`, `personal-pi.toml`, and `personal-devin.toml`;
 - `agent_core/`, `pyproject.toml`, and installer scripts;
 - `README.md`, `AGENTS.md`, `docs/`, and `prompts/`;
 - schemas, steward scripts, and the append-only `memory/memories.jsonl` ledger.
@@ -48,24 +48,25 @@ Installed or generated surfaces include:
 
 - real skill copies under `~/.pi/agent/skills/<personal-skill>/`;
 - declared Pi agents and templates under `~/.pi/agent/agents/*.md` and `~/.pi/agent/prompts/*.md`;
+- explicit Devin copies under `%APPDATA%\devin\skills\` and `%APPDATA%\devin\agents\`;
 - `~/.agent-core-state/ownership.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
 ### Global Sync Rules
 
 - `~/.agent-core` is the fixed canonical checkout. Do not add configurable checkout paths, credential handling, or another bootstrap package.
-- Both personal manifests are manual allowlists. Never infer publication by scanning `skills/` or `pi/`.
+- All three personal manifests are manual allowlists. Never infer publication by scanning `skills/`, `pi/`, or `devin/`.
 - Keep the console launcher and CMD installer small and stable. The normal Windows path must not require PowerShell, `uv`, `pip`, elevation, or downloaded packages.
 - Require Python 3.10+ and keep runtime code standard-library-only.
 - The launcher must reject a dirty checkout and cross a fresh-process boundary before sync code runs. Ordinary sync fast-forwards with authenticated Git; explicit `sync --no-pull` skips only that refresh and publishes the current clean committed checkout without silent fallback.
 - Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
-- Preflight each configured skill, Pi agent/template, and ownership record. Do not inspect or modify global system guidance or harness settings.
-- The committed manifest is authoritative for exactly declared Pi-native skills, agents and prompts: overwrite different installed files/directories, even if unmanaged or locally edited. Refuse unsupported file types and unsafe parents. Legacy `.agents/` migration still requires verified fingerprints.
-- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default.
+- Preflight each configured skill, harness-specific agent/template, and ownership record. Do not inspect or modify global system guidance or harness settings.
+- The committed manifests are authoritative for exactly declared destinations in the selected harness: overwrite different installed files/directories, even if unmanaged or locally edited. Refuse unsupported file types and unsafe parents. Legacy `.agents/` migration still requires verified fingerprints and remains Pi-only.
+- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default; a named one-time resource migration may retire only its unchanged fingerprint-owned predecessor.
 - Stage, fingerprint and verify selected resources; migrate verified legacy-owned copies and registered aliases through the same rollback transaction; atomically publish ownership last. Preserve unrelated, unowned and unselected resources.
-- Publish selected files only under `~/.pi/agent/{skills,agents,prompts}/`. Never create copies or aliases for Codex, Claude or other harnesses by default.
+- Default sync publishes selected files only under `~/.pi/agent/{skills,agents,prompts}/`. The explicit Devin harness publishes only under `%APPDATA%\devin\{skills,agents}\`; never target another harness implicitly.
 - Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
-- Successful sync prints the commit, exact declared names/counts, verified Pi root, and migration count when relevant. Conflicts report exact paths.
+- Successful sync prints the commit, selected harness, exact declared names/counts, verified native root, and Pi migration count when relevant. Conflicts report exact paths.
 
 Canonical details: `docs/consumer-repo-enrollment.md`.
 
@@ -104,7 +105,7 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 | Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical global sync and legacy retirement behavior. |
 | Personal list | `personal-skills.toml` | Authoritative copied skill set. |
 | CLI launcher | `agent_core/bootstrap.py` | Canonical refresh and fresh-process boundary. |
-| Sync engine | `agent_core/sync.py` | Pi-native publication, verification, safe migration and rollback. |
+| Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin publication, verification, safe migration and rollback. |
 | Legacy retirement | `agent_core/retire.py` | Safe cleanup of prior project-local installations. |
 | Memory contract | `docs/memory-pilot.md` | Ledger schema, approval boundary, and tooling behavior. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |

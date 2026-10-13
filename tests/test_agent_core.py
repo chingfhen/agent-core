@@ -16,6 +16,11 @@ from pathlib import Path
 from unittest.mock import patch
 
 from agent_core import apply, bootstrap, retire, sync
+from agent_core.devin_manifest import (
+    DEVIN_MANIFEST_FILENAME,
+    DevinManifestError,
+    load_devin_names,
+)
 from agent_core.manifest import MANIFEST_FILENAME, ManifestError, load_skill_names
 from agent_core.pi_manifest import PI_MANIFEST_FILENAME, PiManifestError, load_pi_names
 
@@ -39,6 +44,8 @@ def initialize_repo(path: Path) -> None:
     git(path, "init", "-q")
     git(path, "config", "user.name", "Agent Core Tests")
     git(path, "config", "user.email", "agent-core@example.invalid")
+    git(path, "config", "gc.auto", "0")
+    git(path, "config", "maintenance.auto", "false")
 
 
 def commit_all(path: Path, message: str) -> None:
@@ -62,6 +69,9 @@ def write_config(checkout: Path, names: list[str]) -> None:
     pi_manifest = checkout / PI_MANIFEST_FILENAME
     if not pi_manifest.exists():
         write_pi_config(checkout, agents=[], prompts=[])
+    devin_manifest = checkout / DEVIN_MANIFEST_FILENAME
+    if not devin_manifest.exists():
+        write_devin_config(checkout, agents=[])
 
 
 def write_pi_config(checkout: Path, agents: list[str], prompts: list[str]) -> None:
@@ -75,6 +85,17 @@ def write_pi_config(checkout: Path, agents: list[str], prompts: list[str]) -> No
 
 def write_pi_resource(checkout: Path, category: str, name: str, content: str) -> None:
     path = checkout / "pi" / category / f"{name}.md"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(content, encoding="utf-8")
+
+
+def write_devin_config(checkout: Path, agents: list[str]) -> None:
+    content = "agents = [\n" + "".join(f'    "{name}",\n' for name in agents) + "]\n"
+    (checkout / DEVIN_MANIFEST_FILENAME).write_text(content, encoding="utf-8")
+
+
+def write_devin_resource(checkout: Path, name: str, content: str) -> None:
+    path = checkout / "devin" / "agents" / f"{name}.md"
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(content, encoding="utf-8")
 
@@ -291,6 +312,116 @@ class PiManifestTests(unittest.TestCase):
                 load_pi_names(path)
 
 
+class DevinManifestTests(unittest.TestCase):
+    def test_strict_devin_manifest(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / DEVIN_MANIFEST_FILENAME
+            path.write_text('agents = [\n  "commit-agent",\n]\n', encoding="utf-8")
+            self.assertEqual(load_devin_names(path), ["commit-agent"])
+            path.write_text('agents = ["one"]\n', encoding="utf-8")
+            with self.assertRaises(DevinManifestError):
+                load_devin_names(path)
+
+
+class DevinResourceSyncTests(AgentCoreSyncTests):
+    def setUp(self) -> None:
+        super().setUp()
+        write_devin_config(self.checkout, agents=["commit-agent"])
+        write_devin_resource(
+            self.checkout,
+            "commit-agent",
+            "---\nname: commit-agent\nmodel: codex\nallowed-tools:\n  - read\n  - exec\n---\n",
+        )
+        commit_all(self.checkout, "configure Devin resources")
+        self.app_data = self.root / "AppData" / "Roaming"
+
+    def devin_skill(self, name: str = "demo") -> Path:
+        return self.app_data / "devin" / "skills" / name
+
+    def devin_agent(self) -> Path:
+        return self.app_data / "devin" / "agents" / "commit-agent.md"
+
+    def test_devin_publish_is_global_native_and_idempotent(self) -> None:
+        first = sync.sync_checkout(
+            self.checkout, self.home, "devin", app_data=self.app_data
+        )
+        second = sync.sync_checkout(
+            self.checkout, self.home, "devin", app_data=self.app_data
+        )
+
+        self.assertEqual([plan.classification for plan in first.skills], ["added"])
+        self.assertEqual([plan.classification for plan in first.devin_resources], ["added"])
+        self.assertEqual([plan.classification for plan in second.skills], ["unchanged"])
+        self.assertEqual([plan.classification for plan in second.devin_resources], ["unchanged"])
+        self.assertTrue((self.devin_skill() / "SKILL.md").is_file())
+        self.assertIn("model: codex", self.devin_agent().read_text(encoding="utf-8"))
+        self.assertFalse((self.app_data / ".devin").exists())
+        self.assertFalse((self.home / ".pi").exists())
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertIn("demo", state["devin_skills"])
+        self.assertIn("commit-agent", state["devin_agents"])
+        self.assertEqual(state["skills"], {})
+
+    def test_devin_declared_resources_replace_differing_targets(self) -> None:
+        self.devin_skill().mkdir(parents=True)
+        (self.devin_skill() / "SKILL.md").write_text("local skill", encoding="utf-8")
+        self.devin_agent().parent.mkdir(parents=True)
+        self.devin_agent().write_text("local agent", encoding="utf-8")
+
+        result = sync.sync_checkout(
+            self.checkout, self.home, "devin", app_data=self.app_data
+        )
+
+        self.assertEqual([plan.classification for plan in result.skills], ["replaced"])
+        self.assertEqual([plan.classification for plan in result.devin_resources], ["replaced"])
+        self.assertIn("version one", (self.devin_skill() / "SKILL.md").read_text())
+        self.assertIn("model: codex", self.devin_agent().read_text())
+
+    def test_pi_and_devin_ownership_coexist(self) -> None:
+        sync.sync_checkout(self.checkout, self.home, "devin", app_data=self.app_data)
+        with patch.dict(os.environ, {"APPDATA": str(self.app_data)}):
+            sync.sync_checkout(self.checkout, self.home)
+
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertIn("demo", state["skills"])
+        self.assertIn("demo", state["devin_skills"])
+        self.assertIn("commit-agent", state["devin_agents"])
+
+    def test_uncommitted_devin_source_is_refused(self) -> None:
+        write_devin_resource(self.checkout, "commit-agent", "uncommitted edit")
+        with self.assertRaisesRegex(sync.SyncError, "must match the canonical commit"):
+            sync.sync_checkout(self.checkout, self.home, "devin", app_data=self.app_data)
+        self.assertFalse(self.devin_agent().exists())
+
+    def test_devin_state_failure_rolls_back_all_resources(self) -> None:
+        with patch.object(apply, "_atomic_write", side_effect=OSError("test state failure")):
+            with self.assertRaisesRegex(sync.SyncError, "test state failure"):
+                sync.sync_checkout(
+                    self.checkout, self.home, "devin", app_data=self.app_data
+                )
+        self.assertFalse(self.devin_skill().exists())
+        self.assertFalse(self.devin_agent().exists())
+        self.assertFalse(sync.global_state_path(self.home).exists())
+
+    def test_devin_requires_appdata(self) -> None:
+        with patch.dict(os.environ, {}, clear=True):
+            with self.assertRaisesRegex(sync.SyncError, "APPDATA is required"):
+                sync.sync_checkout(self.checkout, self.home, "devin")
+
+    def test_devin_result_output_names_native_destination(self) -> None:
+        result = sync.sync_checkout(
+            self.checkout, self.home, "devin", app_data=self.app_data
+        )
+        with patch("sys.stdout", new_callable=StringIO) as stdout:
+            sync.print_result(result)
+        output = stdout.getvalue()
+        self.assertIn("Harness: devin", output)
+        self.assertIn("Skills (1): demo", output)
+        self.assertIn("Agents (1): commit-agent", output)
+        self.assertIn(r"%APPDATA%\devin\{skills,agents}", output)
+        self.assertNotIn("Prompts", output)
+
+
 class PiResourceSyncTests(AgentCoreSyncTests):
     def setUp(self) -> None:
         super().setUp()
@@ -366,7 +497,19 @@ class PiResourceSyncTests(AgentCoreSyncTests):
         commit_all(self.checkout, "remove Pi selections")
         sync.sync_checkout(self.checkout, self.home)
         self.assertTrue(self.agent().exists())
-        self.assertTrue(self.prompt().exists())
+        self.assertFalse(self.prompt().exists())
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertNotIn("commit-with-subagent", state["pi_prompts"])
+
+    def test_locally_modified_retired_prompt_blocks_removal(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        self.prompt().write_text("local prompt edit", encoding="utf-8")
+        write_pi_config(self.checkout, agents=["commit-agent"], prompts=[])
+        commit_all(self.checkout, "replace prompt with skill")
+
+        with self.assertRaisesRegex(sync.SyncError, "locally modified"):
+            sync.sync_checkout(self.checkout, self.home)
+        self.assertEqual(self.prompt().read_text(encoding="utf-8"), "local prompt edit")
 
     def test_uncommitted_pi_source_fails_before_installation(self) -> None:
         write_pi_resource(self.checkout, "agents", "commit-agent", "uncommitted edit")
@@ -492,7 +635,7 @@ class PiMigrationTests(unittest.TestCase):
         self.assertEqual(settings.read_text(), '{"theme":"custom"}')
 
         state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
-        self.assertEqual(state["version"], 4)
+        self.assertEqual(state["version"], sync.STATE_VERSION)
         self.assertEqual(Path(state["skills"]["demo"]["destination"]).resolve(), self.pi_skill().resolve())
         self.assertEqual(Path(state["pi_agents"]["commit-agent"]["destination"]).resolve(), self.pi_agent().resolve())
         self.assertEqual(sync.sync_checkout(self.checkout, self.home).legacy, [])
@@ -668,6 +811,24 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         self.assertEqual((self.home / "fresh-process.txt").read_text(), "fresh")
         self.assertIn("remote two", (self.home / ".pi/agent/skills/demo/SKILL.md").read_text())
 
+    def test_explicit_devin_harness_reaches_fresh_process(self) -> None:
+        app_data = self.root / "AppData" / "Roaming"
+        with patch.dict(os.environ, {"APPDATA": str(app_data)}):
+            result = bootstrap.refresh_and_launch(
+                self.checkout,
+                self.project,
+                command="sync",
+                home=self.home,
+                harness="devin",
+            )
+
+        self.assertEqual(result, 0)
+        self.assertIn(
+            "remote one",
+            (app_data / "devin/skills/demo/SKILL.md").read_text(encoding="utf-8"),
+        )
+        self.assertFalse((self.home / ".pi").exists())
+
     def test_dirty_checkout_and_pull_failure_are_refused(self) -> None:
         (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
         with self.assertRaisesRegex(bootstrap.AgentCoreError, "staged, unstaged, or untracked"):
@@ -710,14 +871,18 @@ class AgentCoreBootstrapTests(unittest.TestCase):
             bootstrap, "refresh_and_launch", return_value=0
         ) as launch:
             self.assertEqual(bootstrap.main(["sync", "--no-pull"]), 0)
+            self.assertEqual(bootstrap.main(["sync", "--harness", "devin"]), 0)
             self.assertEqual(bootstrap.main(["apply", "--here"]), 0)
             self.assertEqual(bootstrap.main(["retire-local", "--here"]), 0)
-        self.assertEqual(launch.call_count, 3)
+        self.assertEqual(launch.call_count, 4)
         self.assertEqual(launch.call_args_list[0].kwargs["command"], "sync")
         self.assertTrue(launch.call_args_list[0].kwargs["no_pull"])
-        self.assertEqual(launch.call_args_list[1].kwargs["command"], "apply")
-        self.assertFalse(launch.call_args_list[1].kwargs["no_pull"])
-        self.assertEqual(launch.call_args_list[2].kwargs["command"], "retire-local")
+        self.assertEqual(launch.call_args_list[0].kwargs["harness"], "pi")
+        self.assertEqual(launch.call_args_list[1].kwargs["command"], "sync")
+        self.assertEqual(launch.call_args_list[1].kwargs["harness"], "devin")
+        self.assertEqual(launch.call_args_list[2].kwargs["command"], "apply")
+        self.assertFalse(launch.call_args_list[2].kwargs["no_pull"])
+        self.assertEqual(launch.call_args_list[3].kwargs["command"], "retire-local")
 
 
 class InstallerAndCompatibilityTests(unittest.TestCase):

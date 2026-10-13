@@ -1,0 +1,4 @@
+# Explicit Devin resources published only by agent-core sync --harness devin.
+agents = [
+    "commit-agent",
+]

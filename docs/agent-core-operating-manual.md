@@ -1,6 +1,6 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-10-11
+**Last Updated:** 2026-10-13
 
 **Status:** Current
 
@@ -14,7 +14,13 @@
 agent-core sync
 ```
 
-Run it from any directory. It refreshes the fixed `~/.agent-core` checkout and publishes configured skills, subagents and prompt templates into Pi's native home only. It does not publish global system guidance or change settings.
+Run it from any directory. It refreshes the fixed `~/.agent-core` checkout and publishes configured skills, subagents and prompt templates into Pi's native home. It does not publish global system guidance or change settings. Pi remains the default harness.
+
+To publish shared skills and Devin-specific custom agents globally for Devin Desktop/CLI on Windows, run:
+
+```cmd
+agent-core sync --harness devin
+```
 
 Do not manually copy managed skills. Maintain global prompts yourself. Do not run the deprecated project-local `apply` command for normal personal use.
 
@@ -63,6 +69,8 @@ agent-core sync --no-pull
 
 ## What Sync Installs
 
+Default Pi sync installs:
+
 ```text
 ~/.pi/agent/
 ├── skills/<name>/SKILL.md
@@ -70,14 +78,25 @@ agent-core sync --no-pull
 └── prompts/<name>.md
 ```
 
-Two allowlists select what is published:
+Explicit Devin sync installs:
 
-- `personal-skills.toml`: skill directories from `skills/<name>/`.
-- `personal-pi.toml`: agent definitions from `pi/agents/<name>.md` and command templates from `pi/prompts/<name>.md`.
+```text
+%APPDATA%\devin\
+├── skills\<name>\SKILL.md
+└── agents\<name>.md
+```
 
-Pi discovers all three native locations automatically. No extra `settings.json` entries or manual copies are required. Install `pi-subagents` and set up any specialized model credentials separately; sync never installs extensions or edits settings.
+The global Windows Devin path has no leading dot. `.devin/` is a project-level directory.
 
-The first sync upgrades older ownership records (version 2 or 3). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
+Three allowlists select what is published:
+
+- `personal-skills.toml`: shared skill directories from `skills/<name>/`.
+- `personal-pi.toml`: Pi agent definitions from `pi/agents/<name>.md` and command templates from `pi/prompts/<name>.md`.
+- `personal-devin.toml`: Devin custom-agent definitions from `devin/agents/<name>.md`.
+
+Both harnesses discover their native locations automatically. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-with-subagent` are installed as explicit-only skills.
+
+The first sync upgrades older ownership records (versions 2 through 4). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
 
 ### Global guidance
 
@@ -85,7 +104,7 @@ The first sync upgrades older ownership records (version 2 or 3). For **selected
 
 ### Ownership
 
-Machine-local tracking is retained at `~/.agent-core-state/ownership.json`, outside the repository. It records exact managed destinations and fingerprints so migration and updates can be verified and rolled back.
+Machine-local tracking is retained at `~/.agent-core-state/ownership.json`, outside the repository. It records exact per-harness managed destinations and fingerprints so migration and updates can be verified and rolled back.
 
 ## Verify The Result
 
@@ -93,9 +112,10 @@ Successful output is intentionally brief. For example:
 
 ```text
 agent-core sync: OK (abcdef012345)
-Skills (12): project-tasks, project-docs, ...
+Harness: pi
+Skills (13): project-tasks, project-docs, ..., commit-with-subagent
 Agents (1): commit-agent
-Prompts (1): commit-with-subagent
+Prompts (0): none
 Migrated legacy entries: 14
 Verified: ~/.pi/agent/{skills,agents,prompts} (global guidance untouched)
 ```
@@ -108,7 +128,14 @@ dir "%USERPROFILE%\.pi\agent\agents"
 dir "%USERPROFILE%\.pi\agent\prompts"
 ```
 
-Start a new Pi session or use `/reload` to discover changed resources. File verification is not proof that Pi or an underlying model obeyed the instructions.
+Start a new Pi session or use `/reload` to discover changed Pi resources. Restart or reload Devin Desktop as appropriate after Devin sync. File verification is not proof that either harness loaded or obeyed the instructions.
+
+For Devin filesystem inspection:
+
+```cmd
+dir "%APPDATA%\devin\skills"
+dir "%APPDATA%\devin\agents"
+```
 
 ## Publish A Personal Skill
 
@@ -156,7 +183,7 @@ agent-core sync
 
 Agent Core refuses ignored, untracked, missing, linked, or uncommitted files inside configured sources.
 
-Removing a name from either personal manifest stops future updates but does not delete previously installed managed copies or their ownership records. This additive behavior avoids surprise deletion. Resolve obsolete retained entries deliberately; there is no default global force or prune command.
+Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. The `commit-with-subagent` prompt-to-skill migration is a narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
 
 ## Maintain Global Guidance Separately
 
@@ -202,9 +229,9 @@ agent-core sync --no-pull
 
 The status command must print nothing. `--no-pull` is explicit and never silently falls back when an ordinary sync pull fails.
 
-### An installed Pi resource differs from the canonical source
+### An installed harness resource differs from the canonical source
 
-For any declared skill, agent or prompt, `agent-core sync` installs the committed canonical version automatically, replacing differing Pi-native content without user-created backups. The transactional rollback area is temporary and exists only to recover from a failed sync. If the installed target is a symlink, directory where a Markdown file belongs, or another unsupported object, sync refuses it instead of following or deleting it. Unselected resources stay untouched.
+For any declared resource in the selected harness, sync installs the committed canonical version automatically, replacing differing native content without user-created backups. The transactional rollback area is temporary and exists only to recover from a failed sync. If an installed target is a symlink, a directory where a Markdown file belongs, or another unsupported object, sync refuses it instead of following or deleting it. Unselected resources stay untouched.
 
 ### Previously installed Claude alias
 
@@ -244,9 +271,16 @@ agent-core sync
 :: Publish a clean checkout already updated through GitHub Desktop
 agent-core sync --no-pull
 
+:: Publish global Devin Desktop/CLI resources
+agent-core sync --harness devin
+
 :: Verify Pi skills and ownership
 dir "%USERPROFILE%\.pi\agent\skills"
 type "%USERPROFILE%\.agent-core-state\ownership.json"
+
+:: Verify Devin resources
+dir "%APPDATA%\devin\skills"
+dir "%APPDATA%\devin\agents"
 
 :: Inspect canonical checkout problems
 git -C "%USERPROFILE%\.agent-core" status --short

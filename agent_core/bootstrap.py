@@ -44,11 +44,13 @@ def _validate_checkout(checkout: Path) -> None:
         checkout / "pyproject.toml",
         checkout / "personal-skills.toml",
         checkout / "personal-pi.toml",
+        checkout / "personal-devin.toml",
         checkout / "agent_core" / "bootstrap.py",
         checkout / "agent_core" / "apply.py",
         checkout / "agent_core" / "sync.py",
         checkout / "agent_core" / "retire.py",
         checkout / "agent_core" / "manifest.py",
+        checkout / "agent_core" / "devin_manifest.py",
     )
     required_directories = (checkout / "agent_core", checkout / "skills")
     missing = [str(path) for path in required_files if not path.is_file()]
@@ -83,6 +85,7 @@ def refresh_and_launch(
     here: bool = False,
     home: Path | None = None,
     no_pull: bool = False,
+    harness: str = "pi",
 ) -> int:
     if command in {"apply", "retire-local"}:
         if here:
@@ -104,7 +107,14 @@ def refresh_and_launch(
     _validate_checkout(checkout)
     if command == "sync":
         module = "agent_core.sync"
-        arguments = ["--checkout", str(checkout), "--home", str(home or Path.home())]
+        arguments = [
+            "--checkout",
+            str(checkout),
+            "--home",
+            str(home or Path.home()),
+            "--harness",
+            harness,
+        ]
     elif command == "apply":
         module = "agent_core.apply"
         arguments = ["--checkout", str(checkout), "--cwd", str(project_cwd)]
@@ -133,12 +143,18 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     sync_parser = subparsers.add_parser(
-        "sync", help="Publish declared skills, agents and prompts to the native Pi installation."
+        "sync", help="Publish declared resources to Pi (default) or an explicit supported harness."
     )
     sync_parser.add_argument(
         "--no-pull",
         action="store_true",
         help="Skip the remote refresh and publish from the current clean committed checkout.",
+    )
+    sync_parser.add_argument(
+        "--harness",
+        choices=("pi", "devin"),
+        default="pi",
+        help="Target harness. Defaults to pi.",
     )
     apply_parser = subparsers.add_parser(
         "apply", help="Deprecated: copy configured skills into one project or directory."
@@ -174,6 +190,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             command=args.command,
             here=getattr(args, "here", False),
             no_pull=getattr(args, "no_pull", False),
+            harness=getattr(args, "harness", "pi"),
         )
     except AgentCoreError as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)

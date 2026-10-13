@@ -6,7 +6,6 @@ import json
 import os
 import shutil
 import stat
-import subprocess
 import sys
 import uuid
 from dataclasses import dataclass
@@ -14,17 +13,24 @@ from pathlib import Path
 from typing import Sequence
 
 from agent_core import apply
+from agent_core.devin_manifest import (
+    DEVIN_MANIFEST_FILENAME,
+    DevinManifestError,
+    load_devin_names,
+)
 from agent_core.manifest import MANIFEST_FILENAME
 from agent_core.pi_manifest import PI_MANIFEST_FILENAME, PiManifestError, load_pi_names
 
-STATE_VERSION = 4
+STATE_VERSION = 5
 STATE_DIRECTORY = ".agent-core-state"
 STATE_FILENAME = "ownership.json"
 SHARED_SKILL_BASE = Path(".pi/agent/skills")
+DEVIN_DIRECTORY = "devin"
 LEGACY_SKILL_BASE = Path(".agents/skills")
 CLAUDE_SKILL_BASE = Path(".claude/skills")
 PI_BASES = {"agents": Path(".pi/agent/agents"), "prompts": Path(".pi/agent/prompts")}
 LEGACY_PI_BASES = {"agents": Path(".agents/agents"), "prompts": Path(".agents/prompts")}
+RETIRED_PI_RESOURCES = {"prompts": {"commit-with-subagent"}}
 LEGACY_GUIDANCE_DESTINATIONS = {
     "pi": Path(".pi/agent/AGENTS.md"),
     "codex": Path(".codex/AGENTS.md"),
@@ -61,6 +67,20 @@ class PiPlan:
 
 
 @dataclass(frozen=True)
+class DevinSource:
+    name: str
+    path: Path
+    fingerprint: str
+
+
+@dataclass(frozen=True)
+class DevinPlan:
+    source: DevinSource
+    target: Path
+    classification: str
+
+
+@dataclass(frozen=True)
 class LegacyPlan:
     path: Path
     category: str
@@ -70,6 +90,7 @@ class LegacyPlan:
 
 @dataclass(frozen=True)
 class SyncResult:
+    harness: str
     checkout: Path
     commit: str
     manifest: Path
@@ -77,6 +98,7 @@ class SyncResult:
     shared_base: Path
     skills: list[SkillPlan]
     pi_resources: list[PiPlan]
+    devin_resources: list[DevinPlan]
     legacy: list[LegacyPlan]
 
 
@@ -89,7 +111,16 @@ def _path_text(path: Path) -> str:
 
 
 def _empty_state() -> dict[str, object]:
-    return {"version": STATE_VERSION, "skills": {}, "aliases": {}, "guidance": {}, "pi_agents": {}, "pi_prompts": {}}
+    return {
+        "version": STATE_VERSION,
+        "skills": {},
+        "aliases": {},
+        "guidance": {},
+        "pi_agents": {},
+        "pi_prompts": {},
+        "devin_skills": {},
+        "devin_agents": {},
+    }
 
 
 def _expect_record(record: object, fields: set[str], context: str) -> dict[str, str]:
@@ -100,7 +131,9 @@ def _expect_record(record: object, fields: set[str], context: str) -> dict[str, 
     return record
 
 
-def load_global_state(path: Path, home: Path) -> dict[str, object]:
+def load_global_state(
+    path: Path, home: Path, devin_base: Path | None = None
+) -> dict[str, object]:
     if not apply._lexists(path):
         return _empty_state()
     if apply._entry_kind(path) != "file":
@@ -109,17 +142,32 @@ def load_global_state(path: Path, home: Path) -> dict[str, object]:
         payload = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SyncError(f"Global ownership state is malformed: {path}: {exc}") from exc
-    old_fields = {"version", "skills", "aliases", "guidance"}
-    new_fields = old_fields | {"pi_agents", "pi_prompts"}
+    legacy_fields = {"version", "skills", "aliases", "guidance"}
+    pi_fields = legacy_fields | {"pi_agents", "pi_prompts"}
+    current_fields = pi_fields | {"devin_skills", "devin_agents"}
     if not isinstance(payload, dict):
         raise SyncError(f"Global ownership state has an invalid shape: {path}")
-    if payload.get("version") == 2 and set(payload) == old_fields:
-        payload = {**payload, "version": STATE_VERSION, "pi_agents": {}, "pi_prompts": {}}
-    elif payload.get("version") in {3, STATE_VERSION} and set(payload) == new_fields:
-        payload["version"] = STATE_VERSION
+    if payload.get("version") == 2 and set(payload) == legacy_fields:
+        payload = {
+            **payload,
+            "version": STATE_VERSION,
+            "pi_agents": {},
+            "pi_prompts": {},
+            "devin_skills": {},
+            "devin_agents": {},
+        }
+    elif payload.get("version") in {3, 4} and set(payload) == pi_fields:
+        payload = {
+            **payload,
+            "version": STATE_VERSION,
+            "devin_skills": {},
+            "devin_agents": {},
+        }
+    elif payload.get("version") == STATE_VERSION and set(payload) == current_fields:
+        pass
     else:
         raise SyncError(f"Global ownership state has an unsupported version or shape: {path}")
-    if not all(isinstance(payload[key], dict) for key in new_fields - {"version"}):
+    if not all(isinstance(payload[key], dict) for key in current_fields - {"version"}):
         raise SyncError(f"Global ownership state has invalid record collections: {path}")
 
     for name, raw in payload["skills"].items():
@@ -180,6 +228,37 @@ def load_global_state(path: Path, home: Path) -> dict[str, object]:
                 or not HEX_FINGERPRINT.fullmatch(record["fingerprint"])
             ):
                 raise SyncError(f"Invalid Pi {category} ownership record for {name!r}")
+
+    devin_records = [payload["devin_skills"], payload["devin_agents"]]
+    if any(devin_records) and devin_base is None:
+        raise SyncError("APPDATA is required to validate managed Devin ownership")
+    if devin_base is not None:
+        for name, raw in payload["devin_skills"].items():
+            if not apply._safe_skill_name(name):
+                raise SyncError(f"Invalid managed Devin skill name: {name!r}")
+            record = _expect_record(
+                raw, {"destination", "source_commit", "fingerprint"}, f"Devin skill {name!r}"
+            )
+            expected = devin_base / "skills" / name
+            if (
+                Path(record["destination"]).resolve(strict=False) != expected.resolve(strict=False)
+                or not apply.HEX_SHA.fullmatch(record["source_commit"])
+                or not HEX_FINGERPRINT.fullmatch(record["fingerprint"])
+            ):
+                raise SyncError(f"Invalid Devin skill ownership record for {name!r}")
+        for name, raw in payload["devin_agents"].items():
+            if not apply._safe_skill_name(name):
+                raise SyncError(f"Invalid managed Devin agent name: {name!r}")
+            record = _expect_record(
+                raw, {"destination", "source_commit", "fingerprint"}, f"Devin agent {name!r}"
+            )
+            expected = devin_base / "agents" / f"{name}.md"
+            if (
+                Path(record["destination"]).resolve(strict=False) != expected.resolve(strict=False)
+                or not apply.HEX_SHA.fullmatch(record["source_commit"])
+                or not HEX_FINGERPRINT.fullmatch(record["fingerprint"])
+            ):
+                raise SyncError(f"Invalid Devin agent ownership record for {name!r}")
     return payload
 
 
@@ -282,7 +361,59 @@ def _file_fingerprint(path: Path) -> str:
     try:
         return hashlib.sha256(path.read_bytes()).hexdigest()
     except OSError as exc:
-        raise SyncError(f"Cannot read Pi resource {path}: {exc}") from exc
+        raise SyncError(f"Cannot read managed resource {path}: {exc}") from exc
+
+
+def _resolve_devin_base(app_data: Path | None = None) -> Path:
+    if app_data is None:
+        raw = os.environ.get("APPDATA", "").strip()
+        if not raw:
+            raise SyncError("APPDATA is required for --harness devin")
+        app_data = Path(raw)
+    return app_data.resolve(strict=False) / DEVIN_DIRECTORY
+
+
+def _ambient_devin_base() -> Path | None:
+    raw = os.environ.get("APPDATA", "").strip()
+    return _resolve_devin_base(Path(raw)) if raw else None
+
+
+def _load_devin_sources(checkout: Path) -> list[DevinSource]:
+    manifest = checkout / DEVIN_MANIFEST_FILENAME
+    if not apply._lexists(manifest):
+        raise SyncError(f"Required Devin manifest is missing: {manifest}")
+    if apply._entry_kind(manifest) != "file":
+        raise SyncError(f"Devin manifest is not a regular file: {manifest}")
+    try:
+        names = load_devin_names(manifest)
+    except DevinManifestError as exc:
+        raise SyncError(str(exc)) from exc
+
+    if len(set(name.casefold() for name in names)) != len(names):
+        raise SyncError(f"Duplicate Devin agent names in {DEVIN_MANIFEST_FILENAME}")
+    for name in names:
+        if not apply._safe_skill_name(name):
+            raise SyncError(f"Unsafe Devin agent name: {name!r}")
+
+    paths = [manifest] + [checkout / "devin" / "agents" / f"{name}.md" for name in names]
+    for path in paths:
+        if not apply._lexists(path) or apply._entry_kind(path) != "file":
+            raise SyncError(f"Configured Devin source is not a regular file: {path}")
+        relative = path.relative_to(checkout).as_posix()
+        if relative not in apply._tracked_paths(checkout, relative):
+            raise SyncError(f"Configured Devin source is not Git-tracked: {relative}")
+        diff = apply._run_git(checkout, "diff", "--quiet", "HEAD", "--", relative)
+        if diff.returncode != 0:
+            raise SyncError(f"Configured Devin source must match the canonical commit: {relative}")
+
+    return [
+        DevinSource(
+            name,
+            checkout / "devin" / "agents" / f"{name}.md",
+            _file_fingerprint(checkout / "devin" / "agents" / f"{name}.md"),
+        )
+        for name in names
+    ]
 
 
 def _load_pi_sources(checkout: Path) -> list[PiSource]:
@@ -371,6 +502,101 @@ def _build_pi_plans(
     return plans, retired
 
 
+def _build_retired_pi_plans(
+    home: Path, selected: list[PiSource], state: dict[str, object]
+) -> list[LegacyPlan]:
+    selected_keys = {(source.category, source.name) for source in selected}
+    plans: list[LegacyPlan] = []
+    errors: list[str] = []
+
+    for category, names in RETIRED_PI_RESOURCES.items():
+        records = state[f"pi_{category}"]
+        assert isinstance(records, dict)
+        for name in names:
+            if (category, name) in selected_keys:
+                continue
+            record = records.get(name)
+            if record is None:
+                continue
+            target = Path(record["destination"])
+            if apply._lexists(target):
+                if apply._entry_kind(target) != "file":
+                    errors.append(f"Retired Pi resource {target} is not a regular file")
+                    continue
+                if _file_fingerprint(target) != record["fingerprint"]:
+                    errors.append(f"Retired Pi resource {target} was locally modified; refusing removal")
+                    continue
+            plans.append(LegacyPlan(target, f"pi_{category}", name, "file"))
+
+    if errors:
+        raise SyncError("Preflight refused retired Pi resource changes:\n- " + "\n- ".join(errors))
+    return plans
+
+
+def _build_devin_skill_plans(
+    devin_base: Path, sources: list[apply.SourceSkill], state: dict[str, object]
+) -> list[SkillPlan]:
+    records = state["devin_skills"]
+    assert isinstance(records, dict)
+    plans: list[SkillPlan] = []
+    errors: list[str] = []
+
+    for source in sources:
+        target = devin_base / "skills" / source.name
+        record = records.get(source.name)
+        if not apply._lexists(target):
+            classification = "added" if record is None else "recreated"
+        else:
+            try:
+                installed = apply.fingerprint_directory(target)
+            except apply.ApplyError as exc:
+                errors.append(f"Devin skill {target} is not a regular directory: {exc}")
+                continue
+            if installed == source.fingerprint:
+                classification = "unchanged" if record is not None else "adopted"
+            else:
+                classification = "updated" if record is not None else "replaced"
+        plans.append(SkillPlan(source, target, classification))
+
+    if errors:
+        raise SyncError("Preflight refused Devin skill changes:\n- " + "\n- ".join(errors))
+    return plans
+
+
+def _build_devin_agent_plans(
+    devin_base: Path, sources: list[DevinSource], state: dict[str, object]
+) -> list[DevinPlan]:
+    records = state["devin_agents"]
+    assert isinstance(records, dict)
+    plans: list[DevinPlan] = []
+    errors: list[str] = []
+
+    for source in sources:
+        target = devin_base / "agents" / f"{source.name}.md"
+        record = records.get(source.name)
+        if not apply._lexists(target):
+            classification = "added" if record is None else "recreated"
+        else:
+            try:
+                kind = apply._entry_kind(target)
+                installed = _file_fingerprint(target) if kind == "file" else None
+            except (apply.ApplyError, SyncError) as exc:
+                errors.append(str(exc))
+                continue
+            if installed is None:
+                errors.append(f"{target} is not a regular file")
+                continue
+            if installed == source.fingerprint:
+                classification = "unchanged" if record is not None else "adopted"
+            else:
+                classification = "updated" if record is not None else "replaced"
+        plans.append(DevinPlan(source, target, classification))
+
+    if errors:
+        raise SyncError("Preflight refused Devin agent changes:\n- " + "\n- ".join(errors))
+    return plans
+
+
 def _remove_path(path: Path) -> None:
     metadata = path.stat(follow_symlinks=False)
     if stat.S_ISLNK(metadata.st_mode):
@@ -394,24 +620,27 @@ def _render_state(state: dict[str, object]) -> str:
         "guidance": dict(sorted(state["guidance"].items())),
         "pi_agents": dict(sorted(state["pi_agents"].items())),
         "pi_prompts": dict(sorted(state["pi_prompts"].items())),
+        "devin_skills": dict(sorted(state["devin_skills"].items())),
+        "devin_agents": dict(sorted(state["devin_agents"].items())),
     }
     return json.dumps(ordered, indent=2) + "\n"
 
 
-def sync_checkout(checkout: Path, home: Path) -> SyncResult:
+def _sync_pi_checkout(checkout: Path, home: Path) -> SyncResult:
     checkout = checkout.resolve()
     home = home.resolve()
     sources, commit = apply.load_sources(checkout)
     pi_sources = _load_pi_sources(checkout)
 
     ownership_path = global_state_path(home)
-    state = load_global_state(ownership_path, home)
+    state = load_global_state(ownership_path, home, _ambient_devin_base())
     destinations = [home / SHARED_SKILL_BASE / source.name for source in sources]
     destinations.extend(home / PI_BASES[src.category] / f"{src.name}.md" for src in pi_sources)
     destinations.append(ownership_path)
     skill_plans, old_skills = _build_skill_plans(home, sources, state)
     pi_plans, old_pi = _build_pi_plans(home, pi_sources, state)
-    legacy_plans = old_skills + old_pi
+    retired_pi = _build_retired_pi_plans(home, pi_sources, state)
+    legacy_plans = old_skills + old_pi + retired_pi
     destinations.extend(plan.path for plan in legacy_plans)
     _ensure_real_parents(home, destinations)
 
@@ -431,6 +660,8 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
     for plan in legacy_plans:
         if plan.category == "aliases":
             prospective["aliases"].pop(plan.name, None)
+        elif plan.category in {"pi_agents", "pi_prompts"}:
+            prospective[plan.category].pop(plan.name, None)
     prospective["guidance"] = {}
 
     state_directory = ownership_path.parent
@@ -455,13 +686,15 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
                 raise SyncError(f"Staged Pi resource fingerprint mismatch: {plan.source.name}")
 
         # Repeat all safety checks immediately before the first replacement.
-        current_state = load_global_state(ownership_path, home)
+        current_state = load_global_state(ownership_path, home, _ambient_devin_base())
         if current_state != state:
             raise SyncError(f"Global ownership state changed after preflight: {ownership_path}")
         if _build_skill_plans(home, sources, state) != (skill_plans, old_skills):
             raise SyncError("Skill targets changed during preflight")
         if _build_pi_plans(home, pi_sources, state) != (pi_plans, old_pi):
             raise SyncError("Pi targets changed during preflight")
+        if _build_retired_pi_plans(home, pi_sources, state) != retired_pi:
+            raise SyncError("Retired Pi targets changed during preflight")
 
         for plan in skill_plans:
             if plan.classification in {"unchanged", "adopted"}:
@@ -534,6 +767,7 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
         shutil.rmtree(transaction, ignore_errors=True)
 
     return SyncResult(
+        "pi",
         checkout,
         commit,
         checkout / MANIFEST_FILENAME,
@@ -541,32 +775,187 @@ def sync_checkout(checkout: Path, home: Path) -> SyncResult:
         home / SHARED_SKILL_BASE,
         skill_plans,
         pi_plans,
+        [],
         legacy_plans,
     )
 
 
+def _sync_devin_checkout(
+    checkout: Path, home: Path, app_data: Path | None = None
+) -> SyncResult:
+    checkout = checkout.resolve()
+    home = home.resolve()
+    devin_base = _resolve_devin_base(app_data)
+    sources, commit = apply.load_sources(checkout)
+    agent_sources = _load_devin_sources(checkout)
+
+    ownership_path = global_state_path(home)
+    state = load_global_state(ownership_path, home, devin_base)
+    skill_plans = _build_devin_skill_plans(devin_base, sources, state)
+    agent_plans = _build_devin_agent_plans(devin_base, agent_sources, state)
+    managed_destinations = [plan.target for plan in skill_plans]
+    managed_destinations.extend(plan.target for plan in agent_plans)
+    _ensure_real_parents(devin_base, managed_destinations)
+    _ensure_real_parents(home, [ownership_path])
+
+    prospective = json.loads(json.dumps(state))
+    for plan in skill_plans:
+        prospective["devin_skills"][plan.source.name] = {
+            "destination": _path_text(plan.target),
+            "source_commit": commit,
+            "fingerprint": plan.source.fingerprint,
+        }
+    for plan in agent_plans:
+        prospective["devin_agents"][plan.source.name] = {
+            "destination": _path_text(plan.target),
+            "source_commit": commit,
+            "fingerprint": plan.source.fingerprint,
+        }
+
+    state_directory = ownership_path.parent
+    state_directory.mkdir(parents=True, exist_ok=True)
+    transaction = state_directory / f"transaction-{uuid.uuid4().hex}"
+    stage = transaction / "stage"
+    backup = transaction / "backup"
+    completed: list[tuple[Path, Path | None]] = []
+    try:
+        (stage / "skills").mkdir(parents=True)
+        (stage / "agents").mkdir(parents=True)
+        backup.mkdir(parents=True)
+        for plan in skill_plans:
+            staged = stage / "skills" / plan.source.name
+            shutil.copytree(plan.source.path, staged, symlinks=True)
+            if apply.fingerprint_directory(staged) != plan.source.fingerprint:
+                raise SyncError(f"Staged Devin skill fingerprint mismatch: {plan.source.name}")
+        for plan in agent_plans:
+            staged = stage / "agents" / f"{plan.source.name}.md"
+            shutil.copy2(plan.source.path, staged)
+            if _file_fingerprint(staged) != plan.source.fingerprint:
+                raise SyncError(f"Staged Devin agent fingerprint mismatch: {plan.source.name}")
+
+        current_state = load_global_state(ownership_path, home, devin_base)
+        if current_state != state:
+            raise SyncError(f"Global ownership state changed after preflight: {ownership_path}")
+        if _build_devin_skill_plans(devin_base, sources, state) != skill_plans:
+            raise SyncError("Devin skill targets changed during preflight")
+        if _build_devin_agent_plans(devin_base, agent_sources, state) != agent_plans:
+            raise SyncError("Devin agent targets changed during preflight")
+
+        for plan in skill_plans:
+            if plan.classification in {"unchanged", "adopted"}:
+                continue
+            plan.target.parent.mkdir(parents=True, exist_ok=True)
+            saved: Path | None = None
+            if apply._lexists(plan.target):
+                saved = backup / "skills" / plan.source.name
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(plan.target, saved)
+            completed.append((plan.target, saved))
+            os.replace(stage / "skills" / plan.source.name, plan.target)
+
+        for plan in agent_plans:
+            if plan.classification in {"unchanged", "adopted"}:
+                continue
+            plan.target.parent.mkdir(parents=True, exist_ok=True)
+            saved = None
+            if apply._lexists(plan.target):
+                saved = backup / "agents" / f"{plan.source.name}.md"
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(plan.target, saved)
+            completed.append((plan.target, saved))
+            os.replace(stage / "agents" / f"{plan.source.name}.md", plan.target)
+
+        for plan in skill_plans:
+            if apply.fingerprint_directory(plan.target) != plan.source.fingerprint:
+                raise SyncError(f"Published Devin skill fingerprint mismatch: {plan.target}")
+        for plan in agent_plans:
+            if _file_fingerprint(plan.target) != plan.source.fingerprint:
+                raise SyncError(f"Published Devin agent fingerprint mismatch: {plan.target}")
+
+        try:
+            apply._atomic_write(ownership_path, _render_state(prospective))
+        except OSError as exc:
+            raise SyncError(f"Could not publish global ownership state {ownership_path}: {exc}") from exc
+    except Exception as exc:
+        rollback_errors: list[str] = []
+        for target, saved in reversed(completed):
+            try:
+                if apply._lexists(target):
+                    _remove_path(target)
+                if saved is not None and apply._lexists(saved):
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(saved, target)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"{target}: {rollback_exc}")
+        if rollback_errors:
+            raise SyncError(
+                f"Sync failed ({exc}) and rollback was incomplete:\n- " + "\n- ".join(rollback_errors)
+            ) from exc
+        if isinstance(exc, (SyncError, apply.ApplyError)):
+            raise SyncError(str(exc)) from exc
+        raise SyncError(f"Sync failed before completion: {exc}") from exc
+    finally:
+        shutil.rmtree(transaction, ignore_errors=True)
+
+    return SyncResult(
+        "devin",
+        checkout,
+        commit,
+        checkout / MANIFEST_FILENAME,
+        ownership_path,
+        devin_base / "skills",
+        skill_plans,
+        [],
+        agent_plans,
+        [],
+    )
+
+
+def sync_checkout(
+    checkout: Path,
+    home: Path,
+    harness: str = "pi",
+    *,
+    app_data: Path | None = None,
+) -> SyncResult:
+    if harness == "pi":
+        return _sync_pi_checkout(checkout, home)
+    if harness == "devin":
+        return _sync_devin_checkout(checkout, home, app_data)
+    raise SyncError(f"Unsupported harness: {harness}")
+
+
 def print_result(result: SyncResult) -> None:
     print(f"agent-core sync: OK ({result.commit[:12]})")
+    print(f"Harness: {result.harness}")
     print(f"Skills ({len(result.skills)}): " + (", ".join(p.source.name for p in result.skills) or "none"))
-    for category in ("agents", "prompts"):
-        plans = [p for p in result.pi_resources if p.source.category == category]
-        print(f"{category.capitalize()} ({len(plans)}): " + (", ".join(p.source.name for p in plans) or "none"))
-    if result.legacy:
-        print(f"Migrated legacy entries: {len(result.legacy)}")
-    print("Verified: ~/.pi/agent/{skills,agents,prompts} (global guidance untouched)")
+    if result.harness == "pi":
+        for category in ("agents", "prompts"):
+            plans = [p for p in result.pi_resources if p.source.category == category]
+            print(f"{category.capitalize()} ({len(plans)}): " + (", ".join(p.source.name for p in plans) or "none"))
+        if result.legacy:
+            print(f"Migrated legacy entries: {len(result.legacy)}")
+        print("Verified: ~/.pi/agent/{skills,agents,prompts} (global guidance untouched)")
+    else:
+        print(
+            f"Agents ({len(result.devin_resources)}): "
+            + (", ".join(p.source.name for p in result.devin_resources) or "none")
+        )
+        print("Verified: %APPDATA%\\devin\\{skills,agents} (global guidance untouched)")
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Internal post-refresh Agent Core global sync implementation.")
     parser.add_argument("--checkout", required=True)
     parser.add_argument("--home", required=True)
+    parser.add_argument("--harness", choices=("pi", "devin"), default="pi")
     return parser
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = build_parser().parse_args(argv)
     try:
-        result = sync_checkout(Path(args.checkout), Path(args.home))
+        result = sync_checkout(Path(args.checkout), Path(args.home), args.harness)
     except (SyncError, apply.ApplyError) as exc:
         print(f"agent-core: error: {exc}", file=sys.stderr)
         return 1
