@@ -1,12 +1,12 @@
 # Agent Core
 
-**Last Updated:** 2026-10-13
+**Last Updated:** 2026-10-14
 
 **Status:** Current
 
 **Source Of Truth:** Defines the purpose and current architecture of the private Agent Core repository.
 
-**Update When:** Canonical layout, personal-skill distribution, or memory architecture changes.
+**Update When:** Canonical layout, personal-skill distribution, memory architecture, or the Places contract changes.
 
 ### Read First
 
@@ -16,6 +16,7 @@
 - Pi and Devin discover their native resources without settings edits. Global guidance remains unmanaged.
 - `skills/` is hand-edited production source. Do not edit production skills without explicit human approval.
 - `docs/agent-core-operating-manual.md` is the human command reference. `docs/consumer-repo-enrollment.md` owns the detailed distribution and migration contract.
+- `scripts/places.py` is a standalone Bash/CMD directory navigator documented in `docs/places.md`; it is independent of Agent Core sync.
 - `tasks/` holds active execution state; docs and agent guidance hold durable truth.
 
 ## Current Contract
@@ -26,7 +27,7 @@
 - `personal-skills.toml`, `personal-pi.toml`, and `personal-devin.toml`
 - `agent_core/*.py`
 - `pyproject.toml`
-- `scripts/install-agent-core.cmd` and `scripts/install_agent_core.py`
+- `scripts/install-agent-core.cmd`, `scripts/install_agent_core.py`, and `scripts/places.py`
 - `README.md`, `AGENTS.md`, `docs/`, and `prompts/`
 - `memory/memories.jsonl` and steward scripts
 
@@ -84,6 +85,12 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 - `source-material/` holds non-canonical seed inputs and supporting artifacts.
 - `archive/` holds retired historical reference material.
 
+## Places Directory Navigator
+
+`scripts/places.py` is a standalone, dependency-free personal directory navigator for Linux Bash and Windows CMD. It keeps stable manually aliased favorites separate from a generated Git-repository cache under `~/.agent-core/`, and installs the minimal shell integration required for an interactive selection to change the current directory. It is independent of `agent-core sync` and can be copied to another machine by itself.
+
+See `docs/places.md` for setup, commands, file formats, refresh behavior, and platform boundaries.
+
 ## Memory Pilot
 
 - `memory/memories.jsonl` is the append-only canonical ledger.
@@ -93,7 +100,8 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 
 ## Dependency Strategy
 
-- Runtime and installation require Python 3.10+ and use only the standard library.
+- Agent Core runtime and installation require Python 3.10+ and use only the standard library.
+- The standalone Places navigator supports Python 3.8+ and also uses only the standard library.
 - The Windows installer and generated shim do not install the package or dependencies.
 - `uv` remains an optional maintainer convenience, not an installation or runtime requirement.
 - Standalone steward scripts may continue using `uv run` and PEP 723 metadata where appropriate.
@@ -112,6 +120,7 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 | Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin publication, ownership, rollback, and Pi legacy migration. |
 | Legacy engine | `agent_core/apply.py` | Deprecated project-local compatibility. |
 | Retirement engine | `agent_core/retire.py` | Safe removal of old managed project copies. |
+| Places navigator | `docs/places.md` | Standalone directory discovery, menu, state, setup, and portability contract. |
 | Memory pilot | `docs/memory-pilot.md` | Canonical ledger and approval contract. |
 
 ### Decisions
