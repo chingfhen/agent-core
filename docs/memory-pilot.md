@@ -1,6 +1,6 @@
 # Memory Pilot
 
-**Last Updated:** 2026-09-15
+**Last Updated:** 2026-10-14
 
 **Status:** Current
 
@@ -76,7 +76,7 @@ Each JSONL row stores one immutable memory revision with these fields:
 #### Access Boundary
 
 - Only stewards use `scripts/memory.py`.
-- Global personal-skill sync does not configure project memory or replace the canonical Google Drive knowledge-base workflow.
+- Global personal-skill sync does not configure project memory. The separate [knowledge-base skill](../skills/knowledge-base/SKILL.md) owns Markdown records and requested managed artifacts; it does not use this ledger, its topic approval rules, or its tooling.
 
 ### Related Surfaces
 

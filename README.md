@@ -91,12 +91,18 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 
 See `docs/places.md` for setup, commands, file formats, refresh behavior, and platform boundaries.
 
+## Knowledge Base
+
+[`skills/knowledge-base/SKILL.md`](skills/knowledge-base/SKILL.md) is the canonical knowledge-base workflow and is selected in `personal-skills.toml`. It preserves reusable context in dated Markdown records, retrieves prior learning selectively, and creates or updates managed human-facing artifacts only on request. Local use defaults to `~/.kb/`, with processed originals retained separately under `~/.kb-archive/`; explicit instructions can select another location without a project registry.
+
+The former Drive workflow is no longer authoritative. This skill change does not migrate any KB content. GitHub/web-app use requires explicit repository identity and suitable connector capabilities; local paths and skill loading are not automatically available there. See the [human operating manual](docs/agent-core-operating-manual.md#knowledge-base-workflow) for publication and usage entry points.
+
 ## Memory Pilot
 
 - `memory/memories.jsonl` is the append-only canonical ledger.
 - Search and index outputs are disposable and untracked.
 - Memory tooling remains steward-only and is run through `uv run scripts/memory.py`.
-- Global sync does not configure project memory or replace the canonical Google Drive knowledge-base workflow.
+- Global sync does not configure project memory. The separate `knowledge-base` skill does not use or change this ledger.
 
 ## Dependency Strategy
 

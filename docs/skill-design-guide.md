@@ -1,7 +1,7 @@
 ---
 title: Skill Design Guide
 description: Canonical criteria for designing, invoking, consolidating, publishing, and retiring Agent Core skills.
-updated: 2026-10-08
+updated: 2026-10-14
 ---
 
 # Skill Design Guide
@@ -50,7 +50,7 @@ Keep these boundaries clear:
 - `engineering`: implement approved work.
 - `project-tasks`: make unfinished work portable.
 - `project-docs`: maintain settled project truth.
-- `knowledge-base`: manage evidence and knowledge.
+- `knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
 - `learning-markdown`: author lessons; not automatic KB persistence.
 - `approval-gate`: support a consequential approval.
 - `human-unblock`: clear a human-owned obstacle during execution.

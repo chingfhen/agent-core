@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-13
+updated: 2026-10-14
 ---
 
 # Skills Catalogue
@@ -16,6 +16,7 @@ updated: 2026-10-13
 | --- | --- | --- |
 | [project-tasks](../skills/project-tasks/SKILL.md) | You need to save, resume, checkpoint, or hand off unfinished work. | Execution continuity, not project truth. |
 | [project-docs](../skills/project-docs/SKILL.md) | You want to maintain durable project decisions, contracts, or guidance. | Settled understanding, not an active backlog. |
+| [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", clear the KB inbox, create/update a managed artifact, or recall prior context. | Selective proactive retrieval; explicit writes to records/managed outputs. No approval queue or automatic synthesis. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
 | [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
 | [explain-tech](../skills/explain-tech/SKILL.md) | "Explain this error/architecture/change" or "debrief what we built." | Quick by default; Deep and Debrief modes. |
@@ -33,7 +34,6 @@ updated: 2026-10-13
 | Skill | Reach for it when… | Note |
 | --- | --- | --- |
 | [document-text-extraction](../skills/document-text-extraction/SKILL.md) | Explicitly extract a named PDF/image locally. | Temporary extraction only; independent of KB and `evidence-authoring`. |
-| [knowledge-base](../skills/knowledge-base/SKILL.md) | Consult the **repo copy** of the KB workflow. | **Not installed by sync.** Agent Core's steward guidance identifies a separate Google Drive workflow; `global/AGENTS.md` is no longer published to user prompts. |
 | [repo-audit](../skills/repo-audit/SKILL.md) | Request a dedicated whole-repository risk/bloat audit. | Specialized full-repo report, not routine code review. |
 | [ml-architecture-review](../skills/ml-architecture-review/SKILL.md) | Explicitly request focused ML architecture decision analysis. | Specialized investigation; planning remains general-purpose. |
 | [humanize-spoken-output](../skills/humanize-spoken-output/SKILL.md) | Rewrite spoken scripts, narration, and interview answers naturally. | Content editing, not technical teaching. |

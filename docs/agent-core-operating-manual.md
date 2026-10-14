@@ -1,6 +1,6 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-10-13
+**Last Updated:** 2026-10-14
 
 **Status:** Current
 
@@ -184,6 +184,14 @@ agent-core sync
 Agent Core refuses ignored, untracked, missing, linked, or uncommitted files inside configured sources.
 
 Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. The `commit-with-subagent` prompt-to-skill migration is a narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
+
+## Knowledge Base Workflow
+
+The canonical workflow is [`skills/knowledge-base/SKILL.md`](../skills/knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
+
+Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed command effects and retrieval rules. Local defaults are `~/.kb/` and the separate `~/.kb-archive/`; applicable instructions or the current request can select another root. No `projects.toml` entry is required or read by this skill.
+
+The former Drive workflow is no longer canonical; existing KB content remains where it is until a separate migration is requested. GitHub-connected web apps need an explicitly selected repository/ref/directory and access to the canonical skill and its references. Connector access does not guarantee skill discovery, writes, or external archival. Updating Agent Core does not configure those integrations or replace user-managed global guidance that may still point to Drive.
 
 ## Maintain Global Guidance Separately
 

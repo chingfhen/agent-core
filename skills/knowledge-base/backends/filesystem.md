@@ -1,206 +1,89 @@
-# Filesystem Backend Adapter
-
-## Purpose
-
-Implement the canonical Knowledge Base workflow on an ordinary filesystem.
-
-Read and follow the canonical `SKILL.md` first. This adapter defines storage mechanics only. It does not redefine KB semantics.
-
-Use this backend when the active root is a local or mounted filesystem path and no storage-specific backend such as Google Drive is selected.
-
-No Git repository is required or assumed.
-
----
-
-# Runtime Configuration
-
-Recommended project configuration:
-
-```text
-Knowledge Base Backend: filesystem
-Knowledge Base Root: <exact filesystem path>
-Knowledge Base Name: <optional name>
-```
-
-The exact configured root is authoritative.
-
-When no exact root is configured, a uniquely identifiable nearby directory matching `*-knowledge-base` may be used only when current context makes the intended KB unambiguous. Otherwise ask rather than guessing.
-
-The `*-knowledge-base` suffix is a discovery convention, not a validity requirement.
-
----
-
-# Filesystem Boundary
-
-Treat the configured root and its descendants as the complete writable KB namespace.
-
-Before mutation, resolve the root to a stable normalized path when the runtime supports it.
-
-Do not:
-
-- write outside the root;
-- follow a symlink, junction, mount indirection, or path traversal outside the root for KB mutation;
-- delete or overwrite unrelated files;
-- infer that a sibling directory belongs to the KB merely because its name looks related.
-
-External source/context files may be read only when explicitly supplied or authorized by project configuration or the human. They remain outside KB ownership.
-
----
-
-# Required Capabilities
-
-The backend needs ordinary filesystem operations:
-
-```text
-list directories
-read files
-create directories
-create files
-replace files
-move / rename
-copy when explicitly needed
-search filenames and text
-remove files only when authorized by the canonical workflow
-```
-
-If the environment cannot safely perform a required operation, stop rather than simulating persistence.
-
----
-
-# Markdown Integrity
-
-KB Markdown must be stored as raw UTF-8 Markdown text.
-
-Do not route Markdown through rich-document conversion merely to save it.
-
-Preserve:
-
-- headings;
-- lists;
-- code fences;
-- links;
-- emphasis;
-- frontmatter;
-- literal paths and identifiers.
-
-Use the filesystem's normal text-file write mechanism.
-
----
-
-# Mutation Mechanics
-
-## Create
-
-Create required parent directories first, then write the intended file.
-
-Never silently overwrite an existing unrelated artifact. When filename identity is uncertain, use a collision-safe name or resolve the ambiguity first.
-
-## Replace
-
-When rewriting an existing knowledge page or index, preserve unrelated content and write only the intended new complete contents.
-
-Prefer a temporary-file-then-rename pattern when the runtime supports it cheaply and it materially reduces partial-write risk. Do not add elaborate transactional machinery for ordinary low-risk edits.
-
-## Move / Rename
-
-Use a filesystem move/rename operation when possible so content remains unchanged.
-
-After moving evidence or workflow-state artifacts, repair only directly affected links or provenance paths required by the canonical workflow.
-
-## Delete
-
-Delete only when the canonical workflow explicitly calls for removal or when the human explicitly authorizes it.
-
-Routine curation normally moves items between workflow states; it should not delete the only copy of substantive material.
-
----
-
-# Search and Retrieval
-
-Prefer cheap filesystem narrowing:
-
-```text
-known path
-→ direct read
-
-known topic
-→ index / filename search
-
-remembered phrase
-→ text search within the active root
-
-approximate date
-→ date-prefixed filename filtering
-```
-
-Use tools such as filename search, recursive grep, ripgrep, or equivalent capabilities when available.
-
-Do not scan unrelated directories outside the configured root.
-
----
-
-# Version History
-
-This backend does not guarantee historical revisions of mutable knowledge pages.
-
-Do not create synthetic change logs, snapshots, or a home-grown version-control system merely to imitate Git or Drive history.
-
-Traceability still comes from:
-
-```text
-current knowledge
-→ ## Evidence
-→ permanent evidence
-→ source-archive when exact original fidelity matters
-```
-
-If the host filesystem independently provides version history, it may be used when helpful, but the KB workflow does not depend on it.
-
----
-
-# Verification
-
-Follow the canonical risk-proportionate verification rules.
-
-For normal filesystem operations, cheap checks are usually enough:
-
-```text
-create → target exists
-move   → target exists and source no longer occupies the pending state
-edit   → write returned successfully; inspect only the affected portion when needed
-index  → expected entry is present when not otherwise established
-```
-
-Do not reread entire files after every successful local write.
-
-Use stronger verification for destructive or large structural changes.
-
----
-
-# Failure Rules
-
-Stop or narrow when:
-
-- the root path is missing or ambiguous;
-- the root cannot be accessed safely;
-- a path resolves outside the root;
-- an existing target would be overwritten ambiguously;
-- required read/write/move capability is unavailable;
-- the operation would leave a partial workflow state that cannot be completed safely.
-
-Never claim a filesystem mutation succeeded without an observed successful operation or minimal targeted confirmation.
-
----
-
-# Filesystem Backend Standard
-
-A healthy filesystem deployment should require only:
-
-```text
-SKILL.md
-backends/filesystem.md
-```
-
-plus project or agent configuration identifying the active root.
-
-No Git repository, database, external registry, or additional infrastructure is required.
+# Filesystem Backend
+
+Read the main [skill](../SKILL.md) first. Use this adapter for a durable local or
+mounted filesystem, including a local Git checkout. Git is not required.
+
+## Roots and capabilities
+
+Resolve the KB and archive roots by the skill's precedence rules. Expand `~` using
+the actual user's home (`%USERPROFILE%` on Windows); do not use a guessed username,
+working directory, or ephemeral sandbox home. Default roots are `~/.kb/` and
+`~/.kb-archive/`. Report resolved absolute paths after writes.
+
+Before mutation, normalize paths and inspect the relevant existing parents. Refuse
+path traversal or symlink/junction/reparse-point indirection that escapes the selected
+roots. Do not silently adopt a file where a directory is expected or initialize over
+an unrelated existing layout. Preserve unrelated files and user changes.
+
+The archive must be outside the KB and its Git worktree. Check the selected paths,
+not arbitrary repositories. If an explicit archive violates that boundary, request
+a safe destination instead of moving sources there. Ordinary KB writes stay inside
+the KB; inbox processing additionally owns only the exact archival destinations and
+removal of verified processed inputs.
+
+Use ordinary directory listing, UTF-8 reads/writes, filename/text search, copying,
+rename, and targeted removal. If a needed capability is missing, report the limitation;
+a temporary downloaded draft does not establish durable persistence.
+
+## Write and update
+
+- Write raw Markdown, not a rich-document conversion. Create parents lazily.
+- Read current contents before editing an existing record, artifact, or index.
+  Prefer targeted edits; preserve unrelated sections and intervening user changes.
+- For a substantial replacement, use a temporary file followed by atomic replacement
+  when readily available. This prevents torn writes, not concurrent-edit conflicts;
+  recheck the source when concurrent changes are possible.
+- Never overwrite an unrelated collision. Reuse an existing identity only when its
+  content/provenance establishes the match; otherwise choose a descriptive suffix.
+- Do not rename an artifact merely because it was updated. Repair directly affected
+  links if a requested move or rename changes its location.
+
+## Archive and clear safely
+
+Use the main skill's capture-first sequence. For each source whose records and
+navigation are complete:
+
+1. Select `<archive>/YYYY-MM/<original-name>` using archive date. If that path is
+   occupied, use a collision-safe suffix, unless verified identity proves it is the
+   same source from an interrupted operation. Never replace an existing original.
+2. Copy the original bytes without normalization or extraction. For sources already
+   archived on a previous attempt, verify the existing copy instead of duplicating it.
+3. Compare bytes or a content hash, not just size/name, between the input read for
+   capture, the current input, and the archive. A changed input remains pending.
+4. Record the actual archive locator in associated records. Keep the original
+   KB-relative input path for provenance. Verify these targeted updates succeeded.
+5. Remove only the exact unchanged inbox file after the retained copy and record
+   links are established. Recheck identity immediately before removal. If concurrent
+   writing cannot be excluded safely, leave the input pending.
+6. Confirm the input is absent and the archive remains present. Remove empty input
+   subdirectories only when they belonged to this completed batch; preserve the inbox.
+
+Copy-verify-remove is intentional: the archive may be on another volume and a move
+alone may not provide enough fidelity/recovery evidence. If interrupted, an extra
+copy is safer than lost source material. Do not use recursive deletion to empty an
+inbox or archive. Do not remove directories containing unprocessed or newly added files.
+
+Archival does not guarantee backup, portability, or suitability for personal storage.
+Do not archive known secrets or restricted data into an unauthorized destination;
+leave the input in place and report the issue without echoing sensitive values.
+
+## Search
+
+Apply [selective retrieval](../references/retrieval.md). Search explicit `records/`
+and `managed/` directories with available filename/grep tools. Use literal matching
+for error strings when appropriate, and bound returned matches before opening files.
+Do not index or search the external archive by default.
+
+## Git and verification
+
+A local capture modifies files only. Do not initialize a repository, stage, commit,
+push, change remotes, or edit Git exclusions as an incidental KB action. A separate
+publication/migration request determines those operations and their privacy boundary.
+A raw input is not recoverable from Git merely because its parent directory is a
+checkout; untracked/uncommitted files may have no history.
+
+Use successful write results and targeted checks for ordinary records/indexes. Check
+that links resolve and substantial edits preserve unrelated material. For clearing,
+verify retained source fidelity, completed associated records, and source absence.
+Do not perform a whole-KB audit. Report local paths and outstanding steps; do not
+claim changes are on GitHub until an authorized publication actually succeeds.

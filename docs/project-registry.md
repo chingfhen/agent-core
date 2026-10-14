@@ -1,8 +1,8 @@
 # Project Registry
 
-The project registry tells agents where project-owned files live on the current machine.
+The project registry tells registry-aware workflows, including `project-docs` and `project-tasks`, where project-owned files live on the current machine.
 
-It is machine-local configuration.
+It is machine-local configuration. The [knowledge-base skill](../skills/knowledge-base/SKILL.md) does not read this registry: it uses an explicit current root, applicable agent instructions, or the local `~/.kb/` default. Its archive default is `~/.kb-archive/`.
 
 ## Registry Location
 
@@ -26,7 +26,6 @@ description = "OCBC Smart Search"
 root = "/home/cdsw/smart-search-workspace"
 docs = "/home/cdsw/smart-search-workspace/docs"
 tasks = "/home/cdsw/smart-search-workspace/tasks"
-knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
 ```
 
 Another machine may contain completely different projects and paths.
@@ -37,13 +36,13 @@ Another machine may contain completely different projects and paths.
 - `root` — local filesystem root used to identify the project.
 - `docs` — exact location owned by the project documentation workflow.
 - `tasks` — exact location owned by the project task workflow.
-- `knowledge_base` — exact knowledge-base root. Usually a local filesystem path, but workflows that support another backend may use its supported root representation.
+- `knowledge_base` — legacy field, no longer consumed by the knowledge-base skill. Existing machine-local values may remain, but an intended custom KB root must be selected through the skill's current configuration rules.
 
 A project may omit a surface it does not use.
 
 ## Resolution
 
-When a file-producing workflow runs:
+When a registry-aware workflow runs:
 
 1. Read `~/.agent-core/projects.toml`.
 2. Identify the project whose `root` contains the current working directory.
@@ -71,13 +70,9 @@ docs = "/home/cdsw/smart-search-workspace/docs"
 
 means the project documentation workflow uses that configured docs location.
 
-```toml
-knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
-```
+The registry does not select a KB root. Do not automatically copy a legacy `knowledge_base` value into agent guidance or remove it during ordinary KB work.
 
-means the knowledge-base workflow uses that configured knowledge-base root.
-
-If no matching project or required surface is configured, do not guess a writable location.
+If no matching project or required surface is configured, follow the owning workflow's explicit fallback rules rather than guessing from nearby folders.
 
 ## Mutation Reporting
 
@@ -102,8 +97,8 @@ Normal project workflows read the registry but do not modify it.
 
 ## Principle
 
-The registry defines where personal project workflow files belong.
+The registry defines locations only for workflows that explicitly consume it.
 
 Git repository boundaries do not define these locations.
 
-A project's `docs`, `tasks`, or `knowledge_base` may live inside a Git repository, outside it, or elsewhere entirely.
+A project's `docs` or `tasks` may live inside a Git repository, outside it, or elsewhere entirely. The KB has its own independent location rules.

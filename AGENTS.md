@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-13
+**Last Updated:** 2026-10-14
 
 **Status:** Current
 
@@ -80,10 +80,10 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 ### Memory Rules
 
 - The memory pilot remains append-only; `memory/memories.jsonl` is canonical, and generated search/index artifacts are disposable.
-- Route memory operations through `uv run scripts/memory.py`, not direct ledger edits.
-- New memory topic creation requires explicit human approval. Existing active topics may be updated autonomously within scope.
+- Route steward-ledger operations through `uv run scripts/memory.py`, not direct ledger edits.
+- New ledger topic creation requires explicit human approval. Existing active ledger topics may be updated autonomously within scope.
 - Memory tooling is steward-only. Global sync does not create or infer project memory configuration.
-- Knowledge-base work uses the canonical Google Drive workflow identified in `global/AGENTS.md`; do not restore the retired repository-local workflow.
+- The canonical knowledge-base workflow is `skills/knowledge-base/SKILL.md`, selected in `personal-skills.toml`. It owns reusable Markdown records and explicitly requested managed artifacts, not this memory ledger. Retrieval may be proactive when relevant; capture, inbox processing, and artifact writes require an explicit request. The former Drive workflow is no longer authoritative; changing the skill does not migrate KB content.
 
 ## Steward Rules
 
