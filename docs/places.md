@@ -33,7 +33,7 @@ If `py` is unavailable but `python` resolves to Python 3.8 or newer, replace `py
 python3 places.py install
 ```
 
-The installer creates missing state files without replacing existing ones. On Linux it copies the runtime under `~/.local/share/places/`, writes a generated Bash function, and adds one marked source block to `~/.bashrc`. On Windows it copies the runtime under `%LOCALAPPDATA%\Places\`, installs `places.cmd`, and adds its `bin` directory to the user PATH when needed. Open a new terminal after installation, or source `~/.bashrc` in the current Bash session.
+The installer creates missing state files without replacing existing ones. On Linux it copies the runtime under `~/.local/share/places/`, writes a generated Bash function, and adds one marked source block to `~/.bashrc`. On Windows it copies the runtime under `%USERPROFILE%\.local\share\places\`, installs `%USERPROFILE%\.local\bin\places.cmd`, and updates the user PATH when needed. The user-home destination avoids Microsoft Store Python's package-specific filesystem virtualization. Reinstallation removes the obsolete `%LOCALAPPDATA%\Places\bin` PATH entry created by the original installer. Open a new terminal after installation, or source `~/.bashrc` in the current Bash session.
 
 ## Commands
 

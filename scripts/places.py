@@ -475,7 +475,9 @@ def _normalized_path_entry(value: str) -> str:
     return os.path.normcase(os.path.normpath(os.path.expandvars(value.strip().strip('"'))))
 
 
-def add_to_windows_user_path(bin_directory: Path) -> bool:
+def add_to_windows_user_path(
+    bin_directory: Path, remove_directories: Sequence[Path] = ()
+) -> bool:
     import winreg
 
     key_path = r"Environment"
@@ -486,9 +488,15 @@ def add_to_windows_user_path(bin_directory: Path) -> bool:
             current, value_type = "", winreg.REG_EXPAND_SZ
         entries = [entry for entry in current.split(";") if entry]
         wanted = _normalized_path_entry(str(bin_directory))
-        if any(_normalized_path_entry(entry) == wanted for entry in entries):
+        removed = {_normalized_path_entry(str(path)) for path in remove_directories}
+        retained = [
+            entry
+            for entry in entries
+            if _normalized_path_entry(entry) not in removed | {wanted}
+        ]
+        updated = ";".join([str(bin_directory)] + retained)
+        if updated == current:
             return False
-        updated = ";".join([str(bin_directory)] + entries)
         winreg.SetValueEx(key, "Path", 0, value_type, updated)
 
     try:
@@ -540,13 +548,9 @@ def install(
     manual, generated = ensure_state_files(resolved_home)
 
     if platform == "windows":
-        local = Path(
-            local_app_data
-            or os.environ.get("LOCALAPPDATA", resolved_home / "AppData" / "Local")
-        )
-        runtime = local / "Places"
+        runtime = resolved_home / ".local" / "share" / "places"
         installed_script = runtime / "places.py"
-        bin_directory = runtime / "bin"
+        bin_directory = resolved_home / ".local" / "bin"
         launcher = bin_directory / "places.cmd"
         _copy_runtime(source, installed_script)
         bin_directory.mkdir(parents=True, exist_ok=True)
@@ -554,7 +558,13 @@ def install(
             launcher,
             _render_cmd_launcher(python_executable, installed_script, runtime),
         )
-        path_changed = add_to_windows_user_path(bin_directory)
+        legacy_local = Path(
+            local_app_data
+            or os.environ.get("LOCALAPPDATA", resolved_home / "AppData" / "Local")
+        )
+        path_changed = add_to_windows_user_path(
+            bin_directory, remove_directories=[legacy_local / "Places" / "bin"]
+        )
         return {
             "platform": platform,
             "runtime": runtime,
@@ -608,7 +618,7 @@ def _print_install_result(result: dict) -> None:
     if result["platform"] == "windows":
         print("Installed CMD launcher: {}".format(result["launcher"]))
         if result["path_changed"]:
-            print("Added the launcher directory to your user PATH.")
+            print("Updated your user PATH for the CMD launcher.")
         print("Open a new CMD terminal, then run: places refresh")
     else:
         print("Installed Bash integration: {}".format(result["function"]))

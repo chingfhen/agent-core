@@ -7,6 +7,7 @@ import os
 import subprocess
 import sys
 import tempfile
+import types
 import unittest
 from pathlib import Path
 from unittest.mock import patch
@@ -225,12 +226,69 @@ class PlacesInstallerTests(unittest.TestCase):
     def test_windows_launcher_changes_drive_and_directory(self) -> None:
         launcher = places._render_cmd_launcher(
             Path("C:/Python/python.exe"),
-            Path("C:/Users/Test/AppData/Local/Places/places.py"),
-            Path("C:/Users/Test/AppData/Local/Places"),
+            Path("C:/Users/Test/.local/share/places/places.py"),
+            Path("C:/Users/Test/.local/share/places"),
         )
         self.assertIn("cd /d", launcher)
         self.assertIn("choose --selection-file", launcher)
         self.assertIn(":run_command", launcher)
+
+    def test_windows_install_uses_non_virtualized_user_home(self) -> None:
+        legacy_local = Path(self.temporary.name) / "legacy-local"
+        with patch.object(places, "add_to_windows_user_path", return_value=True) as update_path:
+            result = places.install(
+                source=PLACES_SCRIPT,
+                home=self.home,
+                platform="windows",
+                python_executable=Path(sys.executable),
+                local_app_data=legacy_local,
+            )
+
+        self.assertEqual(result["runtime"], self.home / ".local" / "share" / "places")
+        self.assertEqual(result["launcher"], self.home / ".local" / "bin" / "places.cmd")
+        update_path.assert_called_once_with(
+            self.home / ".local" / "bin",
+            remove_directories=[legacy_local / "Places" / "bin"],
+        )
+
+    def test_windows_path_update_removes_broken_legacy_destination(self) -> None:
+        captured = {}
+
+        class Key:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, *args):
+                return False
+
+        fake_winreg = types.SimpleNamespace(
+            HKEY_CURRENT_USER=object(),
+            REG_EXPAND_SZ=2,
+            CreateKey=lambda *_: Key(),
+            QueryValueEx=lambda *_: ("C:/legacy/Places/bin;C:/other", 2),
+            SetValueEx=lambda _key, _name, _reserved, _kind, value: captured.update(
+                value=value
+            ),
+        )
+        fake_ctypes = types.SimpleNamespace(
+            c_ulong=lambda: object(),
+            byref=lambda value: value,
+            windll=types.SimpleNamespace(
+                user32=types.SimpleNamespace(SendMessageTimeoutW=lambda *args: 1)
+            ),
+        )
+        with patch.dict("sys.modules", {"winreg": fake_winreg}), patch.object(
+            places, "ctypes", fake_ctypes
+        ):
+            changed = places.add_to_windows_user_path(
+                Path("C:/Users/Test/.local/bin"),
+                remove_directories=[Path("C:/legacy/Places/bin")],
+            )
+
+        self.assertTrue(changed)
+        self.assertEqual(
+            captured["value"], "{};C:/other".format(Path("C:/Users/Test/.local/bin"))
+        )
 
     @unittest.skipUnless(os.name == "nt", "requires Windows CMD")
     def test_installed_cmd_launcher_changes_its_calling_shell_directory(self) -> None:
