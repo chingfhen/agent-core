@@ -202,9 +202,25 @@ def _contains(parent: Path, child: Path) -> bool:
         return False
 
 
-def _scan_roots(home: Path, extra_roots: Sequence[str]) -> List[Path]:
-    candidates = [home]
-    for raw in extra_roots:
+def _refresh_example() -> str:
+    if os.name == "nt":
+        return 'places refresh "%USERPROFILE%\\Documents"'
+    return 'places refresh "$HOME/projects"'
+
+
+def _scan_roots(raw_roots: Sequence[str]) -> List[Path]:
+    if not raw_roots:
+        raise PlacesError(
+            "refresh requires at least one scan root; no directories were scanned. "
+            "Example: {}".format(_refresh_example())
+        )
+
+    candidates = []
+    for raw in raw_roots:
+        if not raw.strip():
+            raise PlacesError(
+                "Scan root cannot be empty. Example: {}".format(_refresh_example())
+            )
         candidate = Path(raw).expanduser()
         if not candidate.is_absolute():
             candidate = Path.cwd() / candidate
@@ -214,7 +230,11 @@ def _scan_roots(home: Path, extra_roots: Sequence[str]) -> List[Path]:
     for candidate in candidates:
         root = candidate.resolve()
         if not root.is_dir():
-            raise PlacesError("Scan root is not an existing directory: {}".format(candidate))
+            raise PlacesError(
+                "Scan root is not an existing directory: {}. Example: {}".format(
+                    candidate, _refresh_example()
+                )
+            )
         if root not in resolved:
             resolved.append(root)
 
@@ -271,10 +291,10 @@ def _atomic_write(path: Path, content: str) -> None:
         raise
 
 
-def refresh(extra_roots: Sequence[str], home: Optional[Path] = None) -> Tuple[List[Path], List[str]]:
+def refresh(scan_roots: Sequence[str], home: Optional[Path] = None) -> Tuple[List[Path], List[str]]:
+    roots = _scan_roots(scan_roots)
     resolved_home = Path(home or Path.home()).expanduser().resolve()
     _, generated_path = ensure_state_files(resolved_home)
-    roots = _scan_roots(resolved_home, extra_roots)
     repositories, errors, visited = discover_repositories(roots)
     if visited == 0:
         raise PlacesError("No directories could be read; the existing generated file was preserved")
@@ -329,7 +349,9 @@ def render_menu(
                 )
             )
     else:
-        lines.extend(["Git repositories (0)", "  Run 'places refresh' to discover repositories."])
+        lines.extend(
+            ["Git repositories (0)", "  Run 'places refresh <root>' to discover repositories."]
+        )
     return "\n".join(lines)
 
 
@@ -349,7 +371,7 @@ def choose(
     favorites, repositories = load_places(resolved_home)
     if not favorites and not repositories:
         raise PlacesError(
-            "No places are available. Run 'places refresh' or add "
+            "No places are available. Run 'places refresh <root>' or add "
             "'alias = path' entries to ~/.agent-core/places.txt"
         )
 
@@ -601,9 +623,9 @@ def build_parser() -> argparse.ArgumentParser:
     subparsers.add_parser("install", help="Install the Bash or CMD shell integration.")
     subparsers.add_parser("list", help="Print all available paths without prompting.")
     refresh_parser = subparsers.add_parser(
-        "refresh", help="Rescan home plus optional extra roots for Git repositories."
+        "refresh", help="Replace the cache by scanning one or more required directory roots."
     )
-    refresh_parser.add_argument("roots", nargs="*", help="Additional directory trees to scan.")
+    refresh_parser.add_argument("roots", nargs="*", help="Directory trees to scan (required).")
     choose_parser = subparsers.add_parser(
         "choose", help="Internal command used by the installed shell integration."
     )
@@ -619,11 +641,11 @@ def _print_install_result(result: dict) -> None:
         print("Installed CMD launcher: {}".format(result["launcher"]))
         if result["path_changed"]:
             print("Updated your user PATH for the CMD launcher.")
-        print("Open a new CMD terminal, then run: places refresh")
+        print('Open a new CMD terminal, then run: places refresh "%USERPROFILE%\\Documents"')
     else:
         print("Installed Bash integration: {}".format(result["function"]))
         print("Open a new Bash terminal or run: source {}".format(result["bashrc"]))
-        print("Then run: places refresh")
+        print('Then run: places refresh "$HOME/projects"')
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

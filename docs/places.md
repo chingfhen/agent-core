@@ -9,7 +9,7 @@ updated: 2026-10-14
 ## Read First
 
 - `places` shows favorites and cached Git repositories, accepts an alias or number, and changes the current Bash or CMD directory.
-- `places refresh [EXTRA_ROOT ...]` searches the user's home directory plus any extra roots. Ordinary navigation reads the cache and does not rescan.
+- `places refresh ROOT [ROOT ...]` searches only the explicitly supplied roots. At least one root is required; Places never scans the whole home directory by default.
 - The implementation is the standalone, Python-standard-library-only `scripts/places.py`. It supports Python 3.8 or newer on Linux Bash and Windows CMD.
 - Places is independent of `agent-core sync`; copying `places.py` and running its installer is sufficient.
 
@@ -40,14 +40,26 @@ The installer creates missing state files without replacing existing ones. On Li
 ```text
 places
 places list
-places refresh [EXTRA_ROOT ...]
+places refresh ROOT [ROOT ...]
 ```
 
 - `places` displays the interactive menu. Favorites are selected by stable alias; discovered repositories are selected by their current number. Blank input or `q` cancels without changing directory.
 - `places list` emits absolute paths without menu formatting or prompting.
-- `places refresh` recursively searches home for working trees identified by a `.git` directory or file. Extra roots extend that scan for the current refresh. The command validates all roots before replacing the cache, skips directory symlinks and common heavy generated directories, and reports inaccessible locations.
+- `places refresh ROOT [ROOT ...]` recursively searches exactly the supplied directory trees for working trees identified by a `.git` directory or file. The command requires at least one root, validates every root before replacing the cache, skips directory symlinks and common heavy generated directories, and reports inaccessible locations.
 
-A refresh rewrites the complete generated cache. Repositories from an extra root disappear from the next refresh if that root is omitted.
+Windows example:
+
+```cmd
+places refresh "%USERPROFILE%\Documents"
+```
+
+Linux example:
+
+```bash
+places refresh "$HOME/projects"
+```
+
+A refresh rewrites the complete generated cache. Supply every root whose repositories should remain in the cache. Missing or invalid roots produce an actionable example and preserve the previous generated file.
 
 ## State Files
 

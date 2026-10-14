@@ -101,7 +101,7 @@ class PlacesDiscoveryTests(unittest.TestCase):
         (alpha / ".git").write_text("gitdir: elsewhere\n", encoding="utf-8")
         (ignored / ".git").mkdir(parents=True)
 
-        repositories, errors = places.refresh([], self.home)
+        repositories, errors = places.refresh([str(self.home)], self.home)
 
         self.assertEqual(errors, [])
         self.assertEqual(repositories, [alpha.resolve(), zulu.resolve()])
@@ -111,13 +111,25 @@ class PlacesDiscoveryTests(unittest.TestCase):
             [str(alpha.resolve()), str(zulu.resolve())],
         )
 
-    def test_extra_roots_are_scanned_and_invalid_root_preserves_cache(self) -> None:
+    def test_refresh_requires_explicit_roots_and_preserves_cache_on_errors(self) -> None:
         outside = Path(self.temporary.name) / "outside" / "repo"
         (outside / ".git").mkdir(parents=True)
         _, generated = places.ensure_state_files(self.home)
         generated.write_text("original\n", encoding="utf-8")
 
-        with self.assertRaisesRegex(places.PlacesError, "Scan root is not"):
+        with self.assertRaisesRegex(
+            places.PlacesError, "requires at least one scan root.*Example: places refresh"
+        ):
+            places.refresh([], self.home)
+        self.assertEqual(generated.read_text(encoding="utf-8"), "original\n")
+
+        with self.assertRaisesRegex(
+            places.PlacesError, "Scan root cannot be empty.*Example: places refresh"
+        ):
+            places.refresh([""], self.home)
+        with self.assertRaisesRegex(
+            places.PlacesError, "Scan root is not an existing directory.*Example: places refresh"
+        ):
             places.refresh([str(Path(self.temporary.name) / "missing")], self.home)
         self.assertEqual(generated.read_text(encoding="utf-8"), "original\n")
 
