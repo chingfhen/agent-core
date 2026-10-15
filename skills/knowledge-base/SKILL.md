@@ -273,7 +273,7 @@ not once per source.
 | Finding | Action |
 | --- | --- |
 | An existing page already represents the finding accurately | No edit; do not add redundant summaries or links. |
-| New evidence materially changes an existing explanation | Replace the affected claim or section in place and update its supporting links. Preserve qualifications and unrelated content. |
+| New evidence establishes a change to an existing explanation | Replace the affected claim or section in place and update its supporting links. Preserve qualifications and unrelated content. |
 | Records examined during capture jointly answer a reusable question not covered by a page | Create a concise synthesis when it explains relationships, constraints, or conditions that a single record does not. Do not create a page merely because new records exist. |
 | A claim is contradicted but reconciliation needs broader investigation | Mark that claim unresolved, or outdated when established, and link the conflicting evidence. Do not guess a replacement or leave it presented as settled. |
 | The finding belongs in one record or adds no useful cross-record explanation | Leave it in records; no page is needed. |
