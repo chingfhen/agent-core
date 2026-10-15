@@ -8,10 +8,11 @@ or plugin exposes all of them.
 ## Identity and skill loading
 
 An explicit target must establish **owner/repository, branch or ref, and KB directory**.
-A repository-root KB can use directory `/`. If a supplied URL already establishes
-these, reuse it; otherwise resolve missing identity from the tool/current explicit
-configuration or ask. Never guess a repository from its name, search the whole account
-for a default, or equate the skill repository with the content repository.
+A repository-root KB can use `/`. If a URL establishes these, reuse it; otherwise
+resolve them from explicit configuration or ask. Never guess a repository, search
+the whole account for a default, or equate skill and content repositories.
+A separately configured remote knowledge-page location needs its own complete
+destination identity; it does not authorize unrelated writes.
 
 The web app cannot use the human's local `~/.kb/`. It also does not necessarily discover
 or execute `SKILL.md` merely because it can search GitHub. The calling environment
@@ -26,8 +27,9 @@ reads—not test writes in the real KB:
 
 | Operation | Required capability |
 | --- | --- |
-| Recall | Read actual files and narrow paths/search/tree listings within the chosen root/ref |
+| Recall | Read actual files and narrow paths/search/tree listings within the selected root/ref, including relevant living knowledge |
 | Capture/update | Create/update raw Markdown at exact paths, read current contents, confirm persistence |
+| Optional knowledge synthesis | Additionally read/write the authorized knowledge-page location when useful; never required for capture |
 | Inbox processing | Read source content faithfully and perform the required record/index writes |
 | Inbox clearing | Additionally preserve original bytes in an authorized external archive, verify identity, and remove exact inbox entries safely |
 
@@ -38,11 +40,12 @@ external storage based on the ability to search a repository.
 
 ## Reads and retrieval
 
-Apply [selective retrieval](../references/retrieval.md). Use exact paths first, then
-root/month indexes, filename/tree narrowing, and scoped text search where supported.
-Honor the selected ref; a tool that only searches the default branch does not prove
-absence on another branch. Use direct reads/tree listings for that branch or disclose
-the limitation. Follow truncation/pagination only as needed to ground relevant claims.
+Apply [selective retrieval](../references/retrieval.md). Use exact paths, relevant
+living-knowledge pages, root/month indexes, filename/tree narrowing, and scoped
+text search when supported. Include selected `records/`, `knowledge/`, and
+`managed/` or an explicitly configured page location, not other repositories by
+inference. Honor the selected ref; default-branch search cannot establish absence
+on a feature branch. Use scoped direct reads and disclose limitations.
 
 GitHub browser code search supports `repo:` and `path:` qualifiers, but connectors
 and APIs can differ. Use the actual tool's syntax rather than copying browser queries
@@ -71,9 +74,10 @@ not authorize writing to its default branch.
 - A proposed PR is not merged canonical content. Report its status and link; keep
   inbox sources pending until required outputs are durable in the selected KB ref.
 
-Local capture does not imply remote publication; this remote adapter is used only
-when that remote target was selected. Never expose private workplace content merely
-to make it accessible to another runtime.
+Local capture does not imply remote publication; this adapter is used only for
+a selected remote target. A separate knowledge-page destination requires separately
+resolved authorization and capabilities. Optional page updates never gate record
+persistence. Never expose private workplace content for runtime convenience.
 
 ## External archive and cleanup
 

@@ -5,10 +5,11 @@ mounted filesystem, including a local Git checkout. Git is not required.
 
 ## Roots and capabilities
 
-Resolve the KB and archive roots by the skill's precedence rules. Expand `~` using
-the actual user's home (`%USERPROFILE%` on Windows); do not use a guessed username,
-working directory, or ephemeral sandbox home. Default roots are `~/.kb/` and
-`~/.kb-archive/`. Report resolved absolute paths after writes.
+Resolve KB, archive, and any explicitly configured separate knowledge-page roots
+by the skill's precedence rules. Expand `~` using the actual user's home
+(`%USERPROFILE%` on Windows); do not guess names, directories, or temporary
+sandbox paths. Default KB/archive roots are `~/.kb/` and `~/.kb-archive/`;
+living knowledge defaults to `<kb>/knowledge/`. Report actual paths after writes.
 
 Before mutation, normalize paths and inspect the relevant existing parents. Refuse
 path traversal or symlink/junction/reparse-point indirection that escapes the selected
@@ -18,8 +19,10 @@ an unrelated existing layout. Preserve unrelated files and user changes.
 The archive must be outside the KB and its Git worktree. Check the selected paths,
 not arbitrary repositories. If an explicit archive violates that boundary, request
 a safe destination instead of moving sources there. Ordinary KB writes stay inside
-the KB; inbox processing additionally owns only the exact archival destinations and
-removal of verified processed inputs.
+the KB, except an explicitly configured external knowledge-page root may hold
+living pages only. This does not authorize writes to unrelated documentation or
+tasks. Inbox processing owns only the exact archival destinations and removal
+of verified processed inputs.
 
 Use ordinary directory listing, UTF-8 reads/writes, filename/text search, copying,
 rename, and targeted removal. If a needed capability is missing, report the limitation;
@@ -37,6 +40,9 @@ a temporary downloaded draft does not establish durable persistence.
   content/provenance establishes the match; otherwise choose a descriptive suffix.
 - Do not rename an artifact merely because it was updated. Repair directly affected
   links if a requested move or rename changes its location.
+- Write optional living-knowledge pages only under the main skill's usefulness
+  criteria. Prefer stable names, supporting record links, and focused changes;
+  page maintenance must not be a prerequisite for capture.
 
 ## Archive and clear safely
 
@@ -69,10 +75,10 @@ leave the input in place and report the issue without echoing sensitive values.
 
 ## Search
 
-Apply [selective retrieval](../references/retrieval.md). Search explicit `records/`
-and `managed/` directories with available filename/grep tools. Use literal matching
-for error strings when appropriate, and bound returned matches before opening files.
-Do not index or search the external archive by default.
+Apply [selective retrieval](../references/retrieval.md). Search `records/`,
+relevant `knowledge/`, and `managed/` (or a configured external knowledge-page
+root) with available filename/grep tools. Use literal error matching when
+appropriate and bound results before full reads. Do not search the archive by default.
 
 ## Git and verification
 

@@ -1,8 +1,9 @@
 # Authoring Records and Managed Artifacts
 
-Read when writing either content category. The main [skill](../SKILL.md) owns
-invocation, locations, permissions, and lifecycle; this reference owns writing
-quality. Adapt structure to the material rather than filling a universal template.
+Read when writing records or managed artifacts. The main [skill](../SKILL.md)
+owns invocation, locations, permissions, and lifecycle; this reference owns
+writing quality. Optional living-knowledge pages use the separate lightweight
+criteria in the main skill. Adapt structure to the material.
 
 ## Shared Markdown conventions
 
@@ -42,9 +43,26 @@ Strong candidates include:
   a finding safely, excluding secrets;
 - useful mental models, contradictions, unknowns, and limitations.
 
-Select the durable scope first, then represent it faithfully. Default to one coherent
-record; split when independently retrievable topics would otherwise be buried.
-Do not split merely because a transcript is long. Do not preserve every pasted error,
+Select the durable scope first; determine the number of independently retrievable
+records without any preferred count (zero, one, or many):
+
+1. Derive the plausible future questions that would locate useful findings,
+   using actual subjects rather than transcript headings or incidental chronology.
+2. Group findings from the same problem, investigation, decision, or procedure
+   when they share essential context or form one causal explanation.
+3. Split when groups answer substantially different future questions, span
+   distinct systems/processes/decisions, and can be retrieved and updated
+   independently without substantial repeated explanation.
+4. Keep groups together if splitting detaches prerequisites from outcomes,
+   fragments one investigation, or duplicates critical supporting context.
+5. For each group, check existing records before creating a new file: extend a
+   matching context, create a distinct record, or make no change if already
+   represented and no useful new information was learned.
+6. Cross-link related distinct records when it helps recovery of a dependency,
+   correction, or supersession.
+
+The criterion is independent future retrieval, not conversation length. Neither
+single-file nor multi-file capture is preferred. Do not retain every pasted error,
 repetition, exploratory detour, or intermediate hypothesis.
 
 A short opening such as **What we learned** can convey the main result and important

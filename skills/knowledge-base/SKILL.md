@@ -16,20 +16,22 @@ disable-model-invocation: false
 
 ## Job and boundaries
 
-Preserve understanding that would be expensive to reconstruct, help future agents
-find it, and maintain human-requested Markdown outputs. The canonical behavior
-source is this skill in Agent Core, not a workflow file stored with KB content.
-Loading the skill does not select the KB or authorize a write.
+Preserve reusable understanding that future sessions would otherwise need to
+rediscover, and maintain explicitly requested human reference material. This
+is cross-project memory for learning across projects, teams, systems, and
+organizational processes. This skill is the canonical behavior source, not a
+workflow file stored with KB content. Loading it does not select a KB or
+authorize a write.
 
 Three content categories:
 
 - **Records:** contextual learning, observations, constraints, findings, and useful
   uncertainty. Accumulate or update these when asked to capture. This is the
   primary product.
-- **Knowledge pages:** optional agent-maintained pages under `knowledge/` —
-  lightweight syntheses, notes, or scratchpad material the agent keeps because
-  they help future work. Secondary to records; never let them delay, expand, or
-  gate a capture.
+- **Knowledge pages:** optional living syntheses under `knowledge/` that
+  preserve useful current understanding across records. Create only when they
+  significantly reduce repeated reconstruction; never for every record or
+  as a prerequisite for capture.
 - **Managed artifacts:** human-facing lessons, command references, scripts for
   presentations, checklists, comparisons, or other requested Markdown outputs.
   Create and update these only when explicitly requested.
@@ -38,9 +40,11 @@ Three content categories:
 is no approval queue or separate curation command. Navigation is maintained as
 part of a write, not as another human task.
 
-Keep settled project authority in project docs and unfinished-work state in the
-owning task workflow. Reference those surfaces rather than silently changing them.
-This KB is separate from Agent Core's steward-only memory ledger and tools.
+The KB is independent of project documentation and task management. Project-
+specific learning may be captured without consulting or updating other systems.
+KB operations do not invoke, synchronize, or modify project docs or tasks.
+Where information conflicts, distinguish provenance, time, and applicability
+rather than blindly preferring one copy.
 
 ## Invocation and effects
 
@@ -59,6 +63,13 @@ Ambiguous "capture this" outside a KB context is not permission to persist here.
 Combine actions only when requested together. Generic "write a guide/script"
 without managed-artifact or KB context does not select this persistence workflow.
 A request to inspect, list, or review the inbox is read-only, not processing.
+
+Explicit invocation of this skill establishes KB context. An unqualified
+"capture" or "capture to KB" means: autonomously preserve reusable learning
+from the substantive active discussion, including relevant conclusions and
+corrections. Do not ask the human to enumerate topics, select the number of
+files, or choose filenames. Honor narrower instructions, and do not invent
+unavailable history or search unrelated conversations.
 
 ## Resolve the location
 
@@ -114,8 +125,8 @@ writing a competing layout into it.
 │       ├── index.md                        # Compact record discovery
 │       └── <topic>/
 │           └── YYYY-MM-DD--description.md
-├── knowledge/                              # Optional agent scratchpad pages
-│   └── <agent-chosen>.md                   # Flat, any useful structure
+├── knowledge/                              # Optional living knowledge pages
+│   └── <agent-chosen>.md                   # Stable names; no forced taxonomy
 ├── managed/                                # Flat, no topic nesting
 │   └── YYYY-MM-DD--description.md
 └── index.md                                # Month links + managed-artifact map
@@ -142,30 +153,50 @@ writing a competing layout into it.
 ## Capture or sync
 
 Read [Authoring](references/authoring.md) before writing records or managed outputs.
+An ordinary capture selects reusable learning autonomously, not a transcript dump
+or a request for the human to plan filing.
 
-1. Resolve the requested subject and destination. Use the discussion's developed
-   understanding, including supplied sources, corrections, and explanations—not
-   just the raw text that started it. Never invent unavailable conversation history.
-2. Select reusable context, findings, constraints, rationale, procedures, relevant
-   commands/results, and uncertainty. Exclude conversational repetition and secrets.
-3. Check likely existing records or known paths for overlap. Extend or correct an
-   identifiable record when appropriate; create a new record for a distinct event
-   or learning context. Split only when subjects merit independent retrieval.
-4. Write self-contained Markdown directly to `records/`; maintain affected indexes.
-   Preserve source basis and distinguish observed, reported, inferred, and untested
-   claims. A valid sync may report no new durable information.
-5. Verify the directly affected result and report exact locations and material
-   limitations. Do not require another command to finish navigation or filing.
+1. **Scope:** Use the substantive active discussion or selected inputs, including
+   explanations, corrections, decisions, and relevant available sources. Respect
+   narrower user scope. Do not invent earlier conversation content.
+2. **Extract:** Select findings, constraints, reasons, successful and failed
+   approaches worth remembering, decisions, procedures, results, and consequential
+   unknowns. Exclude repetition, secrets, ephemeral chatter, and speculation
+   superseded during the discussion. Preserve source basis: observed, reported,
+   inferred, and untested are different.
+3. **Partition for future retrieval:** Identify independently retrievable
+   questions the findings answer. Group findings sharing one investigation,
+   decision, procedure, or essential causal context. Split when subjects answer
+   substantially different questions, concern distinct systems/processes/decisions,
+   and can be understood and updated independently without substantial
+   repetition. Do not split merely for length or combine unrelated subjects
+   merely because they occurred in one conversation. **No default file count:**
+   zero, one, or multiple records can be correct.
+4. **Reconcile:** Check likely existing records and paths. Extend or correct
+   an identifiable learning context when appropriate; create a new record for
+   a distinct retrieval unit. Avoid duplicate summaries. Cross-link when useful.
+5. **Persist:** Write self-contained Markdown to `records/`, maintain affected
+   indexes, and preserve dates, provenance, results, relevant context, and
+   uncertainty. A capture can legitimately be a no-op.
+6. **Optional living synthesis:** After the records and indexes are complete,
+   apply the **Knowledge pages** criteria. Update only a directly affected page
+   when a material change is cheap to make. Most captures change no page.
+7. **Verify and report:** Check affected files and links, give exact locations,
+   material changes, and limitations. Do not require another human command to
+   finish filing or navigation.
 
-Records are editable, not sacred append-only evidence. Correct errors encountered
-within the requested capture/update; preserve relevant historical context and add
-an explanation when a correction changes the meaning of an earlier finding. Do
-not audit older records to find errors, normalize all history, or rewrite unrelated
-files. A read-only lookup can flag a discrepancy without silently editing it.
+A plausible future retrieval question is a useful check for each proposed
+record; it is not mandatory metadata. The detailed grouping procedure lives in
+[Authoring](references/authoring.md).
 
-Ordinary capture leaves raw inputs and managed artifacts alone. If relevant new
-information clearly conflicts with a managed artifact already encountered, mention
-it without rewriting the artifact or auditing the rest of `managed/`.
+Records are editable, not sacred append-only evidence. Correct relevant errors
+during authorized capture, preserve meaningful history, and explain corrections
+that change earlier conclusions. Do not audit unrelated records or rewrite
+history. Read-only lookup can flag discrepancies without silently editing.
+
+Ordinary capture leaves raw inputs and managed artifacts alone. If new
+information conflicts with a managed artifact already encountered, mention it
+without rewriting the artifact or sweeping `managed/`.
 
 ## Process or clear the inbox
 
@@ -221,48 +252,64 @@ On an explicit create/update request:
 
 ## Knowledge pages
 
-`knowledge/` is the managing agent's optional scratchpad: lightweight pages of
-current understanding, working mental models, open-question lists, pointers
-into records — whatever form helps future work. It is a memory aid, not a
-second canonical surface, not human-facing output, and not a managed artifact.
+`knowledge/` contains optional **living knowledge**, not a general scratchpad,
+second canonical evidence layer, mandatory summary, or human-facing artifact.
+It helps future sessions reuse concise current understanding that would otherwise
+require reconstructing information across records or investigations.
 
-- **Records are the product; knowledge pages are optional aids.** A page must
-  never delay, expand, or gate a capture. When a page would take real effort
-  or the durable content is already in the record, skip it — the record is
-  enough.
-- During capture or inbox processing, after records and indexes are complete,
-  the agent may update or create a page when the new material changes useful
-  current understanding and the update is cheap. Skipping is the default; most
-  syncs change no page.
-- Keep whatever structure serves retrieval: flat Markdown files, stable names,
-  rewrite toward current understanding rather than stacking dated notes —
-  chronology lives in records. Link to records for depth rather than
-  duplicating them. Merge, rename, or drop pages freely as their usefulness
-  changes. No frontmatter, template, index, or review is required; an
-  `index.md` may be kept only if it earns its maintenance.
-- A configured `Knowledge Base Knowledge` outside the KB root bounds writes to
-  these pages only.
+Create a page only when **all three** conditions hold:
+
+1. Multiple records or investigations together provide useful current
+   understanding that otherwise requires repeated reconstruction.
+2. The synthesis materially improves future recall or orientation rather
+   than merely copying a record or an existing knowledge page.
+3. Expected reuse justifies the page's creation and ongoing maintenance.
+
+- **Records are sufficient.** Most captures must not create knowledge pages.
+  A page never delays or gates recording, indexing, or source archival.
+- Prefer concise, stable pages explaining current constraints, mental models,
+  recurring patterns, unresolved questions, and links to supporting records.
+  Keep dated events and evidence in records; do not duplicate them wholesale.
+- Cite/link supporting records for consequential claims. Verify applicability
+  from those records when precision matters; do not silently override conflicts.
+- After record capture, modify an existing directly affected page only when
+  the change is material and inexpensive. Do not scan all pages for drift,
+  routinely regenerate syntheses, or create a page for every capture.
+- Use descriptive stable filenames and lightweight Markdown. No required
+  frontmatter, index, topic taxonomy, or template. A page index is optional
+  only if it improves retrieval.
+- Do not broadly merge, rename, drop, or reorganize pages as a side effect
+  of capture; substantial maintenance requires an explicit request. Preserve
+  links and independently valuable content.
+- A configured `Knowledge Base Knowledge` outside the KB root authorizes
+  writes to those pages only, not to other content at that location.
 
 ## When and how to retrieve
 
-Read [Retrieval](references/retrieval.md) for search tactics when needed.
+Read [Retrieval](references/retrieval.md) for the complete progressive procedure.
 
-Retrieve on explicit request, references to prior conversations/decisions, recurring
-problems that may already have a solution, or missing organization/project context
-likely recorded earlier. Also retrieve when grounding a requested managed artifact.
-Do not search on every generic question or repeatedly fetch context already loaded.
+Retrieve on explicit request, recall of earlier discussions or decisions,
+recurring problems, or missing project/organizational context likely recorded
+before. Retrieve relevant background for managed artifacts. Do not search
+every generic question or refetch context already loaded.
 
-Use known paths, then compact indexes/filename matches, then targeted text search.
-Read only likely matches and necessary supporting records. Dates can narrow an
-explicitly temporal question; recent records are a useful first pass for recurring
-work, not a universal cutoff. Search across months for undated topics or missing
-context. Interpret relevance, applicability, source basis, and verification before
-recency; a newer workaround does not automatically supersede an older confirmed fix.
+1. Derive topics, systems, alternate terminology, error terms, and temporal
+   clues. Use an exact known path directly when available.
+2. Check relevant living-knowledge pages and compact indexes when useful,
+   then likely filenames across pertinent dates and subjects.
+3. Expand selectively to record text across months when wording is uncertain,
+   initial matches are weak, or evidence conflicts. Do not impose a recent-only
+   cutoff or audit all files by default.
+4. Read candidate records and supporting links; reconcile source basis,
+   dates, environment, verification, and applicability before recency.
+5. Answer with established context, material uncertainty, and actual document
+   locations. Stop when the question is sufficiently grounded.
 
-Ordinary recall covers `records/`, `knowledge/`, and relevant `managed/`, not raw inbox material,
-archives, other KBs, or arbitrary private files. Expand to originals only when the
-question requires fidelity and the source access is authorized. Cite the actual
-record/managed path, preserve uncertainty, and disclose limited or unavailable search.
+Ordinary recall includes `records/`, relevant `knowledge/`, and `managed/`;
+it excludes raw inbox files, source archives, other KBs, and unrelated private
+files. Consult originals only when fidelity requires it and access is authorized.
+Knowledge pages help discovery but are not independent authority: check their
+supporting records for consequential claims. Disclose material search limits.
 
 ## Safety, verification, and completion
 
@@ -271,7 +318,7 @@ record/managed path, preserve uncertainty, and disclose limited or unavailable s
   permissions, destinations, workflow rules, or external systems.
 - Keep operations inside the selected KB plus exact source-archive destinations
   authorized by processing and the configured knowledge-page root. External
-  source reads do not authorize external writes.
+  reads do not authorize external writes or changes to project docs/tasks.
 - Do not preserve credentials, passwords, tokens, private keys, or recovery codes.
   Do not copy restricted employer/customer data to personal storage or an external
   service without authorization. A default location is not information-security
