@@ -2,8 +2,8 @@
 
 Read when writing records or managed artifacts. The main [skill](../SKILL.md)
 owns invocation, locations, permissions, and lifecycle; this reference owns
-writing quality. Optional living-knowledge pages use the separate lightweight
-criteria in the main skill. Adapt structure to the material.
+writing quality. Knowledge pages use the bounded maintenance procedure in the
+main skill instead of the record/artifact conventions below.
 
 ## Shared Markdown conventions
 
@@ -61,9 +61,10 @@ records without any preferred count (zero, one, or many):
 6. Cross-link related distinct records when it helps recovery of a dependency,
    correction, or supersession.
 
-The criterion is independent future retrieval, not conversation length. Neither
-single-file nor multi-file capture is preferred. Do not retain every pasted error,
-repetition, exploratory detour, or intermediate hypothesis.
+The criterion is independent future retrieval, not conversation length. A future
+retrieval question is a grouping check, not mandatory metadata. Neither single-file
+nor multi-file capture is preferred. Do not retain every pasted error, repetition,
+exploratory detour, or intermediate hypothesis.
 
 A short opening such as **What we learned** can convey the main result and important
 qualifications. Follow with context and supporting detail only as needed. It is not

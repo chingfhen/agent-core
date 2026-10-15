@@ -27,9 +27,12 @@ user need not remember the date, precise phrase, or filename.
    can provide quick orientation; an index visit is not mandatory.
 3. **Likely topic:** inspect matching filenames and compact relevant indexes in
    `records/`, `knowledge/`, and `managed/`, using distinctive terms and aliases.
-4. **Temporal clue:** narrow to explicitly requested dates. For recent recurring
-   work, current/recent months are a cheap first pass, including adjacent months.
-   Capture dates need not be source/event dates.
+4. **Temporal clue:** distinguish event/source date, capture date, and update
+   date. Month folders and filename dates describe capture, not occurrence or
+   latest change. Use those folders as a strict filter only for a capture-date
+   request; for event/update dates, search relevant subjects across months and
+   check body dates or `updated` metadata. Recent folders can be a first pass
+   for recurring work, not a complete search.
 5. **Broaden when needed:** search names and text across record months when
    wording is uncertain, matches weak, prerequisites missing, or accounts
    conflict. Try alternative terms; do not walk every month or stop just
@@ -43,6 +46,10 @@ Do not impose a fixed "current month only" cutoff. A recent hit may be a workaro
 that depends on an older constraint; follow that relationship when consequential.
 For a broad question such as "our Jira process", use cross-month narrowing even if
 this month's notes happen to mention Jira.
+
+For example, a September incident captured in October lives under October. A
+record captured in June and corrected yesterday stays under June. Neither should
+be excluded by an event-date or update-date question targeting another month.
 
 Indexes are navigation, not factual authority. If an index is missing or stale, use
 filenames and targeted content search; a lookup does not silently rebuild the index.
@@ -80,7 +87,9 @@ material when freshness affects the question. Neither source needs automatic rew
 
 Treat `knowledge/` pages as aids, not authority: a page's current-state claim is
 only as good as the records behind it. Confirm consequential claims in the
-linked records before relying on them.
+linked records before relying on them. An unresolved/outdated notice applies to
+the affected claim, not necessarily the entire page. Follow its evidence links;
+do not present that claim as settled or silently repair the page during recall.
 
 Separate remembered knowledge from newly reasoned advice. Cite the actual documents
 used, not merely their index entries. Preserve material conflicts rather than making

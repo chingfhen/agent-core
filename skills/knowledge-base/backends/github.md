@@ -29,7 +29,7 @@ reads—not test writes in the real KB:
 | --- | --- |
 | Recall | Read actual files and narrow paths/search/tree listings within the selected root/ref, including relevant living knowledge |
 | Capture/update | Create/update raw Markdown at exact paths, read current contents, confirm persistence |
-| Optional knowledge synthesis | Additionally read/write the authorized knowledge-page location when useful; never required for capture |
+| Knowledge-page maintenance | Search/read the authorized page location and write affected pages; missing access leaves maintenance incomplete, not record capture blocked |
 | Inbox processing | Read source content faithfully and perform the required record/index writes |
 | Inbox clearing | Additionally preserve original bytes in an authorized external archive, verify identity, and remove exact inbox entries safely |
 
@@ -76,8 +76,10 @@ not authorize writing to its default branch.
 
 Local capture does not imply remote publication; this adapter is used only for
 a selected remote target. A separate knowledge-page destination requires separately
-resolved authorization and capabilities. Optional page updates never gate record
-persistence. Never expose private workplace content for runtime convenience.
+resolved authorization and capabilities. Apply the main skill's bounded page
+maintenance after record/index persistence. Report unavailable page access or
+failed updates separately; do not substitute a destination or roll back saved
+records. Never expose private workplace content for runtime convenience.
 
 ## External archive and cleanup
 

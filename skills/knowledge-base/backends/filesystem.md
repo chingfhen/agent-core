@@ -40,9 +40,9 @@ a temporary downloaded draft does not establish durable persistence.
   content/provenance establishes the match; otherwise choose a descriptive suffix.
 - Do not rename an artifact merely because it was updated. Repair directly affected
   links if a requested move or rename changes its location.
-- Write optional living-knowledge pages only under the main skill's usefulness
-  criteria. Prefer stable names, supporting record links, and focused changes;
-  page maintenance must not be a prerequisite for capture.
+- Apply the main skill's bounded knowledge-page maintenance after record/index
+  persistence. An inaccessible page root or failed page write leaves that
+  maintenance incomplete, not the records unsaved. Do not substitute another root.
 
 ## Archive and clear safely
 
