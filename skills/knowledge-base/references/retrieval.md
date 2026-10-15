@@ -67,6 +67,10 @@ A managed artifact may be the best concise answer, but it is not automatically c
 or stronger evidence than a record. Read its update date and relevant supporting
 material when freshness affects the question. Neither source needs automatic rewriting.
 
+Treat `knowledge/` pages as aids, not authority: a page's current-state claim is
+only as good as the records behind it. Confirm consequential claims in the
+linked records before relying on them.
+
 Separate remembered knowledge from newly reasoned advice. Cite the actual documents
 used, not merely their index entries. Preserve material conflicts rather than making
 "newest wins" the truth rule. Say when nothing relevant was found or access/search was
