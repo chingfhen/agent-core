@@ -235,6 +235,92 @@ class PlacesInstallerTests(unittest.TestCase):
         self.assertIn("builtin cd --", function)
         self.assertIn("choose", function)
 
+    def test_windows_install_skips_unavailable_powershell_without_breaking_cmd(self) -> None:
+        with patch.object(places, "add_to_windows_user_path", return_value=False), patch.object(
+            places.shutil, "which", return_value=None
+        ):
+            result = places.install(
+                source=PLACES_SCRIPT,
+                home=self.home,
+                platform="windows",
+                python_executable=Path("C:/Python/python.exe"),
+                local_app_data=Path(self.temporary.name) / "legacy-local",
+            )
+
+        self.assertTrue(result["launcher"].is_file())
+        self.assertEqual(result["powershell"]["status"], "skipped")
+
+    def test_windows_install_adds_idempotent_powershell_profile_integration(self) -> None:
+        def which(command: str):
+            if command in {"powershell.exe", "powershell"}:
+                return command
+            return None
+
+        profile = (
+            self.home
+            / "Documents"
+            / "WindowsPowerShell"
+            / "Microsoft.PowerShell_profile.ps1"
+        )
+        profile.parent.mkdir(parents=True)
+        profile.write_text(
+            "Invoke-Expression (& { (zoxide init powershell | Out-String) })\n",
+            encoding="utf-8",
+        )
+        with patch.object(places, "add_to_windows_user_path", return_value=False), patch.object(
+            places.shutil, "which", side_effect=which
+        ):
+            first = places.install(
+                source=PLACES_SCRIPT,
+                home=self.home,
+                platform="windows",
+                python_executable=Path("C:/Python/python.exe"),
+                local_app_data=Path(self.temporary.name) / "legacy-local",
+            )
+            second = places.install(
+                source=PLACES_SCRIPT,
+                home=self.home,
+                platform="windows",
+                python_executable=Path("C:/Python/python.exe"),
+                local_app_data=Path(self.temporary.name) / "legacy-local",
+            )
+
+        self.assertEqual(first["powershell"]["status"], "installed")
+        self.assertEqual(second["powershell"]["status"], "installed")
+        self.assertEqual(
+            profile.read_text(encoding="utf-8").count(places.POWERSHELL_BLOCK_BEGIN), 1
+        )
+        self.assertIn("zoxide init powershell", profile.read_text(encoding="utf-8"))
+        function_file = self.home / ".local" / "share" / "places" / "places.ps1"
+        self.assertIn("function places", function_file.read_text(encoding="utf-8"))
+
+    def test_windows_install_keeps_cmd_when_powershell_profile_setup_warns(self) -> None:
+        profile = (
+            self.home
+            / "Documents"
+            / "WindowsPowerShell"
+            / "Microsoft.PowerShell_profile.ps1"
+        )
+        profile.mkdir(parents=True)
+
+        def which(command: str):
+            return command if command in {"powershell.exe", "powershell"} else None
+
+        with patch.object(places, "add_to_windows_user_path", return_value=False), patch.object(
+            places.shutil, "which", side_effect=which
+        ):
+            result = places.install(
+                source=PLACES_SCRIPT,
+                home=self.home,
+                platform="windows",
+                python_executable=Path("C:/Python/python.exe"),
+                local_app_data=Path(self.temporary.name) / "legacy-local",
+            )
+
+        self.assertTrue(result["launcher"].is_file())
+        self.assertEqual(result["powershell"]["status"], "warning")
+        self.assertTrue(result["powershell"]["warnings"])
+
     def test_windows_launcher_changes_drive_and_directory(self) -> None:
         launcher = places._render_cmd_launcher(
             Path("C:/Python/python.exe"),

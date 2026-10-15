@@ -8,9 +8,9 @@ updated: 2026-10-14
 
 ## Read First
 
-- `places` shows favorites and cached Git repositories, accepts an alias or number, and changes the current Bash or CMD directory.
+- `places` shows favorites and cached Git repositories, accepts an alias or number, and changes the current Bash, CMD, or PowerShell directory.
 - `places refresh ROOT [ROOT ...]` searches only the explicitly supplied roots. At least one root is required; Places never scans the whole home directory by default.
-- The implementation is the standalone, Python-standard-library-only `scripts/places.py`. It supports Python 3.8 or newer on Linux Bash and Windows CMD.
+- The implementation is the standalone, Python-standard-library-only `scripts/places.py`. It supports Python 3.8 or newer on Linux Bash and Windows CMD and PowerShell.
 - Places is independent of `agent-core sync`; copying `places.py` and running its installer is sufficient.
 
 ## Setup
@@ -33,7 +33,7 @@ If `py` is unavailable but `python` resolves to Python 3.8 or newer, replace `py
 python3 places.py install
 ```
 
-The installer creates missing state files without replacing existing ones. On Linux it copies the runtime under `~/.local/share/places/`, writes a generated Bash function, and adds one marked source block to `~/.bashrc`. On Windows it copies the runtime under `%USERPROFILE%\.local\share\places\`, installs `%USERPROFILE%\.local\bin\places.cmd`, and updates the user PATH when needed. The user-home destination avoids Microsoft Store Python's package-specific filesystem virtualization. Reinstallation removes the obsolete `%LOCALAPPDATA%\Places\bin` PATH entry created by the original installer. Open a new terminal after installation, or source `~/.bashrc` in the current Bash session.
+The installer creates missing state files without replacing existing ones. On Linux it copies the runtime under `~/.local/share/places/`, writes a generated Bash function, and adds one marked source block to `~/.bashrc`. On Windows it copies the runtime under `%USERPROFILE%\.local\share\places\`, installs `%USERPROFILE%\.local\bin\places.cmd`, updates the user PATH when needed, and best-effort installs a PowerShell function into the standard Windows PowerShell and PowerShell 7 profiles when those shells are available. PowerShell setup warnings do not prevent the CMD installation from completing. The user-home destination avoids Microsoft Store Python's package-specific filesystem virtualization. Reinstallation removes the obsolete `%LOCALAPPDATA%\Places\bin` PATH entry created by the original installer. Open a new terminal after installation; in an existing Bash session source `~/.bashrc`, or in an existing PowerShell session run `. $PROFILE`.
 
 ## Commands
 
@@ -88,6 +88,6 @@ Favorite order follows `places.txt`, so it is deterministic and human-controlled
 ## Boundaries
 
 - Direct directory changes require shell integration because a child Python process cannot change its parent shell.
-- Initial shell support is Bash on Linux and CMD on Windows. Zsh, Fish, PowerShell, and WSL-to-Windows path translation are not supported.
+- Initial shell support is Bash on Linux and CMD and PowerShell on Windows. Zsh, Fish, and WSL-to-Windows path translation are not supported.
 - Bare Git repositories are not indexed because they are not working directories.
 - If Agent Core is not installed, Places still creates `~/.agent-core` for its state. A later Agent Core clone into that exact path requires temporarily moving the state files, cloning, and restoring them.
