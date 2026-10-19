@@ -226,6 +226,18 @@ Unreadable or materially ambiguous inputs stay pending. When storage permissions
 prevent archival/removal, capture may still complete safely, but cleanup has not.
 Avoid speculative artifacts or claiming an empty inbox just to satisfy the cue.
 
+### Binary or non-text inputs
+
+- `docx`/`xlsx`/`pptx` are ZIP packages: extract text from
+  `word/document.xml` (or the equivalent sheet/slide XML) for capture;
+  `pdf` via pdftotext or a Python reader.
+- A source whose records exist must not remain in `inbox/`: archive or
+  remove it in the same pass. A captured-but-still-present inbox file
+  invites reprocessing in a later sweep.
+- Always archive the original bytes, not the extracted text.
+- If text extraction fails and no reliable content view exists, keep
+  the source pending rather than archiving blind.
+
 ## Managed artifacts
 
 On an explicit create/update request:
