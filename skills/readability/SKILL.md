@@ -28,8 +28,9 @@ It works independently of other writing skills and does not require Markdown.
   diagnosis with concrete examples and the most useful changes. Do not edit.
 
 Infer the reader's knowledge, purpose, and medium from context: understanding,
-deciding, following a procedure, or looking up a fact. Ask only when the target or a consequential
-choice is genuinely ambiguous, not to make the user choose an editorial template.
+deciding, following a procedure, or looking up a fact. Ask only when the target
+or a consequential choice is genuinely ambiguous, not to make the user choose
+an editorial template.
 Apply to the selected output only unless the user explicitly requests a longer
 scope; do not silently change settings or unrelated future responses.
 
@@ -81,9 +82,9 @@ Group related information and order it by explanation, decision, or use—not by
 conversation chronology or the order facts were discovered. Put prerequisites
 before actions and causes near consequences. For procedures, make actions and
 expected outcomes clear, with relevant checks or recovery steps nearby.
-Separate optional exploration,
-evidence, history, and maintenance instructions from the main reading path when
-present, while keeping them accessible where the document's purpose requires them.
+Separate optional exploration, evidence, history, and maintenance
+instructions from the main reading path when present, while keeping them
+accessible where the document's purpose requires them.
 
 Consolidate repeated statements into one clear explanation. Repeat a critical
 warning at its point of use when a section may be consulted independently; do not
