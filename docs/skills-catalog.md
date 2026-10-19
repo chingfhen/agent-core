@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-14
+updated: 2026-10-19
 ---
 
 # Skills Catalogue
@@ -22,6 +22,7 @@ updated: 2026-10-14
 | [explain-tech](../skills/explain-tech/SKILL.md) | "Explain this error/architecture/change" or "debrief what we built." | Quick by default; Deep and Debrief modes. |
 | [human-unblock](../skills/human-unblock/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
 | [learning-markdown](../skills/learning-markdown/SKILL.md) | You want a reusable Markdown lesson from material or a conversation. | Teaching artifact; not automatic KB capture. |
+| [readability](../skills/readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
 | [approval-gate](../skills/approval-gate/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
 | [commit-with-subagent](../skills/commit-with-subagent/SKILL.md) | Explicitly create local commits through the configured commit-agent specialist. | User-triggered only; never pushes. |
@@ -47,6 +48,15 @@ Historical source lives in `archive/skills/` with a `2026-10-08__<former-name>-S
 - Covered by `yagni`: `yagni-review`.
 - Consolidated into `explain-tech`: `quick-orientation`, `human-technical-orientation`, `technical-coach`, `debrief`.
 - Converted into [Skill Design Guide](skill-design-guide.md): `skill-refinement-reference`.
+
+## Replaced writing prompt
+
+[readability](../skills/readability/SKILL.md) replaces `prompts/anti-mannered-prose.md`.
+It includes the prompt's useful plain-language guidance and adds reader-focused
+ordering, explanation, presentation, and meaning-preservation checks. The original
+prompt is retained in [archive](../archive/prompts/2026-10-19__anti-mannered-prose.md),
+not maintained as a second active instruction. `learning-markdown` and
+`mermaid-markdown` remain independent specialist skills, not dependencies.
 
 ## Before making another skill
 
