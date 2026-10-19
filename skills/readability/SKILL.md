@@ -1,7 +1,7 @@
 ---
 name: readability
 description: >
-  Improve human readability when explicitly requested: rewrite a hard-to-read
+  Improve human readability for readability-focused requests: rewrite a hard-to-read
   response or document, review its readability, or make a new answer or artifact
   easy to understand and use. Works across subjects and workflows; preserves
   meaning, task requirements, and consequential detail. Not automatic editing,
@@ -15,7 +15,7 @@ Make the selected output easier for its intended reader to understand and use,
 without weakening the work it must do. Reduce the reader's effort to find the
 point, follow the reasoning, and act correctly—not simply the word count.
 
-This is an explicitly requested intervention, not a permanent writing mode.
+This is a request-scoped intervention, not a permanent writing mode.
 It works independently of other writing skills and does not require Markdown.
 
 ## Resolve the request
@@ -27,8 +27,8 @@ It works independently of other writing skills and does not require Markdown.
 - **Review:** When asked to assess readability without rewriting, give a brief
   diagnosis with concrete examples and the most useful changes. Do not edit.
 
-Infer audience and purpose from context: understanding, deciding, following a
-procedure, or looking up a fact. Ask only when the target or a consequential
+Infer the reader's knowledge, purpose, and medium from context: understanding,
+deciding, following a procedure, or looking up a fact. Ask only when the target or a consequential
 choice is genuinely ambiguous, not to make the user choose an editorial template.
 Apply to the selected output only unless the user explicitly requests a longer
 scope; do not silently change settings or unrelated future responses.
@@ -79,7 +79,9 @@ takeaways, and a concluding summary that all repeat the same point.
 
 Group related information and order it by explanation, decision, or use—not by
 conversation chronology or the order facts were discovered. Put prerequisites
-before actions and causes near consequences. Separate optional exploration,
+before actions and causes near consequences. For procedures, make actions and
+expected outcomes clear, with relevant checks or recovery steps nearby.
+Separate optional exploration,
 evidence, history, and maintenance instructions from the main reading path when
 present, while keeping them accessible where the document's purpose requires them.
 
@@ -87,9 +89,10 @@ Consolidate repeated statements into one clear explanation. Repeat a critical
 warning at its point of use when a section may be consulted independently; do not
 make the reader search elsewhere for a condition needed to act safely.
 
-Use consistent names, status labels, and section order for comparable items so
-readers know where to look. Predictability should aid navigation, not impose empty
-headings, identical paragraph lengths, or repeated disclaimers on every item.
+Within a document, use a logical heading hierarchy and present comparable
+sections or items with consistent terms, labels, order, and formatting. A
+repeated pattern should help readers know where to look next, not force empty
+sections, identical paragraph lengths, or redundant disclaimers.
 
 ### 3. Make the explanation easy to follow
 
@@ -114,7 +117,7 @@ Use the simplest form that makes the information easier to understand:
 - **Prose:** explanations, reasoning, and relationships.
 - **Bullets:** parallel choices, properties, or independent points.
 - **Numbered steps:** a real sequence or an explicitly ranked list.
-- **Headings:** meaningful divisions and lookup destinations, not every sentence.
+- **Headings:** useful previews of meaningful sections, not every sentence.
 - **Tables:** compact comparisons across common dimensions. Use subsections instead
   when cells become paragraphs, contain branching procedures, or need wide screens.
 - **Emphasis:** a few conclusions, critical conditions, or navigational labels.
@@ -124,6 +127,9 @@ Use the simplest form that makes the information easier to understand:
   interrupting the main explanation with the same evidence trail.
 - **Diagrams:** established relationships, sequences, or states that are genuinely
   easier to see than to explain. One visual should answer one clear question.
+
+Where supported, provide text alternatives for informative visuals and do not
+convey essential meaning through colour or position alone.
 
 Use Markdown only where supported and useful. Mermaid is optional, not a required
 skill or dependency. If rendering is unsupported or unknown, prefer prose or a
@@ -141,7 +147,8 @@ Before returning the result, silently check:
 1. Can the reader quickly find the answer or starting point?
 2. Can they follow the reasoning or procedure without reconstructing missing links?
 3. Can they distinguish required actions, optional detail, and unresolved choices?
-4. Is each section, repeated statement, and formatting choice doing useful work?
+4. Is the hierarchy coherent, are comparable items consistent, and are repetition
+   and formatting justified?
 5. Compared with the source or task requirements, have any consequential facts,
    qualifications, permissions, exact tokens, or evidence relationships changed?
 
