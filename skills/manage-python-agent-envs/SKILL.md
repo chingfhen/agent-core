@@ -1,194 +1,224 @@
 ---
 name: manage-python-agent-envs
-description: Autonomously create and manage local, purpose-specific uv environments under .agent-envs without modifying the repository's existing Python environment. Use when an agent needs isolated testing, evaluation, integration, or tooling dependencies that are not part of the product.
+description: >
+  Create, reuse, and manage purpose-specific Python environments with uv.
+  Defaults to independent projects under .agent-envs/, excluded from Git
+  locally, without using or changing the repository's root environment.
+  Use for Python execution, testing, evaluation, and tooling dependencies.
+  Use the standard root environment only when explicitly requested.
 ---
 
-# Manage Local Agent Python Environments
+# Manage Agent Python Environments
 
-Manage agent-owned Python environments under:
+Use one independent uv project per purpose. Default to agent-owned environments,
+not the team's Python setup. Even a one-off Python task uses this layout:
 
-`<repo>/.agent-envs/<purpose>/`
+```text
+<repo>/.agent-envs/
+  offline-eval/
+    pyproject.toml
+    uv.lock
+    .python-version
+    .venv/
+  data-analysis/
+    pyproject.toml
+    uv.lock
+    .python-version
+    .venv/
+```
 
-These environments are local implementation details. They must not modify or
-replace the repository's existing Python environment.
+Use native uv commands, not a custom manager, registry, or activation script.
+Examples below use `<env>` for the absolute purpose-project path and `<repo>` for
+the absolute repository root. Use the current shell's syntax and quote paths.
+Check `uv --version`; if uv or a required option is unavailable, stop and report it
+rather than switching tools or silently upgrading the installation.
 
-## Ownership boundary
+## Boundaries
 
-The repository's existing environment belongs to the product:
+- Never create, use, sync, or modify root `.venv/` unless explicitly requested.
+  Its existence or the presence of a root `uv.lock` is not permission.
+- Read shared Python configuration for requirements, but leave root manifests,
+  lockfiles, Python pins, requirements files, Conda/deployment configuration, and
+  tracked `.gitignore` unchanged unless their modification is explicitly in scope.
+- Do not create task environments elsewhere. Do not use `uv run --with`,
+  `--isolated`, `uvx`, `uv tool install`, or bare `uv venv` as shortcuts.
+- Do not use activation, direct pip, `uv pip` patches, or system Python as an
+  execution fallback. Run workloads through the selected uv project.
+- Follow organizational package-index, certificate, proxy, and interpreter
+  acquisition policy. Never bypass it or change machine-wide settings.
+- uv caches, managed Python installations, and temporary package-build
+  environments may live outside `.agent-envs/`; task environments must not.
+  A virtualenv isolates dependencies, not the code's filesystem/network access.
 
-- `<repo>/pyproject.toml`
-- `<repo>/uv.lock`
-- `<repo>/.venv/`
-- Existing requirements files
-- Existing Conda configuration
-- Existing deployment environment
+## 1. Discover and select
 
-Do not modify those files unless the task explicitly concerns the product
-environment.
+1. Find the Git root with `git rev-parse --show-toplevel`. Read applicable project
+   instructions and the workload's Python/dependency constraints. Without a Git
+   repository, stop and ask rather than invent another location or initialize Git.
+2. Inspect `.agent-envs/` and select a short, lowercase purpose name, such as
+   `offline-eval`, `integration-tests`, or `data-analysis`. Avoid generic `dev`,
+   agent names, dates, and random identifiers.
+3. Reuse the matching project when its Python and dependencies are compatible.
+   Add missing purpose-related dependencies there; do not create a new environment
+   for every command or session. Only split for a different purpose or genuinely
+   incompatible requirements, using a meaningful suffix such as `offline-eval-py311`.
+4. Treat existing environments as shared between agent sessions. Do not change,
+   sync, rebuild, or remove one while another run uses it. Coordinate or stop if
+   uncertain; do not invent a locking service or duplicate it merely to avoid waiting.
+   `uv run --locked` can still sync the environment, so it also needs this check.
+5. Resolve the chosen path and confirm it stays under this repo's `.agent-envs/`.
+   Refuse symlink/junction redirection or an unexplained existing directory; do not
+   overwrite files or adopt an unknown bare virtualenv.
 
-Agent-owned environments belong under:
+## 2. Establish local Git exclusion
 
-`<repo>/.agent-envs/`
+Before creating environment files:
 
-## Standard layout
+- Check `git ls-files -- .agent-envs` from the root. If it returns tracked files,
+  stop: ignoring does not untrack them. Never automatically remove them from Git.
+- Check whether the intended path is already ignored. If not, resolve the local
+  exclusion file using `git rev-parse --git-path info/exclude` from the root and
+  append `/.agent-envs/` on its own line, preserving existing contents. Do not
+  assume `.git` is a directory; worktrees can use a file instead.
+- Verify with `git check-ignore -v -- .agent-envs/<purpose>/pyproject.toml`.
+  Confirm an effective exclusion, not a negating `!` rule. Check the created files
+  again after setup. If exclusion cannot be established, stop rather than editing
+  tracked `.gitignore` or choosing another location.
 
-Each durable agent environment uses:
+This is local to the checkout; no team-wide ignore change or commit is needed.
+Never stage or force-add anything under `.agent-envs/`.
 
-`<repo>/.agent-envs/<purpose>/pyproject.toml`
-`<repo>/.agent-envs/<purpose>/uv.lock`
-`<repo>/.agent-envs/<purpose>/.venv/`
+## 3. Create or restore the selected project
 
-Use short, purpose-based names:
+Before **every uv operation**, explicitly select `<env>`. Scope
+`UV_PROJECT_ENVIRONMENT` to the absolute `<env>/.venv` for those commands only;
+restore any prior value afterward. Clear inherited `VIRTUAL_ENV`, `PYTHONHOME`,
+and `PYTHONPATH` for these commands, and inspect uv overrides that could change
+project, interpreter, or sync selection (including `UV_PROJECT`, `UV_PYTHON`, and
+`UV_NO_SYNC`). Remove conflicting overrides only in the command scope. Preserve
+approved index/proxy/certificate settings. Never use `--active`.
 
-- `evaluation`
-- `integration`
-- `tools`
-- `data-analysis`
-- `notebooks`
+### New project
 
-Do not use:
+Choose Python from the workload's explicit requirement, otherwise a compatible
+repository pin, otherwise an installed supported stable Python. Resolve an exact
+version and record it locally; do not silently upgrade Python on reuse. Obtain a
+missing interpreter through `uv python install` only when organizational policy
+permits; otherwise ask.
 
-- `prod`
-- `dev`
-- Agent names
-- Random identifiers
-- Dates or timestamps
+```text
+uv init --bare --no-package --no-workspace --vcs none --python <version> "<env>"
+```
 
-Do not create multiple environments for the same purpose unless incompatible
-Python or package requirements require it.
+Before any add, lock, sync, or run command, append this boundary to the **new
+local** `pyproject.toml`:
 
-## Git isolation
+```toml
+[tool.uv.workspace]
+```
 
-Ensure the repository's `.gitignore` contains:
+This empty table makes the purpose project its own workspace boundary with no
+additional members. `--no-workspace` prevents enrollment during initialization;
+the table also prevents later commands from using a parent workspace's lockfile.
+Do not add members or edit the parent workspace.
 
-`.agent-envs/`
+```text
+uv python pin --project "<env>" <version>
+uv lock --project "<env>"
+uv sync --project "<env>" --locked
+```
 
-If `.gitignore` is unavailable or must not be changed, use the repository-local
-Git exclusion file:
+Set `requires-python` to the workload's actual compatibility range in the local
+manifest when needed; a Python pin chooses the interpreter but does not narrow
+that range. Add only the dependencies the purpose needs, using the next section.
 
-`.git/info/exclude`
+### Existing project
 
-Add:
+Inspect its manifest, pin, and lockfile before mutation. Confirm the local empty
+workspace boundary; add it only to a known agent-owned standalone project if
+missing. Do not overwrite an existing workspace configuration. Reuse the recorded
+Python version and run `uv sync --project "<env>" --locked` to restore its `.venv`.
+If the local pin is missing, recover the environment's Python version and record
+it before syncing; ask if it cannot be established safely.
+If the lock is missing or stale, inspect why before intentionally running `uv lock`
+inside this purpose project. Do not silently regenerate it to bypass a failure.
 
-`.agent-envs/`
+## 4. Manage dependencies and execute
 
-Prefer `.git/info/exclude` when this workflow is personal and should not alter
-the repository's tracked `.gitignore`.
+Keep dependencies and their resolved versions in this purpose project's manifest
+and lockfile. Do not hand-edit lockfiles. `uv add` and `uv remove` update both files
+and sync automatically; no extra sync is normally needed afterward.
 
-Never commit anything under `.agent-envs/`.
+| Need | Command |
+| --- | --- |
+| Add a required package | `uv add --project "<env>" <package>` |
+| Inspect dependencies | `uv tree --project "<env>" --locked` |
+| Restore from the lock | `uv sync --project "<env>" --locked` |
+| Intentionally upgrade one package | `uv lock --project "<env>" --upgrade-package <package>`, then locked sync |
+| Remove an explicitly unwanted dependency | `uv remove --project "<env>" <package>` |
+| Run a script | `uv run --project "<env>" --locked python "<repo>/scripts/evaluate.py"` |
+| Run tests | `uv run --project "<env>" --locked python -m pytest` |
 
-## Environment selection
+Autonomously add dependencies needed for the declared purpose. Preserve existing
+constraints; ask before incompatible changes, removing dependencies other work may
+need, or changing Python. Do not run blanket upgrades or install a standard suite
+of tools without a task need.
 
-Before creating an environment:
+`--project` selects the environment, **not the process working directory**. Run
+from the repository root unless the workload requires another directory; use
+absolute script/input/output paths when needed. Do not change into `<env>` merely
+to run repository code.
 
-1. Inspect `.agent-envs/` for an existing matching purpose.
-2. Reuse it when its Python and dependency requirements are compatible.
-3. Create a new environment only when no suitable environment exists.
-4. Never modify the root project merely to support agent tooling.
+For a packaged repository, install its local package into this environment with
+`uv add --project "<env>" --editable "<repo>"` when the task needs it. This changes
+only the local environment's dependency declaration, though package builds can
+produce source-tree artifacts. Respect the project's build instructions. Do not
+convert an unpackaged repo into a package or migrate its dependency manager.
+For existing requirements files, use `uv add --project "<env>" -r "<requirements>"`
+only after inspecting their dependencies, sources, and options.
 
-Use an isolated temporary run instead of a durable environment when:
+Invoke scripts through `python` as above, not `uv run script.py`: inline PEP 723
+metadata can select a separate script environment. If such metadata exists, carry
+its required dependencies/Python constraints into the purpose project instead of
+editing the shared script. Do not use `--with` to supply missing packages.
+Add `--env-file "<file>"` to the explicitly targeted run command when task-required
+variables are needed; never copy secrets into the manifest, lockfile, or report.
 
-- The task is a one-off probe
-- Only one or two temporary packages are required
-- No persistent dependency definition is needed
+## 5. Verify, recover, and report
 
-Use a durable `.agent-envs/<purpose>/` project when:
+Before the workload, verify the interpreter:
 
-- The environment will be used repeatedly
-- Several packages must be resolved together
-- A lockfile is useful
-- More than one agent session may use it
-- The task needs a stable Python version
+```text
+uv run --project "<env>" --locked python -c "import sys; print(sys.executable); print(sys.prefix); print(sys.version)"
+```
 
-## Creation procedure
+Confirm the executable and prefix belong to `<env>/.venv` (Windows interpreter:
+`.venv/Scripts/python.exe`; POSIX: `.venv/bin/python`). Stop on a mismatch. Run a
+relevant import or actual entry-point check, and inspect Git status/diffs to ensure
+environment management did not change shared configuration.
 
-For a new durable environment:
+On failure, inspect the error, local dependency tree, Python pin, and lockfile;
+fix the cause and retry the selected project. Never fall back to root/system
+Python, delete a lockfile, relax constraints blindly, or bypass package policy.
+Rebuild a broken `.venv` only when known to be agent-owned and idle, preserving its
+manifest, lockfile, and pin. Do not automatically prune environments; removal
+requires an explicit request.
 
-1. Create `.agent-envs/<purpose>/`.
-2. Initialize a minimal uv project in that directory.
-3. Pin or select the required Python version.
-4. Add only dependencies required for that purpose.
-5. Generate `uv.lock`.
-6. Run `uv sync`.
-7. Verify using the actual entry point or import.
-8. Report the exact project, interpreter and lockfile paths.
+Report concisely: purpose, created/reused, absolute project and interpreter paths,
+Python version, lockfile path, dependencies changed, and verification result.
+When asked for an inventory, list purpose directories, Python pins, direct
+dependencies, and whether their lockfiles and interpreters exist. Do not invent
+verification history or maintain a separate registry.
 
-Do not initialize a uv workspace.
+## Explicit root mode
 
-Each purpose environment is an independent uv project with its own lockfile.
-
-## Execution
-
-Run commands against the selected environment from its project directory, or
-use uv's project-selection option where supported.
-
-Do not manually activate `.venv`.
-
-Do not use:
-
-- Direct `pip install`
-- The system Python as an implicit fallback
-- The repository's root environment for unrelated agent tooling
-- Public package indexes when an organizational package policy applies
-
-## Dependency changes
-
-The agent may autonomously:
-
-- Create a new purpose environment
-- Add dependencies needed for its declared purpose
-- Update that environment's lockfile
-- Recreate its `.venv`
-- Reuse a compatible existing purpose environment
-
-The agent must not autonomously:
-
-- Modify repository-level dependency files
-- Modify deployment requirements
-- Change an existing environment to an incompatible Python version
-- Remove an environment that may be in use
-- Substitute an unapproved package source
-
-## Reporting
-
-After creating or modifying an environment, report:
-
-Environment: <purpose>
-Mode: durable agent environment
-Project: <absolute path>
-Interpreter: <absolute path to Python>
-Python: <version>
-Lockfile: <absolute path>
-Packages changed: <summary>
-Verification: <command and result>
-
-For temporary execution, report:
-
-Environment: temporary isolated uv environment
-Purpose: <purpose>
-Packages: <packages>
-Verification: <command and result>
-
-## Discovery command
-
-When the human asks where environments are stored, list:
-
-- Each directory under `.agent-envs/`
-- Its Python requirement
-- Its interpreter path
-- Whether `.venv` exists
-- Whether `uv.lock` exists
-- Its direct dependencies
-- The most recent verification performed, if recorded
-
-## Organizational policy overlay
-
-If an organization-specific environment skill applies, its rules override this
-skill for:
-
-- Package indexes
-- Proxy configuration
-- Certificates
-- Interpreter acquisition
-- Package quarantine
-- Approved download sources
+Only an explicit request to use/manage the repository's standard environment
+selects root mode, for that task only. Explain the mode switch, inspect the existing
+setup, then use the same explicit targeting with `<env> = <repo>` and environment
+path `<repo>/.venv`. Do not add the agent workspace-boundary table to the root.
+For an existing uv project, prefer locked sync/run. Do not initialize, migrate,
+change shared dependencies, update lockfiles, or alter Python pins unless those
+changes are also authorized. If the request cannot be satisfied without them, ask.
+For an explicitly requested standalone root virtualenv, `uv venv "<repo>/.venv"`
+is allowed; do not invent a root uv project. Default back to `.agent-envs/` for
+subsequent unrelated work.
