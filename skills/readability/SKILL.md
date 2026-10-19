@@ -6,7 +6,7 @@ description: >
   easy to understand and use. Works across subjects and workflows; preserves
   meaning, task requirements, and consequential detail. Not automatic editing,
   summarization, fact-checking, or permission to change files.
-disable-model-invocation: true
+disable-model-invocation: false
 ---
 
 # Readability
