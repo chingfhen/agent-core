@@ -1,7 +1,7 @@
 ---
 title: Skill Design Guide
 description: Canonical criteria for designing, invoking, consolidating, publishing, and retiring Agent Core skills.
-updated: 2026-10-14
+updated: 2026-10-21
 ---
 
 # Skill Design Guide
@@ -28,7 +28,7 @@ The burden of proof is on a *new* skill, not on keeping the old skill untouched.
 
 ## Naming and invocation
 
-Choose a short, literal, memorable name that suggests an action or outcome: `explain-tech`, `project-tasks`, `human-unblock`.
+Choose a short, literal, memorable name that suggests an action or outcome: `learning`, `project-tasks`, `human-unblock`.
 
 Avoid internal implementation terminology that the human would never naturally reach for. A name is a user interface, not just a directory.
 
@@ -51,7 +51,7 @@ Keep these boundaries clear:
 - `project-tasks`: make unfinished work portable.
 - `project-docs`: maintain settled project truth.
 - `knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
-- `learning-markdown`: author lessons; not automatic KB persistence.
+- `learning`: develop human understanding from mechanisms, examples, and judgment; no automatic KB persistence or code changes.
 - `approval-gate`: support a consequential approval.
 - `human-unblock`: clear a human-owned obstacle during execution.
 

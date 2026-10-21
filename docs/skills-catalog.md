@@ -19,9 +19,8 @@ updated: 2026-10-21
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", clear the KB inbox, create/update a managed artifact, or recall prior context. | Selective proactive retrieval; explicit writes to records/managed outputs. No approval queue or automatic synthesis. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
 | [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
-| [explain-tech](../skills/explain-tech/SKILL.md) | "Explain this error/architecture/change" or "debrief what we built." | Quick by default; Deep and Debrief modes. |
+| [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
 | [human-unblock](../skills/human-unblock/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
-| [learning-markdown](../skills/learning-markdown/SKILL.md) | You want a reusable Markdown lesson from material or a conversation. | Teaching artifact; not automatic KB capture. |
 | [readability](../skills/readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
 | [reasoned-advocacy](../skills/reasoned-advocacy/SKILL.md) | Build or challenge a defensible position, evaluate counterarguments, or prepare for stakeholder questions. | Quick or Deep; reasoning and spoken defense, not implementation planning or automatic persistence. |
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
@@ -42,12 +41,13 @@ updated: 2026-10-21
 
 ## Archived — not active
 
-Historical source lives in `archive/skills/` with a `2026-10-08__<former-name>-SKILL.md` filename:
+Historical sources live in `archive/skills/`, named by retirement date:
 
 - Superseded by KB: `evidence-authoring`.
 - Covered by project-tasks / planning: `execution-readiness`, `execution-topology`.
 - Covered by `yagni`: `yagni-review`.
-- Consolidated into `explain-tech`: `quick-orientation`, `human-technical-orientation`, `technical-coach`, `debrief`.
+- Earlier technical teaching line, now consolidated into `learning`: `quick-orientation`, `human-technical-orientation`, `technical-coach`, `debrief` (via `explain-tech`).
+- Replaced by `learning` on 2026-10-21: `explain-tech`, `learning-markdown` ([archived explain-tech](../archive/skills/2026-10-21__explain-tech-SKILL.md), [archived learning-markdown](../archive/skills/2026-10-21__learning-markdown-SKILL.md)).
 - Converted into [Skill Design Guide](skill-design-guide.md): `skill-refinement-reference`.
 
 ## Replaced writing prompt
@@ -56,8 +56,7 @@ Historical source lives in `archive/skills/` with a `2026-10-08__<former-name>-S
 It includes the prompt's useful plain-language guidance and adds reader-focused
 ordering, explanation, presentation, and meaning-preservation checks. The original
 prompt is retained in [archive](../archive/prompts/2026-10-19__anti-mannered-prose.md),
-not maintained as a second active instruction. `learning-markdown` and
-`mermaid-markdown` remain independent specialist skills, not dependencies.
+not maintained as a second active instruction. `learning` and `mermaid-markdown` remain independent specialist skills, not dependencies.
 
 ## Before making another skill
 
