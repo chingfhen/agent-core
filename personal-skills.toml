@@ -11,7 +11,7 @@ skills = [
     "grilling",
     "approval-gate",
     "commit-with-subagent",
-    "manage-python-uv",
+    "manage-python-agent-envs",
     "mermaid-markdown",
     "yagni",
 ]
