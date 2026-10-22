@@ -8,17 +8,21 @@ mounted filesystem, including a local Git checkout. Git is not required.
 Resolve KB, archive, and any explicitly configured separate knowledge-page roots
 by the skill's precedence rules. Expand `~` using the actual user's home
 (`%USERPROFILE%` on Windows); do not guess names, directories, or temporary
-sandbox paths. Default KB/archive roots are `~/.kb/` and `~/.kb-archive/`;
-living knowledge defaults to `<kb>/knowledge/`. Report actual paths after writes.
+sandbox paths. KB/archive roots must be explicitly selected or configured in
+applicable AGENTS.md; workspace-relative paths use its recorded workspace root.
+There are no home-directory fallbacks. Living knowledge stays at `<kb>/knowledge/`
+unless explicitly configured otherwise. Report actual paths after writes.
 
 Before mutation, normalize paths and inspect the relevant existing parents. Refuse
 path traversal or symlink/junction/reparse-point indirection that escapes the selected
 roots. Do not silently adopt a file where a directory is expected or initialize over
 an unrelated existing layout. Preserve unrelated files and user changes.
 
-The archive must be outside the KB and its Git worktree. Check the selected paths,
-not arbitrary repositories. If an explicit archive violates that boundary, request
-a safe destination instead of moving sources there. Ordinary KB writes stay inside
+The archive must be outside the KB directory and must not contain the KB; it may
+share the KB's Git worktree. The standard configured workspace destination is
+`.work-context/archive/knowledge-base/`. Check normalized selected paths, not
+arbitrary repositories. If the archive overlaps the KB, request a separate
+destination instead of moving sources there. Ordinary KB writes stay inside
 the KB, except an explicitly configured external knowledge-page root may hold
 living pages only. This does not authorize writes to unrelated documentation or
 tasks. Inbox processing owns only the exact archival destinations and removal

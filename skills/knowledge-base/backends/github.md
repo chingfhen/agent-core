@@ -14,7 +14,7 @@ the whole account for a default, or equate skill and content repositories.
 A separately configured remote knowledge-page location needs its own complete
 destination identity; it does not authorize unrelated writes.
 
-The web app cannot use the human's local `~/.kb/`. It also does not necessarily discover
+The web app cannot assume access to the human's configured local KB. It also does not necessarily discover
 or execute `SKILL.md` merely because it can search GitHub. The calling environment
 must load the canonical skill and required relative references from Agent Core, then
 resolve the independently selected content root. Do not create a competing workflow
@@ -31,7 +31,7 @@ reads—not test writes in the real KB:
 | Capture/update | Create/update raw Markdown at exact paths, read current contents, confirm persistence |
 | Knowledge-page maintenance | Search/read the authorized page location and write affected pages; missing access leaves maintenance incomplete, not record capture blocked |
 | Inbox processing | Read source content faithfully and perform the required record/index writes |
-| Inbox clearing | Additionally preserve original bytes in an authorized external archive, verify identity, and remove exact inbox entries safely |
+| Inbox clearing | Additionally preserve original bytes in an authorized separate archive, verify identity, and remove exact inbox entries safely |
 
 A read-only connector supports retrieval, not saved capture. It may supply a clearly
 labeled draft when useful, but must not claim a record or managed artifact was saved.
@@ -81,10 +81,13 @@ maintenance after record/index persistence. Report unavailable page access or
 failed updates separately; do not substitute a destination or roll back saved
 records. Never expose private workplace content for runtime convenience.
 
-## External archive and cleanup
+## Archive and cleanup
 
-This backend has no automatic external-archive service. Use an explicitly identified,
-authorized archive reachable from the current runtime, outside the content repository.
+This backend has no automatic archive service. Use an explicitly identified,
+authorized archive reachable from the current runtime, outside the KB directory
+and not containing it. It may be a separate directory in the same repository/ref
+when publication of those original bytes is explicitly authorized. Establish its
+complete repository/ref/path identity before writing.
 Do not choose Google Drive, another repository, a temporary sandbox, or a fictitious
 local home as a fallback. Do not treat Git history as the source archive.
 

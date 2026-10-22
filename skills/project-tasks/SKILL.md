@@ -1,6 +1,6 @@
 ---
 name: project-tasks
-description: Maintains shared human-agent continuation briefs in the active project's configured task surface, or the workspace tasks/ fallback when the project is not registered (including tasks/backlog/ for deferred work), so unfinished discussion, planning, investigation, implementation, or validation can continue without the prior conversation. Load before creating, editing, moving, deleting, or managing task files; not needed merely to read an explicitly identified task file. Rewrites tasks toward current truth while preserving permission boundaries, consequential decisions, blockers, verification state, and the next permitted action.
+description: Maintains shared human-agent continuation briefs in the task surface explicitly configured in applicable AGENTS.md (including tasks/backlog/ for deferred work), so unfinished discussion, planning, investigation, implementation, or validation can continue without the prior conversation. Load before creating, editing, moving, deleting, or managing task files; not needed merely to read an explicitly identified task file. Rewrites tasks toward current truth while preserving permission boundaries, consequential decisions, blockers, verification state, and the next permitted action.
 disable-model-invocation: false
 ---
 
@@ -27,40 +27,26 @@ Saving, checkpointing, updating, handing off, or resuming a task does not by its
 
 ## Surface Ownership
 
-This skill writes only to the task surface resolved for the active project: the configured surface when available, otherwise the workspace-root `tasks/` fallback.
+This skill writes only to the project's explicitly configured task surface.
 
-Machine-local registry:
+Before creating, editing, moving, deleting, listing, or managing tasks, read the
+project map in applicable `AGENTS.md`. Resolve the project from the requested work,
+not solely the session's current working directory; one project may span several
+repositories. Use its `Tasks` location. Resolve workspace-relative paths against
+the recorded workspace root. Read applicable repository guidance too.
 
-```text
-~/.agent-core/projects.toml
-```
+If the project, root, or destination is missing, conflicting, or ambiguous, ask
+before managing files. An inaccessible destination is an error, not permission to
+substitute another location. A confirmed but not-yet-created directory may be
+created during an authorized write. There is no automatic `tasks/` fallback and
+no `projects.toml` workflow. Do not scan for alternative task surfaces or update
+the map during task work; explicitly requested `workspace-setup` owns registration.
+An explicit human-selected destination for this operation is allowed without
+silently changing the saved map. Normal work does not require rerunning setup.
 
-Example:
-
-```toml
-[projects.smart-search]
-description = "OCBC Smart Search"
-root = "/home/cdsw/smart-search-workspace"
-docs = "/home/cdsw/smart-search-workspace/docs"
-tasks = "/home/cdsw/smart-search-workspace/tasks"
-knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
-```
-
-For this skill, `root` and `tasks` are the relevant fields.
-
-Before creating, editing, moving, deleting, listing, or otherwise managing task files:
-
-1. Read `~/.agent-core/projects.toml` when it exists.
-2. Identify the project whose configured `root` contains the current working directory. If several match, use the most specific root.
-3. When a matching project has a `tasks` value, treat that exact value as the writable task-surface root.
-4. When the registry does not exist or has no matching project with a `tasks` value, use (and create as needed) `tasks/` directly under the active workspace root. Do not search for another nearby task directory or substitute a containing Git root.
-5. After using the workspace fallback, tell the human that no configured task surface was available and report the exact fallback path.
-6. Perform task CRUD only inside the resolved configured or fallback surface.
-7. If the registry exists but cannot be read or parsed, report the error instead of silently falling back.
-8. Read the registry for normal task work, but modify it only when the human explicitly asks to register, remove, or change a project.
-9. After a mutation, report every exact resolved filesystem path changed.
-
-Paths such as `tasks/foo.md` and `tasks/backlog/foo.md` are portable logical paths. If the configured surface is `/home/cdsw/smart-search-workspace/tasks`, then logical `tasks/foo.md` resolves to `/home/cdsw/smart-search-workspace/tasks/foo.md`. Record the logical path in the task when useful; report the physical path after mutation.
+`tasks/foo.md` and `tasks/backlog/foo.md` remain logical paths inside the configured
+surface, for example `.work-context/projects/smart-search/tasks/foo.md`. Record
+logical paths when useful; report every exact physical path changed.
 
 The task surface is the only normal writable surface owned by this skill. Reference docs, source material, code, evidence, or archives as needed, but use their owning workflows for mutations. Any task archive must be an established, authorized location inside the resolved task surface; do not invent an external archive.
 

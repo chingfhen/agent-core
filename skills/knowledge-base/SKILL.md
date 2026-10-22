@@ -76,29 +76,35 @@ Use, in order:
 
 1. The explicit KB location selected for this operation.
 2. The KB root in applicable project/agent instructions, such as `AGENTS.md`.
-3. For a local agent with a durable user home, **`~/.kb/`**.
 
-Do not consult or modify `projects.toml` for KB resolution. Do not discover a root
-by scanning nearby folders, Git repositories, other KBs, or the skill's directory.
-An explicit but inaccessible root is an error, not permission to use the default.
-In a temporary sandbox or web app without that user home, require an accessible,
-explicit backend location; do not create a pretend durable `~/.kb/` there.
+There is no home-directory or nearby-folder fallback. If no root is explicitly
+selected or configured, ask; do not initialize another KB. Resolve workspace-relative
+paths against the workspace root recorded in applicable `AGENTS.md`, not the shell's
+working directory. Do not consult or modify `projects.toml`. `workspace-setup`
+confirms the workspace's shared KB; ordinary KB work does not rerun setup or scan
+nearby repositories. A configured inaccessible root is an error, not permission
+to substitute another location. Remote-only runtimes also need an accessible,
+explicit backend location.
 
-For local inbox archival, use an explicitly configured `Knowledge Base Archive`
-if supplied; otherwise **`~/.kb-archive/`**. This is a narrow additional write
-boundary for retaining processed originals, not a second search scope. Keep it
-outside the KB and its Git worktree. Remote-only runtimes need an explicitly
-accessible archive destination; they cannot assume access to the local default.
+Inbox processing uses the explicit `Knowledge Base Archive` selected for the
+operation or configured in applicable instructions. Require that destination before
+processing; there is no `~/.kb-archive/` fallback. Workspace setup records
+`.work-context/archive/knowledge-base/` alongside the KB root. This is a narrow
+additional write boundary for processed originals, not a second search scope.
+The archive must be outside the KB directory and not contain the KB, but may share
+its Git worktree. Archival does not authorize committing or pushing raw sources.
+If configuration is missing or inaccessible, ask/report rather than scattering
+originals or clearing the inbox without retention.
 
 Similarly, an explicitly configured `Knowledge Base Knowledge` outside the KB is
 a narrow write boundary for knowledge pages only — not authorization to write
 other KB content there.
 
-Optional configuration, not a setup prerequisite for local use:
+Explicit configuration (archive required for inbox processing):
 
 ```text
-Knowledge Base Root: <absolute path, or GitHub repository + branch + directory>
-Knowledge Base Archive: <external source-retention location>
+Knowledge Base Root: <absolute/workspace-relative path, or GitHub repository + branch + directory>
+Knowledge Base Archive: <separate source-retention location>
 Knowledge Base Knowledge: <optional knowledge-page root, default <kb>/knowledge/>
 ```
 
@@ -146,7 +152,8 @@ writing a competing layout into it.
 - Indexes locate documents; they do not synthesize facts or replace reading them.
   Update only affected entries; preserve unrelated content.
 - Create directories and indexes lazily on an explicit write or initialization
-  request. Reading a nonexistent default KB is a no-match, not initialization.
+  request at the confirmed location. Reading a configured but absent KB reports
+  that absence; it is not initialization or permission to choose another root.
   Do not introduce databases, embeddings, generated registries, or background jobs.
 
 ## Capture or sync
@@ -335,7 +342,7 @@ supporting records for consequential claims. Disclose material search limits.
   reads do not authorize external writes or changes to project docs/tasks.
 - Do not preserve credentials, passwords, tokens, private keys, or recovery codes.
   Do not copy restricted employer/customer data to personal storage or an external
-  service without authorization. A default location is not information-security
+  service without authorization. A configured location is not information-security
   clearance. Minimize unnecessary PII, especially in discovery surfaces.
 - Do not initialize Git, commit, push, change sharing, or configure connectors as
   an incidental capture step. Follow the backend's explicit publication boundary.

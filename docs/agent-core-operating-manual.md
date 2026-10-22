@@ -1,6 +1,6 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-10-14
+**Last Updated:** 2026-10-22
 
 **Status:** Current
 
@@ -59,7 +59,7 @@ If the installer changed PATH, close CMD and open a new one. Then run:
 agent-core sync
 ```
 
-After setup, this is the normal update command. If command-line Git cannot access the remote but the checkout was already updated through GitHub Desktop, use the explicit offline-refresh variant:
+After setup, this is the normal update command, including when command-line Git cannot access the remote. A failed pull prints a warning and publishes the existing local commit only if the checkout remains valid, clean, unchanged, and free of unfinished Git operations. It explicitly reports that remote freshness is unverified. To skip the pull attempt entirely, optionally use:
 
 ```cmd
 agent-core sync --no-pull
@@ -183,13 +183,24 @@ agent-core sync
 
 Agent Core refuses ignored, untracked, missing, linked, or uncommitted files inside configured sources.
 
-Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. The `commit-with-subagent` prompt-to-skill migration is a narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
+Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. Selecting `manage-python-env` is a named exception: it safely retires unchanged fingerprint-owned `manage-python-agent-envs` and `manage-python-uv` copies for the selected harness. Modified, unowned, or unsafe obsolete copies are preserved and reported as exact-path conflicts; resolve them explicitly rather than expecting sync to delete them. Pi additionally handles verified legacy copies and registered aliases. The `commit-with-subagent` prompt-to-skill migration is another narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
+
+## Set Up Or Refresh A Workspace
+
+1. Run `agent-core sync` (Pi) or `agent-core sync --harness devin`.
+2. Reload/restart the agent so the updated skills are exposed.
+3. Open your normal workspace root and invoke `workspace-setup`.
+4. Resolve any ambiguous project/KB mappings, inspect the proposed section, and approve it.
+
+The skill appends one managed block at the end of root `AGENTS.md`. It lists project repositories, docs/tasks destinations, shared KB/archive, flat Python purpose projects, exposed/missing skills, and concise behavior. Its final response is exactly the saved block. Your custom Use for and Behavior wording survives refreshes. Add a repository or skill later? Request a targeted refresh; no per-session setup is needed.
+
+The setup convention is `.work-context/{knowledge-base,archive/knowledge-base,projects,python}/`. The confirmed AGENTS.md locations are authoritative, not the convention itself. The old `projects.toml` workflow is retired and its files are left untouched. No setup action moves old `cf-workspace` content or configures backup without explicit approval. `manage-python-env` both maintains environments and runs Python workloads through them. See [workspace configuration](workspace-configuration.md).
 
 ## Knowledge Base Workflow
 
 The canonical workflow is [`skills/knowledge-base/SKILL.md`](../skills/knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
 
-Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed command effects and retrieval rules. Local defaults are `~/.kb/` and the separate `~/.kb-archive/`; applicable instructions or the current request can select another root. No `projects.toml` entry is required or read by this skill.
+Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed effects and retrieval rules. KB and archive roots must be explicitly selected or configured; there are no home-directory fallbacks. Workspace setup records `.work-context/knowledge-base/` and `.work-context/archive/knowledge-base/`. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
 
 The former Drive workflow is no longer canonical; existing KB content remains where it is until a separate migration is requested. GitHub-connected web apps need an explicitly selected repository/ref/directory and access to the canonical skill and its references. Connector access does not guarantee skill discovery, writes, or external archival. Updating Agent Core does not configure those integrations or replace user-managed global guidance that may still point to Drive.
 
@@ -228,14 +239,14 @@ Commit and push intended canonical changes or resolve unwanted changes manually.
 git -C "%USERPROFILE%\.agent-core" pull --ff-only
 ```
 
-Prefer fixing ordinary Git credentials, connectivity, or certificate trust. Do not disable SSL verification. If GitHub Desktop can safely update the canonical checkout while command-line Git cannot access the remote, pull that checkout in GitHub Desktop, confirm it is clean, then publish its current commit without another network operation:
+Normal `agent-core sync --harness devin` already tolerates a failed refresh when the unchanged local checkout remains safe; inspect its warning and commit ID. Fix ordinary Git credentials, connectivity, or certificate trust when convenient; never disable SSL verification. GitHub Desktop can update the checkout separately. To explicitly avoid another network attempt:
 
 ```cmd
 git -C "%USERPROFILE%\.agent-core" status --short
 agent-core sync --no-pull
 ```
 
-The status command must print nothing. `--no-pull` is explicit and never silently falls back when an ordinary sync pull fails.
+The status command must print nothing. Both modes refuse dirty/invalid checkouts or unfinished Git operations. If a failed pull changed HEAD, sync stops rather than guessing which implementation to publish. The warning fallback applies only to `sync`, not deprecated `apply` or `retire-local`.
 
 ### An installed harness resource differs from the canonical source
 

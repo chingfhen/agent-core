@@ -1,6 +1,6 @@
 # Agent Core
 
-**Last Updated:** 2026-10-14
+**Last Updated:** 2026-10-22
 
 **Status:** Current
 
@@ -65,9 +65,9 @@ Publish the same declared skills plus Devin-specific agents to Devin Desktop/CLI
 agent-core sync --harness devin
 ```
 
-When another trusted Git client has already updated the clean canonical checkout and command-line Git cannot reach the remote, `agent-core sync --no-pull` explicitly skips only the fast-forward pull. The launcher otherwise refuses a dirty canonical checkout, fast-forwards with `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. Sync validates committed manifests and selected resources before mutation, stages and fingerprints the copies, publishes changed shared files through a rollback-capable transaction, and atomically writes ownership state last.
+The launcher refuses a dirty checkout or unfinished Git operation, attempts `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. If pull fails, ordinary sync warns and publishes the existing local commit only after verifying the checkout is still valid, clean, unchanged, and free of unfinished Git operations. Remote freshness is explicitly unverified. `agent-core sync --no-pull` optionally skips the attempt; it is not required for offline/authentication failures. Sync validates committed manifests and selected resources before mutation, stages and fingerprints the copies, publishes changed shared files through a rollback-capable transaction, and atomically writes ownership state last.
 
-Removing a name from any manifest is normally non-destructive. The prompt-to-skill migration is a narrow exception: Pi sync retires the old managed `commit-with-subagent` prompt only when its recorded fingerprint still matches. Pi also migrates **selected** legacy `.agents/` copies and registered Claude aliases only when ownership is verified, with rollback on failure. Unselected and unowned files remain untouched.
+Removing a name from any manifest is normally non-destructive. Selecting `manage-python-env` triggers a named migration of unchanged fingerprint-owned `manage-python-agent-envs` and `manage-python-uv` copies for the selected harness; modified or unowned old copies are preserved and reported as conflicts. The prompt-to-skill migration is another narrow exception: Pi sync retires the old managed `commit-with-subagent` prompt only when its recorded fingerprint still matches. Pi also migrates **selected** legacy `.agents/` copies and registered Claude aliases only when ownership is verified, with rollback on failure. Unselected and unowned files remain untouched.
 
 Each harness discovers its native installed paths directly. For every declared destination, the committed repository version replaces any differing installed copy, including previously unmanaged or locally edited content; unsupported file types are refused. Devin custom agents remain harness-specific because their model and tool frontmatter differs from Pi. Sync does not edit either harness's settings or credentials.
 
@@ -91,9 +91,15 @@ See `docs/consumer-repo-enrollment.md` for collision, rollback, alias, ownership
 
 See `docs/places.md` for setup, commands, file formats, refresh behavior, and platform boundaries.
 
+## Workspace Integration
+
+After syncing and reloading skills, invoke `workspace-setup` in the root you open in your coding agent. It proposes `.work-context/` for shared knowledge, retained inbox originals, per-project docs/tasks, and flat Python purpose projects. It confirms ambiguous mappings and maintains one short approved section at the end of root `AGENTS.md`, preserving your customized instructions. Its response is exactly the saved section.
+
+`AGENTS.md` replaces the former `projects.toml` workflow. Normal skills use explicitly configured locations, not automatic fallback folders. `manage-python-env` manages **and executes through** reusable uv environments. Code repositories can remain anywhere; several can belong to one project. Setup is requested only for a new workspace or relevant changes, not each session. See [workspace configuration](docs/workspace-configuration.md).
+
 ## Knowledge Base
 
-[`skills/knowledge-base/SKILL.md`](skills/knowledge-base/SKILL.md) is the canonical knowledge-base workflow and is selected in `personal-skills.toml`. It preserves reusable context in dated Markdown records, retrieves prior learning selectively, and creates or updates managed human-facing artifacts only on request. Local use defaults to `~/.kb/`, with processed originals retained separately under `~/.kb-archive/`; explicit instructions can select another location without a project registry.
+[`skills/knowledge-base/SKILL.md`](skills/knowledge-base/SKILL.md) is the canonical knowledge-base workflow and is selected in `personal-skills.toml`. It preserves reusable context in dated Markdown records, retrieves prior learning selectively, and creates or updates managed human-facing artifacts only on request. KB and archive roots must be explicitly configured or selected. Workspace setup records `.work-context/knowledge-base/` and `.work-context/archive/knowledge-base/`; neither is a silent runtime fallback. The archive stays outside the KB directory but may share its Git worktree. Inbox processing verifies original retention before removing inputs; it never implicitly commits or pushes them.
 
 The former Drive workflow is no longer authoritative. This skill change does not migrate any KB content. GitHub/web-app use requires explicit repository identity and suitable connector capabilities; local paths and skill loading are not automatically available there. See the [human operating manual](docs/agent-core-operating-manual.md#knowledge-base-workflow) for publication and usage entry points.
 
@@ -120,6 +126,7 @@ The former Drive workflow is no longer authoritative. This skill change does not
 | Human operating manual | `docs/agent-core-operating-manual.md` | Setup, sync, publication, verification, migration, and recovery commands. |
 | Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical global publication and legacy retirement behavior. |
 | Personal skill list | `personal-skills.toml` | Authoritative copied skill set. |
+| Workspace contract | `docs/workspace-configuration.md` | Explicit resource map, setup, custom behavior, and owning skills. |
 | Pi resource list | `personal-pi.toml` | Authoritative Pi agent and prompt allowlist. |
 | Devin resource list | `personal-devin.toml` | Authoritative Devin custom-agent allowlist. |
 | CLI launcher | `agent_core/bootstrap.py` | Fixed-checkout refresh and fresh-process handoff. |

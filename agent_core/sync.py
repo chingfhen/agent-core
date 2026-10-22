@@ -31,6 +31,8 @@ CLAUDE_SKILL_BASE = Path(".claude/skills")
 PI_BASES = {"agents": Path(".pi/agent/agents"), "prompts": Path(".pi/agent/prompts")}
 LEGACY_PI_BASES = {"agents": Path(".agents/agents"), "prompts": Path(".agents/prompts")}
 RETIRED_PI_RESOURCES = {"prompts": {"commit-with-subagent"}}
+PYTHON_SKILL_REPLACEMENT = "manage-python-env"
+RETIRED_PYTHON_SKILLS = ("manage-python-agent-envs", "manage-python-uv")
 LEGACY_GUIDANCE_DESTINATIONS = {
     "pi": Path(".pi/agent/AGENTS.md"),
     "codex": Path(".codex/AGENTS.md"),
@@ -533,6 +535,61 @@ def _build_retired_pi_plans(
     return plans
 
 
+def _build_retired_python_plans(
+    home: Path,
+    sources: list[apply.SourceSkill],
+    state: dict[str, object],
+    devin_base: Path | None = None,
+) -> list[LegacyPlan]:
+    """Named migration only; never general pruning of removed manifest entries."""
+    selected = {source.name for source in sources}
+    if PYTHON_SKILL_REPLACEMENT not in selected:
+        return []
+    record_key = "devin_skills" if devin_base is not None else "skills"
+    records = state[record_key]
+    plans: list[LegacyPlan] = []
+    errors: list[str] = []
+    for name in RETIRED_PYTHON_SKILLS:
+        if name in selected:
+            raise SyncError(f"Conflicting Python skills selected: {PYTHON_SKILL_REPLACEMENT}, {name}")
+        candidates = (
+            [devin_base / "skills" / name] if devin_base is not None else
+            [home / SHARED_SKILL_BASE / name, home / LEGACY_SKILL_BASE / name]
+        )
+        _ensure_real_parents(devin_base if devin_base is not None else home, candidates)
+        record = records.get(name)
+        for target in candidates:
+            owned = _is_legacy_record(record, target)
+            if apply._lexists(target):
+                if not owned:
+                    errors.append(f"Obsolete Python skill is unowned; preserve and resolve manually: {target}")
+                    continue
+                try:
+                    fingerprint = apply.fingerprint_directory(target)
+                except apply.ApplyError as exc:
+                    errors.append(f"Unsafe obsolete Python skill {target}: {exc}")
+                    continue
+                if fingerprint != record["fingerprint"]:
+                    errors.append(f"Obsolete Python skill was locally modified; refusing removal: {target}")
+                    continue
+            if owned:
+                category = "devin_skills" if devin_base is not None else "retired_skills"
+                plans.append(LegacyPlan(target, category, name, "directory"))
+        if devin_base is None:
+            alias = home / CLAUDE_SKILL_BASE / name
+            _ensure_real_parents(home, [alias])
+            registered = name in state["aliases"]
+            if apply._lexists(alias) and (
+                not registered or not _alias_matches(alias, home / LEGACY_SKILL_BASE / name)
+            ):
+                errors.append(f"Obsolete Python alias is unowned or changed; preserve and resolve manually: {alias}")
+            elif registered:
+                plans.append(LegacyPlan(alias, "aliases", name, "link"))
+    if errors:
+        raise SyncError("Preflight refused Python skill retirement:\n- " + "\n- ".join(errors))
+    return plans
+
+
 def _build_devin_skill_plans(
     devin_base: Path, sources: list[apply.SourceSkill], state: dict[str, object]
 ) -> list[SkillPlan]:
@@ -640,7 +697,8 @@ def _sync_pi_checkout(checkout: Path, home: Path) -> SyncResult:
     skill_plans, old_skills = _build_skill_plans(home, sources, state)
     pi_plans, old_pi = _build_pi_plans(home, pi_sources, state)
     retired_pi = _build_retired_pi_plans(home, pi_sources, state)
-    legacy_plans = old_skills + old_pi + retired_pi
+    retired_python = _build_retired_python_plans(home, sources, state)
+    legacy_plans = old_skills + old_pi + retired_pi + retired_python
     destinations.extend(plan.path for plan in legacy_plans)
     _ensure_real_parents(home, destinations)
 
@@ -662,6 +720,8 @@ def _sync_pi_checkout(checkout: Path, home: Path) -> SyncResult:
             prospective["aliases"].pop(plan.name, None)
         elif plan.category in {"pi_agents", "pi_prompts"}:
             prospective[plan.category].pop(plan.name, None)
+        elif plan.category == "retired_skills":
+            prospective["skills"].pop(plan.name, None)
     prospective["guidance"] = {}
 
     state_directory = ownership_path.parent
@@ -695,6 +755,8 @@ def _sync_pi_checkout(checkout: Path, home: Path) -> SyncResult:
             raise SyncError("Pi targets changed during preflight")
         if _build_retired_pi_plans(home, pi_sources, state) != retired_pi:
             raise SyncError("Retired Pi targets changed during preflight")
+        if _build_retired_python_plans(home, sources, state) != retired_python:
+            raise SyncError("Retired Python targets changed during preflight")
 
         for plan in skill_plans:
             if plan.classification in {"unchanged", "adopted"}:
@@ -793,7 +855,9 @@ def _sync_devin_checkout(
     state = load_global_state(ownership_path, home, devin_base)
     skill_plans = _build_devin_skill_plans(devin_base, sources, state)
     agent_plans = _build_devin_agent_plans(devin_base, agent_sources, state)
+    retired_python = _build_retired_python_plans(home, sources, state, devin_base)
     managed_destinations = [plan.target for plan in skill_plans]
+    managed_destinations.extend(plan.path for plan in retired_python)
     managed_destinations.extend(plan.target for plan in agent_plans)
     _ensure_real_parents(devin_base, managed_destinations)
     _ensure_real_parents(home, [ownership_path])
@@ -805,6 +869,8 @@ def _sync_devin_checkout(
             "source_commit": commit,
             "fingerprint": plan.source.fingerprint,
         }
+    for plan in retired_python:
+        prospective["devin_skills"].pop(plan.name, None)
     for plan in agent_plans:
         prospective["devin_agents"][plan.source.name] = {
             "destination": _path_text(plan.target),
@@ -840,6 +906,8 @@ def _sync_devin_checkout(
             raise SyncError("Devin skill targets changed during preflight")
         if _build_devin_agent_plans(devin_base, agent_sources, state) != agent_plans:
             raise SyncError("Devin agent targets changed during preflight")
+        if _build_retired_python_plans(home, sources, state, devin_base) != retired_python:
+            raise SyncError("Retired Devin Python targets changed during preflight")
 
         for plan in skill_plans:
             if plan.classification in {"unchanged", "adopted"}:
@@ -864,6 +932,13 @@ def _sync_devin_checkout(
                 os.replace(plan.target, saved)
             completed.append((plan.target, saved))
             os.replace(stage / "agents" / f"{plan.source.name}.md", plan.target)
+
+        for plan in retired_python:
+            if apply._lexists(plan.path):
+                saved = backup / "retired-skills" / plan.name
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(plan.path, saved)
+                completed.append((plan.path, saved))
 
         for plan in skill_plans:
             if apply.fingerprint_directory(plan.target) != plan.source.fingerprint:
@@ -907,7 +982,7 @@ def _sync_devin_checkout(
         skill_plans,
         [],
         agent_plans,
-        [],
+        retired_python,
     )
 
 
@@ -941,6 +1016,8 @@ def print_result(result: SyncResult) -> None:
             f"Agents ({len(result.devin_resources)}): "
             + (", ".join(p.source.name for p in result.devin_resources) or "none")
         )
+        if result.legacy:
+            print(f"Retired Python skill entries: {len(result.legacy)}")
         print("Verified: %APPDATA%\\devin\\{skills,agents} (global guidance untouched)")
 
 

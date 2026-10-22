@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-21
+updated: 2026-10-22
 ---
 
 # Skills Catalogue
@@ -14,6 +14,7 @@ updated: 2026-10-21
 
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
+| [workspace-setup](../skills/workspace-setup/SKILL.md) | Explicitly set up a workspace or refresh it after repositories/skills change. | Approved managed block at the end of root AGENTS.md; preserves custom instructions. |
 | [project-tasks](../skills/project-tasks/SKILL.md) | You need to save, resume, checkpoint, or hand off unfinished work. | Execution continuity, not project truth. |
 | [project-docs](../skills/project-docs/SKILL.md) | You want to maintain durable project decisions, contracts, or guidance. | Settled understanding, not an active backlog. |
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", clear the KB inbox, create/update a managed artifact, or recall prior context. | Selective proactive retrieval; explicit writes to records/managed outputs. No approval queue or automatic synthesis. |
@@ -26,7 +27,7 @@ updated: 2026-10-21
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
 | [approval-gate](../skills/approval-gate/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
 | [commit-with-subagent](../skills/commit-with-subagent/SKILL.md) | Explicitly create local commits through the configured commit-agent specialist. | User-triggered only; never pushes. |
-| [manage-python-uv](../skills/manage-python-uv/SKILL.md) | Set up, run, or maintain a **Windows uv** Python environment. | Do not apply to corporate CML/Mamba by default. |
+| [manage-python-env](../skills/manage-python-env/SKILL.md) | Execute Python, tests, evaluations, or manage dependencies. | Reusable independent uv purpose projects under the configured Python root; replaces manage-python-agent-envs and manage-python-uv. |
 | [mermaid-markdown](../skills/mermaid-markdown/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |
 

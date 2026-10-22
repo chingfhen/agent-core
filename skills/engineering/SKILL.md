@@ -122,6 +122,11 @@ them. Reduce round trips without hiding failures in oversized command batches.
 
 ### 4. Verify proportionately
 
+Before Python execution or dependency management, load `manage-python-env` and
+use its configured purpose project for the actual workload. Reuse a compatible
+environment; do not substitute isolated uv commands or team/root environments.
+If the skill or required location is unavailable, report/ask rather than bypass it.
+
 Start with the smallest relevant checks that exercise the changed behavior,
 including important failure paths. Reuse existing tests and add focused regression
 coverage where it meaningfully protects the change. Trivial edits need not acquire

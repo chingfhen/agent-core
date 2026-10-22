@@ -77,6 +77,15 @@ def _ensure_clean(checkout: Path) -> None:
         raise AgentCoreError("Canonical checkout has staged, unstaged, or untracked changes; refusing to pull")
 
 
+def _ensure_no_git_operation(checkout: Path) -> None:
+    for name in ("MERGE_HEAD", "CHERRY_PICK_HEAD", "REVERT_HEAD", "rebase-merge", "rebase-apply", "sequencer", "BISECT_START", "index.lock", "HEAD.lock"):
+        location = Path(_git_output(checkout, "rev-parse", "--git-path", name))
+        if not location.is_absolute():
+            location = checkout / location
+        if location.exists():
+            raise AgentCoreError(f"Unfinished Git operation or lock in canonical checkout: {location}")
+
+
 def refresh_and_launch(
     checkout: Path,
     project_cwd: Path,
@@ -95,6 +104,8 @@ def refresh_and_launch(
             _ensure_project_worktree(project_cwd)
     _validate_checkout(checkout)
     _ensure_clean(checkout)
+    _ensure_no_git_operation(checkout)
+    original_commit = _git_output(checkout, "rev-parse", "HEAD")
 
     if no_pull and command != "sync":
         raise AgentCoreError("--no-pull is supported only for sync")
@@ -102,9 +113,22 @@ def refresh_and_launch(
         pull = _git(checkout, "pull", "--ff-only")
         if pull.returncode != 0:
             detail = pull.stderr.strip() or pull.stdout.strip() or f"exit code {pull.returncode}"
-            raise AgentCoreError(f"Could not refresh canonical checkout: {detail}")
+            if command != "sync":
+                raise AgentCoreError(f"Could not refresh canonical checkout: {detail}")
+            _validate_checkout(checkout)
+            _ensure_clean(checkout)
+            _ensure_no_git_operation(checkout)
+            if _git_output(checkout, "rev-parse", "HEAD") != original_commit:
+                raise AgentCoreError("Failed refresh changed HEAD; refusing local sync fallback")
+            print(
+                f"agent-core: warning: Could not refresh canonical checkout: {detail}\n"
+                f"Publishing existing local commit {original_commit}; remote freshness is unverified.",
+                file=sys.stderr,
+            )
 
     _validate_checkout(checkout)
+    _ensure_clean(checkout)
+    _ensure_no_git_operation(checkout)
     if command == "sync":
         module = "agent_core.sync"
         arguments = [

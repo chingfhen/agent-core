@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-14
+**Last Updated:** 2026-10-22
 
 **Status:** Current
 
@@ -58,11 +58,11 @@ Installed or generated surfaces include:
 - All three personal manifests are manual allowlists. Never infer publication by scanning `skills/`, `pi/`, or `devin/`.
 - Keep the console launcher and CMD installer small and stable. The normal Windows path must not require PowerShell, `uv`, `pip`, elevation, or downloaded packages.
 - Require Python 3.10+ and keep runtime code standard-library-only.
-- The launcher must reject a dirty checkout and cross a fresh-process boundary before sync code runs. Ordinary sync fast-forwards with authenticated Git; explicit `sync --no-pull` skips only that refresh and publishes the current clean committed checkout without silent fallback.
+- The launcher must reject dirty checkouts and unfinished Git operations and cross a fresh-process boundary before sync code runs. Ordinary sync attempts authenticated fast-forward pull; on failure it warns and may publish only the still-valid, clean, unchanged local commit with freshness unverified. `sync --no-pull` skips the attempt. Never bypass source validation or silently fall back.
 - Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
 - Preflight each configured skill, harness-specific agent/template, and ownership record. Do not inspect or modify global system guidance or harness settings.
 - The committed manifests are authoritative for exactly declared destinations in the selected harness: overwrite different installed files/directories, even if unmanaged or locally edited. Refuse unsupported file types and unsafe parents. Legacy `.agents/` migration still requires verified fingerprints and remains Pi-only.
-- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default; a named one-time resource migration may retire only its unchanged fingerprint-owned predecessor.
+- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default; a named one-time resource migration may retire only its unchanged fingerprint-owned predecessor. Selecting `manage-python-env` retires the two old Python skill names only for the selected harness; modified/unowned obsolete copies block with exact paths. Pi-only legacy/alias retirement retains its verification boundary.
 - Stage, fingerprint and verify selected resources; migrate verified legacy-owned copies and registered aliases through the same rollback transaction; atomically publish ownership last. Preserve unrelated, unowned and unselected resources.
 - Default sync publishes selected files only under `~/.pi/agent/{skills,agents,prompts}/`. The explicit Devin harness publishes only under `%APPDATA%\devin\{skills,agents}\`; never target another harness implicitly.
 - Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
@@ -76,6 +76,14 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 - `agent-core retire-local --here` may remove only fingerprint-matching managed copies and exact legacy state and exclusion entries.
 - Refuse tracked or locally modified legacy copies before mutation and preserve unrelated `.agents` and Git exclusion content.
 - Do not scan arbitrary repositories for old installations.
+
+### Workspace Workflow
+
+- `workspace-setup` is steward-maintained production source and is invoked by the human, not each session. It owns one approved block at the end of workspace-root `AGENTS.md`, preserving outside text and human-edited Use for/Behavior wording.
+- The confirmed AGENTS.md map replaces `projects.toml`. No automatic docs/tasks/KB/Python destination fallbacks; missing or conflicting configuration means ask.
+- `.work-context/` is the setup convention, with shared `knowledge-base/`, `archive/knowledge-base/`, `projects/<project>/{docs,tasks}/`, and flat `python/<purpose>/`. Existing layouts require approved migration; code repository organization is unconstrained.
+- `manage-python-env` owns Python environment management AND actual workload execution. `knowledge-base` owns capture-first, verified archival and inbox cleanup. Keep detailed procedures in those skills, not duplicated in managed guidance.
+- Agent Core's canonical `docs/` and `tasks/` remain its explicitly owned steward surfaces; this repository is not migrated by publishing the workspace workflow. Tasks remain read-only unless specifically authorized.
 
 ### Memory Rules
 
@@ -104,6 +112,7 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 | Human operating manual | `docs/agent-core-operating-manual.md` | Canonical setup, sync, publication, migration, verification, and recovery commands. |
 | Distribution contract | `docs/consumer-repo-enrollment.md` | Canonical global sync and legacy retirement behavior. |
 | Personal list | `personal-skills.toml` | Authoritative copied skill set. |
+| Workspace contract | `docs/workspace-configuration.md` | Setup, explicit resource routing, and customization boundaries. |
 | CLI launcher | `agent_core/bootstrap.py` | Canonical refresh and fresh-process boundary. |
 | Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin publication, verification, safe migration and rollback. |
 | Legacy retirement | `agent_core/retire.py` | Safe cleanup of prior project-local installations. |

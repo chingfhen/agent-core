@@ -1,6 +1,6 @@
 # Personal Resource Distribution — Pi-First
 
-**Last Updated:** 2026-10-13
+**Last Updated:** 2026-10-22
 
 **Status:** Current
 
@@ -11,7 +11,7 @@
 ### Read First
 
 - The normal workflow is machine-level `agent-core sync`, runnable from any directory.
-- The fixed canonical checkout is `~/.agent-core`; every sync fast-forwards that clean checkout before touching installed targets.
+- The fixed canonical checkout is `~/.agent-core`; sync attempts a fast-forward refresh, with a warned clean-local-commit fallback on failure. `--no-pull` skips the attempt.
 - `personal-skills.toml`, `personal-pi.toml`, and `personal-devin.toml` are explicit allowlists; repository contents are never automatically enrolled.
 - Default sync publishes only under `~/.pi/agent/`. `--harness devin` explicitly targets `%APPDATA%\devin\` on Windows.
 - Pi and Devin discover their native resources without additional discovery settings.
@@ -87,7 +87,7 @@ The installed command shim invokes `~/.agent-core/agent_core/bootstrap.py` with 
 4. validates the refreshed checkout again;
 5. starts `agent_core.sync` in a fresh Python process from the checkout.
 
-Pull, authentication, network, certificate, or divergence failures stop before installed files change. The explicit `agent-core sync --no-pull` variant skips step 3 only. It still requires a clean fixed checkout, validates committed sources, crosses the same fresh-process boundary, and reports the exact current commit. It is intended for a checkout already updated through another trusted Git client such as GitHub Desktop; ordinary sync never silently falls back to it. The launcher and sync implementation use only Python 3.10+ standard-library APIs.
+For `sync`, a failed pull warns and continues from the existing local commit only after checking the checkout is still valid, clean, at the same HEAD, and free of unfinished Git operations/locks. The warning includes the Git failure and full local commit and explicitly says remote freshness is unverified. Dirty, changed-HEAD, or incomplete-operation failures remain fatal. Deprecated `apply` and `retire-local` retain fatal pull failures. The optional `agent-core sync --no-pull` skips step 3 only; both modes validate committed sources and cross the fresh-process boundary. The launcher and sync implementation use only Python 3.10+ standard-library APIs.
 
 The Windows CMD installer locates `py -3` or `python`, creates `%LOCALAPPDATA%\AgentCore\bin\agent-core.cmd`, and updates the user PATH through `HKCU\Environment`. It does not invoke PowerShell, `setx`, `uv`, `pip`, elevation, or a package download.
 
@@ -116,7 +116,9 @@ For selected resources with historical ownership under `~/.agents/`, the old cop
 
 Resources are staged and fingerprinted, preflight is repeated, changed destinations are published using temporary transaction backups, and all installed outputs are fingerprint-verified. Pi additionally retires selected verified legacy paths. Only then is version-5 ownership atomically written. A failure restores the earlier files and any retired legacy resources. Removal from any manifest is non-destructive by default, and no unowned or unrelated directories are scanned. The `commit-with-subagent` prompt-to-skill migration retires only the exact old Pi prompt when its installed fingerprint still matches ownership state; a local edit blocks removal.
 
-Default sync publishes no resource files outside `~/.pi/agent/` except for removal of explicitly verified selected legacy-owned resources and aliases during this one-time migration. Explicit Devin sync publishes only to `%APPDATA%\devin\skills\` and `%APPDATA%\devin\agents\`. Ownership and transaction state remain in `~/.agent-core-state/`. Global guidance, harness settings, credentials, cloud Playbooks, and plugins remain untouched.
+Selecting `manage-python-env` triggers the named Python consolidation: retire only fingerprint-matching owned `manage-python-agent-envs` and `manage-python-uv` directories in the selected harness, clearing their ownership only in the same rollback transaction. Pi also handles their verified `.agents` predecessors and registered Claude aliases; Devin never touches Pi/legacy resources. Missing owned predecessors can have stale records cleared. Unowned, modified, unsupported, or unsafe-parent predecessors block before publication with exact paths and remain untouched. Do not silently leave duplicate obsolete workflows or infer ownership from content alone. Both old and replacement names in the manifest are an error. Other removed names remain non-destructive.
+
+Default sync publishes no resource files outside `~/.pi/agent/` except for removal of explicitly verified selected legacy-owned resources and aliases during these named migrations. Explicit Devin sync publishes only to `%APPDATA%\devin\skills\` and `%APPDATA%\devin\agents\`. Ownership and transaction state remain in `~/.agent-core-state/`. Global guidance, harness settings, credentials, cloud Playbooks, and plugins remain untouched.
 
 ## Additive Manifest Changes
 
@@ -128,7 +130,7 @@ Automatic pruning is intentionally absent. A future explicit prune operation wou
 
 ## Observability
 
-Successful sync prints the source commit, selected harness, exact selected resource names and counts, the verified native destination, and a brief Pi legacy-migration count when applicable. It does not print transaction internals, aliases or ownership JSON locations during normal runs. Failures identify exact conflicts and do not claim partial success.
+Successful sync prints the source commit, selected harness, exact selected resource names and counts, the verified native destination, and a brief migration/retirement count when applicable. It does not print transaction internals, aliases or ownership JSON locations during normal runs. Failures identify exact conflicts and do not claim partial success.
 
 Verification means filesystem content matches the committed source, not that Pi or Devin has loaded the files or that an agent obeyed them.
 

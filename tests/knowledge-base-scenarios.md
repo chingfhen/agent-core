@@ -2,7 +2,7 @@
 
 Manual regression cases for [the skill](../skills/knowledge-base/SKILL.md).
 These are acceptance criteria, not an automated test suite or evidence that an
-agent has passed them. Use disposable synthetic KBs, never the personal default.
+agent has passed them. Use explicitly configured disposable synthetic KBs, never a live personal KB.
 For an agent trial, provide only the setup/request, load the skill and applicable
 references, then inspect its tool trace and resulting files against the expectations.
 Record the model/runtime and distinguish a specification walkthrough from a trial.

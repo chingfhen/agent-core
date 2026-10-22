@@ -1,6 +1,6 @@
 ---
 name: project-docs
-description: Maintains settled project understanding in the active project's configured documentation surface, or the workspace docs/ fallback when the project is not registered, and stable agent behavior in explicitly owned project guidance. Load before creating, editing, moving, deleting, or managing those surfaces; not needed merely to read explicitly identified files. Routes each durable claim to its canonical authority, integrates useful meaning into existing docs, rewrites stale material toward current understanding, and allows a docs sync to conclude that no change is needed.
+description: Maintains settled project understanding in the documentation surface explicitly configured in applicable AGENTS.md, and stable agent behavior in explicitly owned project guidance. Load before creating, editing, moving, deleting, or managing those surfaces; not needed merely to read explicitly identified files. Routes each durable claim to its canonical authority, integrates useful meaning into existing docs, rewrites stale material toward current understanding, and allows a docs sync to conclude that no change is needed.
 disable-model-invocation: false
 ---
 
@@ -22,40 +22,28 @@ Documentation is not active task state, a transcript, raw evidence, status histo
 
 ## Surface Ownership
 
-This skill writes only to the documentation surface resolved for the active project—configured when available, otherwise the workspace-root `docs/` fallback—and to project-guidance files explicitly assigned to this workflow.
+This skill writes only to the project's explicitly configured documentation surface
+and to project-guidance files explicitly assigned to this workflow.
 
-Machine-local registry:
+Before managing documentation, read the project map in applicable `AGENTS.md`.
+Resolve the project from the requested work, not solely the session's current
+working directory. One project may span several repositories. Use its `Docs`
+location; workspace-relative paths resolve against the recorded workspace root.
+Read applicable repository guidance too. If the project, root, or destination is
+missing, conflicting, or ambiguous, ask before writing. If a configured location
+is inaccessible, report the problem rather than substitute another destination.
+A confirmed but not-yet-created directory may be created during an authorized write.
 
-```text
-~/.agent-core/projects.toml
-```
+There is no automatic `docs/` fallback and no `projects.toml` workflow. Do not
+scan for an alternative surface or rewrite the map during normal documentation
+work. Workspace registration belongs to explicitly requested `workspace-setup`.
+An explicit human-selected destination for this operation is allowed; it does not
+silently change the saved map. Ordinary work does not require invoking setup again.
 
-Example:
-
-```toml
-[projects.smart-search]
-description = "OCBC Smart Search"
-root = "/home/cdsw/smart-search-workspace"
-docs = "/home/cdsw/smart-search-workspace/docs"
-tasks = "/home/cdsw/smart-search-workspace/tasks"
-knowledge_base = "/home/cdsw/smart-search-workspace/knowledge-base"
-```
-
-For this skill, `root` and `docs` are the relevant fields.
-
-Before creating, editing, moving, deleting, or otherwise managing project documentation:
-
-1. Read `~/.agent-core/projects.toml` when it exists.
-2. Identify the project whose configured `root` contains the current working directory. If several match, use the most specific root.
-3. When a matching project has a `docs` value, treat that exact value as the default writable documentation-surface root.
-4. When the registry does not exist or has no matching project with a `docs` value, use (and create as needed) `docs/` directly under the active workspace root. Do not search for another nearby docs directory or substitute a containing Git root.
-5. After using the workspace fallback, tell the human that no configured documentation surface was available and report the exact fallback path.
-6. Perform documentation CRUD only inside the resolved configured or fallback surface unless the human, project configuration, or established project guidance explicitly assigns another project-guidance file to this workflow.
-7. If the registry exists but cannot be read or parsed, report the error instead of silently falling back.
-8. Read the registry for normal documentation work, but modify it only when the human explicitly asks to register, remove, or change a project.
-9. After a mutation, report every exact resolved filesystem path changed.
-
-Paths such as `docs/architecture.md` are logical paths. If the configured surface is `/home/cdsw/smart-search-workspace/docs`, then logical `docs/architecture.md` resolves to `/home/cdsw/smart-search-workspace/docs/architecture.md`. The surface may be inside or outside a Git repository; matching registry configuration remains authoritative when available.
+Paths such as `docs/architecture.md` remain logical paths inside the configured
+surface, for example `.work-context/projects/smart-search/docs/architecture.md`.
+The surface can be inside or outside a Git repository. Preserve the existing
+ownership boundaries and report every exact physical path changed.
 
 ### README and Agent Guidance
 
