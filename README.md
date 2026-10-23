@@ -93,9 +93,9 @@ See `docs/places.md` for setup, commands, file formats, refresh behavior, and pl
 
 ## Workspace Integration
 
-After syncing and reloading skills, invoke `workspace-setup` in the root you open in your coding agent. It proposes `.work-context/` for shared knowledge, retained inbox originals, per-project docs/tasks, and flat Python purpose projects. It confirms ambiguous mappings and maintains one short approved section at the end of root `AGENTS.md`, preserving your customized instructions. Its response is exactly the saved section.
+After syncing and reloading skills, invoke `workspace-setup` in the root you open in your coding agent. It proposes `.work-context/` for shared knowledge, retained inbox originals, per-project docs/tasks, and flat Python purpose projects. It confirms ambiguous mappings and maintains one short approved section in root `AGENTS.md`, preserving your customized instructions. Its response is exactly the saved section.
 
-`AGENTS.md` replaces the former `projects.toml` workflow. Normal skills use explicitly configured locations, not automatic fallback folders. `manage-python-env` manages **and executes through** reusable uv environments. Code repositories can remain anywhere; several can belong to one project. Setup is requested only for a new workspace or relevant changes, not each session. See [workspace configuration](docs/workspace-configuration.md).
+`AGENTS.md` replaces the former `projects.toml` workflow. Normal skills use explicitly configured locations, not automatic fallback folders. `manage-python-env` manages **and executes through** reusable uv environments. Code repositories can remain anywhere; several can belong to one project. Setup is requested only for a new workspace or relevant changes, not each session. The separately invoked `agent-lessons` skill maintains a bounded lessons section in applicable `AGENTS.md` files. See [workspace configuration](docs/workspace-configuration.md).
 
 ## Knowledge Base
 
