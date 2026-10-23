@@ -192,7 +192,9 @@ Removing a name from any personal manifest normally stops future updates without
 3. Open your normal workspace root and invoke `workspace-setup`.
 4. Resolve any ambiguous project/KB mappings, inspect the proposed section, and approve it.
 
-The skill appends one managed block at the end of root `AGENTS.md`. It lists project repositories, docs/tasks destinations, shared KB/archive, flat Python purpose projects, exposed/missing skills, and concise behavior. Its final response is exactly the saved block. Your custom Use for and Behavior wording survives refreshes. Add a repository or skill later? Request a targeted refresh; no per-session setup is needed.
+The skill creates one managed block in root `AGENTS.md` and preserves its position on refresh. It lists project repositories, docs/tasks destinations, shared KB/archive, flat Python purpose projects, exposed/missing skills, and concise behavior. Its final response is exactly the saved block. Your custom Use for and Behavior wording survives refreshes. Add a repository or skill later? Request a targeted refresh; no per-session setup is needed.
+
+To review a session for high-value behavioral lessons, explicitly invoke `agent-lessons`. It autonomously maintains only its marked `AGENTS.md` section and reports changed paths plus a brief summary; it may correctly make no changes.
 
 The setup convention is `.work-context/{knowledge-base,archive/knowledge-base,projects,python}/`. The confirmed AGENTS.md locations are authoritative, not the convention itself. The old `projects.toml` workflow is retired and its files are left untouched. No setup action moves old `cf-workspace` content or configures backup without explicit approval. `manage-python-env` both maintains environments and runs Python workloads through them. See [workspace configuration](workspace-configuration.md).
 
