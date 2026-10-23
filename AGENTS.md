@@ -15,7 +15,7 @@
 - `agent-core sync` defaults to Pi-native publication. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents under `%APPDATA%\devin\`; global guidance and harness settings stay unmanaged.
 - Do not hand-maintain managed copies. Sync owns exact declared per-harness resources recorded in `~/.agent-core-state/ownership.json`; verified previously managed `.agents/` copies and registered Claude aliases are safely retired only by Pi migration.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
-- Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance, load `project-docs`.
+- Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance outside the marked Agent Lessons section, load `project-docs`. The explicitly invoked `agent-lessons` skill independently owns that section.
 - Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits. `global/AGENTS.md` is retained but no longer published by sync.
 
 ## Autonomous State And Memory Routing
