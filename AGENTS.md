@@ -79,10 +79,11 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 
 ### Workspace Workflow
 
-- `workspace-setup` is steward-maintained production source and is invoked by the human, not each session. It owns one approved block at the end of workspace-root `AGENTS.md`, preserving outside text and human-edited Use for/Behavior wording.
+- `workspace-setup` is steward-maintained production source and is invoked by the human, not each session. It owns one approved block within workspace-root `AGENTS.md`, preserving its position, outside text and human-edited Use for/Behavior wording.
 - The confirmed AGENTS.md map replaces `projects.toml`. No automatic docs/tasks/KB/Python destination fallbacks; missing or conflicting configuration means ask.
 - `.work-context/` is the setup convention, with shared `knowledge-base/`, `archive/knowledge-base/`, `projects/<project>/{docs,tasks}/`, and flat `python/<purpose>/`. Existing layouts require approved migration; code repository organization is unconstrained.
 - `manage-python-env` owns Python environment management AND actual workload execution. `knowledge-base` owns capture-first, verified archival and inbox cleanup. Keep detailed procedures in those skills, not duplicated in managed guidance.
+- `agent-lessons` is human-triggered and independently owns only its marked Durable Agent Lessons section in applicable `AGENTS.md` files; it does not maintain KB, docs, or tasks.
 - Agent Core's canonical `docs/` and `tasks/` remain its explicitly owned steward surfaces; this repository is not migrated by publishing the workspace workflow. Tasks remain read-only unless specifically authorized.
 
 ### Memory Rules
