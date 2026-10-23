@@ -14,9 +14,10 @@ updated: 2026-10-22
 
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
-| [workspace-setup](../skills/workspace-setup/SKILL.md) | Explicitly set up a workspace or refresh it after repositories/skills change. | Approved managed block at the end of root AGENTS.md; preserves custom instructions. |
+| [workspace-setup](../skills/workspace-setup/SKILL.md) | Explicitly set up a workspace or refresh it after repositories/skills change. | Approved managed block in root AGENTS.md; preserves existing position and custom instructions. |
 | [project-tasks](../skills/project-tasks/SKILL.md) | You need to save, resume, checkpoint, or hand off unfinished work. | Execution continuity, not project truth. |
 | [project-docs](../skills/project-docs/SKILL.md) | You want to maintain durable project decisions, contracts, or guidance. | Settled understanding, not an active backlog. |
+| [agent-lessons](../skills/agent-lessons/SKILL.md) | Explicitly review current work for lessons that future agents must apply. | Autonomously maintains only its marked AGENTS.md section; no automatic capture or other skill dependency. |
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", clear the KB inbox, create/update a managed artifact, or recall prior context. | Selective proactive retrieval; explicit writes to records/managed outputs. No approval queue or automatic synthesis. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
 | [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
