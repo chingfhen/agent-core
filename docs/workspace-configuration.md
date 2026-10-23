@@ -12,7 +12,7 @@ updated: 2026-10-22
 - Root `AGENTS.md` is the authoritative resource map. The former machine-local
   `~/.agent-core/projects.toml` workflow is retired; do not read, update, or recreate
   it. Existing files are left untouched, not used as a competing authority.
-- Setup owns one marked block at the end of AGENTS.md. It asks about ambiguity,
+- Setup owns one marked block in AGENTS.md and preserves its existing position. It asks about ambiguity,
   obtains approval, preserves human wording, and returns exactly the saved block.
 - Location-dependent skills ask when configuration is missing. They never create
   silent workspace/home-directory fallbacks.
@@ -69,7 +69,8 @@ that text's update is explicitly approved. Changing Agent Core defaults affects
 new sections/rows, not existing custom instructions.
 
 On refresh, keep a single `<!-- BEGIN MANAGED WORKSPACE -->` / `<!-- END MANAGED WORKSPACE -->`
-block at the end, preserve outside text, and relocate rather than duplicate it.
+block in its existing position, preserve outside text, and never relocate it
+just to make it last.
 Refuse ambiguous markers. Targeted changes require targeted discovery, not a fresh
 whole-workspace scan. Read back and verify the saved file before returning exactly
 its block, without a parallel summary. Report persistence failures honestly instead.
@@ -79,6 +80,7 @@ its block, without a parallel summary. Report persistence failures honestly inst
 | Workflow | Location and responsibility |
 | --- | --- |
 | project-docs | The project's mapped Docs surface; settled documentation and explicitly owned guidance |
+| agent-lessons | Dedicated marked lessons section in the verified applicable AGENTS.md; only on explicit invocation |
 | project-tasks | The project's mapped Tasks surface; continuation state and permission boundaries |
 | knowledge-base | Explicit Knowledge Base Root; shared records, syntheses, and requested managed artifacts |
 | knowledge-base inbox processing | Explicit Knowledge Base Archive; verify originals before removing inbox copies |
@@ -119,5 +121,6 @@ registered aliases. See [distribution](consumer-repo-enrollment.md).
 
 - [Operating manual](agent-core-operating-manual.md)
 - [Workspace setup](../skills/workspace-setup/SKILL.md)
+- [Agent lessons](../skills/agent-lessons/SKILL.md)
 - [Python environments](../skills/manage-python-env/SKILL.md)
 - [Knowledge base](../skills/knowledge-base/SKILL.md)
