@@ -49,7 +49,8 @@ empty KB merely to match the convention.
 The block contains only:
 
 - workspace/context/KB/archive/Python roots, check date and check scope;
-- a project-to-repositories/docs/tasks table;
+- a project/docs/tasks table and a repository/project/description table
+  (descriptions are human-editable annotations preserved on refresh);
 - one `Skill / Status / Use for` table;
 - a compact observed Python purpose inventory and any important gaps;
 - one centralized Behavior section.

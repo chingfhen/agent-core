@@ -100,8 +100,8 @@ not permission to invent replacement locations.
 
 Read [Defaults](references/defaults.md) before creating the block or adding rows.
 Use defaults only for newly created Behavior text and new skill rows. Preserve
-existing `Use for` wording and the entire Behavior section on ordinary refresh,
-even when this skill's defaults have changed. Do not reconstruct custom wording
+existing `Use for` wording, repository `Description` annotations, and the entire
+Behavior section on ordinary refresh, even when this skill's defaults have changed. Do not reconstruct custom wording
 from remembered meaning. Update established behavior only on explicit request or
 approval of that exact change. Preserve custom additions inside the block unless
 they conflict with the requested change; ask about a material conflict.
@@ -125,11 +125,17 @@ Python Environment Root: .work-context/python/
 Python purposes observed: <names, none, or not checked>
 
 ### Projects and repositories
-All paths below are workspace-relative.
+All paths below are workspace-relative. Add new repositories as a row in the
+repositories table under the correct project. Descriptions are human-editable
+annotations; the agent maintains structure and paths.
 
-| Project | Git repositories | Docs | Tasks |
-| --- | --- | --- | --- |
-| <name> | <one or more paths> | <path> | <path> |
+| Project | Docs | Tasks |
+| --- | --- | --- |
+| <name> | <path> | <path> |
+
+| Repository | Project | Description |
+| --- | --- | --- |
+| <path> | <project> | <short human-editable annotation> |
 
 ### Skills
 ✓ = exposed to the checking session; ! = expected but unavailable; ? = unknown.
