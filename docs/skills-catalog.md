@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-22
+updated: 2026-10-23
 ---
 
 # Skills Catalogue
