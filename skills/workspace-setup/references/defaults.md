@@ -14,6 +14,7 @@ Availability comes only from the current session's exposed metadata.
 | manage-python-env | All Python execution, testing, evaluation, dependencies, and reusable environments |
 | knowledge-base | Relevant prior context; requested KB capture and inbox processing |
 | project-docs | Durable project documentation and owned guidance |
+| agent-lessons | Explicitly learn from agent work and maintain durable AGENTS.md lessons |
 | project-tasks | Continuation tasks |
 | engineering | Code implementation, debugging, and review |
 | planning | Substantial work requiring a plan |
