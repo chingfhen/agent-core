@@ -2,7 +2,7 @@
 name: workspace-setup
 description: >
   Establish or refresh the workspace resource map and personal workflow in a
-  managed section at the end of root AGENTS.md. Use when the human asks to set up
+  managed section in root AGENTS.md. Use when the human asks to set up
   a workspace, refresh its configuration, or map a newly added repository or skill.
   Human-triggered maintenance, not an automatic every-session preflight.
 disable-model-invocation: true
@@ -21,8 +21,8 @@ workspace's choices and customized instructions.
   a Git root or the shell's current directory. Ask if that root is unclear.
 - Own only the block between `<!-- BEGIN MANAGED WORKSPACE -->` and
   `<!-- END MANAGED WORKSPACE -->` in `<workspace>/AGENTS.md`. Keep exactly one
-  block at the end. Create the file if absent, after approval. Preserve all text
-  outside the block, including text that must precede a relocated block.
+  block; preserve its existing position on refresh. Create the file if absent,
+  after approval. Preserve all text outside the block.
 - `AGENTS.md` is the location authority. Do not create or consume `projects.toml`,
   another registry, or a generated inventory file. Relative resource paths are
   relative to this workspace root, never the process working directory.
@@ -159,9 +159,10 @@ paths. Keep the Behavior heading last so all adjustable instructions stay togeth
 2. Re-read AGENTS.md before mutation. If it changed, merge against current content;
    seek renewed approval for material differences. Refuse unsafe file types or
    path redirection. Do not clobber concurrent human edits.
-3. Write only the approved managed block at the end, preserving outside text.
-   Create only the explicitly approved directory roots.
-4. Read back the file. Verify a single complete block at the end, preserved outside
+3. Write only the approved managed block, preserving its existing position and
+   all outside text. Append a new block by default, without requiring it to
+   remain last. Create only the explicitly approved directory roots.
+4. Read back the file. Verify a single complete block, preserved outside
    text/custom instructions, and the actual approved paths and statuses.
 5. Return exactly the saved managed block, including its markers, without an extra
    preamble, status report, or summary. Do not wrap it in another code fence.
