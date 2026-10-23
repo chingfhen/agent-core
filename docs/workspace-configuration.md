@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical resource-routing and managed-guidance contract for personal workspaces.
-updated: 2026-10-22
+updated: 2026-10-23
 ---
 
 # Workspace Configuration
