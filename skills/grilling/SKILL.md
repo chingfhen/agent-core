@@ -5,7 +5,7 @@ description: Stress-tests a plan or design through sequential, dependency-aware 
 
 Interrogate the plan until we reach shared understanding.
 
-Ask one question at a time. Each question should follow from the current answers, target the highest-value unresolved decision, and include your recommended answer with a brief rationale.
+Ask one question at a time. Each question should follow from the current answers, target the highest-value unresolved decision, and include your recommended answer with a brief rationale. Present each question via the host's interactive multiple-choice question tool (e.g. `ask_user_question`), including the recommended option; fall back to a plain-text question if the tool is unavailable.
 
 Explore the codebase instead of asking when the answer can be discovered from available evidence.
 
