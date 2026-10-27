@@ -2,8 +2,9 @@
 name: project-tasks
 description: >
   Preserve unfinished project work as portable human-agent execution memory.
-  Use to create, checkpoint, prepare, revise, resume, execute, or close a saved
-  project task, including maintaining its progress and task index. Load before
+  Use to create, checkpoint, pause for a fresh session, prepare, revise,
+  resume, execute, or close a saved project task, including maintaining its
+  progress and task index. Load before
   managing a configured task surface or continuing a persisted task; not for
   unrelated implementation or merely reading an explicitly named file. Resolve
   project task locations from applicable AGENTS.md, and preserve decisions,
@@ -231,6 +232,26 @@ Persist an approved plan without re-requesting ceremonial approval; do not
 execute future investigations or preflight checks merely to write the task.
 
 ## Resume, execute, checkpoint, and close
+
+### Pause for a fresh session
+
+Treat cues such as "let's pause", "continue in a fresh session", or "pick this
+up next time" as a request to save a **fresh-session continuation handoff** when
+the conversation concerns unfinished project work. If a task already exists,
+update that task in place; otherwise create one in the configured task surface
+when authorized. Preserve the goal, decisions and rationale already settled,
+current progress and verification, unresolved questions, blockers, relevant
+context pointers, and an unambiguous next permitted action. Make the brief
+self-contained without the present chat. Update `INDEX.md` accordingly and
+report the exact task path plus a short resume cue.
+
+A conversational pause does **not** imply implementation approval, execution
+preflight, or that the work is intentionally deferred. Keep `Status: Active`
+when work simply continues in a later session; use `On Hold` only when the human
+intentionally suspends the work pending a meaningful re-entry condition. Do not
+start additional investigation or implementation merely to finish the handoff,
+and do not silently create a task when the user is merely ending casual chat.
+Honor configured locations and narrower write permissions.
 
 When asked to **resume or execute a named persisted task**, load this skill
 and the task, identify its configured project/task surface, read applicable
