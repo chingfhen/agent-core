@@ -1,346 +1,329 @@
 ---
 name: project-tasks
-description: Maintains shared human-agent continuation briefs in the task surface explicitly configured in applicable AGENTS.md (including tasks/backlog/ for deferred work), so unfinished discussion, planning, investigation, implementation, or validation can continue without the prior conversation. Load before creating, editing, moving, deleting, or managing task files; not needed merely to read an explicitly identified task file. Rewrites tasks toward current truth while preserving permission boundaries, consequential decisions, blockers, verification state, and the next permitted action.
+description: >
+  Preserve unfinished project work as portable human-agent execution memory.
+  Use to create, checkpoint, prepare, revise, resume, execute, or close a saved
+  project task, including maintaining its progress and task index. Load before
+  managing a configured task surface or continuing a persisted task; not for
+  unrelated implementation or merely reading an explicitly named file. Resolve
+  project task locations from applicable AGENTS.md, and preserve decisions,
+  permission boundaries, verification state, and the next permitted action.
 disable-model-invocation: false
 ---
 
 # Project Tasks
 
-## Purpose and Admission
+## Job and boundary
 
-Use a task when unfinished work needs to remain understandable and continuable across sessions, agents, harnesses, or machines.
+**Make unfinished work portable.** A task is durable execution memory: a shared
+human-agent brief that makes planning, investigation, implementation, validation,
+or later discussion continuable across sessions, agents, harnesses, and machines.
 
-Ask:
+Use one when the answer to **"Will future continuation of this work need a durable
+brief?"** is yes. A task need not be implementation-ready. Its first screen
+should help the human understand and supervise the work; a fresh agent should be
+able to take the **next permitted action** without the previous conversation.
 
-> Does future continuation of this work need a durable brief?
+This skill owns the *memory of the work*, not the work's implementation method.
+`planning` shapes substantial work when plan review is required; engineering or
+other execution workflows perform and verify the work; `project-docs` owns
+settled project understanding. Code, tests, schemas, and observed behavior
+remain authoritative for their respective implementation claims. Do not create
+tasks for ordinary short-lived implementation with no persistence need.
 
-A valid continuation may be discussion, planning, investigation, implementation, validation, a human action, or a bounded delegated activity. A task does not need to be ready for implementation to be useful.
+Saving a task does not approve implementation. Asking to execute a saved task
+authorizes only the actions already permitted by the user's request, project
+guidance, and task gates. It normally also includes maintaining **that task's
+progress and its index entry**, unless stricter guidance requires separate
+permission. It does not authorize unrelated task edits, subagents, spending,
+deployment, commits, pushes, or documentation/KB writes.
 
-Each task is a shared control surface for:
+## Resolve the project and its task surface
 
-- a human to understand the goal, rationale, direction, current state, uncertainty, consequential decisions, risk, and required attention;
-- a fresh executor to take the next permitted action without the old conversation.
+Before creating, changing, indexing, or executing a persisted task, read the
+applicable `AGENTS.md` project map and relevant repository guidance. Resolve the
+**project from the requested work**, not just the current working directory.
+One project can span multiple repositories and use one shared Tasks location;
+different projects can share a workspace root.
 
-A task is not durable project documentation, a transcript, a session diary, or an exhaustive implementation manual. Rewrite it toward current usefulness. Preserve history only when it prevents a repeated mistake or explains a constraint that still matters.
+- Use the mapped `Tasks` location. Resolve workspace-relative paths from the
+  recorded workspace root, not the process working directory. A directly
+  identified task file may be read without loading this skill merely to read it.
+- When the project, mapping, root, or destination is missing, conflicting, or
+  ambiguous, ask the human before managing or executing task state. When the
+  destination is inaccessible, report that instead of substituting a path.
+- A human can explicitly select a destination for one operation, without
+  silently changing the saved map. Create a confirmed but absent directory only
+  during an authorized write.
+- No guessed `tasks/` fallback, `projects.toml`, directory-wide search for
+  substitute task surfaces, or incidental workspace configuration updates.
+  `workspace-setup` alone owns the managed workspace block and project/task
+  mappings in `AGENTS.md`; this skill never edits that block.
+- The configured task surface (including its `INDEX.md`) is this skill's normal
+  writable scope. Other repositories, docs, code, raw evidence, archives, and
+  guidance must be changed only under their own authorization/workflows.
+  Report exact physical paths changed, as well as useful logical task paths.
 
-Saving, checkpointing, updating, handing off, or resuming a task does not by itself authorize implementation or broaden any existing permission. Maintaining a task records work; it does not perform the work described by it.
+Apply narrower repository rules even when this skill would ordinarily maintain
+state automatically. In particular, a repository that makes task changes
+explicitly opt-in does not gain broader write permission just because execution
+started.
 
-## Surface Ownership
+## Stable layout and discovery
 
-This skill writes only to the project's explicitly configured task surface.
-
-Before creating, editing, moving, deleting, listing, or managing tasks, read the
-project map in applicable `AGENTS.md`. Resolve the project from the requested work,
-not solely the session's current working directory; one project may span several
-repositories. Use its `Tasks` location. Resolve workspace-relative paths against
-the recorded workspace root. Read applicable repository guidance too.
-
-If the project, root, or destination is missing, conflicting, or ambiguous, ask
-before managing files. An inaccessible destination is an error, not permission to
-substitute another location. A confirmed but not-yet-created directory may be
-created during an authorized write. There is no automatic `tasks/` fallback and
-no `projects.toml` workflow. Do not scan for alternative task surfaces or update
-the map during task work; explicitly requested `workspace-setup` owns registration.
-An explicit human-selected destination for this operation is allowed without
-silently changing the saved map. Normal work does not require rerunning setup.
-
-`tasks/foo.md` and `tasks/backlog/foo.md` remain logical paths inside the configured
-surface, for example `.work-context/projects/smart-search/tasks/foo.md`. Record
-logical paths when useful; report every exact physical path changed.
-
-The task surface is the only normal writable surface owned by this skill. Reference docs, source material, code, evidence, or archives as needed, but use their owning workflows for mutations. Any task archive must be an established, authorized location inside the resolved task surface; do not invent an external archive.
-
-## What a Task Owns
-
-- `project-tasks` owns unfinished-work state, the authoritative current direction, consequential uncertainty, blockers, verification state, and the next permitted action.
-- `planning` owns shaping and resolving substantial work before approval when plan review is requested.
-- Implementation and runtime verification belong to the relevant execution workflow. A task records their state and evidence.
-- `project-docs` owns settled project understanding and durable operating guidance.
-- `tasks/backlog/` holds deferred work that should survive but has no active near-term continuation.
-- Code, tests, schemas, configuration, and observed runtime behavior remain authorities for their respective implementation claims.
-- Conversation may hold exploration in progress until that work needs continuity.
-
-One claim should have one primary authority. A task may link to that authority and state the consequence needed for continuation rather than copy a competing explanation.
-
-## Universal Task Contract
-
-The first screen should normally make these points clear:
-
-- logical file path and creation/update dates;
-- priority and lifecycle status;
-- goal and why it matters;
-- success bar;
-- chosen direction, or explicitly that no direction has been selected;
-- current state;
-- concrete next action, including what kind of activity is permitted;
-- blockers, their impact, and what clears them;
-- material human attention when needed.
-
-Preserve verification requirements and durable-knowledge handling somewhere appropriate, but do not turn every useful field into mandatory template filling.
-
-### Default Shape
-
-New standalone tasks normally use:
+For **new** tasks, use creation-month folders inside the configured task
+surface:
 
 ```text
-tasks/YYYY-MM-DD__kebab-case-name-bookmark.md
+tasks/
+  INDEX.md
+  YYYY-MM/
+    YYYY-MM-DD__descriptive-name.md
+    YYYY-MM-DD__related-effort/
+      overview.md
+      01-first-outcome.md
+      02-following-outcome.md
 ```
 
-The filename date is the immutable creation date. Follow an established task-surface convention when one exists, and do not mass-rename older tasks.
+`tasks/` here is a *logical* location; its actual root comes from `AGENTS.md`.
+Use descriptive, distinctive filenames. The folder and filename dates are the
+task's **creation date**, not the last update, planned execution date, or closure
+date. Once created, the path stays stable across Active, Blocked, On Hold, and
+Closed. Do not move completed tasks into `archive/` or deferred tasks into
+`backlog/`. Git history or the unchanged file preserves historical access.
 
-Use this concise shape when it fits:
+Legacy task locations, filename suffixes, groups, and gates remain usable.
+Read or modify an authorized legacy file **in place**. Do not silently rename,
+move, delete, or mass-migrate existing files to the new scheme.
+
+### INDEX.md — the current-work view
+
+Maintain `INDEX.md` automatically as part of every authorized task creation,
+material state/priority/next-action change, closure, or reopening. It is a
+**navigation view**, not a competing source of truth or a second task record.
+
+- Include links to **all known unfinished tasks**: Active, Blocked, and On Hold.
+  Group by `Now`, `Next`, and `Later` priority; show a concise task name, status,
+  and meaningful next action or re-entry/blocking condition. Keep this scannable.
+- Exclude Closed tasks from the live dashboard. Keep their files at their stable
+  paths for filename, month, and targeted-content search. Reopening restores
+  the entry. Don't create a separate historical catalogue by default.
+- Derive entries from the task files. On routine changes, update only affected
+  entries and preserve unrelated content. Check relevant index entries before
+  creating a task; use bounded, targeted search when similar work may exist.
+- When `INDEX.md` is absent on an authorized write, initialize it from a
+  bounded inventory of the configured task surface, including known legacy
+  folders. Do not silently present a partial inventory as complete: flag
+  unknown coverage if exhaustive discovery is unavailable. Never search other
+  projects or rewrite unrelated files to make the index look full.
+- Keep relative links and any group overview/child links valid. Avoid redundant
+  entries for the same coherent effort; list independently continuable outcomes
+  when they need separate tracking. If index maintenance fails, preserve the
+  authoritative task write if safe and report the index as out of sync.
+
+No monthly indexes, external registries, background synchronizers, database,
+or automatic scheduled sweeps are required. A broader task hygiene sweep is a
+separate, explicitly requested operation.
+
+## Task depth — Brief / Standard / Detailed
+
+**Standard is the default.** Select the level by the requested handoff and its
+consequences, not a word-count quota. Respect an explicit mode; use Detailed
+when the human specifically wants a strong planner to prepare work for a smaller
+executor. Do not silently inflate routine tasks.
+
+When authoring or substantially revising a task, show **one compact human-facing
+line** identifying the selected mode and alternatives, for example:
+
+`Project Tasks · Standard (also: Brief / Detailed)`
+
+This is output observability, not mandatory task metadata or a heading in the
+saved file. Omit the mode line for ordinary reading, execution, or minor status
+updates.
+
+- **Brief:** preserve an idea, early investigation, or lightweight handoff.
+  Capture goal/why, what's known or undecided, permission boundary, and next
+  meaningful action. Compactness does not excuse ambiguity.
+- **Standard:** a fresh-session working brief. Add success bar, current state,
+  selected direction or explicit uncertainty, important constraints, blockers,
+  verification requirements, and an actionable next step.
+- **Detailed:** a high-fidelity planner-to-executor handoff. Preserve consequential
+  decisions and rationale; the chosen architecture or strategy; grounded files,
+  interfaces, and dependencies where known; ordered phases and checkpoints;
+  acceptance tests or observable outcomes; important edge cases, recovery paths,
+  stop conditions, and boundaries of executor discretion. Clearly distinguish
+  observed facts, planned changes, assumptions, and unresolved human choices.
+  Include the details a smaller model might otherwise have to rediscover.
+
+**Trust the executor's ability to implement, but do not require it to
+rediscover decisions that the planner has already resolved.** Detailed does
+not mean micromanaging every command or prescribing speculative code edits.
+Correctness, honesty, and executable clarity apply at all depths. Preserve
+useful depth through handoff; compress completed or superseded mechanics as
+work proceeds without discarding still-binding decisions, acceptance criteria,
+or important failure lessons.
+
+## Task contract
+
+Keep the first screen useful before any long plan. A normal new task has:
 
 ```markdown
-# Task: [Clear short name]
+# Task: [Clear outcome]
 
-**File:** `tasks/YYYY-MM-DD__kebab-case-name-bookmark.md`
+**File:** `tasks/YYYY-MM/YYYY-MM-DD__descriptive-name.md`
 **Created:** YYYY-MM-DD
 **Last Updated:** YYYY-MM-DD
-**Priority:** [Now | Next | Later]
-**Status:** [Active | Blocked | On Hold | Closed]
+**Priority:** Now | Next | Later
+**Status:** Active | Blocked | On Hold | Closed
 
 **Goal:** [...]
 **Why:** [...]
 **Success Bar:** [...]
-**Chosen Direction:** [Selected direction | Not selected]
+**Chosen Direction:** [selected | not yet selected]
 **Current State:** [...]
-**Next Action:** [...]
-**Blockers:** [None | obstacle, impact, and clearing condition]
-**Human Attention:** [...]
+**Next Action:** [action AND whether it is permitted]
+**Blockers:** [none | blocker, impact, and clearing condition]
 ```
 
-`Why` may be combined with `Goal`. `Human Attention` may be omitted when nothing requires it. Add fields such as `Permission Boundary`, `Verification`, `Docs Sync`, `Target Docs`, or `Relevant Code` only when they improve control or continuation.
-
-Use:
-
-- `Priority: Now` for active priority, `Next` for intended next-up work, and `Later` for preserved work that is not near-term;
-- `Status: Active` for open work intended to progress, `Blocked` when the next permitted meaningful action cannot proceed, `On Hold` for an intentional pause, and `Closed` only when required work has ended.
-
-An exploratory task may say:
-
-```text
-Chosen Direction: Not selected
-Next Action: Continue comparing the two architectures. Implementation is not approved. Resolve the ownership boundary before selecting a design.
-```
-
-Do not invent a decision to make the brief appear complete.
-
-### Human Skim Test
-
-A reader should be able to answer:
-
-1. What outcome is being pursued, and why?
-2. What direction has been selected, if any?
-3. What is currently true?
-4. What activity is permitted next?
-5. What blocks it, and what clears the blocker?
-6. How will success be recognized?
-7. What deserves human attention?
-
-### Information Selection
-
-Surface details that affect approval, direction, product or failure behavior, responsibility boundaries, security, privacy, data integrity, cost, recovery, maintainability, or confidence in the plan.
-
-Preserve below the first screen only what is difficult to reconstruct, execution-critical, needed to understand a non-obvious constraint, or likely to prevent a repeated mistake.
-
-Compress routine code navigation, obvious sequencing, ordinary commands, reconstructible test mechanics, duplicate evidence, stale hypotheses, and abandoned plans whose lessons are already captured. Assume future executors are technically strong.
-
-Use direct language. Explain behavior and consequences before file edits or code symbols. Avoid vague instructions such as `investigate further`, `wire up`, or `harden semantics`.
-
-## Continuation and Permission
-
-The task must distinguish among these requests:
-
-- save or checkpoint the task;
-- update the task;
-- prepare it for a fresh session;
-- prepare it for immediate execution;
-- resume the next permitted action;
-- move it to backlog;
-- close it.
-
-A fresh-session handoff is not automatically an immediate execution handoff. Persisting a plan must not execute its investigations, test future credentials, or validate later environments merely to complete the brief.
-
-Write `Next Action` so the allowed activity is unambiguous. When implementation, production access, spending, or another consequential action is not approved, say so directly. If permission is unclear, preserve the narrower interpretation and ask only when the next action actually requires clarification.
-
-Keep delegation topology separate from operational readiness. Describing work as delegable does not grant permission to spawn subagents; follow the runtime's permission requirements.
-
-### Existing Execution Gates
-
-Read older tasks conservatively. If a task contains `Execution Gate` or equivalent permission metadata:
-
-- honor an explicit prohibition or required human unblock;
-- treat `Waiting for Dependency` as blocked until the named completion evidence exists;
-- treat `Ready for Main-Agent Execution` as permission for the stated next action, not unrelated work;
-- treat `Ready for Delegated Execution` as task-level suitability only; the runtime's separate permission requirements for subagents still apply;
-- treat `Not Applicable (Closed)` as no execution permission;
-- do not interpret missing newer metadata as authorization;
-- do not remove or reinterpret a legacy gate during an unrelated update.
-
-Do not mass-migrate historical tasks. Update a task's shape only when that task is otherwise authorized for modification.
-
-## Decisions, Plans, and Uncertainty
-
-The task should contain one authoritative current state, but it need not contain a selected solution before one exists.
-
-For each material choice:
-
-1. record it as an approved or otherwise authoritative decision;
-2. classify it as executor-owned routine detail; or
-3. preserve it as unresolved uncertainty with the discussion, investigation, or human decision needed next.
-
-Do not hide product, architecture, security, privacy, migration, fallback, cost, or user-behavior choices inside phrases such as `either`, `optionally`, or `choose during implementation`.
-
-When substantial planning still needs human review, use `planning`; do not turn the task into the planning conversation. When an approved or authoritative plan exists, preserve its meaningful outcomes, constraints, phase boundaries, and verification requirements. Omit low-level mechanics a strong executor can reconstruct.
-
-Useful optional sections include:
-
-- Decisions Locked
-- Current Understanding
-- Remaining Uncertainty
-- Implementation Plan
-- Boundaries / Stop Conditions
-- Verification Contract
-- Executor Guidance
-- Human Attention
-- Context Pointers
-- Dangerous Evolution to Avoid
-- Execution Topology
-
-Use only sections that improve continuation or human control. A small task should remain small.
-
-## Conditional Operational Readiness
-
-Apply operational preflight when the user asks to prepare for immediate execution, when substantial execution is about to begin, or when the next permitted action itself can create meaningful risk. Do not require full later-phase preflight merely to checkpoint, discuss, or plan.
-
-Judge the actual action, not its label. An investigation may require the same safeguards as implementation if it launches paid jobs, handles sensitive data, alters production, creates external resources, or has destructive effects.
-
-Check as relevant:
-
-- human approval, access, credentials, private data, provider configuration, billing, or quota;
-- unresolved product, architecture, security, privacy, migration, fallback, cost, or deployment decisions;
-- external dependencies, provider capabilities, hardware, environments, or completion evidence;
-- required schemas, interfaces, identity mappings, current production state, or safe validation paths;
-- destructive effects, backup, rollback, recovery, observability, ownership, retries, and paid-provider replay;
-- verification sufficient for the permitted action.
-
-Never put secrets, passwords, tokens, API keys, recovery codes, or private keys in a task. Minimize personal or confidential information and point to protected sources instead of copying them.
-
-### Readiness Is Relative
-
-Readiness applies to the next meaningful action, not the whole effort. A bounded investigation may be ready even though implementation is not. Record later-phase prerequisites without falsely blocking an earlier safe step or implying later work is approved.
-
-A bounded investigation should state:
-
-- the exact question;
-- the evidence to inspect or produce;
-- the decision or step that follows;
-- any cost, access, production, privacy, or safety boundary.
-
-For every blocker, record:
-
-- the obstacle;
-- its impact on the next action or later phase;
-- the human action, dependency result, or external event that clears it;
-- the evidence that shows it is cleared when that is not obvious.
-
-Distinguish a human unblock from an ordinary dependency. Do not manufacture a human action for a dependency, poll indefinitely, or work around a blocker that only the human can clear.
-
-When an explicit readiness verdict is needed, use plain language:
-
-```text
-Operational readiness: READY for [bounded next action]
-Permission boundary: [...]
-Later prerequisites: [...]
-```
-
-or:
-
-```text
-Operational readiness: BLOCKED
-Blocking issue: [...]
-Required human action or dependency result: [...]
-Execution impact: [...]
-```
-
-Before declaring readiness, ensure the current state, selected direction, next action, blockers, permission boundary, plan, and verification contract agree. Correct contradictions such as:
-
-- `Status: Closed` with required validation, approval, cleanup, or implementation pending;
-- a ready verdict while a prerequisite blocks the stated next action;
-- `Blockers: None` while another section identifies a blocker to that action;
-- unresolved material alternatives without a permitted investigation or required decision before affected work;
-- a human-owned next action described as ready for agent execution;
-- a success bar unsupported by the verification contract;
-- a chosen direction that conflicts with the plan;
-- stale understanding presented as current truth.
-
-Do not silently update a task in a way that leaves the human believing it is executable when it is not.
-
-## Lifecycle Operations
-
-All operations must preserve current truth, permission boundaries, dashboard/body consistency, task-surface ownership, and exact-path reporting.
-
-### Save or Checkpoint
-
-Capture the current goal, rationale, known alternatives or selected direction, uncertainty, current state, next permitted action, blockers, and success bar. Do not invent decisions or broaden permission. Done means the work can continue later, not that it is ready for implementation.
-
-### Create or Persist a Plan
-
-Create a dated task or related-task group. Preserve approved direction when one exists, but allow an honest exploratory state when it does not. Classify known prerequisites from available evidence without executing planned investigations or operational checks for future stages.
-
-When the human requested plan review before persistence, use `planning` first and persist the resulting direction only after approval. An explicit instruction to persist an already approved plan does not require another ceremony.
-
-### Update
-
-Change `Last Updated` and rewrite affected sections toward current truth. Refresh decisions, uncertainty, blockers, permission boundaries, verification, durable-knowledge handling, and the next action. Remove superseded material rather than appending a session log.
-
-### Prepare for a Fresh Session
-
-Make the brief independent of the old conversation and make the next permitted activity explicit. Run operational preflight only to the degree required by that next activity. A discussion or planning handoff may remain unresolved; an execution handoff needs the stricter readiness review.
-
-### Resume
-
-Read the first screen, explicit gates, permission statements, blockers, and current state before acting. Take only the next permitted action. Preserve an implementation gate while conducting an approved investigation. If new evidence creates a material human-owned decision or contradicts the authorized direction, stop and surface that issue instead of silently redesigning the work.
-
-### Move to Backlog
-
-Use logical `tasks/backlog/` for intentionally deferred work that should survive without being active. Preserve a meaningful re-entry condition or next action. Moving to backlog does not approve future execution.
-
-### Close
-
-Close only when required work and required validation are complete or have been explicitly removed from scope. Record final state, honest verification, durable-doc handling, and residual follow-up. If required work remains, keep the task open or create an authorized active/backlog task for that work. Closed tasks are not automatically deleted.
-
-## Related Task Groups
-
-Use one file for one coherent outcome even when it has several steps. For several independently continuable tasks sharing an outcome, use:
-
-```text
-tasks/
-    YYYY-MM-DD__related-effort/
-        overview.md
-        01-first-outcome.md
-        02-next-outcome.md
-```
-
-The overview owns the shared outcome, constraints, links, dependency map, and recommended starting point. It does not duplicate each task's dashboard or progress.
-
-Each task owns its outcome, inputs and outputs, decisions, state, blockers, next action, and verification. Make the first actionable task concrete. Later tasks may depend on earlier results; state what result will determine their unresolved choices rather than guessing or executing the investigation early.
-
-Numeric prefixes indicate reading or execution order, not readiness or permission. Keep shared facts authoritative in the overview and task-specific facts in each task. Update only affected downstream assumptions when upstream results arrive. Do not migrate unrelated historical tasks.
-
-## Durable Knowledge and Other Routing
-
-- Route settled project understanding and durable operating behavior through `project-docs` when appropriate.
-- Treat `Target Docs` as a routing hint, not a write contract.
-- Keep current progress, unresolved choices, and remaining work in the task.
-- Keep deferred work in the configured backlog.
-- Reference source material, evidence, and archive content without silently mutating those surfaces.
-- Do not automatically capture task work into a knowledge base.
-- `tasks/INDEX.md`, if present, is optional navigation rather than an authoritative live dashboard.
-- Do not place live task dashboards in agent-guidance files.
-
-A durable-doc review can correctly conclude that no documentation change is needed. Record that conclusion only when useful; do not manufacture docs to mark a field complete.
-
-## Final Test
-
-A good task lets a fresh executor continue the next permitted activity without the old conversation and lets the human understand and supervise the work. It preserves current truth, rationale, consequential decisions, honest uncertainty, permission boundaries, actionable blockers, verification requirements, and a concrete next step without becoming a transcript or implementation manual.
+Combine `Why` with `Goal` or omit empty optional fields on simple tasks. Add
+`Human Attention`, `Permission Boundary`, `Verification`, `Docs Sync`,
+`Relevant Code`, or deeper sections only when they improve control or
+continuation. Do not turn this outline into a mandatory form.
+
+The human should quickly know **what/why, what is decided, what is true now,
+what is allowed next, what blocks it, and how success will be verified**.
+
+Use two independent dimensions:
+
+- **Priority:** Now = current focus; Next = intended next-up; Later = deferred
+  but worth retaining. Later replaces a separate backlog folder.
+- **Status:** Active = progress intended; Blocked = next meaningful action
+  prevented by a dependency or human decision; On Hold = intentionally paused;
+  Closed = work ended, not necessarily successfully implemented.
+
+Closing may mean **Completed**, **Cancelled**, or **Superseded**. Record the
+reason and actual verification/outcome when consequential; never portray
+cancelled work as implemented. Closure does not change the file path. A paused
+or blocked task needs a useful re-entry condition. Priority and status are
+*not* execution permission.
+
+### Decisions, plans, and uncertainty
+
+For material choices, record one of: **locked/approved decision**, **executor-owned
+routine detail**, or **unresolved choice with a permitted investigation or human
+decision**. Preserve consequential product, architecture, security, privacy,
+migration, fallback, cost, and user-behavior choices. Don't hide them behind
+"either", "optionally", or "choose during implementation".
+
+A task should have one current direction and current state; it need not pretend
+the direction is selected before it is. Keep it self-contained for a fresh
+session, linking canonical sources rather than copying competing project truth.
+Rework stale sections instead of appending a session diary. Preserve history only
+where it prevents a recurring mistake or explains a still-binding constraint.
+
+Useful optional Detailed sections: `Decisions Locked`, `Grounded Current
+Understanding`, `Implementation Strategy`, `Execution Phases`, `Acceptance and
+Verification`, `Edge Cases and Recovery`, `Stop Conditions`, `Executor
+Discretion`, and `Context Pointers`. Use only those that earn their space.
+
+When substantial planning requires review, use `planning` and wait for approval.
+Persist an approved plan without re-requesting ceremonial approval; do not
+execute future investigations or preflight checks merely to write the task.
+
+## Resume, execute, checkpoint, and close
+
+When asked to **resume or execute a named persisted task**, load this skill
+and the task, identify its configured project/task surface, read applicable
+`AGENTS.md` guidance, and inspect the relevant current code, docs, and evidence.
+You need not load this skill merely to answer a question about a file's contents.
+The task is execution intent and memory, **not proof that code or the environment
+still matches it**.
+
+1. **Check authority and readiness.** Read the status, current direction,
+   explicit permission/gates, blockers, next action, dependencies, and success
+   bar. Resolve contradictions before acting. Distinguish preparing a handoff
+   from permission to implement. Do not treat an index entry as authorization.
+2. **Act within the approved scope.** Perform only the next permitted work through
+   the relevant implementation workflow. If current evidence contradicts the
+   plan or creates a material human-owned decision, stop and surface it rather
+   than silently redesigning, spending, deploying, or escalating access.
+3. **Maintain execution memory automatically when authorized.** At meaningful
+   checkpoints, blocked transitions, handoffs, and completion, update the same
+   task's current state, decisions affected, blockers, verification actually
+   performed, material deviations, remaining uncertainty, and next action;
+   refresh its index entry. Do not record every command or trivial progress.
+   If a stricter rule withholds task-write permission, report what needs an
+   update instead of editing.
+4. **Close honestly.** Close when the required outcome and verification are
+   complete, or the human explicitly cancels/supersedes the remaining work.
+   Record the result and closure reason, distinguish tested from untested,
+   and identify residual follow-up. If required work remains, leave the task
+   open or, when authorized, make a distinct follow-up task. Remove only the
+   closed task's index entry; do not archive, delete, or relocate its file.
+5. **Report succinctly.** State what changed, verification and gaps, any
+   consequential plan deviation or human action, current task status, and
+   exact task/index paths updated. A failed or partial execution still needs
+   an accurate checkpoint when writes are allowed.
+
+"Execute this task" ordinarily includes the bookkeeping above; the human
+should not need to separately ask to update, close, or re-index it. This
+does not override narrower repository write rules or permission gates.
+
+### Execution gates and operational preflight
+
+Read legacy `Execution Gate` fields conservatively. Honor prohibitions and
+human unblocks; `Waiting for Dependency` needs evidence before proceeding;
+`Ready for Main-Agent Execution` permits only its stated action;
+`Ready for Delegated Execution` indicates suitability, not permission to
+spawn subagents; `Not Applicable (Closed)` permits none. Missing or old
+metadata is not implicit authorization. Preserve material legacy gates when
+touching older files; do not mass-migrate them.
+
+Apply operational preflight **relative to the next action** when preparing
+immediate execution or performing risky activity, including investigations
+that access production, sensitive data, or paid services. Check what matters:
+approval and access, private-data handling, cost/quota, external dependencies,
+interfaces/schemas, production state, destructive effects, backups/rollback,
+retries, observability, and a safe verification path. Do not demand later-phase
+preflight just to checkpoint an idea.
+
+For a blocker, state what is blocked, why, what will clear it, and the evidence
+of clearance if non-obvious. Distinguish human unblock from ordinary dependency.
+Never poll indefinitely, work around a human gate, or mark READY for a blocked
+next action. A safe investigation may proceed while implementation is blocked
+if its own permission and prerequisites are satisfied.
+
+Before claiming execution readiness or closure, check consistency among
+status, priority, direction, blockers, permission, next action, and success
+bar/verification. A `Closed` task with required unperformed work, `Blockers:
+None` alongside an actual blocker, or an "approved" decision contradicted by
+the plan is not a valid handoff.
+
+Never store secrets, keys, passwords, tokens, or recovery codes in task files.
+Minimize sensitive or restricted data; link approved protected sources instead.
+
+## Related tasks, knowledge, and maintenance
+
+Prefer one file per coherent outcome, even with several steps. Use the
+creation-month related-effort group shown above only when its children have
+independently continuable outcomes. `overview.md` owns common intent,
+dependencies, decisions, and suggested entry point; children own their own
+state and verification. Numeric prefixes express sequence, not readiness.
+Keep the index navigable without duplicating every child dashboard.
+
+Before creating another task, inspect the index and targeted relevant existing
+tasks. Reuse or update an existing task when the outcome is the same; link
+related-but-distinct work and dependencies instead of creating competing plans.
+Do not combine genuinely independently continuable outcomes just to reduce
+file count.
+
+Route settled project knowledge to `project-docs` when authorized; a task may
+record that docs sync remains required without silently writing docs. Do not
+automatically capture to a KB. A broader sweep to identify duplicate, stale,
+abandoned, or inconsistent tasks requires a specific request; ordinary writes
+only repair related entries and direct conflicts.
+
+**Final test:** A human can supervise the current work, a fresh agent can
+continue the next *permitted* action without the old conversation, and the
+index points to the actual unfinished tasks without moving or duplicating
+their authoritative files.
