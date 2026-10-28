@@ -1,6 +1,6 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-10-23
+**Last Updated:** 2026-10-28
 
 **Status:** Current
 
@@ -21,6 +21,14 @@ To publish shared skills and Devin-specific custom agents globally for Devin Des
 ```cmd
 agent-core sync --harness devin
 ```
+
+To publish shared skills to OpenCode's native global skills directory:
+
+```cmd
+agent-core sync --harness opencode
+```
+
+OpenCode sync publishes shared skills only; OpenCode agents, commands, global guidance, and settings remain unmanaged.
 
 Do not manually copy managed skills. Maintain global prompts yourself. Do not run the deprecated project-local `apply` command for normal personal use.
 
@@ -86,7 +94,7 @@ Explicit Devin sync installs:
 └── agents\<name>.md
 ```
 
-The global Windows Devin path has no leading dot. `.devin/` is a project-level directory.
+The global Windows Devin path has no leading dot. `.devin/` is a project-level directory. OpenCode skills use `~/.config/opencode/skills/<name>/SKILL.md`; on Windows, the root is `%USERPROFILE%/.config/opencode/skills/`.
 
 Three allowlists select what is published:
 
@@ -94,13 +102,15 @@ Three allowlists select what is published:
 - `personal-pi.toml`: Pi agent definitions from `pi/agents/<name>.md` and command templates from `pi/prompts/<name>.md`.
 - `personal-devin.toml`: Devin custom-agent definitions from `devin/agents/<name>.md`.
 
-Both harnesses discover their native locations automatically. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-with-subagent` are installed as explicit-only skills.
+OpenCode uses the shared-skill allowlist only; this repository has no OpenCode-specific agent or command manifest.
 
-The first sync upgrades older ownership records (versions 2 through 4). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
+Pi and Devin discover their native locations automatically, as does OpenCode for skills. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-with-subagent` are installed as explicit-only skills.
+
+The first sync upgrades older ownership records (versions 2 through 5). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
 
 ### Global guidance
 
-`AGENTS.md`, `CLAUDE.md`, other harness settings and Pi's `settings.json` are not managed or inspected.
+`AGENTS.md`, `CLAUDE.md`, OpenCode's `~/.config/opencode/AGENTS.md`, other harness settings and Pi's `settings.json` are not managed or inspected.
 
 ### Ownership
 
@@ -128,13 +138,19 @@ dir "%USERPROFILE%\.pi\agent\agents"
 dir "%USERPROFILE%\.pi\agent\prompts"
 ```
 
-Start a new Pi session or use `/reload` to discover changed Pi resources. Restart or reload Devin Desktop as appropriate after Devin sync. File verification is not proof that either harness loaded or obeyed the instructions.
+Start a new Pi session or use `/reload` to discover changed Pi resources. Restart or reload Devin Desktop as appropriate after Devin sync; restart OpenCode to discover changed skills. File verification is not proof that Pi, Devin, or OpenCode loaded the files or obeyed the instructions.
 
 For Devin filesystem inspection:
 
 ```cmd
 dir "%APPDATA%\devin\skills"
 dir "%APPDATA%\devin\agents"
+```
+
+For OpenCode skill inspection:
+
+```cmd
+dir "%USERPROFILE%\.config\opencode\skills"
 ```
 
 ## Publish A Personal Skill
@@ -187,7 +203,7 @@ Removing a name from any personal manifest normally stops future updates without
 
 ## Set Up Or Refresh A Workspace
 
-1. Run `agent-core sync` (Pi) or `agent-core sync --harness devin`.
+1. Run `agent-core sync` (Pi), `agent-core sync --harness devin`, or `agent-core sync --harness opencode`.
 2. Reload/restart the agent so the updated skills are exposed.
 3. Open your normal workspace root and invoke `workspace-setup`.
 4. Resolve any ambiguous project/KB mappings, inspect the proposed section, and approve it.
@@ -241,7 +257,7 @@ Commit and push intended canonical changes or resolve unwanted changes manually.
 git -C "%USERPROFILE%\.agent-core" pull --ff-only
 ```
 
-Normal `agent-core sync --harness devin` already tolerates a failed refresh when the unchanged local checkout remains safe; inspect its warning and commit ID. Fix ordinary Git credentials, connectivity, or certificate trust when convenient; never disable SSL verification. GitHub Desktop can update the checkout separately. To explicitly avoid another network attempt:
+Normal `agent-core sync` for Pi, Devin, and OpenCode already tolerates a failed refresh when the unchanged local checkout remains safe; inspect its warning and commit ID. Fix ordinary Git credentials, connectivity, or certificate trust when convenient; never disable SSL verification. GitHub Desktop can update the checkout separately. To explicitly avoid another network attempt:
 
 ```cmd
 git -C "%USERPROFILE%\.agent-core" status --short
@@ -295,6 +311,9 @@ agent-core sync --no-pull
 :: Publish global Devin Desktop/CLI resources
 agent-core sync --harness devin
 
+:: Publish shared skills to OpenCode
+agent-core sync --harness opencode
+
 :: Verify Pi skills and ownership
 dir "%USERPROFILE%\.pi\agent\skills"
 type "%USERPROFILE%\.agent-core-state\ownership.json"
@@ -302,6 +321,9 @@ type "%USERPROFILE%\.agent-core-state\ownership.json"
 :: Verify Devin resources
 dir "%APPDATA%\devin\skills"
 dir "%APPDATA%\devin\agents"
+
+:: Verify OpenCode skills
+dir "%USERPROFILE%\.config\opencode\skills"
 
 :: Inspect canonical checkout problems
 git -C "%USERPROFILE%\.agent-core" status --short

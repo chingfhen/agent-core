@@ -422,6 +422,76 @@ class DevinResourceSyncTests(AgentCoreSyncTests):
         self.assertNotIn("Prompts", output)
 
 
+class OpenCodeResourceSyncTests(AgentCoreSyncTests):
+    def opencode_skill(self, name: str = "demo") -> Path:
+        return self.home / ".config/opencode/skills" / name
+
+    def test_opencode_publishes_shared_skills_only_and_is_idempotent(self) -> None:
+        guidance = self.home / ".config/opencode/AGENTS.md"
+        guidance.parent.mkdir(parents=True)
+        guidance.write_text("user-owned guidance\n", encoding="utf-8")
+
+        first = sync.sync_checkout(self.checkout, self.home, "opencode")
+        second = sync.sync_checkout(self.checkout, self.home, "opencode")
+
+        self.assertEqual([plan.classification for plan in first.skills], ["added"])
+        self.assertEqual([plan.classification for plan in second.skills], ["unchanged"])
+        self.assertTrue((self.opencode_skill() / "SKILL.md").is_file())
+        self.assertFalse((self.home / ".pi").exists())
+        self.assertEqual(guidance.read_text(encoding="utf-8"), "user-owned guidance\n")
+        state = json.loads(sync.global_state_path(self.home).read_text(encoding="utf-8"))
+        self.assertIn("demo", state["opencode_skills"])
+        self.assertEqual(state["skills"], {})
+        self.assertEqual(state["devin_skills"], {})
+
+    def test_opencode_replaces_declared_skill_and_preserves_unrelated_content(self) -> None:
+        target = self.opencode_skill()
+        target.mkdir(parents=True)
+        (target / "SKILL.md").write_text("local edit", encoding="utf-8")
+        unrelated = self.opencode_skill("third-party")
+        unrelated.mkdir(parents=True)
+        (unrelated / "SKILL.md").write_text("leave me", encoding="utf-8")
+
+        result = sync.sync_checkout(self.checkout, self.home, "opencode")
+
+        self.assertEqual([plan.classification for plan in result.skills], ["replaced"])
+        self.assertIn("version one", (target / "SKILL.md").read_text(encoding="utf-8"))
+        self.assertEqual((unrelated / "SKILL.md").read_text(encoding="utf-8"), "leave me")
+
+    def test_opencode_state_failure_rolls_back(self) -> None:
+        with patch.object(apply, "_atomic_write", side_effect=OSError("test state failure")):
+            with self.assertRaisesRegex(sync.SyncError, "test state failure"):
+                sync.sync_checkout(self.checkout, self.home, "opencode")
+        self.assertFalse(self.opencode_skill().exists())
+        self.assertFalse(sync.global_state_path(self.home).exists())
+
+    def test_opencode_upgrades_version_five_ownership(self) -> None:
+        sync.sync_checkout(self.checkout, self.home)
+        state_path = sync.global_state_path(self.home)
+        old_state = json.loads(state_path.read_text(encoding="utf-8"))
+        old_state["version"] = 5
+        old_state.pop("opencode_skills")
+        state_path.write_text(json.dumps(old_state), encoding="utf-8")
+
+        sync.sync_checkout(self.checkout, self.home, "opencode")
+
+        migrated = json.loads(state_path.read_text(encoding="utf-8"))
+        self.assertEqual(migrated["version"], sync.STATE_VERSION)
+        self.assertIn("demo", migrated["skills"])
+        self.assertIn("demo", migrated["opencode_skills"])
+
+    def test_opencode_result_output_names_native_destination(self) -> None:
+        result = sync.sync_checkout(self.checkout, self.home, "opencode")
+        with patch("sys.stdout", new_callable=StringIO) as stdout:
+            sync.print_result(result)
+        output = stdout.getvalue()
+        self.assertIn("Harness: opencode", output)
+        self.assertIn("Skills (1): demo", output)
+        self.assertIn("Verified: ~/.config/opencode/skills", output)
+        self.assertNotIn("Agents", output)
+        self.assertNotIn("Prompts", output)
+
+
 class PiResourceSyncTests(AgentCoreSyncTests):
     def setUp(self) -> None:
         super().setUp()
@@ -832,20 +902,36 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         )
         self.assertFalse((self.home / ".pi").exists())
 
+    def test_explicit_opencode_harness_reaches_fresh_process(self) -> None:
+        result = bootstrap.refresh_and_launch(
+            self.checkout,
+            self.project,
+            command="sync",
+            home=self.home,
+            harness="opencode",
+        )
+
+        self.assertEqual(result, 0)
+        self.assertIn(
+            "remote one",
+            (self.home / ".config/opencode/skills/demo/SKILL.md").read_text(encoding="utf-8"),
+        )
+        self.assertFalse((self.home / ".pi").exists())
+
     def test_dirty_checkout_is_refused(self) -> None:
         (self.checkout / "dirty.txt").write_text("dirty", encoding="utf-8")
         with self.assertRaisesRegex(bootstrap.AgentCoreError, "staged, unstaged, or untracked"):
             bootstrap.refresh_and_launch(self.checkout, self.project, command="sync", home=self.home)
         self.assertFalse((self.home / ".agents").exists())
 
-    def test_pull_failure_warns_and_publishes_local_commit_for_both_harnesses(self) -> None:
+    def test_pull_failure_warns_and_publishes_local_commit_for_all_harnesses(self) -> None:
         self.remote.rename(self.root / "unavailable.git")
         commit = git(self.checkout, "rev-parse", "HEAD").stdout.strip()
         app_data = self.root / "AppData" / "Roaming"
         # Keep bytecode generated by the fresh process out of this fixture's status.
         with (self.checkout / ".git/info/exclude").open("a") as stream:
             stream.write("\n__pycache__/\n")
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             with self.subTest(harness=harness), patch.dict(os.environ, {"APPDATA": str(app_data)}), patch("sys.stderr", new_callable=StringIO) as stderr:
                 result = bootstrap.refresh_and_launch(
                     self.checkout, self.project, command="sync", home=self.home, harness=harness
@@ -855,6 +941,7 @@ class AgentCoreBootstrapTests(unittest.TestCase):
                 self.assertIn("remote freshness is unverified", stderr.getvalue())
         self.assertIn("remote one", (self.home / ".pi/agent/skills/demo/SKILL.md").read_text())
         self.assertIn("remote one", (app_data / "devin/skills/demo/SKILL.md").read_text())
+        self.assertIn("remote one", (self.home / ".config/opencode/skills/demo/SKILL.md").read_text())
 
     def test_failed_pull_never_falls_back_for_legacy_commands(self) -> None:
         self.remote.rename(self.root / "unavailable.git")
@@ -923,17 +1010,19 @@ class AgentCoreBootstrapTests(unittest.TestCase):
         ) as launch:
             self.assertEqual(bootstrap.main(["sync", "--no-pull"]), 0)
             self.assertEqual(bootstrap.main(["sync", "--harness", "devin"]), 0)
+            self.assertEqual(bootstrap.main(["sync", "--harness", "opencode"]), 0)
             self.assertEqual(bootstrap.main(["apply", "--here"]), 0)
             self.assertEqual(bootstrap.main(["retire-local", "--here"]), 0)
-        self.assertEqual(launch.call_count, 4)
+        self.assertEqual(launch.call_count, 5)
         self.assertEqual(launch.call_args_list[0].kwargs["command"], "sync")
         self.assertTrue(launch.call_args_list[0].kwargs["no_pull"])
         self.assertEqual(launch.call_args_list[0].kwargs["harness"], "pi")
         self.assertEqual(launch.call_args_list[1].kwargs["command"], "sync")
         self.assertEqual(launch.call_args_list[1].kwargs["harness"], "devin")
-        self.assertEqual(launch.call_args_list[2].kwargs["command"], "apply")
-        self.assertFalse(launch.call_args_list[2].kwargs["no_pull"])
-        self.assertEqual(launch.call_args_list[3].kwargs["command"], "retire-local")
+        self.assertEqual(launch.call_args_list[2].kwargs["harness"], "opencode")
+        self.assertEqual(launch.call_args_list[3].kwargs["command"], "apply")
+        self.assertFalse(launch.call_args_list[3].kwargs["no_pull"])
+        self.assertEqual(launch.call_args_list[4].kwargs["command"], "retire-local")
 
 
 class InstallerAndCompatibilityTests(unittest.TestCase):

@@ -1,6 +1,6 @@
 # Agent Core
 
-**Last Updated:** 2026-10-23
+**Last Updated:** 2026-10-28
 
 **Status:** Current
 
@@ -11,9 +11,9 @@
 ### Read First
 
 - `~/.agent-core` is the fixed canonical private checkout.
-- `personal-skills.toml` selects shared skills; `personal-pi.toml` and `personal-devin.toml` select harness-specific subagents and Pi templates.
-- `agent-core sync` remains Pi-first. `agent-core sync --harness devin` explicitly publishes the shared skills and declared Devin agents to Devin Desktop/CLI's Windows application-data directory.
-- Pi and Devin discover their native resources without settings edits. Global guidance remains unmanaged.
+- `personal-skills.toml` selects shared skills; `personal-pi.toml` and `personal-devin.toml` select harness-specific agents and Pi templates.
+- `agent-core sync` remains Pi-first. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents; `agent-core sync --harness opencode` publishes shared skills to OpenCode's native global skill directory.
+- Pi and Devin discover their native resources without settings edits; OpenCode discovers skills at its native global path. OpenCode sync manages shared skills only. Global guidance remains unmanaged.
 - `skills/` is hand-edited production source. Do not edit production skills without explicit human approval.
 - `docs/agent-core-operating-manual.md` is the human command reference. `docs/consumer-repo-enrollment.md` owns the detailed distribution and migration contract.
 - `scripts/places.py` is a standalone Bash/CMD directory navigator documented in `docs/places.md`; it is independent of Agent Core sync.
@@ -37,6 +37,7 @@ A successful global sync manages only exact declared destinations for the select
 
 - Pi: `~/.pi/agent/skills/<personal-skill>/`, `agents/<name>.md`, and `prompts/<name>.md`;
 - Devin on Windows: `%APPDATA%\devin\skills\<personal-skill>\` and `%APPDATA%\devin\agents\<name>.md`;
+- OpenCode: `~/.config/opencode/skills/<personal-skill>/` only;
 - `~/.agent-core-state/ownership.json` — machine-local per-harness ownership, fingerprints and safe legacy-migration state.
 
 Existing global guidance files remain in place but are no longer managed by sync. The first skills-only sync releases their old ownership records without reading or editing the files. Derived memory artifacts such as `memory/memory.sqlite` and `MEMORY_INDEX.md` are generated and disposable.
@@ -65,11 +66,17 @@ Publish the same declared skills plus Devin-specific agents to Devin Desktop/CLI
 agent-core sync --harness devin
 ```
 
+Publish the shared skills to OpenCode explicitly:
+
+```text
+agent-core sync --harness opencode
+```
+
 The launcher refuses a dirty checkout or unfinished Git operation, attempts `git pull --ff-only`, and starts the selected committed implementation in a fresh Python process. If pull fails, ordinary sync warns and publishes the existing local commit only after verifying the checkout is still valid, clean, unchanged, and free of unfinished Git operations. Remote freshness is explicitly unverified. `agent-core sync --no-pull` optionally skips the attempt; it is not required for offline/authentication failures. Sync validates committed manifests and selected resources before mutation, stages and fingerprints the copies, publishes changed shared files through a rollback-capable transaction, and atomically writes ownership state last.
 
 Removing a name from any manifest is normally non-destructive. Selecting `manage-python-env` triggers a named migration of unchanged fingerprint-owned `manage-python-agent-envs` and `manage-python-uv` copies for the selected harness; modified or unowned old copies are preserved and reported as conflicts. The prompt-to-skill migration is another narrow exception: Pi sync retires the old managed `commit-with-subagent` prompt only when its recorded fingerprint still matches. Pi also migrates **selected** legacy `.agents/` copies and registered Claude aliases only when ownership is verified, with rollback on failure. Unselected and unowned files remain untouched.
 
-Each harness discovers its native installed paths directly. For every declared destination, the committed repository version replaces any differing installed copy, including previously unmanaged or locally edited content; unsupported file types are refused. Devin custom agents remain harness-specific because their model and tool frontmatter differs from Pi. Sync does not edit either harness's settings or credentials.
+Each harness discovers its native installed paths directly. For every declared destination, the committed repository version replaces any differing installed copy, including previously unmanaged or locally edited content; unsupported file types are refused. OpenCode sync publishes shared skills only; this repository has no OpenCode-specific agent or command source. Devin custom agents remain harness-specific because their model and tool frontmatter differs from Pi. Sync does not edit harness settings or credentials.
 
 Legacy `agent-core apply [--here]` remains temporarily available and deprecated; it still targets project-local `.agents/skills/` and is not retargeted globally. Use `agent-core retire-local --here` in each old target to remove only unchanged managed copies and exact legacy metadata.
 
@@ -130,7 +137,7 @@ The former Drive workflow is no longer authoritative. This skill change does not
 | Pi resource list | `personal-pi.toml` | Authoritative Pi agent and prompt allowlist. |
 | Devin resource list | `personal-devin.toml` | Authoritative Devin custom-agent allowlist. |
 | CLI launcher | `agent_core/bootstrap.py` | Fixed-checkout refresh and fresh-process handoff. |
-| Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin publication, ownership, rollback, and Pi legacy migration. |
+| Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin/OpenCode publication, ownership, rollback, and Pi legacy migration. |
 | Legacy engine | `agent_core/apply.py` | Deprecated project-local compatibility. |
 | Retirement engine | `agent_core/retire.py` | Safe removal of old managed project copies. |
 | Places navigator | `docs/places.md` | Standalone directory discovery, menu, state, setup, and portability contract. |

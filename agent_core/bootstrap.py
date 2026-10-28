@@ -167,7 +167,7 @@ def build_parser() -> argparse.ArgumentParser:
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
     sync_parser = subparsers.add_parser(
-        "sync", help="Publish declared resources to Pi (default) or an explicit supported harness."
+        "sync", help="Publish declared resources to Pi (default), Devin, or OpenCode shared skills."
     )
     sync_parser.add_argument(
         "--no-pull",
@@ -176,9 +176,9 @@ def build_parser() -> argparse.ArgumentParser:
     )
     sync_parser.add_argument(
         "--harness",
-        choices=("pi", "devin"),
+        choices=("pi", "devin", "opencode"),
         default="pi",
-        help="Target harness. Defaults to pi.",
+        help="Target harness. Defaults to pi; OpenCode sync publishes shared skills only.",
     )
     apply_parser = subparsers.add_parser(
         "apply", help="Deprecated: copy configured skills into one project or directory."

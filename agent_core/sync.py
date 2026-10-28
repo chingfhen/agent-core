@@ -21,10 +21,11 @@ from agent_core.devin_manifest import (
 from agent_core.manifest import MANIFEST_FILENAME
 from agent_core.pi_manifest import PI_MANIFEST_FILENAME, PiManifestError, load_pi_names
 
-STATE_VERSION = 5
+STATE_VERSION = 6
 STATE_DIRECTORY = ".agent-core-state"
 STATE_FILENAME = "ownership.json"
 SHARED_SKILL_BASE = Path(".pi/agent/skills")
+OPENCODE_SKILL_BASE = Path(".config/opencode/skills")
 DEVIN_DIRECTORY = "devin"
 LEGACY_SKILL_BASE = Path(".agents/skills")
 CLAUDE_SKILL_BASE = Path(".claude/skills")
@@ -122,6 +123,7 @@ def _empty_state() -> dict[str, object]:
         "pi_prompts": {},
         "devin_skills": {},
         "devin_agents": {},
+        "opencode_skills": {},
     }
 
 
@@ -146,7 +148,7 @@ def load_global_state(
         raise SyncError(f"Global ownership state is malformed: {path}: {exc}") from exc
     legacy_fields = {"version", "skills", "aliases", "guidance"}
     pi_fields = legacy_fields | {"pi_agents", "pi_prompts"}
-    current_fields = pi_fields | {"devin_skills", "devin_agents"}
+    current_fields = pi_fields | {"devin_skills", "devin_agents", "opencode_skills"}
     if not isinstance(payload, dict):
         raise SyncError(f"Global ownership state has an invalid shape: {path}")
     if payload.get("version") == 2 and set(payload) == legacy_fields:
@@ -157,6 +159,7 @@ def load_global_state(
             "pi_prompts": {},
             "devin_skills": {},
             "devin_agents": {},
+            "opencode_skills": {},
         }
     elif payload.get("version") in {3, 4} and set(payload) == pi_fields:
         payload = {
@@ -164,7 +167,10 @@ def load_global_state(
             "version": STATE_VERSION,
             "devin_skills": {},
             "devin_agents": {},
+            "opencode_skills": {},
         }
+    elif payload.get("version") == 5 and set(payload) == pi_fields | {"devin_skills", "devin_agents"}:
+        payload = {**payload, "version": STATE_VERSION, "opencode_skills": {}}
     elif payload.get("version") == STATE_VERSION and set(payload) == current_fields:
         pass
     else:
@@ -230,6 +236,20 @@ def load_global_state(
                 or not HEX_FINGERPRINT.fullmatch(record["fingerprint"])
             ):
                 raise SyncError(f"Invalid Pi {category} ownership record for {name!r}")
+
+    for name, raw in payload["opencode_skills"].items():
+        if not apply._safe_skill_name(name):
+            raise SyncError(f"Invalid managed OpenCode skill name: {name!r}")
+        record = _expect_record(
+            raw, {"destination", "source_commit", "fingerprint"}, f"OpenCode skill {name!r}"
+        )
+        expected = home / OPENCODE_SKILL_BASE / name
+        if (
+            Path(record["destination"]).resolve(strict=False) != expected.resolve(strict=False)
+            or not apply.HEX_SHA.fullmatch(record["source_commit"])
+            or not HEX_FINGERPRINT.fullmatch(record["fingerprint"])
+        ):
+            raise SyncError(f"Invalid OpenCode skill ownership record for {name!r}")
 
     devin_records = [payload["devin_skills"], payload["devin_agents"]]
     if any(devin_records) and devin_base is None:
@@ -540,23 +560,37 @@ def _build_retired_python_plans(
     sources: list[apply.SourceSkill],
     state: dict[str, object],
     devin_base: Path | None = None,
+    *,
+    harness: str | None = None,
 ) -> list[LegacyPlan]:
     """Named migration only; never general pruning of removed manifest entries."""
     selected = {source.name for source in sources}
     if PYTHON_SKILL_REPLACEMENT not in selected:
         return []
-    record_key = "devin_skills" if devin_base is not None else "skills"
+    if harness is None:
+        harness = "devin" if devin_base is not None else "pi"
+    if harness == "pi":
+        record_key = "skills"
+        candidate_bases = (home / SHARED_SKILL_BASE, home / LEGACY_SKILL_BASE)
+        parent_root = home
+    elif harness == "devin" and devin_base is not None:
+        record_key = "devin_skills"
+        candidate_bases = (devin_base / "skills",)
+        parent_root = devin_base
+    elif harness == "opencode":
+        record_key = "opencode_skills"
+        candidate_bases = (home / OPENCODE_SKILL_BASE,)
+        parent_root = home
+    else:
+        raise SyncError(f"Unsupported harness for Python skill retirement: {harness}")
     records = state[record_key]
     plans: list[LegacyPlan] = []
     errors: list[str] = []
     for name in RETIRED_PYTHON_SKILLS:
         if name in selected:
             raise SyncError(f"Conflicting Python skills selected: {PYTHON_SKILL_REPLACEMENT}, {name}")
-        candidates = (
-            [devin_base / "skills" / name] if devin_base is not None else
-            [home / SHARED_SKILL_BASE / name, home / LEGACY_SKILL_BASE / name]
-        )
-        _ensure_real_parents(devin_base if devin_base is not None else home, candidates)
+        candidates = [base / name for base in candidate_bases]
+        _ensure_real_parents(parent_root, candidates)
         record = records.get(name)
         for target in candidates:
             owned = _is_legacy_record(record, target)
@@ -573,9 +607,9 @@ def _build_retired_python_plans(
                     errors.append(f"Obsolete Python skill was locally modified; refusing removal: {target}")
                     continue
             if owned:
-                category = "devin_skills" if devin_base is not None else "retired_skills"
+                category = "retired_skills" if harness == "pi" else record_key
                 plans.append(LegacyPlan(target, category, name, "directory"))
-        if devin_base is None:
+        if harness == "pi":
             alias = home / CLAUDE_SKILL_BASE / name
             _ensure_real_parents(home, [alias])
             registered = name in state["aliases"]
@@ -590,16 +624,20 @@ def _build_retired_python_plans(
     return plans
 
 
-def _build_devin_skill_plans(
-    devin_base: Path, sources: list[apply.SourceSkill], state: dict[str, object]
+def _build_native_skill_plans(
+    skill_base: Path,
+    sources: list[apply.SourceSkill],
+    state: dict[str, object],
+    records_key: str,
+    harness_name: str,
 ) -> list[SkillPlan]:
-    records = state["devin_skills"]
+    records = state[records_key]
     assert isinstance(records, dict)
     plans: list[SkillPlan] = []
     errors: list[str] = []
 
     for source in sources:
-        target = devin_base / "skills" / source.name
+        target = skill_base / source.name
         record = records.get(source.name)
         if not apply._lexists(target):
             classification = "added" if record is None else "recreated"
@@ -607,7 +645,7 @@ def _build_devin_skill_plans(
             try:
                 installed = apply.fingerprint_directory(target)
             except apply.ApplyError as exc:
-                errors.append(f"Devin skill {target} is not a regular directory: {exc}")
+                errors.append(f"{harness_name} skill {target} is not a regular directory: {exc}")
                 continue
             if installed == source.fingerprint:
                 classification = "unchanged" if record is not None else "adopted"
@@ -616,8 +654,24 @@ def _build_devin_skill_plans(
         plans.append(SkillPlan(source, target, classification))
 
     if errors:
-        raise SyncError("Preflight refused Devin skill changes:\n- " + "\n- ".join(errors))
+        raise SyncError(f"Preflight refused {harness_name} skill changes:\n- " + "\n- ".join(errors))
     return plans
+
+
+def _build_devin_skill_plans(
+    devin_base: Path, sources: list[apply.SourceSkill], state: dict[str, object]
+) -> list[SkillPlan]:
+    return _build_native_skill_plans(
+        devin_base / "skills", sources, state, "devin_skills", "Devin"
+    )
+
+
+def _build_opencode_skill_plans(
+    home: Path, sources: list[apply.SourceSkill], state: dict[str, object]
+) -> list[SkillPlan]:
+    return _build_native_skill_plans(
+        home / OPENCODE_SKILL_BASE, sources, state, "opencode_skills", "OpenCode"
+    )
 
 
 def _build_devin_agent_plans(
@@ -679,6 +733,7 @@ def _render_state(state: dict[str, object]) -> str:
         "pi_prompts": dict(sorted(state["pi_prompts"].items())),
         "devin_skills": dict(sorted(state["devin_skills"].items())),
         "devin_agents": dict(sorted(state["devin_agents"].items())),
+        "opencode_skills": dict(sorted(state["opencode_skills"].items())),
     }
     return json.dumps(ordered, indent=2) + "\n"
 
@@ -986,6 +1041,120 @@ def _sync_devin_checkout(
     )
 
 
+def _sync_opencode_checkout(checkout: Path, home: Path) -> SyncResult:
+    checkout = checkout.resolve()
+    home = home.resolve()
+    sources, commit = apply.load_sources(checkout)
+
+    ownership_path = global_state_path(home)
+    state = load_global_state(ownership_path, home, _ambient_devin_base())
+    skill_plans = _build_opencode_skill_plans(home, sources, state)
+    retired_python = _build_retired_python_plans(
+        home, sources, state, harness="opencode"
+    )
+    destinations = [plan.target for plan in skill_plans]
+    destinations.extend(plan.path for plan in retired_python)
+    destinations.append(ownership_path)
+    _ensure_real_parents(home, destinations)
+
+    prospective = json.loads(json.dumps(state))
+    for plan in skill_plans:
+        prospective["opencode_skills"][plan.source.name] = {
+            "destination": _path_text(plan.target),
+            "source_commit": commit,
+            "fingerprint": plan.source.fingerprint,
+        }
+    for plan in retired_python:
+        prospective["opencode_skills"].pop(plan.name, None)
+    prospective["guidance"] = {}
+
+    state_directory = ownership_path.parent
+    state_directory.mkdir(parents=True, exist_ok=True)
+    transaction = state_directory / f"transaction-{uuid.uuid4().hex}"
+    stage = transaction / "stage"
+    backup = transaction / "backup"
+    completed: list[tuple[Path, Path | None]] = []
+    try:
+        (stage / "skills").mkdir(parents=True)
+        backup.mkdir(parents=True)
+        for plan in skill_plans:
+            staged = stage / "skills" / plan.source.name
+            shutil.copytree(plan.source.path, staged, symlinks=True)
+            if apply.fingerprint_directory(staged) != plan.source.fingerprint:
+                raise SyncError(f"Staged OpenCode skill fingerprint mismatch: {plan.source.name}")
+
+        current_state = load_global_state(ownership_path, home, _ambient_devin_base())
+        if current_state != state:
+            raise SyncError(f"Global ownership state changed after preflight: {ownership_path}")
+        if _build_opencode_skill_plans(home, sources, state) != skill_plans:
+            raise SyncError("OpenCode skill targets changed during preflight")
+        if _build_retired_python_plans(
+            home, sources, state, harness="opencode"
+        ) != retired_python:
+            raise SyncError("Retired OpenCode Python targets changed during preflight")
+
+        for plan in skill_plans:
+            if plan.classification in {"unchanged", "adopted"}:
+                continue
+            plan.target.parent.mkdir(parents=True, exist_ok=True)
+            saved: Path | None = None
+            if apply._lexists(plan.target):
+                saved = backup / "skills" / plan.source.name
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(plan.target, saved)
+            completed.append((plan.target, saved))
+            os.replace(stage / "skills" / plan.source.name, plan.target)
+
+        for plan in retired_python:
+            if apply._lexists(plan.path):
+                saved = backup / "retired-skills" / plan.name
+                saved.parent.mkdir(parents=True, exist_ok=True)
+                os.replace(plan.path, saved)
+                completed.append((plan.path, saved))
+
+        for plan in skill_plans:
+            if apply.fingerprint_directory(plan.target) != plan.source.fingerprint:
+                raise SyncError(f"Published OpenCode skill fingerprint mismatch: {plan.target}")
+
+        try:
+            apply._atomic_write(ownership_path, _render_state(prospective))
+        except OSError as exc:
+            raise SyncError(f"Could not publish global ownership state {ownership_path}: {exc}") from exc
+    except Exception as exc:
+        rollback_errors: list[str] = []
+        for target, saved in reversed(completed):
+            try:
+                if apply._lexists(target):
+                    _remove_path(target)
+                if saved is not None and apply._lexists(saved):
+                    target.parent.mkdir(parents=True, exist_ok=True)
+                    os.replace(saved, target)
+            except Exception as rollback_exc:
+                rollback_errors.append(f"{target}: {rollback_exc}")
+        if rollback_errors:
+            raise SyncError(
+                f"Sync failed ({exc}) and rollback was incomplete:\n- " + "\n- ".join(rollback_errors)
+            ) from exc
+        if isinstance(exc, (SyncError, apply.ApplyError)):
+            raise SyncError(str(exc)) from exc
+        raise SyncError(f"Sync failed before completion: {exc}") from exc
+    finally:
+        shutil.rmtree(transaction, ignore_errors=True)
+
+    return SyncResult(
+        "opencode",
+        checkout,
+        commit,
+        checkout / MANIFEST_FILENAME,
+        ownership_path,
+        home / OPENCODE_SKILL_BASE,
+        skill_plans,
+        [],
+        [],
+        retired_python,
+    )
+
+
 def sync_checkout(
     checkout: Path,
     home: Path,
@@ -997,6 +1166,8 @@ def sync_checkout(
         return _sync_pi_checkout(checkout, home)
     if harness == "devin":
         return _sync_devin_checkout(checkout, home, app_data)
+    if harness == "opencode":
+        return _sync_opencode_checkout(checkout, home)
     raise SyncError(f"Unsupported harness: {harness}")
 
 
@@ -1011,7 +1182,7 @@ def print_result(result: SyncResult) -> None:
         if result.legacy:
             print(f"Migrated legacy entries: {len(result.legacy)}")
         print("Verified: ~/.pi/agent/{skills,agents,prompts} (global guidance untouched)")
-    else:
+    elif result.harness == "devin":
         print(
             f"Agents ({len(result.devin_resources)}): "
             + (", ".join(p.source.name for p in result.devin_resources) or "none")
@@ -1019,13 +1190,17 @@ def print_result(result: SyncResult) -> None:
         if result.legacy:
             print(f"Retired Python skill entries: {len(result.legacy)}")
         print("Verified: %APPDATA%\\devin\\{skills,agents} (global guidance untouched)")
+    else:
+        if result.legacy:
+            print(f"Retired Python skill entries: {len(result.legacy)}")
+        print("Verified: ~/.config/opencode/skills (global guidance untouched)")
 
 
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Internal post-refresh Agent Core global sync implementation.")
     parser.add_argument("--checkout", required=True)
     parser.add_argument("--home", required=True)
-    parser.add_argument("--harness", choices=("pi", "devin"), default="pi")
+    parser.add_argument("--harness", choices=("pi", "devin", "opencode"), default="pi")
     return parser
 
 

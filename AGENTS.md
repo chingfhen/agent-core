@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-23
+**Last Updated:** 2026-10-28
 
 **Status:** Current
 
@@ -12,7 +12,7 @@
 
 - You are the steward agent when working in this repository.
 - `skills/` is the hand-edited production source. Do not change production workflow skills unless the human explicitly approves the skill edit.
-- `agent-core sync` defaults to Pi-native publication. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents under `%APPDATA%\devin\`; global guidance and harness settings stay unmanaged.
+- `agent-core sync` defaults to Pi-native publication. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents under `%APPDATA%\devin\`; `--harness opencode` publishes shared skills under `~/.config/opencode/skills/`. Global guidance and harness settings stay unmanaged.
 - Do not hand-maintain managed copies. Sync owns exact declared per-harness resources recorded in `~/.agent-core-state/ownership.json`; verified previously managed `.agents/` copies and registered Claude aliases are safely retired only by Pi migration.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
 - Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance outside the marked Agent Lessons section, load `project-docs`. The explicitly invoked `agent-lessons` skill independently owns that section.
@@ -49,6 +49,7 @@ Installed or generated surfaces include:
 - real skill copies under `~/.pi/agent/skills/<personal-skill>/`;
 - declared Pi agents and templates under `~/.pi/agent/agents/*.md` and `~/.pi/agent/prompts/*.md`;
 - explicit Devin copies under `%APPDATA%\devin\skills\` and `%APPDATA%\devin\agents\`;
+- explicit OpenCode shared skills under `~/.config/opencode/skills/<name>/`;
 - `~/.agent-core-state/ownership.json`;
 - derived `memory/memory.sqlite` and `MEMORY_INDEX.md`.
 
@@ -60,11 +61,11 @@ Installed or generated surfaces include:
 - Require Python 3.10+ and keep runtime code standard-library-only.
 - The launcher must reject dirty checkouts and unfinished Git operations and cross a fresh-process boundary before sync code runs. Ordinary sync attempts authenticated fast-forward pull; on failure it warns and may publish only the still-valid, clean, unchanged local commit with freshness unverified. `sync --no-pull` skips the attempt. Never bypass source validation or silently fall back.
 - Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
-- Preflight each configured skill, harness-specific agent/template, and ownership record. Do not inspect or modify global system guidance or harness settings.
+- Preflight each configured skill, harness-specific agent/template, and ownership record. OpenCode publication is shared-skills-only. Do not inspect or modify global system guidance or harness settings.
 - The committed manifests are authoritative for exactly declared destinations in the selected harness: overwrite different installed files/directories, even if unmanaged or locally edited. Refuse unsupported file types and unsafe parents. Legacy `.agents/` migration still requires verified fingerprints and remains Pi-only.
 - Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default; a named one-time resource migration may retire only its unchanged fingerprint-owned predecessor. Selecting `manage-python-env` retires the two old Python skill names only for the selected harness; modified/unowned obsolete copies block with exact paths. Pi-only legacy/alias retirement retains its verification boundary.
 - Stage, fingerprint and verify selected resources; migrate verified legacy-owned copies and registered aliases through the same rollback transaction; atomically publish ownership last. Preserve unrelated, unowned and unselected resources.
-- Default sync publishes selected files only under `~/.pi/agent/{skills,agents,prompts}/`. The explicit Devin harness publishes only under `%APPDATA%\devin\{skills,agents}\`; never target another harness implicitly.
+- Default sync publishes selected files only under `~/.pi/agent/{skills,agents,prompts}/`. The explicit Devin harness publishes only under `%APPDATA%\devin\{skills,agents}\`; explicit OpenCode sync publishes only under `~/.config/opencode/skills/`; never target another harness implicitly.
 - Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
 - Successful sync prints the commit, selected harness, exact declared names/counts, verified native root, and Pi migration count when relevant. Conflicts report exact paths.
 
@@ -115,7 +116,7 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 | Personal list | `personal-skills.toml` | Authoritative copied skill set. |
 | Workspace contract | `docs/workspace-configuration.md` | Setup, explicit resource routing, and customization boundaries. |
 | CLI launcher | `agent_core/bootstrap.py` | Canonical refresh and fresh-process boundary. |
-| Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin publication, verification, safe migration and rollback. |
+| Sync engine | `agent_core/sync.py` | Pi-default and explicit Devin/OpenCode publication, verification, safe migration and rollback. |
 | Legacy retirement | `agent_core/retire.py` | Safe cleanup of prior project-local installations. |
 | Memory contract | `docs/memory-pilot.md` | Ledger schema, approval boundary, and tooling behavior. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |

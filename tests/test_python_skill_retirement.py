@@ -35,7 +35,12 @@ class PythonSkillRetirementTests(unittest.TestCase):
         return sync.sync_checkout(self.checkout, self.home, harness, app_data=self.app_data)
 
     def target(self, harness, name):
-        base = self.home / ".pi/agent" if harness == "pi" else self.app_data / "devin"
+        if harness == "pi":
+            base = self.home / ".pi/agent"
+        elif harness == "devin":
+            base = self.app_data / "devin"
+        else:
+            base = self.home / ".config/opencode"
         return base / "skills" / name
 
     def replace_manifest(self):
@@ -44,10 +49,10 @@ class PythonSkillRetirementTests(unittest.TestCase):
         commit_all(self.checkout, "consolidate Python")
 
     def test_selected_harness_only_owned_predecessors_retired_and_idempotent(self):
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             self.publish(harness)
         self.replace_manifest()
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             with self.subTest(harness=harness):
                 result = self.publish(harness)
                 self.assertEqual(len(result.legacy), 2)
@@ -57,17 +62,18 @@ class PythonSkillRetirementTests(unittest.TestCase):
                     self.assertFalse(self.target(harness, old).exists())
                 if harness == "pi":
                     self.assertTrue(self.target("devin", sync.RETIRED_PYTHON_SKILLS[0]).exists())
+                    self.assertTrue(self.target("opencode", sync.RETIRED_PYTHON_SKILLS[0]).exists())
                 self.assertEqual(self.publish(harness).legacy, [])
         state = json.loads(sync.global_state_path(self.home).read_text())
-        for key in ("skills", "devin_skills"):
+        for key in ("skills", "devin_skills", "opencode_skills"):
             self.assertIn("unrelated", state[key])
             self.assertNotIn(sync.RETIRED_PYTHON_SKILLS[0], state[key])
 
     def test_modified_owned_predecessor_blocks_before_publication(self):
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             self.publish(harness)
         self.replace_manifest()
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             old = self.target(harness, sync.RETIRED_PYTHON_SKILLS[0]) / "SKILL.md"
             old.write_text("human customization")
             before = sync.global_state_path(self.home).read_bytes()
@@ -79,7 +85,7 @@ class PythonSkillRetirementTests(unittest.TestCase):
 
     def test_unowned_predecessor_preserved_and_reported(self):
         self.replace_manifest()
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             old = self.target(harness, sync.RETIRED_PYTHON_SKILLS[1])
             old.mkdir(parents=True)
             (old / "SKILL.md").write_text("unowned")
@@ -90,16 +96,16 @@ class PythonSkillRetirementTests(unittest.TestCase):
             self.assertFalse(self.target(harness, sync.PYTHON_SKILL_REPLACEMENT).exists())
 
     def test_state_failure_restores_old_skills_and_preserves_other_harness(self):
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             self.publish(harness)
         self.replace_manifest()
         before = sync.global_state_path(self.home).read_bytes()
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             with self.subTest(harness=harness), patch.object(apply, "_atomic_write", side_effect=OSError("injected")), self.assertRaisesRegex(sync.SyncError, "injected"):
                 self.publish(harness)
             self.assertEqual(sync.global_state_path(self.home).read_bytes(), before)
             self.assertFalse(self.target(harness, sync.PYTHON_SKILL_REPLACEMENT).exists())
-            for other in ("pi", "devin"):
+            for other in ("pi", "devin", "opencode"):
                 for old in sync.RETIRED_PYTHON_SKILLS:
                     self.assertTrue((self.target(other, old) / "SKILL.md").is_file())
 
@@ -182,10 +188,10 @@ class PythonSkillRetirementTests(unittest.TestCase):
         self.assertNotIn(old, json.loads(state_path.read_text())["aliases"])
 
     def test_unsupported_predecessor_type_preserved(self):
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             self.publish(harness)
         self.replace_manifest()
-        for harness in ("pi", "devin"):
+        for harness in ("pi", "devin", "opencode"):
             old = self.target(harness, sync.RETIRED_PYTHON_SKILLS[0])
             shutil.rmtree(old)
             old.write_text("not a directory")
