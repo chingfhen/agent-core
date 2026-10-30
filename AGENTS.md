@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-28
+**Last Updated:** 2026-10-30
 
 **Status:** Current
 
@@ -31,7 +31,7 @@
 
 ### Roles
 
-- **Steward agent:** Maintains this canonical repository, package, docs, workflows, and memory tooling.
+- **Steward agent:** Maintains this canonical repository, package, docs, workflows, and memory tooling. Owns oversight of skill effectiveness, reliability, and robustness: investigate observed failures, propose proportionate improvements, and implement production skill changes after explicit human approval.
 - **Executor agent:** Works in any directory using globally installed personal skills plus project-owned instructions and skills.
 - **Managed global destination:** An exact user-home path published by Agent Core and fingerprinted in machine-local ownership state.
 
@@ -79,6 +79,8 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 - Do not scan arbitrary repositories for old installations.
 
 ### Workspace Workflow
+
+Current skill contract below. The approved lean-section and two-layer lessons replacement is documented in [workspace configuration](docs/workspace-configuration.md#approved-target--lean-skill-owned-guidance); implementation and workspace adoption are still pending.
 
 - `workspace-setup` is steward-maintained production source and is invoked by the human, not each session. It owns one approved block within workspace-root `AGENTS.md`, preserving its position, outside text and human-edited Use for/Behavior wording.
 - The confirmed AGENTS.md map replaces `projects.toml`. No automatic docs/tasks/KB/Python destination fallbacks; missing or conflicting configuration means ask.
