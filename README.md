@@ -1,6 +1,6 @@
 # Agent Core
 
-**Last Updated:** 2026-10-28
+**Last Updated:** 2026-10-30
 
 **Status:** Current
 
@@ -100,13 +100,13 @@ See `docs/places.md` for setup, commands, file formats, refresh behavior, and pl
 
 ## Workspace Integration
 
-After syncing and reloading skills, invoke `workspace-setup` in the root you open in your coding agent. It proposes `.work-context/` for shared knowledge, retained inbox originals, per-project docs/tasks, and flat Python purpose projects. It confirms ambiguous mappings and maintains one short approved section in root `AGENTS.md`, preserving your customized instructions. Its response is exactly the saved section.
+Core workflow skills maintain their own lean routing sections in applicable `AGENTS.md`. They reuse confirmed resources or propose initialization when absent; `workspace-setup` is an optional approved setup/refresh convenience. `.work-context/` is the convention for shared knowledge, retained inbox originals, per-project docs/tasks, and flat Python purpose projects. Established locations and customized guidance survive; legacy central blocks require approved migration.
 
-`AGENTS.md` replaces the former `projects.toml` workflow. Normal skills use explicitly configured locations, not automatic fallback folders. `manage-python-env` manages **and executes through** reusable uv environments. Code repositories can remain anywhere; several can belong to one project. Setup is requested only for a new workspace or relevant changes, not each session. The separately invoked `agent-lessons` skill maintains a bounded lessons section in applicable `AGENTS.md` files. See [workspace configuration](docs/workspace-configuration.md).
+`AGENTS.md` replaces the former `projects.toml` workflow. `manage-python-env` manages **and executes through** reusable uv environments, loading before interpreter/import probes too. New tasks use creation-month/workstream folders, retain a live root index, and link required context alongside deliverables and next actions. An explicit fresh-session handoff or task closeout coordinates KB capture, docs integration, and lessons review through the owning skills; ordinary task updates stay lightweight. Lessons keep essential guards and conditional pointers, with detail in docs/KB rather than a new companion. All skills permit model invocation; request-only effects still require human intent. See [workspace configuration](docs/workspace-configuration.md).
 
 ## Knowledge Base
 
-[`skills/knowledge-base/SKILL.md`](skills/knowledge-base/SKILL.md) is the canonical knowledge-base workflow and is selected in `personal-skills.toml`. It preserves reusable context in dated Markdown records, retrieves prior learning selectively, and creates or updates managed human-facing artifacts only on request. KB and archive roots must be explicitly configured or selected. Workspace setup records `.work-context/knowledge-base/` and `.work-context/archive/knowledge-base/`; neither is a silent runtime fallback. The archive stays outside the KB directory but may share its Git worktree. Inbox processing verifies original retention before removing inputs; it never implicitly commits or pushes them.
+[`skills/knowledge-base/SKILL.md`](skills/knowledge-base/SKILL.md) is the canonical knowledge-base workflow and is selected in `personal-skills.toml`. It preserves reusable context in dated Markdown records, retrieves prior learning selectively, and creates or updates managed human-facing artifacts only on request. It remains standalone and owns its routing/first use. `.work-context/knowledge-base/` and `.work-context/archive/knowledge-base/` are proposals when resources are absent, not silent fallbacks. The archive is required for inbox processing, stays outside the KB, and may share its Git worktree. Processing verifies original retention before removing inputs; it never implicitly commits or pushes them.
 
 The former Drive workflow is no longer authoritative. This skill change does not migrate any KB content. GitHub/web-app use requires explicit repository identity and suitable connector capabilities; local paths and skill loading are not automatically available there. See the [human operating manual](docs/agent-core-operating-manual.md#knowledge-base-workflow) for publication and usage entry points.
 

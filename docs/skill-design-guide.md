@@ -1,7 +1,7 @@
 ---
 title: Skill Design Guide
 description: Canonical criteria for designing, invoking, consolidating, publishing, and retiring Agent Core skills.
-updated: 2026-10-21
+updated: 2026-10-30
 ---
 
 # Skill Design Guide
@@ -34,12 +34,14 @@ Avoid internal implementation terminology that the human would never naturally r
 
 The YAML `description` should say **when to use it** and distinguish it from nearest neighbors. Avoid long synonym lists or claims that it governs every task.
 
-Select invocation deliberately:
-- **Agent-discoverable:** The agent must recognize a relevant situation proactively. Keep the trigger narrow enough to avoid accidental activation.
-- **Explicit invocation:** The human wants a voluntary mode or specialized utility. Where the harness supports it, disable autonomous invocation.
+All canonical skills are model-discoverable/callable. Select their action trigger deliberately:
+- **Proactive use:** The agent recognizes a relevant situation. Keep the trigger narrow enough to avoid accidental activation.
+- **Request-only operation:** A voluntary mode or consequential action requires human intent, expressed naturally or through a harness shortcut. State that boundary in description/instructions rather than hiding the skill from the model.
 - **Reference material:** No invocation needed; place it under `docs/` or a skill-local `references/` file, not in a redundant skill.
 
-Do not treat invocation flags as universal across harnesses without checking their behavior.
+Keep `disable-model-invocation` false or absent and include the model when explicit
+trigger lists are used. Do not treat flags as universal across harnesses; verify
+actual discovery/loading separately from permission to perform the workflow.
 
 ## Responsibility boundaries
 
@@ -48,12 +50,19 @@ Use **one skill per job**. Similar *steps* do not imply duplicate skills when ou
 Keep these boundaries clear:
 - `planning`: select and justify the direction.
 - `engineering`: implement approved work.
-- `project-tasks`: make unfinished work portable.
+- `project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
 - `project-docs`: maintain settled project truth.
 - `knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
+- `agent-lessons`: improve future behavior; keep concise guards/pointers in guidance and use docs/KB for supporting detail.
 - `learning`: develop human understanding from mechanisms, examples, and judgment; no automatic KB persistence or code changes.
 - `approval-gate`: support a consequential approval.
 - `human-unblock`: clear a human-owned obstacle during execution.
+
+Docs and KB remain standalone. Tasks may coordinate their use and lessons review
+for a requested handoff/closeout; lessons may use their owning workflows for detail.
+Keep common findings at one primary authority and avoid recursive coordination.
+Usability/routing instructions should stay small; put less frequent procedures
+behind skill-local references so each skill's core job remains prominent.
 
 A new mode within one skill is preferable to a second skill when the **goal is the same** and only depth, timing, or presentation changes. Name available modes clearly and use a sensible default.
 

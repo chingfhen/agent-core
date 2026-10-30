@@ -1,6 +1,6 @@
 ---
 name: project-docs
-description: Maintains settled project understanding in the documentation surface explicitly configured in applicable AGENTS.md, and stable agent behavior in explicitly owned project guidance. Load before creating, editing, moving, deleting, or managing those surfaces; not needed merely to read explicitly identified files. Routes each durable claim to its canonical authority, integrates useful meaning into existing docs, rewrites stale material toward current understanding, and allows a docs sync to conclude that no change is needed.
+description: Maintains settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Load before maintaining those surfaces; not needed merely to read identified files. Establishes its own docs routing when needed, routes each durable claim to its canonical authority, integrates useful meaning into existing docs, and allows a docs sync to conclude that no change is needed.
 disable-model-invocation: false
 ---
 
@@ -25,18 +25,21 @@ Documentation is not active task state, a transcript, raw evidence, status histo
 This skill writes only to the project's explicitly configured documentation surface
 and to project-guidance files explicitly assigned to this workflow.
 
-Before managing documentation, read the project map in applicable `AGENTS.md`.
+Before managing documentation, read the docs routing in applicable `AGENTS.md`.
 Resolve the project from the requested work, not solely the session's current
 working directory. One project may span several repositories. Use its `Docs`
-location; workspace-relative paths resolve against the recorded workspace root.
-Read applicable repository guidance too. If the project, root, or destination is
-missing, conflicting, or ambiguous, ask before writing. If a configured location
+location; new section-relative paths resolve against the declaring AGENTS.md
+directory, while legacy workspace-relative paths retain their recorded base.
+Read applicable repository guidance too. For missing routing or an authorized
+routing change, read [Docs routing](references/routing.md). Ask about conflicting
+or ambiguous project identity/ownership. If a configured location
 is inaccessible, report the problem rather than substitute another destination.
 A confirmed but not-yet-created directory may be created during an authorized write.
 
-There is no automatic `docs/` fallback and no `projects.toml` workflow. Do not
-scan for an alternative surface or rewrite the map during normal documentation
-work. Workspace registration belongs to explicitly requested `workspace-setup`.
+There is no automatic `docs/` fallback and no `projects.toml` workflow. This skill
+can establish its own resources without workspace-setup. Maintain only its owned
+docs-root/entry-point section when routing changes; do not scan for a substitute
+surface or rewrite legacy central blocks without migration approval.
 An explicit human-selected destination for this operation is allowed; it does not
 silently change the saved map. Ordinary work does not require invoking setup again.
 

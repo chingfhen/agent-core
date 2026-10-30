@@ -1,10 +1,11 @@
 ---
 name: commit-with-subagent
 description: Create clean local Git commits using the dedicated commit-agent subagent. Use only when the user explicitly asks to commit changes.
-disable-model-invocation: true
+disable-model-invocation: false
 agent: commit-agent
 triggers:
   - user
+  - model
 ---
 
 Create appropriate local Git commits for the current repository without pushing.

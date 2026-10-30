@@ -59,6 +59,11 @@ Ambiguous "capture this" outside a KB context is not permission to persist here.
 | "Update [managed artifact]" | Read relevant records and current context | Read only when useful | Revise the identified output | Unchanged |
 | "Search the KB", or relevant proactive recall | Read only | Read only when useful | Read only when useful | Excluded unless asked |
 
+An explicitly requested project-task handoff/closeout or agent-lessons capture
+may supply the human's capture intent through its coordinating workflow. Apply
+this skill's normal admission and ownership rules; do not call back into the
+coordinator. Ordinary task execution or read-only recall is not capture intent.
+
 Combine actions only when requested together. Generic "write a guide/script"
 without managed-artifact or KB context does not select this persistence workflow.
 A request to inspect, list, or review the inbox is read-only, not processing.
@@ -77,18 +82,19 @@ Use, in order:
 1. The explicit KB location selected for this operation.
 2. The KB root in applicable project/agent instructions, such as `AGENTS.md`.
 
-There is no home-directory or nearby-folder fallback. If no root is explicitly
-selected or configured, ask; do not initialize another KB. Resolve workspace-relative
-paths against the workspace root recorded in applicable `AGENTS.md`, not the shell's
-working directory. Do not consult or modify `projects.toml`. `workspace-setup`
-confirms the workspace's shared KB; ordinary KB work does not rerun setup or scan
-nearby repositories. A configured inaccessible root is an error, not permission
+There is no home-directory or nearby-folder fallback. For missing configuration
+or an authorized routing change, read [KB routing](references/routing.md); this
+skill can establish its own resources without workspace-setup. New section-relative
+paths resolve from the declaring AGENTS.md directory; legacy workspace-relative
+paths retain their recorded base, never the shell's working directory. Do not
+consult or modify `projects.toml` or scan nearby repositories. A configured
+inaccessible root is an error, not permission
 to substitute another location. Remote-only runtimes also need an accessible,
 explicit backend location.
 
 Inbox processing uses the explicit `Knowledge Base Archive` selected for the
 operation or configured in applicable instructions. Require that destination before
-processing; there is no `~/.kb-archive/` fallback. Workspace setup records
+processing; there is no `~/.kb-archive/` fallback. First use may propose
 `.work-context/archive/knowledge-base/` alongside the KB root. This is a narrow
 additional write boundary for processed originals, not a second search scope.
 The archive must be outside the KB directory and not contain the KB, but may share

@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-23
+updated: 2026-10-30
 ---
 
 # Skills Catalogue
@@ -10,15 +10,18 @@ updated: 2026-10-23
 
 `personal-skills.toml` is the authoritative list of skills published by `agent-core sync`. This catalogue is informational: being listed here **does not** install a skill. A removed manifest entry also does not automatically uninstall old copies.
 
+All canonical skills permit model invocation. Natural-language intent can activate
+request-only workflows; availability/loading does not authorize unrelated effects.
+
 ## Active — in `personal-skills.toml`
 
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
-| [workspace-setup](../skills/workspace-setup/SKILL.md) | Explicitly set up a workspace or refresh it after repositories/skills change. | Approved managed block in root AGENTS.md; preserves existing position and custom instructions. |
-| [project-tasks](../skills/project-tasks/SKILL.md) | You need to save, resume, checkpoint, or hand off unfinished work. | Execution continuity, not project truth. |
-| [project-docs](../skills/project-docs/SKILL.md) | You want to maintain durable project decisions, contracts, or guidance. | Settled understanding, not an active backlog. |
-| [agent-lessons](../skills/agent-lessons/SKILL.md) | Explicitly review current work for lessons that future agents must apply. | Autonomously maintains only its marked AGENTS.md section; no automatic capture or other skill dependency. |
-| [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", clear the KB inbox, create/update a managed artifact, or recall prior context. | Selective proactive retrieval; explicit writes to records/managed outputs. No approval queue or automatic synthesis. |
+| [workspace-setup](../skills/workspace-setup/SKILL.md) | Request coordinated setup/refresh or an approved legacy-block migration. | Optional; follows skill-owned sections and preserves position/custom text. |
+| [project-tasks](../skills/project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
+| [project-docs](../skills/project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
+| [agent-lessons](../skills/agent-lessons/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
+| [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, create/update a managed artifact, or recall prior context. | Standalone selective recall and requested persistence; own routing, bounded knowledge-page maintenance, verified archival. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
 | [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
@@ -28,7 +31,7 @@ updated: 2026-10-23
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
 | [approval-gate](../skills/approval-gate/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
 | [commit-with-subagent](../skills/commit-with-subagent/SKILL.md) | Explicitly create local commits through the configured commit-agent specialist. | User-triggered only; never pushes. |
-| [manage-python-env](../skills/manage-python-env/SKILL.md) | Execute Python, tests, evaluations, or manage dependencies. | Reusable independent uv purpose projects under the configured Python root; replaces manage-python-agent-envs and manage-python-uv. |
+| [manage-python-env](../skills/manage-python-env/SKILL.md) | Before Python execution, including interpreter/import probes, tests, evaluations, or dependency changes. | Own root/activation section and first use; manage AND execute through compatible independent uv purpose projects. |
 | [mermaid-markdown](../skills/mermaid-markdown/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |
 

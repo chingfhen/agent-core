@@ -7,8 +7,9 @@ description: >
   durable improvements using verified applicable guidance and other available,
   authorized project resources. Use for "agent lessons", "learn from this
   session", "remember this for future agents", or reflection on difficult agent
-  work. Do not trigger during ordinary work or automatically capture notes.
-disable-model-invocation: true
+  work, including operational-lessons review in an explicitly requested project
+  handoff or closeout. Do not trigger during ordinary work or automatically capture notes.
+disable-model-invocation: false
 ---
 
 # Agent Lessons
@@ -16,7 +17,8 @@ disable-model-invocation: true
 ## Purpose and trigger
 
 Improve **future agent behavior**, not the volume of saved knowledge or the size
-of `AGENTS.md`. Invoke only when the human asks. A call after difficult,
+of `AGENTS.md`. Invoke when the human asks in natural language or explicitly
+requests a coordinated project-task handoff/closeout. A call after difficult,
 first-time work is a strong signal to investigate what the agent had to figure
 out; it does not require the human to identify the lesson. An observation from
 the human (e.g. "you did not use uv") is a lead to investigate, not an
@@ -44,6 +46,9 @@ Do not interpret this invocation as blanket approval for unrelated feature
 work, broad cleanup, destructive changes, security-policy changes, or external
 publication. If an otherwise useful improvement needs separate approval or
 unavailable access, do what is safely authorized and report the gap.
+
+When project-tasks coordinates the request, reuse its findings and saved sources;
+return learning changes/gaps to it rather than recursively initiating a handoff.
 
 ## Discover lessons
 
@@ -132,6 +137,23 @@ when that genuinely helps future work. Do not force every discovery into
    problem; a concise `AGENTS.md` rule plus a detailed supporting reference is
    appropriate when neither alone would reliably transfer the lesson.
 
+### Route detail through docs and KB
+
+Keep essential before-action constraints inline and use conditional pointers for
+detail: "Before creating a PR, consult <procedure>#<heading>." Keep critical gates
+visible before retrieval; do not require reading all linked material every session.
+Settled project procedures belong in project docs; reusable findings and supporting
+evidence belong in the KB, through their owning workflows. Link actual stable
+headings and retain consequential scope/version qualifications in the reference.
+
+Do not create a separate `agent-lessons.md` companion or use the task folder as
+a substitute knowledge store. Preserve existing companion content/links until an
+authorized migration identifies its new home. If a suitable destination or owning
+skill is unavailable, retain useful existing detail and report the gap; never
+shorten the only useful source before its replacement is saved and verified.
+Consolidate relevant sources rather than append transcripts. An existing skill's
+missed activation belongs at its owning cue, not in a duplicate lessons procedure.
+
 ### Locate applicable AGENTS.md
 
 Always identify and inspect the actual applicable `AGENTS.md` path(s), even
@@ -155,7 +177,7 @@ the heading, in each chosen `AGENTS.md`:
 ## Durable Agent Lessons
 
 - When [applicable context], [specific action or prohibition].
-  Details: [stable authoritative path, only if needed].
+  Details: [stable authoritative path/heading, with a consultation trigger].
 
 <!-- END AGENT LESSONS -->
 ```

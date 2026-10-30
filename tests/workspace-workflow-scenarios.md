@@ -1,77 +1,131 @@
 # Workspace workflow acceptance scenarios
 
-Manual agent-level regression cases, not claims of automated or Devin execution.
-Use disposable synthetic workspaces. Provide only setup/request to the agent and
-inspect its actual tool trace and file results. Record model/harness for live trials.
+Agent-level regression cases, not claims of automated or target-harness execution.
+Use disposable synthetic workspaces. Give the agent only the setup/request;
+inspect actual tool traces and saved files. Record model, harness, and installed
+skill revision for live trials. A specification walkthrough is not a trial.
 
-## Setup and persistence
+## Independent routing and preservation
 
-1. **Fresh root:** No AGENTS.md, repos arranged arbitrarily, no context home.
-   Request workspace setup. Expect bounded discovery, proposed standard layout,
-   questions about ambiguous project membership, and approval before creation.
-   Do not initialize Git, create environments, or make KB records/tasks.
-2. **Multi-repo projects:** Two repos belong to one project, four to another, and
-   unrelated repos sit in `others/`. Expect explicit repository lists, one docs/tasks
-   pair per confirmed project, and unassigned entries instead of invented grouping.
-3. **Ambiguous KB:** Both a nested knowledge-base folder and a home KB exist in the
-   provided context. Expect a question before selecting; never create a new KB to
-   avoid the ambiguity. A confirmed inaccessible KB is an error, not fallback.
-4. **Human customization:** Change Use for wording and Behavior, add handwritten
-   text after the managed block, then request adding one repo. Expect preservation
-   of custom text, a single block relocated to the end, all outside bytes preserved,
-   targeted check scope, and no whole-workspace rescan.
-5. **Markers/concurrency:** Duplicate/truncated markers or a concurrent AGENTS.md
-   edit before persistence. Expect refusal or safe reconciliation, not overwriting
-   uncertain ownership. A failed write is reported as failure, not echoed as saved.
-6. **Exact result:** After an approved update, extract the persisted marker-delimited
-   block. The final response must equal it, with no independent summary or code fence.
-   All gaps belong inside the block. Snapshot facts must not claim runtime health.
+1. **First use without setup:** No resource configuration or context home. Request
+   task authoring (repeat separately for docs, KB capture, and Python workload).
+   Expect one proposal for the owning conventional root and registration, approval
+   before initialization, and only that owner's resources/section. No mandatory
+   setup, central registry, or invented project for KB/Python.
+2. **Clear existing resource:** Provide identifiable conventional docs/tasks/KB,
+   but omit its section. During authorized maintenance, expect bounded ownership
+   inspection, reuse, and registration without a redundant adoption approval.
+   A read-only query must not initialize/register; an empty Python folder or bare
+   .venv is not evidence of compatible adoption.
+3. **Ambiguous/inaccessible:** Two plausible KBs, unclear project, conflicting
+   guidance, or inaccessible configured resources. Expect a focused question/error,
+   no substitute destination or competing empty root.
+4. **Human customization:** Put custom activation wording in an owner block and
+   handwritten text after it. Change one root. Expect the block in its original
+   position, preserved customized wording and outside text, and a targeted diff.
+   General docs ownership cannot rewrite another owner's block.
+5. **Markers/concurrency:** Duplicate/truncated/nested markers or a concurrent
+   human edit before persistence. Expect refusal or safe reconciliation and readback,
+   not an uncertain replacement. A failed write is never presented as saved.
+6. **Partial routing/index write:** Primary task/docs/KB write succeeds but guidance
+   or index persistence fails. Preserve valid primary work, identify the exact stale
+   navigation, and retry missing steps without duplicate content.
+7. **Path bases:** Declare relative routing in a nested AGENTS.md; change cwd to a
+   sibling code repo. New paths use the declaring directory. Legacy paths use their
+   recorded workspace base until approved migration. Explicit operation-only
+   destinations do not silently change saved routing.
+8. **Shared projects and remote resources:** Two repos share project tasks/docs;
+   another configured task surface is cross-project; KB uses repository/ref/dir
+   locators and an external knowledge-page root. Preserve each identity and backend;
+   verify code cwd from the task/project entry point before implementation.
 
-## Skill evidence and routing
+## Optional setup, startup, and invocation
 
-7. **New or missing skills:** Expose a new skill, withhold a baseline skill, and leave
-   an old Python skill on disk. Expect a new table row, an unavailable row, no guessed
-   file reads for missing skills, and preservation of custom existing purpose text.
-   If skill metadata cannot be exposed, status is unknown rather than assumed OK.
-8. **No configuration:** Request docs/tasks/KB/Python work without a configured
-   destination. Expect a focused question, not docs/, tasks/, ~/.kb/, .agent-envs/,
-   or even the conventional .work-context/ as a silent fallback.
-9. **Session stays at root:** Request Project B work while cwd stays at workspace
-   root. Expect Project B's confirmed docs/tasks destinations. A genuinely ambiguous
-   project requires asking. No projects.toml read or incidental map update.
+9. **Approved setup:** Request coordinated setup in a fresh root. Expect only
+   useful owner sections, approval before creation, valid existing entry points,
+   and a short saved-path/gap receipt. No skill inventory, environment snapshot,
+   sample lessons, Python execution, Git setup, or content capture.
+10. **Legacy refresh/migration:** Existing central block has custom Use for/Behavior
+    and repository descriptions. Targeted refresh preserves text and position.
+    Conversion requires identified targets and approval; preserve custom material
+    and path bases while removing superseded destination rows. No content moves.
+11. **Startup cue:** Approved initialization proposes one factual path instruction
+    outside the owner sections. Routine owner maintenance preserves it without
+    duplication. Absent guidance is not fabricated; a cue is not compliance proof.
+12. **Availability and natural language:** Request lessons or setup naturally,
+    without a slash command. Verify model-visible metadata and actual skill loading
+    on each target harness. Withhold an owner skill: expect an honest gap, no guessed
+    installed-copy read or claimed invocation. An available skill does not authorize
+    unsolicited commits, setup, or lessons writes.
 
-## Python utilization
+## Task continuity and coordinated closeout
 
-10. **Compatible reuse:** Supply a configured Python root with an idle, compatible
-    offline-eval purpose project. Request evaluation from a nested code repo.
-    Expect manage-python-env loading, scoped explicit uv targeting, interpreter
-    verification, and the actual evaluation run through that environment while
-    using the code repo as cwd. No isolated uv command or new per-session environment.
-11. **New dependency/purpose:** A missing compatible package is added to the chosen
-    recipe. An incompatible Python requirement gets a deliberate compatible choice
-    or question, not silent upgrades. New purpose projects are direct children of
-    the configured Python root, not forced project/purpose nesting.
-12. **Safety/recovery:** Supply a junction redirect, unknown bare virtualenv, busy
-    environment, stale lock, inherited VIRTUAL_ENV, or parent uv workspace. Expect
-    refusal/coordination or scoped correction; no root environment or system fallback.
-    Locked interpreter output must point into the selected purpose project's .venv.
-13. **Backup recipe:** In a personal context Git repo, manifests/locks/pins remain
-    trackable and generated/secret state excluded. Team tracked files stay unchanged.
-    Without Git, environments still work and no repository is initialized.
+13. **Workstream discovery:** Create two tasks for AWS migration and one for dataset
+    evaluation. Expect creation-month/workstream paths, literal reused names, stable
+    paths after status changes, and a root index with all unfinished work and
+    workstream labels. Ask about migration across two months without a filename:
+    read the relevant index/task, summarize state, and ask only if candidates differ
+    materially. No new task solely because a new conversation began.
+14. **Fresh-session handoff:** Supply a conversation with an approved decision,
+    qualified finding, completed validation, remaining deliverables, and a useful
+    operational lesson. Say "handoff to the next fresh session and agent". Expect
+    bounded KB/docs/lessons evaluation through the owners, meaningful no-ops where
+    applicable, verified sources before task pointers, and a short resume receipt.
+    No actual subagent launch, speculative investigation, or duplicated full summaries.
+15. **Cold resume:** Start a separate trial with only the task path/workstream.
+    Expect goal/deliverables/next-action understanding and actual reads of required
+    sources before dependent work. Conditional references wait until relevant.
+    Missing critical references or conflicting code/design are surfaced precisely.
+    No dependence on the original conversation or whole-KB read.
+16. **Multi-task inputs:** One task produces a compatibility report, another consumes
+    it. Shared overview/source owns common intent; child tasks name specific inputs,
+    deliverables, and unresolved choices dependent on the producing result. Numeric
+    ordering and priority do not confer execution permission.
+17. **Explicit closeout:** Ask to close a completed task. Evaluate KB/docs/lessons,
+    verify deliverables and source persistence, record tested/untested results, then
+    remove only its live index entry. Keep the task file stable. A narrower "task
+    only" request and opt-in write rules prevail. Ordinary execution progress does
+    not trigger this coordinated persistence review.
+18. **Failed capture/retry:** Deny a required KB write during closeout. Save safe
+    task state and exact pending persistence; do not mark capture or required
+    closeout complete. Retry uses saved outputs without duplicates. Missing owners
+    or destinations are reported, not replaced by invented storage. No recursive
+    tasks→lessons→tasks handoff; standalone KB/docs never call the coordinator back.
 
-## Archive and permissions
+## Python execution
 
-14. **Shared context archive:** Configure KB and archive as sibling paths under
-    .work-context in one Git repo. Process an inbox input. Expect record persistence,
-    byte-verified original archival under archive/knowledge-base/YYYY-MM, recorded
-    provenance, and only then removal of the unchanged inbox copy. No Git publication.
-15. **Archive failure:** Missing config, denied access, changed original, or archive
-    nested within KB. Expect a clear gap and preserved source, never a hidden home
-    fallback or blind clearing. Ordinary KB recall does not scan archive or inbox.
-16. **Existing cf-workspace:** Request setup without migration approval. Expect the
-    existing confirmed context to remain authoritative. Propose migration separately;
-    do not create a competing empty KB or move team repositories.
+19. **Probe before workload:** Provide both a repository .venv and a configured
+    compatible purpose environment. Ask to check interpreter/imports without naming
+    the skill. Inspect the first executable command: skill loading precedes Python,
+    including probes. Actual executable/prefix must be the purpose .venv. Reading
+    source/path metadata is permitted before execution. A repository bootstrap
+    script does not select its environment.
+20. **Reuse/new purpose:** With an idle compatible purpose project, run a nested-repo
+    workload through explicitly targeted uv from the code cwd. Missing compatible
+    dependencies update that recipe; incompatible requirements get a deliberate
+    choice. New purpose projects are flat, not per-session or per-project clones.
+21. **Recovery and recipe:** Junction redirection, busy/unknown environment, stale
+    lock, inherited VIRTUAL_ENV, or parent uv workspace produces refusal/coordination
+    or scoped correction. No root/system fallback. Personal manifests/locks/pins
+    remain trackable; generated state is excluded; team configuration is preserved.
 
-Automated tests cover publication, Python-skill retirement, pull-failure fallback,
-static manifest/default/link consistency, and rollback. These scenarios additionally
-require actual model/harness trials before claiming end-to-end workflow compliance.
+## Lessons and archival
+
+22. **Long operational recipe:** Supply a synthetic PR procedure or version-qualified
+    platform finding. Lessons uses an existing docs/KB home through its owner,
+    consolidates supporting detail, and adds a conditional heading pointer with
+    essential guards inline. No new agent-lessons.md or mandatory whole-file read.
+    Existing Python activation prevents a duplicate generic lesson.
+23. **Unavailable detail / legacy companion:** An existing long lesson or companion
+    is the only useful source and supporting storage is unavailable. Preserve it
+    and report the gap. Migration needs approval; never shorten/delete before a
+    verified replacement. Human-owned text remains protected.
+24. **Archive and restricted writes:** Sibling KB/archive paths in one context Git
+    repo. Processing persists records, verifies unchanged originals at collision-safe
+    archive paths, records provenance, then removes inbox copies. No publication.
+    Missing archive config/access or changed source preserves inputs and reports
+    the gap. Ordinary retrieval needs no archive and does not read inbox/originals.
+
+Automated [contract checks](test_workspace_contracts.py) cover source metadata,
+real reference paths/anchors, declared names, and balanced owner template markers.
+They do not execute these scenarios or prove customization preservation in a harness.

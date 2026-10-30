@@ -1,7 +1,7 @@
 ---
 name: ml-architecture-review
 description: Perform a decision-focused ML architecture investigation with evidence, alternatives, trade-offs, risks, and a leading recommendation.
-disable-model-invocation: true
+disable-model-invocation: false
 argument-hint: "[architecture question or decision]"
 ---
 

@@ -9,7 +9,8 @@ Resolve KB, archive, and any explicitly configured separate knowledge-page roots
 by the skill's precedence rules. Expand `~` using the actual user's home
 (`%USERPROFILE%` on Windows); do not guess names, directories, or temporary
 sandbox paths. KB/archive roots must be explicitly selected or configured in
-applicable AGENTS.md; workspace-relative paths use its recorded workspace root.
+applicable AGENTS.md; new section-relative paths use its declaring directory,
+while legacy workspace-relative paths retain their recorded workspace root.
 There are no home-directory fallbacks. Living knowledge stays at `<kb>/knowledge/`
 unless explicitly configured otherwise. Report actual paths after writes.
 

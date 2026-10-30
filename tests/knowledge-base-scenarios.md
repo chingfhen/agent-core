@@ -124,3 +124,15 @@ required record outputs are only proposed in an unmerged PR.
 substituting a destination. In the PR case, distinguish proposed from persisted
 content and keep sources pending until required records/indexes are durable in
 the selected KB ref. Do not use the page-failure exception to bypass that gate.
+
+## 11. Coordinated capture and standalone operation
+
+**Setup/request:** A project-task handoff explicitly requests preservation of a
+decision, supporting evidence, and next-session tasks. The coordinator invokes KB
+capture with that scope. Repeat as a standalone KB capture and as read-only recall.
+
+**Expected:** Capture applies normal admission, source qualification, record/page
+maintenance, and verification. Return saved locators or a valid no-op to the caller;
+do not invoke docs/tasks or recursively orchestrate a handoff. Read-only recall
+writes nothing. A missing destination follows the skill's first-use proposal rules,
+never an invented personal KB or task-folder substitute; report unavailable access.

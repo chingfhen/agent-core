@@ -15,7 +15,7 @@
 - `agent-core sync` defaults to Pi-native publication. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents under `%APPDATA%\devin\`; `--harness opencode` publishes shared skills under `~/.config/opencode/skills/`. Global guidance and harness settings stay unmanaged.
 - Do not hand-maintain managed copies. Sync owns exact declared per-harness resources recorded in `~/.agent-core-state/ownership.json`; verified previously managed `.agents/` copies and registered Claude aliases are safely retired only by Pi migration.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
-- Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance outside the marked Agent Lessons section, load `project-docs`. The explicitly invoked `agent-lessons` skill independently owns that section.
+- Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance outside another skill's marked section, load `project-docs`. Each skill owns only its declared routing section; `agent-lessons` owns the marked lessons section.
 - Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits. `global/AGENTS.md` is retained but no longer published by sync.
 
 ## Autonomous State And Memory Routing
@@ -80,13 +80,15 @@ Canonical details: `docs/consumer-repo-enrollment.md`.
 
 ### Workspace Workflow
 
-Current skill contract below. The approved lean-section and two-layer lessons replacement is documented in [workspace configuration](docs/workspace-configuration.md#approved-target--lean-skill-owned-guidance); implementation and workspace adoption are still pending.
+The canonical contract is [workspace configuration](docs/workspace-configuration.md). Source implementation, selected-harness publication, and workspace adoption are distinct steps.
 
-- `workspace-setup` is steward-maintained production source and is invoked by the human, not each session. It owns one approved block within workspace-root `AGENTS.md`, preserving its position, outside text and human-edited Use for/Behavior wording.
-- The confirmed AGENTS.md map replaces `projects.toml`. No automatic docs/tasks/KB/Python destination fallbacks; missing or conflicting configuration means ask.
+- Core resource skills own lean routing sections and can establish their own resources. `workspace-setup` is an optional request-triggered convenience. Preserve human wording, outside content, and block positions; migrate legacy central blocks only with approval.
+- AGENTS.md routing replaces `projects.toml`. Reuse confirmed resources; absent resources need an initialization proposal/approval. New relative paths use the declaring guidance directory; legacy paths retain their recorded base. Ask about ambiguity and report inaccessible resources.
 - `.work-context/` is the setup convention, with shared `knowledge-base/`, `archive/knowledge-base/`, `projects/<project>/{docs,tasks}/`, and flat `python/<purpose>/`. Existing layouts require approved migration; code repository organization is unconstrained.
 - `manage-python-env` owns Python environment management AND actual workload execution. `knowledge-base` owns capture-first, verified archival and inbox cleanup. Keep detailed procedures in those skills, not duplicated in managed guidance.
-- `agent-lessons` is human-triggered and independently owns only its marked Durable Agent Lessons section in applicable `AGENTS.md` files; it does not maintain KB, docs, or tasks.
+- `project-tasks` owns execution continuity, deliverables, context pointers, and its index. Explicit handoff/closeout requests coordinate KB/docs/lessons through their owning workflows; ordinary task updates do not. KB and docs remain standalone.
+- `agent-lessons` owns its marked essential-rule/conditional-pointer section. Supporting detail uses docs/KB through their owners; no new lessons companion. Explicit lessons requests or coordinated handoff/closeout activate review, subject to local write gates.
+- All canonical skills permit model invocation. Natural-language activation does not broaden the request's permissions.
 - Agent Core's canonical `docs/` and `tasks/` remain its explicitly owned steward surfaces; this repository is not migrated by publishing the workspace workflow. Tasks remain read-only unless specifically authorized.
 
 ### Memory Rules

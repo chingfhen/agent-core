@@ -1,6 +1,6 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-10-28
+**Last Updated:** 2026-10-30
 
 **Status:** Current
 
@@ -104,7 +104,7 @@ Three allowlists select what is published:
 
 OpenCode uses the shared-skill allowlist only; this repository has no OpenCode-specific agent or command manifest.
 
-Pi and Devin discover their native locations automatically, as does OpenCode for skills. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-with-subagent` are installed as explicit-only skills.
+Pi and Devin discover their native locations automatically, as does OpenCode for skills. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-with-subagent` are installed as skills. They are model-callable; committing still requires an explicit human request.
 
 The first sync upgrades older ownership records (versions 2 through 5). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
 
@@ -138,7 +138,7 @@ dir "%USERPROFILE%\.pi\agent\agents"
 dir "%USERPROFILE%\.pi\agent\prompts"
 ```
 
-Start a new Pi session or use `/reload` to discover changed Pi resources. Restart or reload Devin Desktop as appropriate after Devin sync; restart OpenCode to discover changed skills. File verification is not proof that Pi, Devin, or OpenCode loaded the files or obeyed the instructions.
+Start a new Pi session or use `/reload` to discover changed Pi resources. Restart or reload Devin Desktop as appropriate after Devin sync. OpenCode V2 supports live resource reload and `/reload`; verify its exposed skills. File verification is not proof that Pi, Devin, or OpenCode loaded the files or obeyed the instructions.
 
 For Devin filesystem inspection:
 
@@ -204,21 +204,40 @@ Removing a name from any personal manifest normally stops future updates without
 ## Set Up Or Refresh A Workspace
 
 1. Run `agent-core sync` (Pi), `agent-core sync --harness devin`, or `agent-core sync --harness opencode`.
-2. Reload/restart the agent so the updated skills are exposed.
-3. Open your normal workspace root and invoke `workspace-setup`.
-4. Resolve any ambiguous project/KB mappings, inspect the proposed section, and approve it.
+2. Verify that the updated skills are exposed in the target harness.
+3. Open your normal workspace root. Each resource skill can establish its own
+   routing; ask `workspace-setup` when you want a coordinated setup/refresh.
+4. Resolve ambiguous ownership/locations, inspect the proposed sections, and
+   approve initialization or any legacy-block migration.
 
-The skill creates one managed block in root `AGENTS.md` and preserves its position on refresh. It lists project repositories, docs/tasks destinations, shared KB/archive, flat Python purpose projects, exposed/missing skills, and concise behavior. Its final response is exactly the saved block. Your custom Use for and Behavior wording survives refreshes. Add a repository or skill later? Request a targeted refresh; no per-session setup is needed.
+Each resource skill owns a lean marked section with confirmed locations and a few useful entry points. Setup follows those owner contracts and returns saved paths plus material gaps. It preserves custom wording and block positions; moving the old central block into separate sections requires explicit migration approval. The optional factual startup cue is approved once outside the sections. Setup is not a per-session prerequisite.
 
-To review a session for high-value behavioral lessons, explicitly invoke `agent-lessons`. It autonomously maintains only its marked `AGENTS.md` section and reports changed paths plus a brief summary; it may correctly make no changes.
+To review operational learning, ask naturally, for example "capture the lessons from this session". `agent-lessons` maintains essential rules and conditional pointers in its marked section; supporting detail uses docs/KB through their owning workflows. It may correctly make no changes. No new `agent-lessons.md` companion is created.
 
 The setup convention is `.work-context/{knowledge-base,archive/knowledge-base,projects,python}/`. The confirmed AGENTS.md locations are authoritative, not the convention itself. The old `projects.toml` workflow is retired and its files are left untouched. No setup action moves old `cf-workspace` content or configures backup without explicit approval. `manage-python-env` both maintains environments and runs Python workloads through them. See [workspace configuration](workspace-configuration.md).
+
+### Hand Work to the Next Session or Close It Out
+
+Say "hand this off to a fresh session", "prepare the next tasks for another agent",
+or "we're done; close this task" in project-task context. `project-tasks` evaluates
+KB capture, docs integration, and operational lessons through the owning skills,
+verifies supporting material, then saves the task/context map and index. You need
+not name four skills. Each supporting review can be a valid no-op; missing access
+or incomplete persistence is reported rather than hidden. "Task only" narrows scope.
+
+Tasks name deliverables, acceptance, current state, context sources with read
+triggers, and the next permitted action. New files use
+`tasks/YYYY-MM/<workstream>/YYYY-MM-DD__name.md`; existing files keep their paths.
+The root INDEX.md navigates unfinished work across months. Resume by task path or
+workstream; the agent reads the selected task and required context before acting.
+Routine progress updates do not run the full closeout. Handoff does not authorize
+spawning agents, implementation, or publication beyond the actual request.
 
 ## Knowledge Base Workflow
 
 The canonical workflow is [`skills/knowledge-base/SKILL.md`](../skills/knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
 
-Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed effects and retrieval rules. KB and archive roots must be explicitly selected or configured; there are no home-directory fallbacks. Workspace setup records `.work-context/knowledge-base/` and `.work-context/archive/knowledge-base/`. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
+Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed effects, retrieval, and first-use routing rules. It can propose `.work-context/knowledge-base/` and, when processing needs it, `.work-context/archive/knowledge-base/`; neither is a fallback. Established remote locations and optional knowledge-page roots remain valid. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
 
 The former Drive workflow is no longer canonical; existing KB content remains where it is until a separate migration is requested. GitHub-connected web apps need an explicitly selected repository/ref/directory and access to the canonical skill and its references. Connector access does not guarantee skill discovery, writes, or external archival. Updating Agent Core does not configure those integrations or replace user-managed global guidance that may still point to Drive.
 

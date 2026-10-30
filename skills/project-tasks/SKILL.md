@@ -4,11 +4,12 @@ description: >
   Preserve unfinished project work as portable human-agent execution memory.
   Use to create, checkpoint, pause for a fresh session, prepare, revise,
   resume, execute, or close a saved project task, including maintaining its
-  progress and task index. Load before
+  progress and task index. Coordinate docs, KB, and lessons when the human asks
+  to hand work to a fresh session or close it out. Load before
   managing a configured task surface or continuing a persisted task; not for
   unrelated implementation or merely reading an explicitly named file. Resolve
-  project task locations from applicable AGENTS.md, and preserve decisions,
-  permission boundaries, verification state, and the next permitted action.
+  project task locations through applicable AGENTS.md, and preserve decisions,
+  deliverables, permission boundaries, verification state, and the next permitted action.
 disable-model-invocation: false
 ---
 
@@ -25,7 +26,7 @@ brief?"** is yes. A task need not be implementation-ready. Its first screen
 should help the human understand and supervise the work; a fresh agent should be
 able to take the **next permitted action** without the previous conversation.
 
-This skill owns the *memory of the work*, not the work's implementation method.
+This skill owns the *memory of the work* and its handoff, not the work's implementation method.
 `planning` shapes substantial work when plan review is required; engineering or
 other execution workflows perform and verify the work; `project-docs` owns
 settled project understanding. Code, tests, schemas, and observed behavior
@@ -37,29 +38,32 @@ authorizes only the actions already permitted by the user's request, project
 guidance, and task gates. It normally also includes maintaining **that task's
 progress and its index entry**, unless stricter guidance requires separate
 permission. It does not authorize unrelated task edits, subagents, spending,
-deployment, commits, pushes, or documentation/KB writes.
+deployment, commits, pushes, or documentation/KB writes. Explicit handoff and
+closeout requests additionally authorize the bounded persistence review below,
+subject to narrower local rules and the human's stated limits.
 
 ## Resolve the project and its task surface
 
 Before creating, changing, indexing, or executing a persisted task, read the
-applicable `AGENTS.md` project map and relevant repository guidance. Resolve the
+applicable `AGENTS.md` task routing and relevant repository guidance. Resolve the
 **project from the requested work**, not just the current working directory.
 One project can span multiple repositories and use one shared Tasks location;
 different projects can share a workspace root.
 
-- Use the mapped `Tasks` location. Resolve workspace-relative paths from the
-  recorded workspace root, not the process working directory. A directly
+- Use the configured `Tasks` location. New section-relative paths resolve from
+  the declaring AGENTS.md directory; legacy workspace-relative paths retain their
+  recorded workspace root. Neither uses the process working directory. A directly
   identified task file may be read without loading this skill merely to read it.
-- When the project, mapping, root, or destination is missing, conflicting, or
-  ambiguous, ask the human before managing or executing task state. When the
-  destination is inaccessible, report that instead of substituting a path.
+- For missing routing or an authorized routing change, read
+  [Task routing](references/routing.md). This skill can establish its own resources
+  without workspace-setup. Ask about ambiguous identity/ownership; report an
+  inaccessible configured destination instead of substituting a path.
 - A human can explicitly select a destination for one operation, without
   silently changing the saved map. Create a confirmed but absent directory only
   during an authorized write.
-- No guessed `tasks/` fallback, `projects.toml`, directory-wide search for
-  substitute task surfaces, or incidental workspace configuration updates.
-  `workspace-setup` alone owns the managed workspace block and project/task
-  mappings in `AGENTS.md`; this skill never edits that block.
+- No guessed `tasks/` fallback, `projects.toml`, or whole-workspace inventory.
+  Maintain only the owned task-root/index section when routing actually changes;
+  preserve legacy central blocks until an explicitly approved migration.
 - The configured task surface (including its `INDEX.md`) is this skill's normal
   writable scope. Other repositories, docs, code, raw evidence, archives, and
   guidance must be changed only under their own authorization/workflows.
@@ -72,21 +76,24 @@ started.
 
 ## Stable layout and discovery
 
-For **new** tasks, use creation-month folders inside the configured task
-surface:
+For **new** tasks, use a creation-month folder and one shallow, semantic
+workstream folder inside the configured task surface:
 
 ```text
 tasks/
   INDEX.md
   YYYY-MM/
-    YYYY-MM-DD__descriptive-name.md
-    YYYY-MM-DD__related-effort/
-      overview.md
-      01-first-outcome.md
-      02-following-outcome.md
+    aws-migration/
+      YYYY-MM-DD__validate-cutover.md
+      YYYY-MM-DD__prepare-rollback.md
+    dataset-evaluation/
+      YYYY-MM-DD__agree-evaluation-criteria.md
 ```
 
 `tasks/` here is a *logical* location; its actual root comes from `AGENTS.md`.
+Reuse literal workstream names across months; create folders only as needed.
+An overview or related-effort subfolder is useful only for independently
+continuable tasks sharing meaningful coordination, not for every workstream.
 Use descriptive, distinctive filenames. The folder and filename dates are the
 task's **creation date**, not the last update, planned execution date, or closure
 date. Once created, the path stays stable across Active, Blocked, On Hold, and
@@ -105,7 +112,8 @@ material state/priority/next-action change, closure, or reopening. It is a
 
 - Include links to **all known unfinished tasks**: Active, Blocked, and On Hold.
   Group by `Now`, `Next`, and `Later` priority; show a concise task name, status,
-  and meaningful next action or re-entry/blocking condition. Keep this scannable.
+  and meaningful next action or re-entry/blocking condition. Show workstream
+  labels so related work remains discoverable across months. Keep this scannable.
 - Exclude Closed tasks from the live dashboard. Keep their files at their stable
   paths for filename, month, and targeted-content search. Reopening restores
   the entry. Don't create a separate historical catalogue by default.
@@ -125,6 +133,12 @@ material state/priority/next-action change, closure, or reopening. It is a
 No monthly indexes, external registries, background synchronizers, database,
 or automatic scheduled sweeps are required. A broader task hygiene sweep is a
 separate, explicitly requested operation.
+
+For natural-language continuation such as "where are we with the AWS migration?",
+select the relevant project/index, then read the matching task before its next
+permitted action. Ask only when materially different candidates remain plausible.
+Give a short state/next-action summary. Confirm the relevant code repository from
+the task or a project entry point; a shared task folder does not establish code cwd.
 
 ## Task depth — Brief / Standard / Detailed
 
@@ -171,7 +185,7 @@ Keep the first screen useful before any long plan. A normal new task has:
 ```markdown
 # Task: [Clear outcome]
 
-**File:** `tasks/YYYY-MM/YYYY-MM-DD__descriptive-name.md`
+**File:** `tasks/YYYY-MM/<workstream>/YYYY-MM-DD__descriptive-name.md`
 **Created:** YYYY-MM-DD
 **Last Updated:** YYYY-MM-DD
 **Priority:** Now | Next | Later
@@ -179,6 +193,7 @@ Keep the first screen useful before any long plan. A normal new task has:
 
 **Goal:** [...]
 **Why:** [...]
+**Deliverables:** [concrete outputs or changes, when useful]
 **Success Bar:** [...]
 **Chosen Direction:** [selected | not yet selected]
 **Current State:** [...]
@@ -190,6 +205,10 @@ Combine `Why` with `Goal` or omit empty optional fields on simple tasks. Add
 `Human Attention`, `Permission Boundary`, `Verification`, `Docs Sync`,
 `Relevant Code`, or deeper sections only when they improve control or
 continuation. Do not turn this outline into a mandatory form.
+
+The goal describes the intended outcome; deliverables name reviewable outputs
+(for example IaC, a validation report, or a PR); the success bar establishes their
+acceptance. Combine these on small tasks rather than requiring three empty fields.
 
 The human should quickly know **what/why, what is decided, what is true now,
 what is allowed next, what blocks it, and how success will be verified**.
@@ -231,7 +250,45 @@ When substantial planning requires review, use `planning` and wait for approval.
 Persist an approved plan without re-requesting ceremonial approval; do not
 execute future investigations or preflight checks merely to write the task.
 
+### Resume context
+
+On creation, resumption, or substantial handoff, consult relevant project docs and use KB
+recall when prior findings could materially inform the work. Read-only retrieval
+does not authorize source maintenance. Keep a small context map with exact paths
+or remote locators, what each source supplies, and when it must be read. Identify
+approved design, observed evidence, procedures, and unresolved investigation
+accurately; code/runtime still controls current implementation claims.
+
+```markdown
+## Resume Context
+- Before implementation: <docs path>#<heading>
+  — approved constraints and rationale.
+- Before validation: <KB locator>
+  — observed limitation, scope/version, and remaining uncertainty.
+- Repository: <confirmed code location>.
+- Dependency: <task path> — consumes its verified compatibility report.
+```
+
+Use real sources only; omit inapplicable entries. Retain consequential constraints
+and the next action in the task itself so the human can supervise it. Verify
+pointers and consult required sources before dependent work; an inaccessible
+required source is a specific readiness gap, not permission to guess. Conditional
+references wait until relevant. Reconcile material conflicts with current evidence.
+
 ## Resume, execute, checkpoint, and close
+
+### Coordinated handoff and closeout
+
+In project-task context, "hand this off to a fresh session", "prepare/delegate
+the next tasks to another agent", and "we're done; close this task" request a
+coordinated persistence review. No slash commands or special word "full" are
+required. Read [Handoff and closeout](references/handoff.md): evaluate KB capture,
+docs integration, and operational lessons through their owning skills, verify
+supporting material, then save task state/context and index navigation. Each
+review may correctly produce no change. Respect a narrower "task only" request.
+
+This does not spawn agents or approve implementation/publication. Routine status
+updates and ordinary execution bookkeeping do not trigger the cross-surface review.
 
 ### Pause for a fresh session
 
@@ -244,6 +301,11 @@ current progress and verification, unresolved questions, blockers, relevant
 context pointers, and an unambiguous next permitted action. Make the brief
 self-contained without the present chat. Update `INDEX.md` accordingly and
 report the exact task path plus a short resume cue.
+
+An explicit fresh-session handoff also uses the coordinated workflow above;
+a simple progress checkpoint need not. Save consequential decisions at meaningful
+checkpoints while context is available, rather than relying on a final transcript
+reconstruction after context has been lost.
 
 A conversational pause does **not** imply implementation approval, execution
 preflight, or that the work is intentionally deferred. Keep `Status: Active`
@@ -262,7 +324,8 @@ still matches it**.
 
 1. **Check authority and readiness.** Read the status, current direction,
    explicit permission/gates, blockers, next action, dependencies, and success
-   bar. Resolve contradictions before acting. Distinguish preparing a handoff
+   bar and deliverables. Read the task's required resume context before dependent
+   work. Resolve contradictions before acting. Distinguish preparing a handoff
    from permission to implement. Do not treat an index entry as authorization.
 2. **Act within the approved scope.** Perform only the next permitted work through
    the relevant implementation workflow. If current evidence contradicts the
@@ -277,6 +340,7 @@ still matches it**.
    update instead of editing.
 4. **Close honestly.** Close when the required outcome and verification are
    complete, or the human explicitly cancels/supersedes the remaining work.
+   For an explicit closeout request, complete the coordinated review first.
    Record the result and closure reason, distinguish tested from untested,
    and identify residual follow-up. If required work remains, leave the task
    open or, when authorized, make a distinct follow-up task. Remove only the
@@ -326,7 +390,7 @@ Minimize sensitive or restricted data; link approved protected sources instead.
 ## Related tasks, knowledge, and maintenance
 
 Prefer one file per coherent outcome, even with several steps. Use the
-creation-month related-effort group shown above only when its children have
+creation-month/workstream related-effort group only when its children have
 independently continuable outcomes. `overview.md` owns common intent,
 dependencies, decisions, and suggested entry point; children own their own
 state and verification. Numeric prefixes express sequence, not readiness.
@@ -339,9 +403,10 @@ Do not combine genuinely independently continuable outcomes just to reduce
 file count.
 
 Route settled project knowledge to `project-docs` when authorized; a task may
-record that docs sync remains required without silently writing docs. Do not
-automatically capture to a KB. A broader sweep to identify duplicate, stale,
-abandoned, or inconsistent tasks requires a specific request; ordinary writes
+record that docs sync remains required without silently writing docs. KB capture
+requires a capture request or the explicit coordinated handoff/closeout intent
+above; ordinary task maintenance does not authorize it. A broader sweep to identify
+duplicate, stale, abandoned, or inconsistent tasks requires a specific request; ordinary writes
 only repair related entries and direct conflicts.
 
 **Final test:** A human can supervise the current work, a fresh agent can

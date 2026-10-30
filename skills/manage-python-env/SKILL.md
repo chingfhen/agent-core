@@ -2,26 +2,31 @@
 name: manage-python-env
 description: >
   Manage and execute Python through reusable, independent uv purpose projects
-  under the Python Environment Root explicitly configured in AGENTS.md. Use for
-  all Python execution, testing, evaluation, tooling, and dependency management;
+  under a confirmed Python Environment Root. Load before all Python execution,
+  including interpreter checks and import probes, testing, evaluation, tooling,
+  and dependency management;
   reuse compatible environments automatically instead of ad hoc isolated commands.
   Keep personal environments separate from team Python configuration.
+disable-model-invocation: false
 ---
 
 # Manage Python Environments
 
-Own both environment management AND utilization. Before a Python workload, select
+Own both environment management AND utilization. Before the first Python command,
+including interpreter checks and import probes, load this skill and select
 or create the right purpose project, then actually execute through it. Do not just
 inventory environments or recommend one while running elsewhere.
 
 ## Resolve and select
 
-1. Read `Python Environment Root` in applicable `AGENTS.md`; resolve relative paths
-   against its recorded workspace root, not the shell's current directory. The
-   setup convention is `.work-context/python/`, but it is not a runtime fallback.
-   Missing, conflicting, or inaccessible configuration means ask/report. An explicit
+1. Read `Python Environment Root` in applicable `AGENTS.md`. New section-relative
+   paths resolve from its declaring directory; legacy workspace-relative paths
+   retain their recorded base, never the shell's current directory. For missing
+   routing or an authorized routing change, read [Python routing](references/routing.md).
+   This skill can establish its own resources without workspace-setup. An explicit
    destination selected by the human for this operation is allowed without changing
-   the saved workspace map. No `projects.toml` or separate environment registry.
+   the saved routing. Report inaccessible configured resources and ask about
+   conflicting ownership/destinations. No `projects.toml` or separate environment registry.
 2. Identify the workload's code root and Python/dependency constraints. It may be
    a repository nested below the workspace; environment storage need not be in Git.
    Read project instructions and team dependency files without changing them.
@@ -38,6 +43,9 @@ inventory environments or recommend one while running elsewhere.
 5. Resolve paths and require the selected purpose project to stay inside the
    configured root. Refuse symlink/junction/reparse redirection, unexplained existing
    directories, and unknown bare virtualenvs. Do not adopt or overwrite them.
+
+Reading a path or source file is not Python execution. Selecting a repository's
+bootstrap script does not select or authorize its repository-local environment.
 
 Use `<env>` below for the absolute purpose-project path and `<code>` for the
 workload's code root. Paths are separate on purpose. The context home can be a
@@ -192,7 +200,7 @@ preserving the recipe. Report purpose, created/reused, absolute project/interpre
 paths, Python version, lock path, dependency changes, and actual workload result.
 Inventory-only requests list purpose folders, pins, direct dependencies, and
 lock/interpreter presence, without claiming runtime verification or writing a
-second registry. Runtime use does not require rewriting AGENTS.md's snapshot.
+second registry. Runtime use does not require rewriting AGENTS.md routing.
 
 ## Explicit team/root mode
 

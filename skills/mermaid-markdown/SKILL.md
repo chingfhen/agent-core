@@ -1,7 +1,7 @@
 ---
 name: mermaid-markdown
 description: Creates clear Mermaid diagrams and simple quantitative charts for already-understood systems, processes, relationships, and results, then inserts them directly into the user's chosen Markdown file. Clarifies the intended visual message when necessary; does not perform architecture or planning work.
-disable-model-invocation: true
+disable-model-invocation: false
 license: MIT
 ---
 
