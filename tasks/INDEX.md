@@ -10,4 +10,4 @@
 
 ## Later
 
-None.
+- [Azure MCP Skill Delivery](2026-10/agent-mcp/2026-10-31__evaluate-azure-mcp-skill-delivery.md) — On Hold. Re-entry: after testing ChatGPT's native plugin path, or when the human explicitly resumes MCP development; evaluate read-only instruction delivery and zero-cost Azure hosting before any implementation.
