@@ -1,30 +1,38 @@
-# Task: Evaluate Azure MCP delivery for Agent Core skills
+# Task: Evaluate and prototype remote MCP delivery of Agent Core skills
 
 **File:** `tasks/2026-10/agent-mcp/2026-10-31__evaluate-azure-mcp-skill-delivery.md`
 **Created:** 2026-10-31
 **Last Updated:** 2026-10-31
-**Priority:** Later
-**Status:** On Hold
+**Priority:** Next
+**Status:** Active
 
-**Goal:** Explore a small, read-only MCP server that makes canonical Agent Core skills discoverable and retrievable by remote AI clients (particularly ChatGPT), while gaining practical MCP development and deployment experience.
+**Goal:** Make canonical Agent Core instructions easier for hosted agents such as ChatGPT to discover and retrieve, using a small read-only MCP server, while gaining practical MCP development experience.
 
-**Why:** Local Pi/OpenCode/Devin skill discovery already works through `agent-core sync`. In hosted ChatGPT, the GitHub connector can fetch known files but does not automatically expose skills as native discovery metadata. The human wants reliable instruction discovery without repeatedly naming repository paths.
+**Why:** Local Pi/OpenCode/Devin already discover native skills through `agent-core sync`. ChatGPT's GitHub connector fetches known files but does not automatically surface the registered skills, their descriptions, or applicable `AGENTS.md` as native instruction-discovery metadata.
 
-**Chosen Direction:** Investigate only; no Azure implementation/hosting choice approved. Preserve `chingfhen/agent-core` as the single canonical skills source and existing native skill sync unchanged. Azure Functions and Azure Container Apps are candidates, not commitments. The user prefers zero ongoing hosting cost and low cold-start latency.
+**Current State:** The user explicitly resumed MCP planning on 2026-10-31; no implementation or deployment has occurred. Direct GitHub retrieval of `AGENTS.md`, `personal-skills.toml`, and `skills/knowledge-base/SKILL.md` was demonstrated. OpenAI developer docs describe creating a personal plugin from a custom MCP URL, while plan/permission documentation is not fully consistent; verify the user's actual Plus account with the published demo before treating connectivity as proven.
 
-**Current State:** No MCP server built or deployed. The private GitHub connector successfully fetched `AGENTS.md`, `personal-skills.toml`, and `skills/knowledge-base/SKILL.md` in ChatGPT on 2026-10-31. Current ChatGPT Plus custom external MCP connection availability is a product limitation; a native ChatGPT skill/plugin route is being investigated first. MCP access alone would not guarantee skill invocation or compliance.
+**Chosen Direction:** Investigate a **read-only, instruction-delivery-only** MVP. `chingfhen/agent-core` remains the single canonical source for SKILL.md, references, AGENTS.md, and existing native sync. No KB/task writes, tool execution, vector DB, skill duplication, or enforcement gateway.
 
-**Next Action:** **Not yet authorized to implement.** When the user resumes this task, verify current ChatGPT Plus MCP/plugin support and whether a native plugin already solves skill discovery. If MCP remains worthwhile for interoperable clients or learning, propose a minimal implementation and hosting/cost trade-off for approval.
+**Proposed architecture (not yet approved):** A separate private `chingfhen/agent-core-mcp` service repository for MCP SDK dependencies, deployment, and cloud-specific configuration. It reads an allowlisted skill catalogue and full content/references from `chingfhen/agent-core` at runtime using narrowly scoped read-only GitHub access. Keeping the service separate protects the lean, standard-library-only `agent-core sync` runtime. A self-contained subproject in Agent Core is a viable alternative if the user prefers one repo. Do not copy the canonical skill files into the service as another maintained source.
 
-**Re-entry Condition:** The user explicitly asks to revisit Azure MCP development, or the plugin experiment establishes an unmet delivery requirement.
+**Discovery design issue:** Merely exposing generic `list_skills`/`read_skill` operations does not make agent selection automatic. Compare descriptive tool metadata and/or per-skill tool exposure against native plugin-packaged skills using ordinary fresh-chat prompts. The MCP client still decides when to call a tool.
 
-**Success Bar (if implementation is later approved):** A compatible MCP client can discover a bounded skill catalogue, fetch full `SKILL.md` and selectively fetch references from the current canonical GitHub repository, with source revision and secure read-only access. Test default skill selection from a natural-language request versus direct GitHub retrieval. No duplicate skills store, KB writes, task execution, credential leakage, or unnoticed cloud charges.
+**Hosting constraints:** Azure is preferred for learning, but the user wants essentially zero ongoing expense and acceptable cold starts. Azure Functions Flex Consumption (including storage charges) and Azure Container Apps scale-to-zero are candidates. Local MCP Inspector testing precedes provisioning. Favor stateless Streamable HTTP, no UI, and GitHub Actions deployment if a host is approved. Do not select paid/always-ready resources silently.
 
-**Permission Boundary:** This task saves investigation context only. Do not provision Azure resources, create secrets, change existing skill distribution, register an external MCP connector, or modify production skills without separate authorization.
+**Next Action (permitted now):** Confirm whether the user successfully connected and invoked the official demo MCP server in their Plus account; agree on repo ownership and initial deployment target; then prepare a narrow implementation plan. **Building code and provisioning/deploying infrastructure remain unapproved** until the user explicitly requests them.
+
+**Blockers / Human Attention:** Account-level MCP availability must be confirmed; final repo/hosting choice and implementation permission are undecided. Credentials, Azure subscription, or GitHub Actions secret configuration would require user action at deployment time.
+
+**Success Bar:** On an MCP-compatible client, retrieve an allowlisted skill and references with source commit identity; avoid broad private repository browsing, unauthorized data exposure, and duplicate skill copies. Demonstrate skill invocation from a natural request without the user naming paths, and measure selection reliability relative to GitHub-only access.
+
+**Permission Boundary:** Planning and this task/index update only. No creation of a second repo, Azure services, secrets, connector registration, changes to production Agent Core skills or native sync, or cloud costs without separate authorization.
 
 ## Resume Context
-- `AGENTS.md` — Agent Core steward constraints and current skill distribution boundary.
-- `docs/consumer-repo-enrollment.md` — existing native skill publication/sync contract.
-- `personal-skills.toml` — canonical selected skill list.
-- `skills/knowledge-base/SKILL.md` — example skill and selective reference-loading conventions.
-- OpenAI Help Center: [Plugins in ChatGPT](https://help.openai.com/en/articles/20001256-plugins-in-codexOpenAI) and [Custom MCP servers](https://help.openai.com/en/articles/12584461-connecting-custom-mcp-servers-in-chatgpt) — re-check current plan eligibility on resumption.
+- `AGENTS.md` and `README.md` — steward contract, zero-dependency sync runtime, canonical source and boundaries.
+- `docs/consumer-repo-enrollment.md` and `personal-skills.toml` — native skill publishing and canonical registration.
+- `skills/knowledge-base/SKILL.md` — skill content, references, and workflow example.
+- [OpenAI custom MCP plugin quickstart](https://developers.openai.com/plugins/quickstart) — demo MCP connection and ChatGPT Work testing.
+- [OpenAI plugin MCP server guide](https://developers.openai.com/plugins/build/mcp-server) — standard SDKs and HTTP transport.
+- [OpenAI MCP connection guide](https://developers.openai.com/api/docs/guides/custom-mcp-server) — tool discovery and authentication.
+- [Azure Functions MCP hosting](https://learn.microsoft.com/en-us/azure/azure-functions/functions-create-ai-enabled-apps) — Azure server options and support maturity; recheck before implementation.
