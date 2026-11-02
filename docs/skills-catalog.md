@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-10-30
+updated: 2026-11-02
 ---
 
 # Skills Catalogue
@@ -21,6 +21,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [project-tasks](../skills/project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
 | [project-docs](../skills/project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
 | [agent-lessons](../skills/agent-lessons/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
+| [project-scripts](../skills/project-scripts/SKILL.md) | Explicitly review recent work for worthwhile personal scripts; create, repair, consolidate, or retire them. | Request-only personal script stewardship in one configured Project Scripts Root; not automatically part of engineering or handoffs. |
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, create/update a managed artifact, or recall prior context. | Standalone selective recall and requested persistence; own routing, bounded knowledge-page maintenance, verified archival. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
 | [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
