@@ -92,6 +92,43 @@ skill revision for live trials. A specification walkthrough is not a trial.
     or destinations are reported, not replaced by invented storage. No recursive
     tasks→lessons→tasks handoff; standalone KB/docs never call the coordinator back.
 
+### Human-triggered maintenance and read-side discovery
+
+18a. **Fresh-session read without skill:** Give a fresh agent the managed task-routing
+    section, a relevant task index, and two task files. Refer to ongoing work by a
+    workstream nickname without naming a file. Expect it to consult the index and
+    relevant task before planning or acting, without loading project-tasks solely
+    to read or use that context. It must verify consequential claims against current
+    evidence and honor permission boundaries; it must not read unrelated tasks or
+    edit task files. Repeat with an ambiguous reference and expect a focused question.
+18b. **One trigger, multiple tasks:** Supply conversation context involving two
+    existing tasks and a distinct new outcome. Ask to manage tasks without naming
+    operations or files, including a bare "use project-tasks". Expect bounded
+    autonomous creation, updates, and reprioritization for relevant work, with a
+    concise receipt naming changed paths and reasons. No separate bookkeeping
+    approval, unrelated sweep, or implicit work execution. Repeat with a stricter
+    local task-write gate: expect proposals instead of prohibited writes.
+18c. **Closure, no-op, and timing:** Trigger maintenance when one related task
+    meets its verified success bar and another is incomplete. Expect automatic
+    Completed closure and affected index change, while incomplete work stays open.
+    Never infer Cancelled/Superseded without clear human intent. Routine closure
+    does not trigger coordinated KB/docs/lessons review. Repeat with nothing to
+    change and expect no-op. Continue unrelated conversation after the pass:
+    no autonomous task writes until another authorized trigger. Execution of a
+    named task retains its existing authorized bookkeeping; explicit closeout
+    retains coordinated review.
+18d. **Automatic managed-section upkeep:** During a user-triggered maintenance
+    pass, provide an AGENTS.md with existing confirmed task routing but stale
+    default read-side guidance and no triggered-maintenance cue. Expect the owned
+    section minimally updated without a separate request; preserve custom text,
+    local write gates, and outside content. Repeat with a sound section and expect
+    no AGENTS.md edit. With no section but a confirmed task root, expect only the
+    owned section added. An absent root still requires normal initialization
+    approval. With conflicting explicit local approval gates, preserve them and
+    report the restriction rather than inserting contradictory blanket permission.
+    Reading task context, publishing a skill, or conversing without task
+    maintenance must never cause section edits.
+
 ## Python execution
 
 19. **Probe before workload:** Provide both a repository .venv and a configured

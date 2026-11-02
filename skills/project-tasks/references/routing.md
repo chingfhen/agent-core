@@ -1,7 +1,10 @@
 # Task routing and first use
 
-Read when task configuration is missing or its routing must change. This skill
-owns only `<!-- BEGIN PROJECT TASKS -->` through `<!-- END PROJECT TASKS -->`
+Read during an authorized, human-triggered task-management pass when task
+configuration is missing, routing must change, or the applicable managed section
+is absent or missing current cues. No separate request to maintain that section
+is needed during the pass. This skill owns only
+`<!-- BEGIN PROJECT TASKS -->` through `<!-- END PROJECT TASKS -->`
 in the verified applicable AGENTS.md. A workspace is the human's working scope,
 not necessarily cwd or a Git root. Ask if scope/project identity is ambiguous.
 
@@ -26,7 +29,21 @@ Creation-time example only; substitute confirmed paths and a useful description:
 ```markdown
 <!-- BEGIN PROJECT TASKS -->
 ## Project Tasks
-Load project-tasks before managing or continuing saved tasks.
+When saved task context is relevant to the current work or a workstream reference,
+consult the task index and matching tasks before planning or acting. Use targeted
+search if needed; ask when materially different matches remain. If none match,
+continue within the request and permissions. Reading or using task context does
+not require loading project-tasks. Verify consequential claims against current
+evidence and respect recorded permission boundaries.
+
+Load project-tasks for task maintenance or execution of a saved task.
+Task maintenance is human-triggered. When requested, independently create,
+update, checkpoint, reprioritize, and close verified-Completed tasks for relevant
+work, maintaining INDEX.md without separate routine bookkeeping approval.
+Report meaningful changes and reasons, or no-op. Authorization ends with that
+pass; do not maintain tasks during unrelated conversation. Do not infer
+cancellation, implementation, deployment, or docs/KB/lessons permission.
+Stricter local write gates and human limits prevail.
 
 ### Forecasting
 Tasks: .work-context/projects/forecasting/tasks/
@@ -43,10 +60,23 @@ under the main skill's rules; never advertise a nonexistent index as saved.
 
 ## Targeted maintenance
 
-Markers/headings/labels and the initial activation cue are defaults. Maintain
-confirmed locations and affected navigation; preserve customized behavioral text,
-outside content, and block position. Do not copy skill procedures into guidance.
-Do not edit another owner's section or regenerate the entire file.
+Markers/headings/labels and the initial activation cue are defaults. During each
+authorized task-management pass, reuse the applicable AGENTS.md already read for
+routing: if the owned section is absent, or lacks an equivalent read-side discovery
+cue or human-triggered maintenance authorization, create or minimally patch it
+without a separate request. Skip a sound section without rewriting it; do not
+perform a broad workspace audit. Confirm a task destination before adding a
+section; a new task root still needs its normal initialization approval.
+
+Maintain confirmed locations and affected navigation; preserve customized
+behavioral text, stricter local gates, outside content, and block position. Do not
+copy skill procedures into guidance, edit another owner's section, or regenerate
+the whole file. Replace obsolete default "load skill to continue reading" cues
+only when they conflict with read-only task discovery. If a local approval gate
+conflicts with the default maintenance authorization, preserve the gate and
+report the remaining restriction rather than silently overriding it. A source or
+installed skill update, read-only retrieval, or ordinary conversation does not
+itself authorize workspace changes.
 
 Reread immediately before writing. Refuse duplicate, incomplete, nested, or
 ambiguous markers and unsafe paths; reconcile concurrent edits without clobbering
