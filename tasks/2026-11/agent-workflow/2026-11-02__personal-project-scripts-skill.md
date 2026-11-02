@@ -4,7 +4,7 @@
 **Created:** 2026-11-02
 **Last Updated:** 2026-11-02
 **Priority:** Now
-**Status:** Active
+**Status:** Closed
 
 **Goal:** Add an independent, explicitly invoked `project-scripts` skill to convert worthwhile recurring agent procedures into usable, deterministic personal scripts.
 
@@ -14,4 +14,6 @@
 
 **Deliverable:** New `skills/project-scripts/SKILL.md` (plus focused authoring reference if useful), personal installation manifest entry and skills catalogue entry on `main`. No personal script or workspace storage root needs to be created until the first actual script request.
 
-**Next Action:** Authorized: write the skill and registration, verify directly on `main`, then mark this task Closed if delivered.
+**Outcome:** Completed 2026-11-02. Created [`skills/project-scripts/SKILL.md`](../../../../skills/project-scripts/SKILL.md) and [`references/cli-craft.md`](../../../../skills/project-scripts/references/cli-craft.md). Registered in `personal-skills.toml` and `docs/skills-catalog.md`, directly on `main`. Verified remote file contents and cross-references; not runtime-tested in Pi/OpenCode, and no script collection was initialized because no actual script was requested.
+
+**Next Action:** None for this task. First actual script invocation should resolve/approve one personal Project Scripts Root, then initialize it only if a script qualifies.
