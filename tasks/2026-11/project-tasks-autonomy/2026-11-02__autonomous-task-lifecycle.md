@@ -4,12 +4,25 @@
 **Created:** 2026-11-02
 **Last Updated:** 2026-11-02
 **Priority:** Now
-**Status:** Active — prepared for delegation to an external agent
+**Status:** Active — original scope needs clarification
 
 **Goal:** Make `project-tasks` operate as the human↔agent bridge: the agent manages the full task lifecycle (create, update, checkpoint, prioritize, close, index) autonomously and smoothly, while the human supervises without needing content-level judgment.
 **Why:** The human is a new joiner who cannot judge which tasks to open/close/prioritize — the agent holds the context (dumped into KB records). Gating lifecycle decisions on the human produces stale or absent tasks; the pilot on 2026-11-02 showed state living in the conversation until a wrap-up request, instead of in task files.
 **Deliverables:** (a) analysis of the current skill against the feedback below; (b) a proportionate design for autonomous lifecycle + reporting contract; (c) implementation where permitted — skill text changes need explicit human approval under the steward contract, so expect a proposal artifact plus any ungated config edits.
 **Success Bar:** A fresh session can resume any workstream by natural reference ("that eaip thing on the infinity ticket"), the agent maintains tasks from work-start (not wrap-up), closes/reprioritizes autonomously with visible reporting, and the human never has to answer "should we open/close this?" to keep the system working.
+
+**Current State:** The merged `project-tasks` skill now supports autonomous task
+creation, updates, reprioritization, and verified-Completed closure during a
+human-triggered maintenance pass, subject to local gates. See commits `9edb41c`,
+`e1ed3be`, and `5d8aa38`, merged in `22a5f01`. This is narrower than the original
+standing-autonomy ideas below; it does not authorize task maintenance throughout
+ordinary conversation. The original success bar has not been verified in a fresh
+session. Treat the original ideas as historical, not as an approved implementation plan.
+
+**Next Action:** Clarify whether any of the original broader outcome remains wanted
+or whether this task should be closed as superseded. Do not delegate the original
+proposal or infer approval for standing autonomous task writes. Publication and
+workspace adoption of the merged skill require separate verification.
 
 ## Human feedback (verbatim intent)
 
