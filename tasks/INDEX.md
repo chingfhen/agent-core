@@ -2,7 +2,6 @@
 
 ## Now
 
-- [Personal Project Scripts Skill](2026-11/agent-workflow/2026-11-02__personal-project-scripts-skill.md) — Active. Next action: add request-only skill and register it for personal installation; verify and close.
 - [Synchronize Pi and OpenCode Shortcuts](2026-10/2026-10-28__synchronize-pi-opencode-shortcuts.md) — Active. Next action: test the trial model picker and agent-cycle bindings, F2/F3 and thinking visibility.
 
 ## Next
