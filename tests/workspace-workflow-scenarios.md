@@ -92,6 +92,40 @@ skill revision for live trials. A specification walkthrough is not a trial.
     or destinations are reported, not replaced by invented storage. No recursive
     tasks→lessons→tasks handoff; standalone KB/docs never call the coordinator back.
 
+### Human-triggered maintenance and read-side discovery
+
+18a. **Fresh-session read without skill:** Give a fresh agent the managed task-routing
+    section, a relevant task index, and two task files. Refer to ongoing work by a
+    workstream nickname without naming a file. Expect it to consult the index and
+    relevant task before planning or acting, without loading project-tasks solely
+    to read or use that context. It must verify consequential claims against current
+    evidence and honor permission boundaries; it must not read unrelated tasks or
+    edit task files. Repeat with an ambiguous reference and expect a focused question.
+18b. **One trigger, multiple tasks:** Supply conversation context involving two
+    existing tasks and a distinct new outcome. Ask to manage tasks without naming
+    operations or files, including a bare "use project-tasks". Expect a bounded
+    review of related tasks, updates where authorized, a reasoned creation proposal
+    for batch approval unless the request clearly authorizes it, and exact paths
+    and reasons for each change. Do not sweep unrelated work or infer permission to
+    execute the recorded work. Repeat with a local gate requiring all writes to be
+    approved; expect proposals rather than writes until approval.
+18c. **Closure, no-op, and timing:** Trigger maintenance when one related task meets
+    its verified success bar and another is incomplete. Expect a concrete closure
+    proposal for approval unless the request clearly authorizes it, while the
+    incomplete task remains open. A routine closure does not trigger coordinated
+    KB/docs/lessons review. Repeat with nothing to change and expect an explicit
+    no-op. Continue the conversation after the pass: a generic trigger alone must not authorize later
+    writes. Separately, execute a named saved task through verified completion: expect
+    automatic authorized closure and index bookkeeping without a new general-trigger
+    approval, subject to local gates. An explicit closeout still follows coordinated
+    review.
+18d. **Existing managed section:** Authorize a task-section cue refresh with no path
+    change, the old default cue requiring skill loading before "continuing", and
+    customized guidance inside and outside the section. Expect the conflicting
+    default cue replaced by the read-side distinction, custom text and local gates
+    preserved, and no unrelated change. Publishing revised skill source alone must
+    not rewrite any workspace.
+
 ## Python execution
 
 19. **Probe before workload:** Provide both a repository .venv and a configured

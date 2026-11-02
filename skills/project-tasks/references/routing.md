@@ -1,6 +1,7 @@
 # Task routing and first use
 
-Read when task configuration is missing or its routing must change. This skill
+Read when task configuration is missing, its routing must change, or an existing
+managed section has an authorized cue refresh. This skill
 owns only `<!-- BEGIN PROJECT TASKS -->` through `<!-- END PROJECT TASKS -->`
 in the verified applicable AGENTS.md. A workspace is the human's working scope,
 not necessarily cwd or a Git root. Ask if scope/project identity is ambiguous.
@@ -26,7 +27,14 @@ Creation-time example only; substitute confirmed paths and a useful description:
 ```markdown
 <!-- BEGIN PROJECT TASKS -->
 ## Project Tasks
-Load project-tasks before managing or continuing saved tasks.
+When saved task context is relevant to the current work or a workstream reference,
+consult the task index and matching tasks before planning or acting. Use targeted
+search if needed; ask when materially different matches remain. If none match,
+continue within the request and permissions. Reading or using task context does
+not require loading project-tasks. Verify consequential claims against current
+evidence and respect recorded permission boundaries.
+
+Load project-tasks for task maintenance or execution of a saved task.
 
 ### Forecasting
 Tasks: .work-context/projects/forecasting/tasks/
@@ -47,6 +55,13 @@ Markers/headings/labels and the initial activation cue are defaults. Maintain
 confirmed locations and affected navigation; preserve customized behavioral text,
 outside content, and block position. Do not copy skill procedures into guidance.
 Do not edit another owner's section or regenerate the entire file.
+
+When an existing section is explicitly authorized for a cue refresh, add or refine
+its read-side guidance to make relevant index/task discovery independent of skill
+invocation. Replace the old default cue requiring skill loading before "continuing"
+saved tasks when it conflicts with that distinction; preserve genuinely customized
+behavior and local write gates. A source or installed skill update does not by itself
+rewrite existing workspace sections.
 
 Reread immediately before writing. Refuse duplicate, incomplete, nested, or
 ambiguous markers and unsafe paths; reconcile concurrent edits without clobbering

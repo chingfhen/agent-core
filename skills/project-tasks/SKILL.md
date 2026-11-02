@@ -4,12 +4,13 @@ description: >
   Preserve unfinished project work as portable human-agent execution memory.
   Use to create, checkpoint, pause for a fresh session, prepare, revise,
   resume, execute, or close a saved project task, including maintaining its
-  progress and task index. Coordinate docs, KB, and lessons when the human asks
-  to hand work to a fresh session or close it out. Load before
-  managing a configured task surface or continuing a persisted task; not for
-  unrelated implementation or merely reading an explicitly named file. Resolve
-  project task locations through applicable AGENTS.md, and preserve decisions,
-  deliverables, permission boundaries, verification state, and the next permitted action.
+  progress and task index. On a general maintenance request, select relevant
+  tasks and actions from the work context. Coordinate docs, KB, and lessons when
+  the human asks to hand work to a fresh session or close it out. Load before
+  managing a task surface or executing a saved task; not merely to discover,
+  read, or use task context. Resolve project task locations through applicable
+  AGENTS.md, and preserve decisions, deliverables, permission boundaries,
+  verification state, and the next permitted action.
 disable-model-invocation: false
 ---
 
@@ -52,9 +53,10 @@ different projects can share a workspace root.
 
 - Use the configured `Tasks` location. New section-relative paths resolve from
   the declaring AGENTS.md directory; legacy workspace-relative paths retain their
-  recorded workspace root. Neither uses the process working directory. A directly
-  identified task file may be read without loading this skill merely to read it.
-- For missing routing or an authorized routing change, read
+  recorded workspace root. Neither uses the process working directory. Discovering,
+  reading, or using relevant task/index context does not require loading this skill.
+- For missing routing, an authorized routing change, or an authorized managed
+  section cue refresh, read
   [Task routing](references/routing.md). This skill can establish its own resources
   without workspace-setup. Ask about ambiguous identity/ownership; report an
   inaccessible configured destination instead of substituting a path.
@@ -62,8 +64,9 @@ different projects can share a workspace root.
   silently changing the saved map. Create a confirmed but absent directory only
   during an authorized write.
 - No guessed `tasks/` fallback, `projects.toml`, or whole-workspace inventory.
-  Maintain only the owned task-root/index section when routing actually changes;
-  preserve legacy central blocks until an explicitly approved migration.
+  Maintain only the owned task-root/index section for authorized routing changes
+  or cue refreshes; preserve legacy central blocks until an explicitly approved
+  migration.
 - The configured task surface (including its `INDEX.md`) is this skill's normal
   writable scope. Other repositories, docs, code, raw evidence, archives, and
   guidance must be changed only under their own authorization/workflows.
@@ -139,6 +142,40 @@ select the relevant project/index, then read the matching task before its next
 permitted action. Ask only when materially different candidates remain plausible.
 Give a short state/next-action summary. Confirm the relevant code repository from
 the task or a project entry point; a shared task folder does not establish code cwd.
+
+## General maintenance request
+
+When the human generally invokes project-tasks, such as "use project-tasks" or
+"manage the tasks", without specifying an operation, start a bounded maintenance
+review; do not ask the human to name files or actions. Review the current work
+context and relevant saved tasks. Resolve the project and consult its index and
+targeted task files; identify all directly
+related outcomes, including multiple tasks where appropriate. Decide which existing
+tasks need updates, whether a distinct task is needed, whether a task is ready for
+closure or resumption, or whether nothing needs changing. Reuse tasks for the same
+outcome; ask only when project identity, scope, a materially different match, or a
+consequential decision cannot be resolved from available context. Do not expand a
+bounded review into an unrelated project-wide hygiene sweep.
+
+- A general maintenance request authorizes this bounded review and ordinary updates
+  to relevant existing tasks and affected index entries, subject to narrower local
+  rules and user limits. It does not grant standing permission for later writes as
+  the conversation continues. Report a no-op when no changes are warranted.
+- For new tasks or closure, present a concrete recommendation with the reason and
+  request approval, preferably in one compact batch, unless the human's request
+  already clearly authorizes the relevant action. Honor stricter local gates for
+  any write. This default does not add a closure approval to otherwise authorized
+  bookkeeping during explicit execution of a saved task. Explicit handoff or
+  closeout retains its coordinated review; a routine maintenance decision to close
+  is not itself an explicit closeout request.
+- Close as Completed only when the required outcome and verification are established;
+  cancellation or supersession requires human intent as specified below. Never infer
+  permission to execute work from a task's presence, priority, or status. An explicit
+  request to resume work may authorize execution within its stated scope and gates.
+- Report each created, updated, or closed task with its exact physical path and
+  short reason; report affected index paths, pending approvals, and any failure or
+  access gap. Do not claim proposed changes were made. Routine maintenance does not
+  by itself authorize docs, KB, or lessons writes.
 
 ## Task depth — Brief / Standard / Detailed
 
@@ -315,10 +352,11 @@ start additional investigation or implementation merely to finish the handoff,
 and do not silently create a task when the user is merely ending casual chat.
 Honor configured locations and narrower write permissions.
 
-When asked to **resume or execute a named persisted task**, load this skill
-and the task, identify its configured project/task surface, read applicable
-`AGENTS.md` guidance, and inspect the relevant current code, docs, and evidence.
-You need not load this skill merely to answer a question about a file's contents.
+When asked to **execute work from a saved task**, load this skill and the task,
+identify its configured project/task surface, read applicable `AGENTS.md` guidance,
+and inspect the relevant current code, docs, and evidence. Reading or using saved
+task context alone, including answering a question about it, does not require
+loading this skill or authorize task writes.
 The task is execution intent and memory, **not proof that code or the environment
 still matches it**.
 
