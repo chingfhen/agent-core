@@ -8,7 +8,8 @@ description: >
   authorized project resources. Use for "agent lessons", "learn from this
   session", "remember this for future agents", or reflection on difficult agent
   work, including operational-lessons review in an explicitly requested project
-  handoff or closeout. Do not trigger during ordinary work or automatically capture notes.
+  handoff or closeout. Applying existing rules or reading their references does not
+  invoke a lessons review. Do not trigger during ordinary work or automatically capture notes.
 disable-model-invocation: false
 ---
 

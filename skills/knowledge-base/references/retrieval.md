@@ -1,7 +1,8 @@
 # Selective KB Retrieval
 
-Use with the [skill](../SKILL.md) when finding prior context. This is a bounded
-lookup, not a KB audit or a requirement to search before every answer.
+Consult this reference when a difficult lookup warrants more detail; neither it nor
+the [maintenance skill](../SKILL.md) is required for ordinary reading. This is a
+bounded lookup, not a KB audit or a requirement to search before every answer.
 
 ## Decide whether a lookup earns its cost
 

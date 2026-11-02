@@ -1,7 +1,8 @@
 # Docs routing and first use
 
-Read when docs configuration is missing or its routing must change. This skill
-owns `<!-- BEGIN PROJECT DOCS -->` through `<!-- END PROJECT DOCS -->` in verified
+Read when docs configuration is missing, routing must change, or a discovery-cue
+refresh is authorized. This skill owns `<!-- BEGIN PROJECT DOCS -->` through
+`<!-- END PROJECT DOCS -->` in verified
 applicable AGENTS.md, plus documentation/guidance explicitly assigned by the main
 skill's ownership rules. General guidance ownership never overrides another
 skill's marked section. Confirm workspace/project scope; cwd or a Git root alone
@@ -27,7 +28,13 @@ Creation-time example; use confirmed locations and existing useful entry points:
 ```markdown
 <!-- BEGIN PROJECT DOCS -->
 ## Project Docs
-Consult relevant entry points below for project decisions.
+For questions, decisions, or changes involving project meaning, architecture,
+interfaces, constraints, or established procedures, consult relevant entry points
+below or search the confirmed docs root selectively. Docs establish intended meaning;
+verify current implementation or deployed state against code and runtime evidence as
+appropriate. Reading or using docs does not require project-docs and does not
+authorize maintenance. Ask about ambiguous project identity; report inaccessible
+resources rather than substituting.
 Load project-docs before maintaining documentation or owned guidance.
 
 ### Forecasting
@@ -49,6 +56,13 @@ Legacy workspace-relative paths retain their recorded base until approved migrat
 Markers/headings/labels and the minimal initial cue are defaults; routine changes
 maintain confirmed paths and directly affected entry points. Preserve customized
 behavior, outside text, other owners' blocks, and the section's position.
+
+During a human-authorized docs-maintenance pass, minimally add or refresh the owned
+discovery cue when guidance changes are within authorized scope and the cue is absent
+or outdated. A separately requested cue-only refresh is also valid. Replace a
+conflicting old default, not genuinely customized human behavior or stricter gates;
+ask about conflicting custom instructions. Skip equivalent guidance and unrelated
+audits. Reading, source edits, and publication do not themselves authorize a refresh.
 
 Reread before mutation; refuse duplicate/incomplete/nested/ambiguous markers and
 unsafe paths. Reconcile concurrent changes safely, read back, and verify the owned

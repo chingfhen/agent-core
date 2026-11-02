@@ -1,7 +1,8 @@
 # Filesystem Backend
 
-Read the main [skill](../SKILL.md) first. Use this adapter for a durable local or
-mounted filesystem, including a local Git checkout. Git is not required.
+Use this adapter for a durable local or mounted filesystem, including a local Git
+checkout. Git is not required. Read the main [skill](../SKILL.md) for maintenance;
+ordinary read-only access requires neither it nor this adapter.
 
 ## Roots and capabilities
 
@@ -80,10 +81,10 @@ leave the input in place and report the issue without echoing sensitive values.
 
 ## Search
 
-Apply [selective retrieval](../references/retrieval.md). Search `records/`,
-relevant `knowledge/`, and `managed/` (or a configured external knowledge-page
-root) with available filename/grep tools. Use literal error matching when
+Search `records/`, relevant `knowledge/`, and `managed/` (or a configured external
+knowledge-page root) with available filename/grep tools. Use literal error matching when
 appropriate and bound results before full reads. Do not search the archive by default.
+[Selective retrieval](../references/retrieval.md) provides detail for difficult lookups.
 
 ## Git and verification
 

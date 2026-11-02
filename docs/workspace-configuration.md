@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-10-30
+updated: 2026-11-02
 ---
 
 # Workspace Configuration
@@ -21,14 +21,19 @@ updated: 2026-10-30
 
 ## Skill-Owned Guidance
 
-### Always-loaded admission
+### Guidance admission
 
 AGENTS.md contains confirmed routing, selective entry points with when-to-read
 cues, and essential before-action constraints. Detailed procedures stay in their
 owning skills or selectively read references. No line quota replaces this judgment.
-Reading relevant project rules is distinct from invoking their maintenance skill.
+When applicable guidance and resources are available, agents can discover, read,
+and use relevant docs, KB material, task context, and existing lessons without
+invoking their maintenance skills. Reading does not authorize maintenance. Consult
+only what the work needs; missing or inaccessible resources are gaps, not permission
+to guess a replacement or initialize one. Applicable guidance is not necessarily
+actually loaded by every harness.
 
-| Owner | Always-loaded content | Detail elsewhere |
+| Owner | Standing guidance | Detail elsewhere |
 | --- | --- | --- |
 | project-tasks | Task roots and descriptive INDEX.md links; activation cue | Workstream navigation in INDEX.md; deliverables, state, gates, context map in tasks |
 | project-docs | Docs roots and a few canonical entry points with consultation cues | Project meaning, architecture, rationale, rules, and deeper navigation in docs |
@@ -50,6 +55,14 @@ KNOWLEDGE BASE, PYTHON ENVIRONMENTS, or AGENT LESSONS. Markers, headings, labels
 and minimal initial activation cues are defaults. Routine maintenance updates
 confirmed paths and affected navigation, preserving customized behavior, outside
 text, other sections, and position. Managed does not mean regenerate.
+
+During a human-authorized docs or KB maintenance pass, an owner may minimally
+refresh a missing or outdated discovery cue when that guidance is within the
+authorized scope; an explicit cue-only refresh is also valid. Preserve customized
+wording and stricter gates, ask about conflicts, and leave equivalent cues unchanged.
+Reading, source edits, and publication alone do not authorize workspace changes.
+Keep useful outputs reachable through existing indexes and links; add a guidance
+pointer only for a missing durable entry point or trigger, not for every output.
 
 Reread before mutation. Refuse ambiguous, duplicate, incomplete, or nested markers
 and unsafe paths; reconcile concurrent edits safely, read back, and verify scoped

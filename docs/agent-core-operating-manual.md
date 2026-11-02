@@ -1,6 +1,6 @@
 # Agent Core Human Operating Manual
 
-**Last Updated:** 2026-10-30
+**Last Updated:** 2026-11-02
 
 **Status:** Current
 
@@ -237,9 +237,9 @@ spawning agents, implementation, or publication beyond the actual request.
 
 The canonical workflow is [`skills/knowledge-base/SKILL.md`](../skills/knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
 
-Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed effects, retrieval, and first-use routing rules. It can propose `.work-context/knowledge-base/` and, when processing needs it, `.work-context/archive/knowledge-base/`; neither is a fallback. Established remote locations and optional knowledge-page roots remain valid. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
+Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed write effects, optional retrieval guidance, and first-use routing rules. It can propose `.work-context/knowledge-base/` and, when processing needs it, `.work-context/archive/knowledge-base/`; neither is a fallback. Established remote locations and optional knowledge-page roots remain valid. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
 
-The former Drive workflow is no longer canonical; existing KB content remains where it is until a separate migration is requested. GitHub-connected web apps need an explicitly selected repository/ref/directory and access to the canonical skill and its references. Connector access does not guarantee skill discovery, writes, or external archival. Updating Agent Core does not configure those integrations or replace user-managed global guidance that may still point to Drive.
+The former Drive workflow is no longer canonical; existing KB content remains where it is until a separate migration is requested. GitHub-connected web apps need an explicitly selected repository/ref/directory and scoped read tools for recall; maintenance also requires access to the canonical skill and applicable references. Connector access does not guarantee skill discovery, writes, or external archival. Updating Agent Core does not configure those integrations or replace user-managed global guidance that may still point to Drive.
 
 ## Maintain Global Guidance Separately
 

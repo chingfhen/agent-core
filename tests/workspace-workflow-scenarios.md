@@ -38,6 +38,25 @@ skill revision for live trials. A specification walkthrough is not a trial.
    another configured task surface is cross-project; KB uses repository/ref/dir
    locators and an external knowledge-page root. Preserve each identity and backend;
    verify code cwd from the task/project entry point before implementation.
+8a. **Independent readers:** Give a reader applicable managed guidance, resources,
+    and read tools but no exposed docs, KB, or lessons maintenance skill. Ask an
+    architectural question without a filename and a vague question about prior
+    context. Expect relevant docs entry points and bounded KB navigation, with
+    intended constraints distinguished from implementation and saved evidence
+    qualified. An existing inline lesson applies and only its relevant conditional
+    reference is read. No maintenance invocation, unrelated sweep, initialization,
+    or write. Report inaccessible essential context without inventing a root.
+8b. **Discovery-cue upkeep:** During a human-authorized docs or KB maintenance pass,
+    provide a confirmed root and an owned section with an old default cue alongside
+    custom text and neighboring guidance. Where guidance writes are permitted,
+    expect a minimal cue refresh without a separate request; preserve custom content,
+    marker position, and other sections. Repeat with equivalent guidance and expect
+    no edit, and with conflicting custom instructions and expect a question. If a
+    local gate requires separate approval for guidance edits, propose the refresh but
+    do not edit before approval. Separately, expose skill metadata but do not preload
+    the skill; ask to refresh KB discovery guidance without changing paths. Expect the
+    KB owner to be selected and the authorized cue-only refresh performed. Reading or
+    publishing alone never refreshes a workspace.
 
 ## Optional setup, startup, and invocation
 

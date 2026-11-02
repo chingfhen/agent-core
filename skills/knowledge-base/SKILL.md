@@ -1,14 +1,14 @@
 ---
 name: knowledge-base
 description: >
-  Preserve and retrieve reusable context in a Markdown knowledge base. Use when
+  Preserve reusable context in a Markdown knowledge base. Use when
   the user says "sync to KB", "capture this" in a KB context, asks to process,
-  clear, clean up, or sweep the KB inbox, or asks to create or update a "managed
-  artifact". Also use for explicit KB searches and proactively when a question
-  depends on earlier discussions, recurring problems, or missing organization-
-  or project-specific context that prior records may contain. Retrieve selectively;
-  write only on request. Generic document creation is not KB persistence, and
-  this skill does not maintain project docs or active task state.
+  clear, clean up, or sweep the KB inbox, asks to create or update a "managed
+  artifact", or requests KB routing or discovery-cue maintenance. Discover and read
+  relevant KB context selectively without invoking
+  this maintenance skill; reading does not authorize writes. Generic document
+  creation is not KB persistence, and this skill does not maintain project docs
+  or active task state.
 disable-model-invocation: false
 ---
 
@@ -82,9 +82,12 @@ Use, in order:
 1. The explicit KB location selected for this operation.
 2. The KB root in applicable project/agent instructions, such as `AGENTS.md`.
 
-There is no home-directory or nearby-folder fallback. For missing configuration
-or an authorized routing change, read [KB routing](references/routing.md); this
-skill can establish its own resources without workspace-setup. New section-relative
+There is no home-directory or nearby-folder fallback. For missing configuration,
+an authorized routing change, or an authorized discovery-cue refresh, read
+[KB routing](references/routing.md). During a human-authorized KB-maintenance pass,
+minimally refresh a missing or outdated cue in the owned section when its guidance
+is within authorized scope; no separate refresh request is needed. This skill can
+establish its own resources without workspace-setup. New section-relative
 paths resolve from the declaring AGENTS.md directory; legacy workspace-relative
 paths retain their recorded base, never the shell's working directory. Do not
 consult or modify `projects.toml` or scan nearby repositories. A configured
@@ -114,12 +117,15 @@ Knowledge Base Archive: <separate source-retention location>
 Knowledge Base Knowledge: <optional knowledge-page root, default <kb>/knowledge/>
 ```
 
-Read the applicable backend before storage operations:
+For mutations, read the applicable backend before storage operations:
 
 - [Filesystem](backends/filesystem.md): local/mounted paths, including Git checkouts.
 - [GitHub](backends/github.md): repository access through a connector or API.
 
-Do not silently use another backend if a required capability is unavailable.
+Ordinary read-only recall does not require this skill or a backend reference.
+For complex remote reads, consult the applicable backend if available. Honor the
+configured identity and report unavailable capabilities rather than silently using
+another backend.
 The former Google Drive workflow is not an active backend for this skill. Existing
 Drive or legacy `evidence/knowledge/review/approved` content is not migrated,
 reclassified, or deleted by loading this skill or performing an ordinary capture.
@@ -156,7 +162,9 @@ writing a competing layout into it.
   managed artifact with a short purpose description. Monthly indexes list each
   record once with its date, topic, relative link, and retrieval-oriented scope.
 - Indexes locate documents; they do not synthesize facts or replace reading them.
-  Update only affected entries; preserve unrelated content.
+  Update only affected entries; preserve unrelated content. Keep authorized outputs
+  reachable through existing navigation; add a guidance pointer only for a missing
+  durable entry point or trigger, not for every record or artifact.
 - Create directories and indexes lazily on an explicit write or initialization
   request at the confirmed location. Reading a configured but absent KB reports
   that absence; it is not initialization or permission to choose another root.
@@ -322,10 +330,12 @@ Read-only recall may flag discrepancies but never performs these writes.
 
 ## When and how to retrieve
 
-Read [Retrieval](references/retrieval.md) before lookup for the progressive search,
-including terminology expansion, date interpretation, and evidence reconciliation.
-Use known paths, then targeted discovery and cross-month search as needed; stop
-when the question is grounded, not after a whole-KB audit.
+Discovering, reading, and using KB material does not require this skill. Use known
+paths, then targeted discovery and cross-month search as needed; stop when the
+question is grounded, not after a whole-KB audit. For unfamiliar terms, conflicting
+evidence, or other complex lookups, consult [Retrieval](references/retrieval.md)
+if accessible; it is not a prerequisite for ordinary reading. If unavailable,
+use bounded search and disclose material search or access limits.
 
 Retrieve on explicit request, recall of earlier discussions or decisions,
 recurring problems, or missing project/organizational context likely recorded

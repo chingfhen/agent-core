@@ -1,11 +1,12 @@
 # GitHub Backend
 
-Read the main [skill](../SKILL.md) first. Use this adapter for repository access
-through a connector or API. A local Git checkout uses the filesystem adapter instead.
+Use this adapter for repository access through a connector or API. A local Git
+checkout uses the filesystem adapter instead. Read the main [skill](../SKILL.md)
+for maintenance; ordinary read-only access requires neither it nor this adapter.
 These are capability-based requirements, not claims that a particular ChatGPT app
 or plugin exposes all of them.
 
-## Identity and skill loading
+## Identity and workflow availability
 
 An explicit target must establish **owner/repository, branch or ref, and KB directory**.
 A repository-root KB can use `/`. If a URL establishes these, reuse it; otherwise
@@ -14,11 +15,11 @@ the whole account for a default, or equate skill and content repositories.
 A separately configured remote knowledge-page location needs its own complete
 destination identity; it does not authorize unrelated writes.
 
-The web app cannot assume access to the human's configured local KB. It also does not necessarily discover
-or execute `SKILL.md` merely because it can search GitHub. The calling environment
-must load the canonical skill and required relative references from Agent Core, then
-resolve the independently selected content root. Do not create a competing workflow
-copy inside the KB to simulate skill installation.
+The web app cannot assume access to the human's configured local KB or that a
+maintenance skill is exposed merely because it can search GitHub. Read-only recall
+can use available read tools and the independently configured content root without
+loading the skill. For maintenance, load the canonical skill and required references;
+if unavailable, report the gap. Do not create a competing workflow copy inside the KB.
 
 ## Capability check
 
@@ -40,12 +41,12 @@ external storage based on the ability to search a repository.
 
 ## Reads and retrieval
 
-Apply [selective retrieval](../references/retrieval.md). Use exact paths, relevant
-living-knowledge pages, root/month indexes, filename/tree narrowing, and scoped
-text search when supported. Include selected `records/`, `knowledge/`, and
+Use exact paths, relevant living-knowledge pages, root/month indexes, filename/tree
+narrowing, and scoped text search when supported. Include selected `records/`, `knowledge/`, and
 `managed/` or an explicitly configured page location, not other repositories by
 inference. Honor the selected ref; default-branch search cannot establish absence
 on a feature branch. Use scoped direct reads and disclose limitations.
+[Selective retrieval](../references/retrieval.md) provides detail for difficult lookups.
 
 GitHub browser code search supports `repo:` and `path:` qualifiers, but connectors
 and APIs can differ. Use the actual tool's syntax rather than copying browser queries

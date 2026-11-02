@@ -1,6 +1,6 @@
 ---
 name: project-docs
-description: Maintains settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Load before maintaining those surfaces; not needed merely to read identified files. Establishes its own docs routing when needed, routes each durable claim to its canonical authority, integrates useful meaning into existing docs, and allows a docs sync to conclude that no change is needed.
+description: Maintains settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Load before maintaining those surfaces; discovering, reading, or using relevant docs does not require this skill. Establishes its own docs routing when needed, routes each durable claim to its canonical authority, integrates useful meaning into existing docs, and allows a docs sync to conclude that no change is needed.
 disable-model-invocation: false
 ---
 
@@ -30,16 +30,19 @@ Resolve the project from the requested work, not solely the session's current
 working directory. One project may span several repositories. Use its `Docs`
 location; new section-relative paths resolve against the declaring AGENTS.md
 directory, while legacy workspace-relative paths retain their recorded base.
-Read applicable repository guidance too. For missing routing or an authorized
-routing change, read [Docs routing](references/routing.md). Ask about conflicting
-or ambiguous project identity/ownership. If a configured location
+Read applicable repository guidance too. For missing routing, an authorized routing
+change, or an authorized discovery-cue refresh, read
+[Docs routing](references/routing.md). During a human-authorized docs-maintenance
+pass, minimally refresh a missing or outdated cue in the owned section when its
+guidance is within authorized scope; no separate refresh request is needed. Ask about
+conflicting or ambiguous project identity/ownership. If a configured location
 is inaccessible, report the problem rather than substitute another destination.
 A confirmed but not-yet-created directory may be created during an authorized write.
 
 There is no automatic `docs/` fallback and no `projects.toml` workflow. This skill
 can establish its own resources without workspace-setup. Maintain only its owned
-docs-root/entry-point section when routing changes; do not scan for a substitute
-surface or rewrite legacy central blocks without migration approval.
+docs-root/entry-point section for authorized routing or cue changes; do not scan for
+a substitute surface or rewrite legacy central blocks without migration approval.
 An explicit human-selected destination for this operation is allowed; it does not
 silently change the saved map. Ordinary work does not require invoking setup again.
 
@@ -201,7 +204,7 @@ Persist conclusions and useful rationale, not raw investigation history. Preserv
 - Do not include secrets, passwords, tokens, private keys, live credentials, or sensitive source content that does not belong in project documentation.
 - Do not turn a routine sync into an audit of unrelated areas.
 
-When a canonical document is renamed, moved, split, merged, or materially rescoped, update directly affected indexes and links in the same change.
+Keep useful outputs reachable through existing entry points; update directly affected indexes and links when authorized. Add a guidance pointer only when it provides a missing durable entry point or trigger, not for every document. When a canonical document is renamed, moved, split, merged, or materially rescoped, update directly affected indexes and links in the same change.
 
 ### Markdown Conventions
 
