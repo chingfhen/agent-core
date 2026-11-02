@@ -55,22 +55,25 @@ different projects can share a workspace root.
   the declaring AGENTS.md directory; legacy workspace-relative paths retain their
   recorded workspace root. Neither uses the process working directory. Discovering,
   reading, or using relevant task/index context does not require loading this skill.
-- For missing routing, an authorized routing change, or an authorized managed
-  section cue refresh, read
-  [Task routing](references/routing.md). This skill can establish its own resources
-  without workspace-setup. Ask about ambiguous identity/ownership; report an
-  inaccessible configured destination instead of substituting a path.
+- During an authorized, human-triggered task-management pass, check the applicable
+  `AGENTS.md` section while reading repository guidance. If task routing is
+  missing or the owned section is absent or lacks the current discovery and
+  maintenance cues, follow [Task routing](references/routing.md) to establish
+  or minimally refresh it without a separate request. Skip equivalent guidance;
+  never change it merely to read task context or publish a skill. Ask about
+  ambiguous identity/ownership; report inaccessible destinations.
 - A human can explicitly select a destination for one operation, without
   silently changing the saved map. Create a confirmed but absent directory only
   during an authorized write.
 - No guessed `tasks/` fallback, `projects.toml`, or whole-workspace inventory.
-  Maintain only the owned task-root/index section for authorized routing changes
-  or cue refreshes; preserve legacy central blocks until an explicitly approved
-  migration.
+  Maintain only the owned Project Tasks section under the routing rules; preserve
+  legacy central blocks until an explicitly approved migration.
 - The configured task surface (including its `INDEX.md`) is this skill's normal
-  writable scope. Other repositories, docs, code, raw evidence, archives, and
-  guidance must be changed only under their own authorization/workflows.
-  Report exact physical paths changed, as well as useful logical task paths.
+  writable scope. A verified marked Project Tasks section in `AGENTS.md` may
+  also be created/refreshed during authorized management as specified in routing.
+  Other guidance, repositories, docs, code, raw evidence, and archives require
+  their own authorization/workflows. Report exact physical paths changed, as
+  well as useful logical task paths.
 
 Apply narrower repository rules even when this skill would ordinarily maintain
 state automatically. In particular, a repository that makes task changes
@@ -157,25 +160,21 @@ outcome; ask only when project identity, scope, a materially different match, or
 consequential decision cannot be resolved from available context. Do not expand a
 bounded review into an unrelated project-wide hygiene sweep.
 
-- A general maintenance request authorizes this bounded review and ordinary updates
-  to relevant existing tasks and affected index entries, subject to narrower local
-  rules and user limits. It does not grant standing permission for later writes as
-  the conversation continues. Report a no-op when no changes are warranted.
-- For new tasks or closure, present a concrete recommendation with the reason and
-  request approval, preferably in one compact batch, unless the human's request
-  already clearly authorizes the relevant action. Honor stricter local gates for
-  any write. This default does not add a closure approval to otherwise authorized
-  bookkeeping during explicit execution of a saved task. Explicit handoff or
-  closeout retains its coordinated review; a routine maintenance decision to close
-  is not itself an explicit closeout request.
-- Close as Completed only when the required outcome and verification are established;
-  cancellation or supersession requires human intent as specified below. Never infer
-  permission to execute work from a task's presence, priority, or status. An explicit
-  request to resume work may authorize execution within its stated scope and gates.
-- Report each created, updated, or closed task with its exact physical path and
-  short reason; report affected index paths, pending approvals, and any failure or
-  access gap. Do not claim proposed changes were made. Routine maintenance does not
-  by itself authorize docs, KB, or lessons writes.
+- One maintenance request authorizes the agent to independently create, update,
+  checkpoint, reprioritize, and close verified-Completed tasks related to the work
+  context, with affected index changes. No separate approval for routine task
+  bookkeeping is needed. Honor narrower local write gates and user limits; propose
+  prohibited changes instead. This permission expires after the pass: do not
+  maintain tasks proactively during other conversation or later work.
+- Close as Completed only when the required outcome and verification are established.
+  Cancelled or Superseded requires clear human intent, not agent inference.
+  Explicit closeout still uses the coordinated persistence review; a routine
+  Completed closure does not trigger it. Never infer permission to execute work
+  from a task's presence, priority, or status.
+- Report each meaningful task change with its action, identity, exact physical path,
+  and short reason; include affected index paths and any approval/access gaps.
+  Report a no-op when nothing changes, and never claim a proposed change was made.
+  Routine maintenance does not authorize execution or docs, KB, or lessons writes.
 
 ## Task depth — Brief / Standard / Detailed
 
