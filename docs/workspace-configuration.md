@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-11-02
+updated: 2026-11-03
 ---
 
 # Workspace Configuration
@@ -11,10 +11,13 @@ updated: 2026-11-02
 - Canonical skills implement lean, independently owned AGENTS.md routing and
   explicit coordinated task handoff/closeout. Publication and workspace adoption
   are separate; source edits do not update installed skills or external guidance.
-- `project-docs` and `knowledge-base` are standalone. `project-tasks` coordinates
-  their use and operational-lessons review for an explicit handoff/closeout.
-  `agent-lessons` uses docs/KB through their owning workflows when detail needs
-  preservation. There is no mandatory setup skill, registry, or coordinator cycle.
+- `project-docs`, `knowledge-base`, and `project-scripts` are independently
+  usable resource skills. `project-tasks` coordinates task continuity and
+  KB/docs/operational-lessons review for explicit handoff/closeout.
+  `agent-lessons` coordinates bounded improvements to future agent behavior,
+  using relevant owning skills without making those skills depend on it.
+  Coordinators must respect owner permissions and avoid recursive invocation.
+  There is no mandatory setup skill or new lessons registry.
 - The [implementation task](../tasks/2026-10/2026-10-29__skill-owned-agents-sections.md)
   records delivery and actual verification. Static checks and saved instructions
   do not establish fresh-session harness compliance.
@@ -188,18 +191,29 @@ work remains pending until completed or explicitly waived/cancelled.
 ## Operational Lessons
 
 Explicit natural-language lessons requests and coordinated handoff/closeout cues
-activate a bounded review. The marked section keeps essential pre-action rules
-and conditional pointers to specific headings. It never requires reading every
-reference at session start. Reuse existing authoritative sources and consolidate
-relevant content; a difficult session does not require a new standing rule.
+activate a bounded behavioral-improvement review. `agent-lessons` diagnoses
+improvement opportunities, judges likely benefit and interference, and selects
+only justified interventions: guidance, docs, KB, a genuine continuation task,
+a concrete deterministic personal script/check, or no change. It delegates
+resource maintenance to the relevant owning skill through a bounded request.
+An owner may accept authorized delegated work without knowing the caller's
+identity. Delegation does not override local write gates or create permission
+to modify unrelated resources. A task handoff may still invoke lessons review;
+the lessons review must not recursively start another handoff.
 
-Detailed project procedures use project-docs; reusable findings/evidence use KB.
-The proposed new `agent-lessons.md` companion was dropped in the 2026-10-30 review.
-Existing companion content/links remain until an authorized migration identifies
-a suitable home. Missing supporting access cannot justify deleting useful detail.
-Save/verify supporting material before shortening guidance. Generic skill
-procedures stay in their skills; improve a missed activation cue at its owner
-rather than adding duplicate lessons.
+The marked lessons section keeps essential pre-action rules and conditional
+pointers to specific headings. It never requires reading every reference at
+session start. Maintain affected rules by consolidating, narrowing, or retiring
+them when justified; consequential changes should consider possible unintended
+behavior and use proportionate verification. No change is a valid outcome.
+
+Detailed project procedures live in project docs; reusable findings and evidence
+live in KB; personal deterministic utilities belong to Project Scripts. These
+remain independently usable. No new `agent-lessons.md` companion or lessons
+registry is needed. Preserve existing companion material until any authorized
+migration saves its replacement. Save and verify supporting detail before
+shortening guidance. Generic skill procedures stay in their owning skills;
+fix missed activation cues at the owner instead of adding duplicate lessons.
 
 ## Optional Setup and Invocation
 
