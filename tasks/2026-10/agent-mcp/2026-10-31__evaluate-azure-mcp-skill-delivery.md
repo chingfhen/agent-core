@@ -2,11 +2,17 @@
 
 **File:** `tasks/2026-10/agent-mcp/2026-10-31__evaluate-azure-mcp-skill-delivery.md`
 **Created:** 2026-10-31
-**Last Updated:** 2026-10-31
-**Priority:** Next
-**Status:** Active
+**Last Updated:** 2026-11-05
+**Priority:** Later
+**Status:** Closed
 
-**Goal:** Make canonical Agent Core instructions easier for hosted agents such as ChatGPT to discover and retrieve, using a small read-only MCP server, while gaining practical MCP development experience.
+**Closure:** **Superseded (2026-11-05)** by the deferred ChatGPT native thin-skill-loader evaluation and a distinct cross-project Task Execution Service direction. No Azure MCP repository, server, OAuth deployment or implementation was created; the old approved proposal was planning only. Human preference: do not pursue a separate read-only Azure skill MCP by default. Preserve this task as historical context; reopen only on explicit new need.
+
+**Superseding tasks:**
+- `tasks/2026-11/chatgpt-skill-loaders/2026-11-05__evaluate-thin-native-skill-loaders.md` — deferred discovery experiment.
+- `tasks/2026-11/task-execution-service/2026-11-05__design-trustworthy-cross-project-executor.md` — deferred cross-project trusted execution design; any future MCP is a delegation interface, not a skill-delivery prerequisite.
+
+**Historical goal:** Make canonical Agent Core instructions easier for hosted agents such as ChatGPT to discover and retrieve, using a small read-only MCP server, while gaining practical MCP development experience.
 
 **Why:** Local Pi/OpenCode/Devin already discover native skills through `agent-core sync`. ChatGPT's GitHub connector fetches known files but does not automatically surface the registered skills, their descriptions, or applicable `AGENTS.md` as native instruction-discovery metadata.
 
@@ -24,9 +30,9 @@
 
 **Hosting constraints:** Azure Functions **Flex Consumption**, scale-to-zero, no always-ready instances; cold starts may still occur despite faster scaling. Verify SDK-based MCP hosting support/current preview requirements. Monthly execution free grants do not cover required Azure Storage or all networking/logging charges. Set spending safeguards and obtain explicit resource/deployment approval before any Azure changes. Favor Python official MCP SDK, stateless Streamable HTTP, minimal dependencies, local MCP Inspector testing, and GitHub Actions CI/CD. Python is a proposed executor detail, not a user-approved language choice.
 
-**Next Action (permitted now):** Prepare a small design/implementation proposal for the separate `agent-core-mcp` repository. Spike/prove Azure Functions MCP hosting with OAuth and ChatGPT's plugin before treating production auth as supported. Verify endpoint/metadata, static OAuth client registration and ChatGPT redirect compatibility, source authorization, and invocation from natural prompts. **Repo creation, code implementation, Azure provisioning, credentials, and deployment still require separate explicit authorization.**
+**Historical next action (no longer permitted under this closed task):** Prepare a small design/implementation proposal for the separate `agent-core-mcp` repository. Spike/prove Azure Functions MCP hosting with OAuth and ChatGPT's plugin before treating production auth as supported. Verify endpoint/metadata, static OAuth client registration and ChatGPT redirect compatibility, source authorization, and invocation from natural prompts. **Repo creation, code implementation, Azure provisioning, credentials, and deployment still require separate explicit authorization.**
 
-**Blockers / Human Attention:** ChatGPT Plus MCP tool access is verified. Remaining: implement/deploy authorization, choose/validate compatible Microsoft Entra ID registration and MCP discovery; obtain explicit permission before creating code or billable Azure resources; set up a read-only GitHub credential and Azure subscription/cost guardrails at deployment time.
+**Historical blockers / Human Attention:** ChatGPT Plus MCP tool access is verified. Remaining: implement/deploy authorization, choose/validate compatible Microsoft Entra ID registration and MCP discovery; obtain explicit permission before creating code or billable Azure resources; set up a read-only GitHub credential and Azure subscription/cost guardrails at deployment time.
 
 **Success Bar:** On an MCP-compatible client, retrieve an allowlisted skill and references with source commit identity; avoid broad private repository browsing, unauthorized data exposure, and duplicate skill copies. Demonstrate skill invocation from a natural request without the user naming paths, and measure selection reliability relative to GitHub-only access.
 
