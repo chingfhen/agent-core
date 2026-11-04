@@ -7,9 +7,9 @@
 
 ## Next
 
-- [Agent Core MCP Skill Delivery](2026-10/agent-mcp/2026-10-31__evaluate-azure-mcp-skill-delivery.md) — Active (planning). Plus MCP tool invocation verified; separate repo and Azure Functions approved. Next: validate ChatGPT-compatible Entra OAuth and prepare implementation proposal; repo/code/deployment gated.
 - [Durable Learning Mechanism for Operational Constraints](2026-10-23__durable-agent-constraint-learning-bookmark.md) — Active. Next action: human evaluates durable options outside this repository; resume when that evaluation identifies a direction or requests further investigation.
 
 ## Later
 
+- [Trustworthy Task Execution Service](2026-11/task-execution-service/2026-11-05__design-trustworthy-cross-project-executor.md) — On Hold (deferred). Resume on request: harden cross-project readiness, permissions, audit/receipt and local-continuation design before any Sprite prototype.
 - [ChatGPT Native Thin Skill Loaders](2026-11/chatgpt-skill-loaders/2026-11-05__evaluate-thin-native-skill-loaders.md) — On Hold (deferred). Resume on request: validate canonical GitHub-backed native skill discovery against full-package and GitHub-only options; no implementation approved.
