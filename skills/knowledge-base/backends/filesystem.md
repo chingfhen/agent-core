@@ -27,7 +27,7 @@ arbitrary repositories. If the archive overlaps the KB, request a separate
 destination instead of moving sources there. Ordinary KB writes stay inside
 the KB, except an explicitly configured external knowledge-page root may hold
 living pages only. This does not authorize writes to unrelated documentation or
-tasks. Inbox processing owns only the exact archival destinations and removal
+tasks. Approved original archival owns only the specifically selected destinations
 of verified processed inputs.
 
 Use ordinary directory listing, UTF-8 reads/writes, filename/text search, copying,
@@ -50,34 +50,35 @@ a temporary downloaded draft does not establish durable persistence.
   persistence. An inaccessible page root or failed page write leaves that
   maintenance incomplete, not the records unsaved. Do not substitute another root.
 
-## Archive and clear safely
+## Explicit original-byte archival
 
-Use the main skill's capture-first sequence. For each source whose records and
-navigation are complete:
+Use this adapter **only after** the main skill has shown the proposed filenames
+and `<archive>/YYYY-MM/` destinations and obtained affirmative selection.
+Do not scan the archive or any legacy inbox to select additional sources.
 
-1. Select `<archive>/YYYY-MM/<original-name>` using archive date. If that path is
-   occupied, use a collision-safe suffix, unless verified identity proves it is the
-   same source from an interrupted operation. Never replace an existing original.
-2. Copy the original bytes without normalization or extraction. For sources already
-   archived on a previous attempt, verify the existing copy instead of duplicating it.
-3. Compare bytes or a content hash, not just size/name, between the input read for
-   capture, the current input, and the archive. A changed input remains pending.
-4. Record the actual archive locator in associated records. Keep the original
-   KB-relative input path for provenance. Verify these targeted updates succeeded.
-5. Remove only the exact unchanged inbox file after the retained copy and record
-   links are established. Recheck identity immediately before removal. If concurrent
-   writing cannot be excluded safely, leave the input pending.
-6. Confirm the input is absent and the archive remains present. Remove empty input
-   subdirectories only when they belonged to this completed batch; preserve the inbox.
+1. Resolve and normalize each **approved** source path and destination. The
+   archive root must be separately configured/authorized, outside the KB.
+   Month folder is the **archival date** in `YYYY-MM` format, even when the
+   original file was created earlier.
+2. Preserve original filenames and exact bytes by copying (not moving). If a
+   destination path exists, confirm the identity before reusing an identical
+   copy; otherwise choose a collision-safe suffixed name, never overwrite.
+   Do not add a mandatory topic subdirectory.
+3. Verify the retained content against the source read for this operation with
+   byte comparison or a strong content hash (e.g. SHA-256). Detect source changes
+   during the operation. Never infer success from same filename or size.
+4. After verification, write the actual archived locator into the associated
+   KB record **if knowledge capture was requested**. Preserve the pre-archive
+   original path when useful and do not claim archival before it exists.
+5. Do not delete or move source files, empty `inbox/` directories, or delete
+   old archive data. If a copy/check fails, keep all original data in place and
+   report the specific incomplete action.
 
-Copy-verify-remove is intentional: the archive may be on another volume and a move
-alone may not provide enough fidelity/recovery evidence. If interrupted, an extra
-copy is safer than lost source material. Do not use recursive deletion to empty an
-inbox or archive. Do not remove directories containing unprocessed or newly added files.
-
-Archival does not guarantee backup, portability, or suitability for personal storage.
-Do not archive known secrets or restricted data into an unauthorized destination;
-leave the input in place and report the issue without echoing sensitive values.
+A manually archived original explicitly referenced by the human is read from
+that exact path for ordinary capture and is **not** copied or relocated.
+Report missing/inaccessible exact files instead of searching for substitutions.
+An archive does not guarantee backup, portability, or permission to put
+workplace source data into private storage.
 
 ## Search
 
@@ -95,7 +96,7 @@ A raw input is not recoverable from Git merely because its parent directory is a
 checkout; untracked/uncommitted files may have no history.
 
 Use successful write results and targeted checks for ordinary records/indexes. Check
-that links resolve and substantial edits preserve unrelated material. For clearing,
-verify retained source fidelity, completed associated records, and source absence.
+that links resolve and substantial edits preserve unrelated material. For explicitly approved archival, verify retained byte fidelity, exact destinations,
+and unchanged original sources.
 Do not perform a whole-KB audit. Report local paths and outstanding steps; do not
 claim changes are on GitHub until an authorized publication actually succeeds.
