@@ -25,9 +25,9 @@
 
 **Chosen Direction:** Approved by the human in the Nov 4, 2026 discussion. Use the existing canonical KB skill, no new separate skill, manifests, source-tracker, archive scan, or database.
 
-**Current State:** Branch created; task recorded. Implementation to be applied and reviewed on this branch.
+**Current State:** Revised canonical skill, routing, source-provenance guidance, filesystem and GitHub adapters, and directly affected Agent Core guidance are implemented on the feature branch. Static reads/checks and GitHub comparison verify the changed files exist only on this branch; live harness execution and approved binary-archive copying have **not** been tested.
 
-**Next Action:** Implement and statically verify the revised canonical skill and affected references on this branch. After verification, present the diff/paths for human review. **Do not merge to `main` without a separate request.**
+**Next Action:** Human reviews the branch diff/approved contract. If desired, run a controlled dry-run in a workspace with a configured archive and throwaway test originals; seek separate permission before merge or rollout to installed harnesses. **Do not merge to `main` without a separate request.**
 
 **Blockers:** None for instruction changes. End-to-end runtime/archive tests require an accessible configured archive and approved test files; do not write real originals merely to validate skill prose.
 
@@ -49,3 +49,19 @@
 - `docs/workspace-configuration.md` — concise canonical project understanding.
 - `skills/project-tasks/SKILL.md` and `tasks/INDEX.md` — task format, maintenance and navigation.
 - This task's user-approved design is from the current ring-document archival conversation; personal ring files are **not** an authorized test/archive batch.
+
+## Verification performed (2026-11-04)
+
+- Read back all nine affected paths at the feature branch; verified skill and
+  routing references, archive contract cues, task/index navigation and AGENTS
+  markers are present.
+- GitHub compared `main` to this branch: branch is ahead, not behind, with
+  only the task, index, canonical skill, its references, Agent Core guidance
+  and workspace-configuration doc changed. No source binaries were written.
+- Static scenario checks cover unchanged capture, affirmative original-file
+  selection, `YYYY-MM` naming, non-destructive retention, exact manual
+  archive references, missing-file reporting, deprecation of inbox processing,
+  safe routing adoption and GitHub backend limitations.
+- **Not validated:** actual cross-harness activation, runtime approval
+  prompting, binary fidelity against an archive or legacy AGENTS migration.
+  No claims of those outcomes until independently exercised.
