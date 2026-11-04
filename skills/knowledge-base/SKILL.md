@@ -1,10 +1,11 @@
 ---
 name: knowledge-base
 description: >
-  Preserve reusable context in a Markdown knowledge base. Use when
-  the user says "sync to KB", "capture this" in a KB context, asks to process,
-  clear, clean up, or sweep the KB inbox, asks to create or update a "managed
-  artifact", or requests KB routing or discovery-cue maintenance. Discover and read
+  Preserve reusable context in a Markdown knowledge base. Use for
+  human-requested KB capture, original-source archival, managed-artifact
+  creation/update, or KB routing and discovery-cue maintenance. Original archival
+  requires explicit file-selection approval; legacy inbox processing is retired.
+  Discover and read
   relevant KB context selectively without invoking
   this maintenance skill; reading does not authorize writes. Generic document
   creation is not KB persistence, and this skill does not maintain project docs
