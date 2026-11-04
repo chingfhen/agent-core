@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-10-30
+**Last Updated:** 2026-11-04
 
 **Status:** Current
 
@@ -85,7 +85,7 @@ The canonical contract is [workspace configuration](docs/workspace-configuration
 - Core resource skills own lean routing sections and can establish their own resources. `workspace-setup` is an optional request-triggered convenience. Preserve human wording, outside content, and block positions; migrate legacy central blocks only with approval.
 - AGENTS.md routing replaces `projects.toml`. Reuse confirmed resources; absent resources need an initialization proposal/approval. New relative paths use the declaring guidance directory; legacy paths retain their recorded base. Ask about ambiguity and report inaccessible resources.
 - `.work-context/` is the setup convention, with shared `knowledge-base/`, `archive/knowledge-base/`, `projects/<project>/{docs,tasks}/`, and flat `python/<purpose>/`. Existing layouts require approved migration; code repository organization is unconstrained.
-- `manage-python-env` owns Python environment management AND actual workload execution. `knowledge-base` owns capture-first, verified archival and inbox cleanup. Keep detailed procedures in those skills, not duplicated in managed guidance.
+- `manage-python-env` owns Python environment management AND actual workload execution. `knowledge-base` owns knowledge capture and explicitly requested, per-file-approved original-byte archival. Legacy inbox processing is retired; existing files are preserved. Keep detailed procedures in those skills, not duplicated in managed guidance.
 - `project-tasks` owns execution continuity, deliverables, context pointers, and its index. Explicit handoff/closeout requests coordinate KB/docs/lessons through their owning workflows; ordinary task updates do not. KB and docs remain standalone.
 - `agent-lessons` owns its marked essential-rule/conditional-pointer section. Supporting detail uses docs/KB through their owners; no new lessons companion. Explicit lessons requests or coordinated handoff/closeout activate review, subject to local write gates.
 - All canonical skills permit model invocation. Natural-language activation does not broaden the request's permissions.
@@ -97,7 +97,7 @@ The canonical contract is [workspace configuration](docs/workspace-configuration
 - Route steward-ledger operations through `uv run scripts/memory.py`, not direct ledger edits.
 - New ledger topic creation requires explicit human approval. Existing active ledger topics may be updated autonomously within scope.
 - Memory tooling is steward-only. Global sync does not create or infer project memory configuration.
-- The canonical knowledge-base workflow is `skills/knowledge-base/SKILL.md`, selected in `personal-skills.toml`. It owns reusable Markdown records and explicitly requested managed artifacts, not this memory ledger. Retrieval may be proactive when relevant; capture, inbox processing, and artifact writes require an explicit request. The former Drive workflow is no longer authoritative; changing the skill does not migrate KB content.
+- The canonical knowledge-base workflow is `skills/knowledge-base/SKILL.md`, selected in `personal-skills.toml`. It owns reusable Markdown records and explicitly requested managed artifacts, not this memory ledger. Retrieval may be proactive when relevant; capture, original archival, and artifact writes require an explicit request. Original archival additionally requires approval of the proposed exact files and destinations. The former Drive workflow is no longer authoritative; changing the skill does not migrate KB content.
 
 ## Steward Rules
 
@@ -124,3 +124,17 @@ The canonical contract is [workspace configuration](docs/workspace-configuration
 | Legacy retirement | `agent_core/retire.py` | Safe cleanup of prior project-local installations. |
 | Memory contract | `docs/memory-pilot.md` | Ledger schema, approval boundary, and tooling behavior. |
 | Active handoff | `tasks/` | Fresh-session continuity for unfinished work. |
+
+<!-- BEGIN PROJECT TASKS -->
+## Project Tasks
+
+Tasks: tasks/
+- [Active task index](tasks/INDEX.md) — consult relevant saved execution state
+  before planning or continuing task work; task reading is permitted without
+  invoking the project-tasks maintenance skill.
+- Load project-tasks for human-requested creation, execution, checkpoint or
+  maintenance. This repository retains its **explicit task-write gate**:
+  do not autonomously edit task files/index in unrelated work.
+- For an authorized task pass, maintain only the task files/index in scope;
+  honor other skills' ownership, execution permissions, and merge/deployment gates.
+<!-- END PROJECT TASKS -->
