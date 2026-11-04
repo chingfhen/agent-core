@@ -93,7 +93,12 @@ human file selection. Determine backend byte-copy/verification capability from
 exposed operations; do not perform a test write to real user archives.
 
 The separate archive must be explicitly configured, reachable, authorized for
-these exact files, and **outside** the KB. A repository/ref/path is not an
+these exact files, and **outside** the KB. A private GitHub repository may hold
+an explicitly approved archive at a repository path such as `archive/`, even
+when the KB occupies a separate `knowledge-base/` directory in that same
+repository. Resolve its **repository + branch + directory** from applicable
+`AGENTS.md` and preserve the established Git publication boundary; private
+repository visibility does not itself approve copying sensitive originals. A repository/ref/path is not an
 authorized archival destination merely because the agent can push commits.
 Never silently choose another GitHub repository, the KB repository itself,
 Google Drive, a temporary sandbox, or an arbitrary local home. For remote
@@ -103,7 +108,11 @@ explicit destination approval. Preserve existing storage and work restrictions.
 If approved and technically possible: store the **original bytes** at the
 approved `<archive>/YYYY-MM/<original-name>` locator, use collision-safe names,
 verify bytes/hashes, and record actual locators in KB records when capture was
-requested. Never delete the source by default. If not possible, preserve any
+requested. For GitHub, prefer a single commit containing only the approved
+original blobs; verify the resulting blob SHA / bytes, and do not treat successful
+Markdown writes as proof that local binary inputs can be passed to the connector.
+If binary upload is unsupported or the agent cannot transfer source bytes into
+the GitHub operation, report the blocker instead of converting or omitting them. Never delete the source by default. If not possible, preserve any
 completed Markdown capture separately and report original archival as
 **unfulfilled**, with the specific access/capability blocker.
 
