@@ -2,6 +2,7 @@
 
 ## Now
 
+- [Approval-gated Knowledge Base original archival](2026-11/knowledge-base/2026-11-04__approval-gated-original-archiving.md) — Active. Implement and verify the revised KB skill on the feature branch; human review before any merge.
 - [Synchronize Pi and OpenCode Shortcuts](2026-10/2026-10-28__synchronize-pi-opencode-shortcuts.md) — Active. Next action: test the trial model picker and agent-cycle bindings, F2/F3 and thinking visibility.
 - [Autonomous Task Lifecycle for project-tasks](2026-11/project-tasks-autonomy/2026-11-02__autonomous-task-lifecycle.md) — Active. Human-triggered maintenance is merged; clarify whether the original broader autonomy remains wanted or the task is superseded.
 
