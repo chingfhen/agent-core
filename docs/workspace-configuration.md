@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-11-03
+updated: 2026-11-04
 ---
 
 # Workspace Configuration
@@ -40,14 +40,19 @@ actually loaded by every harness.
 | --- | --- | --- |
 | project-tasks | Task roots and descriptive INDEX.md links; activation cue | Workstream navigation in INDEX.md; deliverables, state, gates, context map in tasks |
 | project-docs | Docs roots and a few canonical entry points with consultation cues | Project meaning, architecture, rationale, rules, and deeper navigation in docs |
-| knowledge-base | KB/archive roots and established backend/knowledge-page configuration; routing cue | Records, syntheses, content indexes, storage/archival procedures |
+| knowledge-base | KB root, optional original-archive root, backend/knowledge-page configuration and selective retrieval cue | Records, syntheses, content indexes, approval-gated original preservation |
 | manage-python-env | Python root beside its before-execution activation cue | Compatibility in manifests/pins/locks/runtime; execution procedure in skill |
 | agent-lessons | Essential pre-action constraints and conditional reference pointers | Settled procedures in docs; reusable findings/evidence in KB |
 
 The four resource owners define their creation-time shapes in skill-local
 `references/routing.md`; agent-lessons defines its narrow section in SKILL.md.
 Task/KB indexes stay local. Environment and skill inventories do not become
-standing guidance. Python execution includes interpreter/import probes; reading
+standing guidance. The knowledge-base skill maintains its own marked AGENTS.md
+section during authorized KB maintenance (including safe adoption of clear
+legacy unmarked routing); ordinary capture leaves source bytes untouched.
+Approved original archival retains exact originals under the configured archive
+root's `YYYY-MM/` month, without overwriting or deleting sources. The legacy
+`inbox/` processing lifecycle is deprecated, with any existing files preserved. Python execution includes interpreter/import probes; reading
 a path/source file is not execution. Selecting a repository script does not
 authorize its repository-local environment.
 
@@ -87,7 +92,7 @@ discarding valid primary work or claiming everything succeeded.
 
 Folder existence alone proves neither identity nor ownership. Python adoption
 requires actual recipe/independence inspection. Initialize only the invoking
-skill's resources. An archive is needed for inbox processing, not ordinary recall.
+skill's resources. An original archive is optional for ordinary KB recall and capture. Explicit original archival requires the destination and approval of the proposed files and their paths; existing archives are never scanned as processing queues.
 KB/Python need no project identity; preserve explicit cross-project task surfaces.
 
 New section-relative paths resolve from the directory containing the declaring
