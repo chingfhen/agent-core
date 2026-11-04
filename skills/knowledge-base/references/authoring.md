@@ -113,23 +113,38 @@ correction, briefly identify what changed and its basis; do not silently turn a
 historical failed attempt into a success. Link related records when their difference
 or supersession matters. Do not search the entire KB for other things to correct.
 
-### Raw-source provenance
+### Original-source provenance
 
-For records derived from inbox files, retain enough identity to prevent duplicate
-processing and recover the original:
+When capture uses an original document (including one that the human manually
+archived), retain its **exact available source locator** in the associated
+record. The user may point to a precise existing
+`archive/YYYY-MM/original-name.pdf` without moving or recopying that file.
+Record whether the original was actually read/verified in this runtime or the
+locator is only user-reported. If a referenced file cannot be accessed, report
+that blocker and do not pretend its content was examined.
 
 ```text
-Source: Teams meeting transcript, clarified in discussion
+Source: Named project report, discussed with the user
 Source date: 2026-10-12
-Original input: inbox/aws-session.txt
-Archived source: <actual verified archive path or remote locator>
+Original source: archive/2026-10/report.pdf
+Original access: Verified read in this workspace
 ```
 
-Use an available stable source ID or content hash when needed to distinguish changed
-files or resume partial archival. A filename match alone does not establish identity.
-Only record completed archival after it exists; while processing is incomplete the
-original-input locator remains sufficient. Each output from a split source retains
-its source association. Archive paths are provenance, not ordinary search targets.
+If explicit original archival was **separately approved and verified**, add
+the *actual* archived locator and optionally a content hash/source identity
+when it helps distinguish copies:
+
+```text
+Original source: conversation attachment report.pdf
+Archived original: <verified archive root>/2026-11/report.pdf
+Verification: Original bytes/hash matched retained copy
+```
+
+Do not write proposed archive destinations as completed, create a global
+processed-file manifest, or search archives to infer what was captured. Source
+paths are evidence pointers rather than general search scope. Preserve
+workspace-relative paths where stable and note that another harness may lack
+access. A filename match alone does not prove source identity.
 
 ## Managed artifacts: write for a specific human use
 
