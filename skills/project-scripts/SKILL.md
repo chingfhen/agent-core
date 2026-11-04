@@ -1,12 +1,12 @@
 ---
 name: project-scripts
 description: >
-  On explicit request, review recent agent work or the current conversation for
-  worthwhile personal deterministic scripts; create, improve, consolidate, or
+  On a concrete direct or authorized delegated request, review recent agent work
+  for worthwhile personal deterministic scripts; create, improve, consolidate, or
   retire scripts in the configured Project Scripts Root. Use for "project scripts",
   "review scripts from this session", "automate what we did", or "make this
   repeatable as a personal CLI". This is script stewardship, not ordinary
-  engineering execution, agent-lessons capture, or automatic project handoff.
+  engineering execution or automatic project handoff.
 disable-model-invocation: false
 ---
 
@@ -16,7 +16,16 @@ disable-model-invocation: false
 
 **Turn repeatable agent work into small, dependable software that both humans and agents can use.** Optimize for avoided future reasoning, tool calls, mistakes, and waiting **plus** human usefulness, not number of scripts written.
 
-Invoke only when the human requests a script review, creation, improvement, or maintenance. A general request to implement a feature, run tests, capture lessons, or hand off a task does **not** invoke this skill. Do not add this skill to another workflow's automatic steps. A named script or review-only request narrows the scope; an unqualified `project-scripts` invocation reviews the substantive available conversation and relevant existing personal scripts. Do not invent inaccessible history.
+Invoke for a concrete request to review, create, improve, or maintain personal
+scripts, whether made directly or delegated within an already authorized
+workflow. A delegated request must identify a specific mechanical opportunity
+and its permitted scope; it does not initiate a general script sweep. Ordinary
+feature work, tests, discussion, or task handoff do **not** independently
+authorize script stewardship. A named script or review-only request narrows
+the scope; an unqualified `project-scripts` request calls for a bounded review
+of the substantive available conversation and relevant existing personal scripts.
+Do not invent inaccessible history or treat a caller's invocation as permission
+to bypass local write gates.
 
 An invocation permits proportionate script maintenance in the confirmed personal scripts collection, subject to applicable permissions. It does **not** authorize executing real-world effects of those scripts, modifying team/project source repositories, installing tools, changing unrelated guidance or skills, or publishing scripts elsewhere. Building or testing with safe fixtures is different from running against actual data or services. Honor narrower human or repository restrictions. A review-only request makes no edits.
 

@@ -46,19 +46,22 @@ ordinary learning response, including the other available modes:
 Keep this marker outside a separately requested lesson file, managed artifact,
 or strict-format output if it would contaminate the deliverable.
 
-- **Quick — minimum useful understanding.** Usually around one screen. Give the
-  essential mental model and **at least one concrete causal bridge** that makes
-  the explanation real: what happens, what makes it happen, and a consequential
-  implication or likely misconception. Never substitute a feature catalogue or
-  analogy for that bridge. Do not inflate a simple answer merely to meet a format.
-- **Standard — working understanding.** Connect the main parts with one
-  representative end-to-end example, operation, or causal sequence. Include the
-  concrete mechanics, key distinctions, and failure/verification clues the
-  learner needs to reason about the subject or guide work.
-- **Deep — substantial command of the subject.** Investigate the important
-  mechanisms, configurations or examples, trade-offs, alternatives, failure
-  paths, evidence, and transferable principles, to the depth needed for
-  informed judgment and effective supervision. Not encyclopedic coverage.
+- **Quick — the essence (default).** Explain the subject as a knowledgeable
+  colleague would over lunch: naturally, directly, and accurately. Start with
+  the problem, central insight, and why it works or matters. Give the smallest
+  explanation that forms a correct mental model, often just a few sentences.
+  Include a concrete causal bridge; use an example only when it helps. Avoid
+  formal preambles, source-order retelling, and unnecessary jargon, but retain
+  important terminology, assumptions, and caveats. Stop when the essence is clear.
+- **Standard — working understanding.** Build on Quick's mental model rather
+  than restart with textbook definitions. Walk through a representative
+  example, operation, or causal sequence. Include the mechanics, key distinctions,
+  and failure/verification clues needed to reason about the subject or guide work.
+- **Deep — substantial command of the subject.** Build on established
+  understanding to investigate important mechanisms, configurations or examples,
+  evidence, assumptions, trade-offs, alternatives, failure paths, and
+  transferable principles. Enable critical evaluation and informed supervision,
+  rather than simply producing a longer explanation. Not encyclopedic coverage.
 
 These are **depth levels, not quality levels**: correctness, causal coherence,
 and useful concreteness are mandatory in all three. Respect a requested mode
@@ -128,8 +131,11 @@ impose quizzes, Socratic questioning, flashcards, or study schedules by default.
   works, the important paths or decisions, and what was *actually* verified.
   A debrief is a learning context, **not a fourth mode**. Do not narrate every edit.
 - **Learning from documents or a conversation:** Distill one coherent lesson
-  rather than reproduce source order. Preserve supported claims, causal
-  reasoning, consequential caveats, and useful terminology. If outside
+  rather than reproduce source order. For dense papers or articles, first
+  reconstruct what problem the work tackles, its central idea, and why that
+  idea matters, as an expert might explain it informally. Do not present that
+  reconstruction as the author's own words or intent. Preserve supported claims,
+  causal reasoning, consequential caveats, and useful terminology. If outside
   knowledge is added, distinguish it from source-derived material.
 - **Requested reusable lesson:** Provide a self-contained, readable lesson
   with high-signal takeaways and an adaptive body. Split into multiple units

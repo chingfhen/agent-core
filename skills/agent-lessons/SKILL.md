@@ -27,26 +27,27 @@ instruction to encode verbatim. Independently look for consequential lessons
 the human may not have noticed. One valuable discovery can suffice, and it is
 valid to change nothing.
 
-Own the **learning outcome**, not one storage format. Choose the smallest
-durable improvement that makes future agents more likely to avoid a mistake,
-find needed context, or follow a successful practice. Depending on the actual
-workspace, this may involve concise instructions, an existing template or
-reference, a knowledge-base record, project documentation, a continuation task,
-a preventive check, or another appropriate resource. These are examples, not
-a required stack or exhaustive list. External links can be useful references
-when reliable and relevant; a link alone is insufficient if future agents
-would have no reason to encounter it.
+Own the **learning outcome**, not one storage format. Act as a bounded
+**behavioral-improvement coordinator**, not a general-purpose project
+orchestrator. Choose the smallest durable intervention that makes future agents
+more likely to avoid a mistake, find needed context, or follow a successful
+practice. Possible outcomes include concise instructions, an existing template
+or reference, a KB record, project documentation, a genuine continuation task,
+a deterministic script/check, or no change. This is not a mandatory stack.
+External links help only when future agents will know when to consult them.
 
-Invocation is an explicit request to evaluate and preserve valuable
-**operational learning** using appropriately configured, writable resources.
-Do not require the human to separately enumerate lessons or name companion
-skills. Load and follow the owning workflow or skill before mutating its
-resources. Respect its location, permission, verification, and publication
-contracts, applicable higher-priority instructions, and explicit human limits.
-Do not interpret this invocation as blanket approval for unrelated feature
-work, broad cleanup, destructive changes, security-policy changes, or external
-publication. If an otherwise useful improvement needs separate approval or
-unavailable access, do what is safely authorized and report the gap.
+Invocation authorizes a bounded evaluation of **operational learning** and
+directly relevant maintenance already permitted by the request and applicable
+guidance. Do not ask the human to enumerate lessons, select destinations, name
+companion skills, or reapprove ordinary changes already authorized. A request
+may reach this skill by natural language, a named invocation, or an authorized
+coordinating workflow; the spelling of the trigger does not expand or narrow
+permissions. Load and follow the owning workflow before changing its resources.
+Respect its scope, permissions, verification, publication rules, higher-priority
+instructions, and explicit human limits. Delegation never bypasses a narrower
+local approval gate. Do not infer approval for unrelated implementation, broad
+cleanup, destructive actions, security changes, skill rewrites, commits,
+deployment, or external publication. Do permitted work and report blockers.
 
 When project-tasks coordinates the request, reuse its findings and saved sources;
 return learning changes/gaps to it rather than recursively initiating a handoff.
@@ -76,8 +77,13 @@ Consider, without treating this as an exhaustive checklist:
 - local organizational practices that ordinary models cannot infer;
 - recurring output, communication, or quality expectations.
 
-Judge every candidate on **future impact, likelihood of being missed, scope,
+Judge candidates on **future impact, likelihood of being missed, scope,
 durability, actionability, evidential confidence, and attention cost**.
+For a consequential behavioral change, consider one realistic future task it
+should improve and one plausible situation where it might mislead, constrain, or
+distract the agent. Narrow the rule or prefer conditional retrieval when the
+unintended effects outweigh always-loaded value. This is a lightweight
+counterfactual, not a required score, benchmark, or invented proof of improvement.
 One serious incident can suffice; recurrence is not required. Prefer lessons
 that transfer to related future tasks, not generic platitudes like "be careful".
 
@@ -137,6 +143,31 @@ when that genuinely helps future work. Do not force every discovery into
    edit is required when an existing discoverable source already solves the
    problem; a concise `AGENTS.md` rule plus a detailed supporting reference is
    appropriate when neither alone would reliably transfer the lesson.
+
+### Coordinate only justified improvements
+
+When the chosen intervention involves another owned resource, use its relevant
+owning skill or workflow to evaluate and maintain it. Applicable capabilities
+may include `knowledge-base` for reusable evidence, `project-docs` for settled
+project procedures, `project-tasks` for genuine unfinished follow-up, and
+`project-scripts` for a worthwhile deterministic personal utility. This skill
+knows how to delegate to them; they need not know about or depend on this skill.
+Do not invoke every capability, start a broad hygiene sweep, or create redundant
+artifacts to demonstrate coordination.
+
+Give the owning workflow a **bounded request**: the diagnosed problem, supporting
+facts, intended future behavior, confirmed resource/project scope, what is
+permitted, and how to recognize completion. The owner applies its own admission
+and quality rules and may return a valid no-op. Do not use a task as a lessons
+archive, a script as a substitute for judgment, or a KB record as an instruction.
+If a prerequisite or write needs additional approval, perform independent safe
+changes and report the specific blocked action. Do not recursively start a
+project handoff/closeout or another improvement pass.
+
+Persist and verify substantive supporting detail before replacing inline detail
+with a pointer. Preserve a critical before-action constraint in guidance even
+when the full procedure lives elsewhere. Skill maintenance and other changes
+outside the granted resource scope still require their own authorization.
 
 ### Route detail through docs and KB
 
@@ -198,9 +229,11 @@ human-owned instructions.
 
 ## Maintain, don't accumulate
 
-- Read the existing lessons; evaluate relevant additions alongside their
-  relationship to current rules. Consolidate overlapping instructions and
-  rewrite vague or stale wording when the evidence supports it.
+- Read the existing lessons affected by a proposed improvement, not the entire
+  workspace. Consolidate overlapping instructions and rewrite vague or stale
+  wording when the evidence supports it. Consider whether evidence warrants
+  promoting a narrowly useful rule, narrowing a broad one, or retiring an
+  obsolete rule rather than appending another reminder.
 - Remove or supersede a lesson only with sufficient evidence that it is wrong,
   obsolete, redundant, or overbroad—not merely because it did not matter today.
 - Express **when + do/avoid**, adding a short pointer to authoritative docs or
@@ -227,17 +260,22 @@ human-owned instructions.
 1. Identify and inspect the applicable `AGENTS.md` path(s), recording the
    exact verified locations. If none can be established, say so explicitly.
 2. Select evidenced improvements that pass the future-impact and activation
-   tests. A difficult session deserves a careful look, not compulsory edits.
-3. If new supporting material is needed, use its owning skill/workflow and
-   verified target; read/reconcile existing content before writing. Persist
-   and verify the supporting source before adding a guidance pointer to it.
+   tests. For consequential guidance changes, check a realistic beneficial use
+   and plausible interference with other work. No compulsory edits or routine
+   evaluation suite.
+3. Independently coordinate only the selected, permitted interventions through
+   their owning skills/workflows. Read/reconcile existing content before writing;
+   persist and verify supporting sources before adding a guidance pointer.
 4. For an `AGENTS.md` edit, reread the target immediately before mutation.
    Change only the marked Agent Lessons section. Confirm exactly one valid
    owned block, unchanged surroundings, and the relevant diff. Do not claim
    harness loading was verified unless actually tested.
 5. Verify each changed resource and relevant link or locator. Check that the
-   improvement can realistically be discovered and acted on by a future agent,
-   and distinguish saved changes from proposed or blocked ones.
+   improvement can realistically be discovered and acted on without conflicting
+   with affected instructions. For high-consequence or uncertain changes, use
+   a small representative behavior check when feasible and authorized; do not
+   require it for routine changes or claim measured improvement from reasoning
+   alone. Distinguish saved changes from proposed or blocked ones.
 6. Return a **brief completion note**, not a long reflection report:
    - **`AGENTS.md` located:** exact path(s) checked, stating **changed** or
      **unchanged**; if none verified, say **not located** and why.

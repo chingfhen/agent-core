@@ -59,10 +59,10 @@ Ambiguous "capture this" outside a KB context is not permission to persist here.
 | "Update [managed artifact]" | Read relevant records and current context | Read only when useful | Revise the identified output | Unchanged |
 | "Search the KB", or relevant proactive recall | Read only | Read only when useful | Read only when useful | Excluded unless asked |
 
-An explicitly requested project-task handoff/closeout or agent-lessons capture
-may supply the human's capture intent through its coordinating workflow. Apply
-this skill's normal admission and ownership rules; do not call back into the
-coordinator. Ordinary task execution or read-only recall is not capture intent.
+An authorized coordinating workflow may convey the human's capture intent for
+bounded KB maintenance within its permitted scope. Apply this skill's normal
+admission, ownership, and permission rules; do not invoke the coordinator in
+return. Ordinary task execution or read-only recall is not capture intent.
 
 Combine actions only when requested together. Generic "write a guide/script"
 without managed-artifact or KB context does not select this persistence workflow.
