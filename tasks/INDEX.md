@@ -12,4 +12,4 @@
 
 ## Later
 
-None.
+- [ChatGPT Native Thin Skill Loaders](2026-11/chatgpt-skill-loaders/2026-11-05__evaluate-thin-native-skill-loaders.md) — On Hold (deferred). Resume on request: validate canonical GitHub-backed native skill discovery against full-package and GitHub-only options; no implementation approved.
