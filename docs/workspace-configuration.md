@@ -52,7 +52,8 @@ section during authorized KB maintenance (including safe adoption of clear
 legacy unmarked routing); ordinary capture leaves source bytes untouched.
 Approved original archival retains exact originals under the configured archive
 root's `YYYY-MM/` month, without overwriting or deleting sources. The legacy
-`inbox/` processing lifecycle is deprecated, with any existing files preserved. Python execution includes interpreter/import probes; reading
+`inbox/` processing lifecycle is deprecated, with any existing files preserved.
+Python execution includes interpreter/import probes; reading
 a path/source file is not execution. Selecting a repository script does not
 authorize its repository-local environment.
 
