@@ -27,7 +27,7 @@
 
 **Current State:** Revised canonical skill, routing, source-provenance guidance, filesystem and GitHub adapters, and directly affected Agent Core guidance are implemented on the feature branch. Static reads/checks and GitHub comparison verify the changed files exist only on this branch; live harness execution and approved binary-archive copying have **not** been tested.
 
-**Next Action:** Human reviews the branch diff/approved contract. If desired, run a controlled dry-run in a workspace with a configured archive and throwaway test originals; seek separate permission before merge or rollout to installed harnesses. **Do not merge to `main` without a separate request.**
+**Next Action:** Human reviews the branch diff/approved contract and may separately authorize merge. Validate GitHub binary-transfer capability in an environment that can access the original uploaded bytes before claiming remote archival; no test or deployment on this branch. **Do not merge to `main` without a separate request.**
 
 **Blockers:** None for instruction changes. End-to-end runtime/archive tests require an accessible configured archive and approved test files; do not write real originals merely to validate skill prose.
 
@@ -65,3 +65,24 @@
 - **Not validated:** actual cross-harness activation, runtime approval
   prompting, binary fidelity against an archive or legacy AGENTS migration.
   No claims of those outcomes until independently exercised.
+
+## Follow-up — personal GitHub original archive (2026-11-04)
+
+- Human explicitly approved **private** `chingfhen/knowledge-base`, branch
+  `main`, directory `archive/` as the personal original-source archive.
+  The KB content root remains `knowledge-base/` within the same repository.
+  Different environments (including OCBC) keep their own confirmed roots.
+- The personal KB repo's `AGENTS.md` now records that GitHub archive root in a
+  KB-owned marked section, replacing the legacy local archive line while keeping
+  unrelated restrictions. This update is **outside** the Agent Core feature branch
+  and was explicitly authorized for the user's personal KB.
+- The GitHub backend reference on this feature branch now explicitly covers
+  same-private-repository archives under a directory disjoint from the KB, with
+  binary-blob and byte-verification requirements.
+- The four user-approved LeCaine PDFs/photos are **not yet archived in GitHub**:
+  the connector has Git blob operations but cannot directly consume binary files
+  mounted in the conversation runtime. A checksum-verified ZIP staging package
+  was prepared; the KB collection record contains approved target paths,
+  exact uploaded-byte SHA-256 checksums and the explicit pending status.
+  Completing the original upload is a separate pending transfer, not a skill
+  implementation success.
