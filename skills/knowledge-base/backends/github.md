@@ -31,8 +31,8 @@ reads—not test writes in the real KB:
 | Recall | Read actual files and narrow paths/search/tree listings within the selected root/ref, including relevant living knowledge |
 | Capture/update | Create/update raw Markdown at exact paths, read current contents, confirm persistence |
 | Knowledge-page maintenance | Search/read the authorized page location and write affected pages; missing access leaves maintenance incomplete, not record capture blocked |
-| Inbox processing | Read source content faithfully and perform the required record/index writes |
-| Inbox clearing | Additionally preserve original bytes in an authorized separate archive, verify identity, and remove exact inbox entries safely |
+| Original archival proposal | Identify exact accessible originals and propose destinations without writing |
+| Approved original archival | Copy selected **original bytes** to an authorized archive, verify fidelity and report actual locators; a Markdown-only connector is insufficient |
 
 A read-only connector supports retrieval, not saved capture. It may supply a clearly
 labeled draft when useful, but must not claim a record or managed artifact was saved.
@@ -52,7 +52,9 @@ GitHub browser code search supports `repo:` and `path:` qualifiers, but connecto
 and APIs can differ. Use the actual tool's syntax rather than copying browser queries
 blindly. Verify search hits by reading the file at the selected identity/ref.
 
-Do not include raw inbox files or another repository in ordinary recall. Search can
+Do not search original archives, legacy inbox files or another repository during
+ordinary recall. An exact original specified by the human or a KB source pointer
+may be read if authorized and accessible. Search can
 lag writes; use mutation-returned paths/revisions and direct reads for recent content.
 
 ## Mutations and publication boundary
@@ -73,7 +75,7 @@ not authorize writing to its default branch.
 - Respect established branch/PR policy. Do not force-push, create repositories, change
   permissions, bypass protections, merge a PR, or modify unrelated files.
 - A proposed PR is not merged canonical content. Report its status and link; keep
-  inbox sources pending until required outputs are durable in the selected KB ref.
+  any source archival uncompleted until original bytes are verified at the approved destination.
 
 Local capture does not imply remote publication; this adapter is used only for
 a selected remote target. A separate knowledge-page destination requires separately
@@ -82,25 +84,34 @@ maintenance after record/index persistence. Report unavailable page access or
 failed updates separately; do not substitute a destination or roll back saved
 records. Never expose private workplace content for runtime convenience.
 
-## Archive and cleanup
+## Explicit archival of original sources
 
-This backend has no automatic archive service. Use an explicitly identified,
-authorized archive reachable from the current runtime, outside the KB directory
-and not containing it. It may be a separate directory in the same repository/ref
-when publication of those original bytes is explicitly authorized. Establish its
-complete repository/ref/path identity before writing.
-Do not choose Google Drive, another repository, a temporary sandbox, or a fictitious
-local home as a fallback. Do not treat Git history as the source archive.
+A GitHub connector's ability to save Markdown does **not** establish permission
+or capability to preserve binary originals. The main skill must first present
+exact source names and approved proposed destinations and obtain affirmative
+human file selection. Determine backend byte-copy/verification capability from
+exposed operations; do not perform a test write to real user archives.
 
-Before removing an inbox entry, establish original-byte preservation, actual archive
-identity, completed records/indexes, recorded provenance, and an unchanged source
-revision/content. Use guarded removal when available. If exact bytes or safe removal
-cannot be verified, retain the source and report cleanup as pending. Missing archive
-access need not prevent safe capture, but it prevents claiming the inbox is cleared.
+The separate archive must be explicitly configured, reachable, authorized for
+these exact files, and **outside** the KB. A repository/ref/path is not an
+authorized archival destination merely because the agent can push commits.
+Never silently choose another GitHub repository, the KB repository itself,
+Google Drive, a temporary sandbox, or an arbitrary local home. For remote
+archives, publication of source bytes is a separate privacy boundary requiring
+explicit destination approval. Preserve existing storage and work restrictions.
 
-An archive path written by a local agent may be inaccessible here. Preserve the
-locator and state that limitation when original-source access is needed. Do not
-fabricate a remote copy or assume GitHub contains those bytes.
+If approved and technically possible: store the **original bytes** at the
+approved `<archive>/YYYY-MM/<original-name>` locator, use collision-safe names,
+verify bytes/hashes, and record actual locators in KB records when capture was
+requested. Never delete the source by default. If not possible, preserve any
+completed Markdown capture separately and report original archival as
+**unfulfilled**, with the specific access/capability blocker.
+
+Manually archived originals identified by exact user reference are not copied,
+moved, swept or rearchived. If the source is inaccessible from a remote session,
+record only its user-reported locator where appropriate and explicitly state the
+file could not be examined. Legacy `inbox/` cleanup is deprecated; do not
+interpret a cleanup cue as permission to remove pending files.
 
 ## Completion
 
