@@ -1,5 +1,45 @@
 #!/usr/bin/env python3
-"""Install and run the dependency-free Places directory navigator."""
+"""Install and run the dependency-free Places directory navigator.
+
+Quick start (Linux, e.g. an OpenShift/RHOAI workbench terminal):
+
+    1. Copy this file anywhere, then install it:
+
+           python3 places.py install
+
+       This copies the runtime to ~/.local/share/places/places.py, writes a
+       places() shell function to ~/.local/share/places/places.bash, and adds
+       a source block to ~/.bashrc.
+
+    2. Load the function into your current shell. ~/.bashrc is only read by
+       bash; if your terminal runs sh (check: echo $0), use one of:
+
+           bash                                              # reads .bashrc
+           . ~/.local/share/places/places.bash                # stay in sh
+
+       (In sh, use "." — "source" does not exist there. Repeat per terminal.)
+
+    3. Seed the repository index (scans for directories containing .git):
+
+           places refresh ~        # or a narrower root, e.g. ~/src
+
+    4. Use it:
+
+           places                  # menu -> type alias or number -> cd there
+           places list             # print all paths, no prompt
+           places refresh <root>   # re-scan after cloning new repos
+
+    Optional: edit ~/.agent-core/places.txt for manual favorites, one per
+    line as "alias = /absolute/path" ("q" is reserved for cancel).
+
+    State files: ~/.agent-core/places.txt (manual favorites) and
+    ~/.agent-core/places.generated.txt (rebuilt by refresh). Everything
+    lives under $HOME, so on workbenches where home is a mounted volume
+    the install survives restarts.
+
+On Windows, "python places.py install" sets up CMD and PowerShell instead;
+open a new terminal after installing.
+"""
 
 from __future__ import annotations
 
