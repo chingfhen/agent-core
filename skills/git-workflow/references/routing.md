@@ -1,0 +1,43 @@
+# Optional repository routing
+
+Read only for requested Git Workflow setup/refresh. This skill owns the
+GIT WORKFLOW marker pair in an explicitly confirmed repository's AGENTS.md.
+Setup is separate from branch approval, skill publication, and ordinary use.
+
+1. Confirm repository, exact guidance file, applicable nested guidance, naming and
+   target conventions, and existing team delivery policy. Reuse policy by pointer.
+2. Propose the small section and obtain setup approval. An approved exact edit
+   satisfies this gate. Resolve conflicts with existing instructions before writing.
+3. Reread the file. Refuse duplicate, incomplete, nested or ambiguous markers and
+   unsafe symlink/junction paths. Preserve outside text, section position, custom
+   wording, stricter rules, and other owners' sections; managed does not mean replace.
+4. Update only confirmed defaults/pointers and missing necessary activation cues.
+   New relative links resolve from this AGENTS.md directory, not cwd. Do not invent
+   policy files or silently migrate legacy guidance. Equivalent wording is a no-op.
+5. Read back the scoped diff, marker pair, and referenced paths. Report exact saved
+   path and any partial failure. Saved guidance is not proof of harness loading.
+
+Example only; substitute confirmed conventions and an existing policy locator,
+or omit the policy line if none exists:
+
+```markdown
+<!-- BEGIN GIT WORKFLOW -->
+## Git Workflow
+
+Branch convention: feature/<slug>-cf (adapt to required prefixes/tickets).
+Default review target: main.
+Policy: [Delivery policy](docs/delivery.md) — consult before publishing or merging.
+
+Use git-workflow for requested managed work or continuation through its branch,
+PR/MR, or project task. A -cf branch reference cues discovery, not write authority;
+verify the saved human approval and live Git state. Generic engineering does not
+start this workflow. Creating/adopting a branch needs an approved proposal; merge
+needs separate explicit human approval. Continue routine work only within the
+approved branch/scope/actions. Use project-tasks for authorized task continuity.
+<!-- END GIT WORKFLOW -->
+```
+
+Keep live branches, SHAs, PR lists, approval records, check dashboards, and detailed
+Git commands out of this section. Task routing remains owned by project-tasks;
+actual branch/request state belongs to Git/the host. This section grants no blanket
+write permission on external branches and does not make a task mandatory.

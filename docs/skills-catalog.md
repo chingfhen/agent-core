@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-11-02
+updated: 2026-11-08
 ---
 
 # Skills Catalogue
@@ -25,6 +25,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
 | [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
 | [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
+| [git-workflow](../skills/git-workflow/SKILL.md) | Request managed branch-based delivery, or continue a managed branch (normally `-cf`), its PR/MR, or a task referencing it. | Approved proposal before creation/adoption; saved approval plus live Git checks before writes; draft checkpoints; separate merge approval. Source/manifest inclusion does not establish harness installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
 | [human-unblock](../skills/human-unblock/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
 | [readability](../skills/readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
