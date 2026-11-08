@@ -4,7 +4,9 @@
 **Created:** 2026-11-08
 **Last Updated:** 2026-11-08
 **Priority:** Now
-**Status:** Active
+**Status:** Closed
+
+**Closure:** Completed candidate delivery on 2026-11-08, with explicitly accepted validation limits. This closes implementation delivery, not merge, installation, or full cross-host acceptance.
 
 **Goal:** Deliver a trusted, portable `git-workflow` skill for the personally owned Agent Core package that makes approved branch-based changes, fresh-session continuation, PR/MR review and human-controlled merging predictable in GitHub, GitLab, and authorized Bitbucket repositories.
 
@@ -14,13 +16,15 @@
 
 **Success Bar:** Fresh agents can (a) refrain from Git Workflow actions on generic engineering prompts, (b) propose a managed branch and stop for approval, (c) safely resume the correct approved managed branch from an exact branch, MR or task reference without human checkout switching, (d) refuse writes on externally owned or insufficiently proven branches, (e) present evidence-backed review readiness and request explicit human merge approval, and (f) distinguish actual provider/tool access and observed tests from assumed capability. No duplicate branch registry or mandatory new Project Task schema.
 
+**Accepted Closure Bar:** The human explicitly accepted delivery after implementation, available checks/trials, verified push and draft GitHub PR, with live GitLab/Bitbucket, installed-harness activation, and the two usage-limited additional trials deferred. The original full behavior ambition above is not a claim that every scenario was observed.
+
 **Chosen Direction:** Design and implementation approved on 2026-11-08, with final trigger/continuity decisions below. Canonical contract: [Git Workflow design](../../../docs/git-workflow-design.md). Agent Core is used by this human alone; the skill respects conventions, colleagues and restrictions in repositories it is applied to.
 
-**Current State:** Candidate implemented and reviewed on `feature/git-workflow-cf` from freshly fetched `origin/main` at `d493b065b59d61f40887797f759732b0d76f609d`. Repository suite: 130 passed, 1 platform skip. Eight independent behavioral trials completed; one exposed unpublished task progress, addressed in the skill with repeat validation explicitly deferred after the subagent service hit its usage limit. Commit/push/draft PR publication is next. No consumer setup, harness installation or merge occurred.
+**Current State:** Implementation committed as `8f96f448c15cc5b0f1869ec9551ac3a14787a08d`, pushed to `feature/git-workflow-cf`, and verified as the head of draft [PR #5](https://github.com/chingfhen/agent-core/pull/5) targeting `main` at publication. This closure receipt is the subsequent task-only checkpoint; use live Git/PR for its containing/current head. Repository suite: 130 passed, 1 platform skip; eight behavioral trials completed with the documented checkpoint gap corrected in source and retest deferred. No consumer setup, harness installation or merge occurred.
 
-**Next Action (permitted):** Commit and push the scoped candidate to `origin` (`https://github.com/chingfhen/agent-core.git`), create/read back the authorized draft PR targeting `main`, then close this task as candidate delivered with the explicitly accepted validation limits. Merge and harness publication still require separate approval.
+**Next Action:** No further implementation required under the accepted candidate-delivery scope. Human may request review of PR #5's exact current head against `main`, including the recorded validation limits. Merge and harness publication still require separate explicit approval; task closure grants neither.
 
-**Blockers:** None for candidate delivery. GitHub API repository/read access and push permission were verified using existing Git credentials without installing a CLI. `gh`/`glab` are absent; no live GitLab/Bitbucket access established. Additional subagent trials and delegated committing hit a service usage limit; the human authorized direct committing and recording those trials as unrun.
+**Blockers:** None for the accepted closed delivery scope. Additional subagent trials and delegated committing hit a service usage limit; the human authorized direct committing and the recorded trial deferrals. Live GitLab/Bitbucket and installed-harness behavior remain unverified, not silently passed.
 
 **Permission Boundary:** Human approved the new skill, commit/push/draft PR and task closeout. Branch: `feature/git-workflow-cf`, target `main`; scope: new skill/references, directly related manifest/docs/tests and this task/index. Existing engineering/commit skills stay unchanged. Human approved bounded test/commit subagents and this repository's standard Python environment for this task; after the service limit, explicitly approved direct committing with the same safeguards. Human accepted candidate-delivery closure with live GitLab/Bitbucket and installed-harness tests deferred, and separately accepted the two additional trials as unrun. No merge, deployment, credential/security changes, unrelated repository changes, harness installation, or consumer guidance setup is authorized.
 
@@ -62,10 +66,19 @@
 - Explicitly authorized repository environment reused: `.venv/Scripts/python.exe`, Python **3.12.11**, existing `uv.lock`; no project dependency/lock/routing changes. `uv` 0.7.13 rebuilt the editable local package through the locked run.
 - Independent source review (`ses_e4455f8e7ffe0uuPzAhFRgTYRj`) found two concrete defects, both fixed: unguarded merge race must fail closed for every provider, and push readback must query the actual push endpoint rather than a different fetch URL.
 - Official GitHub CLI create/merge, GitLab MR API, and Bitbucket Cloud PR API documentation read. Provider guidance is documentation-backed; it is not live GitLab/Bitbucket acceptance. Bitbucket Cloud docs expose draft support; Data Center remains product/version-specific.
+- Final four structural checks and task-relative links passed after the source review corrections and evidence updates. Staged diff and whitespace checks passed. Final skill source SHA-256: `896744262DDBF9F8E1AA608933CB1DC3CAF5A5EA36D892548DC775DAB084B910`. The original eight trials preceded its added continuity-publication paragraph; the additional rerun was blocked as recorded below.
+
+### Live publication
+
+- Repository: `https://github.com/chingfhen/agent-core.git`; approved source branch `feature/git-workflow-cf`, target `main`; implementation base `d493b065b59d61f40887797f759732b0d76f609d`.
+- Initial commit `8f96f448c15cc5b0f1869ec9551ac3a14787a08d` pushed with an explicit branch refspec; exact push-destination remote SHA matched.
+- Created [draft PR #5](https://github.com/chingfhen/agent-core/pull/5) using the GitHub REST API and existing Git credentials. Readback verified repository/source/base identity, exact head SHA, open state, `draft=true`, and `merged=false`. No CLI installation, credential change, ready transition, auto-merge, or merge was performed.
+- The PR links back to this task and summarizes genuine approvals, checks, limitations and next human review. `gh`/`glab` absence did not imply GitHub API unavailability. Hosted CI success is not claimed from local test results.
 
 ### Fresh-agent source-loading trials
 
-OpenCode general subagents, default parent model GPT-6 Astra (no model override).
+OpenCode general subagents with no model override; parent session GPT-6 Astra.
+The resolved per-child model identity was not independently inspected.
 Each received one natural-language request, synthetic repository guidance and
 candidate metadata/source location, without expected-result assertions. This
 explicit source-loading setup is **not native installed-skill trigger testing**.
