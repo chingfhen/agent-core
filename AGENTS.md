@@ -1,6 +1,6 @@
 # Agent OS Steward Contract
 
-**Last Updated:** 2026-11-03
+**Last Updated:** 2026-11-08
 
 **Status:** Current
 
@@ -50,6 +50,26 @@ Reading does not require loading `knowledge-base` or authorize writes. Load
 `knowledge-base` for capture, inbox processing, managed artifacts, or routing
 maintenance; use its applicable backend and authoring references for mutations.
 <!-- END KNOWLEDGE BASE -->
+
+<!-- BEGIN PROJECT TASKS -->
+## Project Tasks
+
+Tasks: tasks/
+- [Task index](tasks/INDEX.md) — unfinished Agent Core work and next actions.
+
+For saved work, consult the index and matching task. For an imperfect reference
+or index miss, search filenames/content in this task root across months using
+likely subjects and known aliases. Read the actual task; reconcile current state,
+outcome, and next action before following older plans or resume commands. Verify
+consequential claims against relevant evidence and clarify unresolved intent or
+permission conflicts. Ask when materially different matches remain; report
+material access/search limits. Reading needs no project-tasks invocation and
+authorizes neither edits nor execution.
+
+Load project-tasks for requested maintenance or saved-task execution. Task writes
+remain explicitly opt-in under this repository's steward rules; maintain only the
+authorized task(s) and affected index entries, reporting meaningful changes.
+<!-- END PROJECT TASKS -->
 
 ## Current Contract
 

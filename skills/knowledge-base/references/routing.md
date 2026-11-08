@@ -37,7 +37,9 @@ For an explicit KB search, or when prior decisions, recurring problems, or missi
 project or organizational context matter, start with a known path, the confirmed
 root's `index.md`, or targeted search. Include records, relevant knowledge pages,
 managed artifacts, and any configured separate page root; not inbox or archive by
-default. Skip proactive lookup when context is already sufficient. Indexes are
+default. For imperfect references or index misses, search filenames/content with
+likely subjects, known aliases, or error terms across relevant months; an index
+miss is not proof of absence. Skip lookup when context is already sufficient. Indexes are
 navigation; saved material may be stale. Compare applicability and evidence, check
 supporting records for consequential claims, and cite actual sources. Record paths
 use capture dates, not event dates, and stay stable after updates; search across
@@ -51,6 +53,9 @@ capture, inbox processing, managed-artifact, or configuration maintenance.
 ```
 
 Keep content indexes inside the KB, and storage/archival procedures in the skill.
+Keep the reader cue sufficient for ordinary discovery without loading the skill
+or retrieval reference. During authorized maintenance, verify affected entry
+points and retain useful human search terms in their navigation descriptions.
 New relative paths resolve from the declaring AGENTS.md directory, not cwd.
 Legacy workspace-relative mappings keep their recorded base until approved migration.
 

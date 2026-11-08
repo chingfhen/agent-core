@@ -1,6 +1,6 @@
 ---
 name: project-docs
-description: Maintains settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Load before maintaining those surfaces; discovering, reading, or using relevant docs does not require this skill. Establishes its own docs routing when needed, routes each durable claim to its canonical authority, integrates useful meaning into existing docs, and allows a docs sync to conclude that no change is needed.
+description: On a docs-maintenance request or authorized handoff, maintain settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Reading or using docs does not require this skill or authorize maintenance. Establish its own routing when needed, integrate durable meaning into its canonical authority, and allow a no-change outcome.
 disable-model-invocation: false
 ---
 
@@ -12,11 +12,23 @@ Maintain the project understanding and operating guidance that future participan
 
 Docs may own intended architecture, product meaning, exclusions, rationale, ownership boundaries, invariants, and constraints that code does not express. They are not merely prose summaries of code.
 
+Project understanding also includes research methods, agreed organizational
+procedures, and confirmed personal or career facts within the project's scope.
+Use evidence appropriate to the claim; software-specific authorities are conditional,
+not prerequisites for maintaining non-coding projects.
+
 A request to `sync to docs` means:
 
 > Evaluate the current work for settled project understanding and durable operating behavior, then integrate what matters into the configured owned documentation surfaces.
 
 A sync may correctly produce no changes. Do not create or modify a document merely to demonstrate activity.
+
+The human controls maintenance timing. A docs request or an authorized coordinated
+handoff/closeout triggers this workflow; reading context or making progress does
+not. A separate explicit standing delegation may permit updates at stated boundaries;
+honor its scope and timing rather than treating ownership alone as permission.
+During ordinary work, concentrate on the requested outcome instead of repeatedly
+running persistence reviews.
 
 Documentation is not active task state, a transcript, raw evidence, status history, a backlog, or a record of everything that happened. Preserve settled meaning and behavior whose absence would cause worse decisions, repeated investigation, recurring mistakes, or loss of important project intent.
 
@@ -164,6 +176,8 @@ Documentation is not automatically stronger than every other source. Identify au
 | Intended architecture or design constraint | Canonical design docs or ADRs |
 | Product semantics or deliberate project decision | Canonical project docs |
 | Stable agent operating behavior | Canonical agent guidance |
+| Personal facts, ownership, or preferences | Relevant primary records and explicit human confirmation; retain verification limits |
+| Organizational process or approval state | Responsible authority's policy, decision, or approval record, qualified by date and scope |
 | External protocol, vendor, or regulatory requirement | The authoritative external source, with project consequences documented locally |
 
 This is a reasoning aid, not a rigid global precedence order.
@@ -258,7 +272,8 @@ Small documents should omit sections that do not help. Use a compact diagram onl
 
 ## Sync Workflow
 
-Use this workflow when durable understanding or behavior changes, or when the human asks to update or sync docs or project knowledge.
+Use this workflow at the authorized maintenance boundary to evaluate changed
+understanding or behavior. The trigger authorizes the review, not a mandatory write.
 
 1. **Resolve ownership.** Identify the configured docs surface and any explicitly owned README or guidance target. Inspect relevant existing docs, task context, and authority surfaces.
 2. **Evaluate admission.** Determine what settled project understanding or durable behavior should survive. It is valid to select nothing.
@@ -268,7 +283,9 @@ Use this workflow when durable understanding or behavior changes, or when the hu
 6. **Repair.** Update directly affected indexes and links without expanding into an unrelated audit.
 7. **Verify and report.** Check the changed surfaces and affected links proportionately. Report material changes, rerouting, unresolved uncertainty, or a valid no-op, plus every exact resolved path mutated.
 
-Self-initiate a docs update only when the result is settled, material, directly related to current work, and consistent with repository guidance and owning workflows.
+Within that review, integrate only settled, material results directly related to
+the request. If the human reserved syncing for wrap-up, wait for that trigger;
+do not interrupt execution with automatic docs maintenance.
 
 A sync is complete when durable meaning is clear in its canonical home, transient state was excluded, authority conflicts were resolved or honestly preserved, and no stale directly affected guidance competes with the result.
 

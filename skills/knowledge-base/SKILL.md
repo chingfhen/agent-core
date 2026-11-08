@@ -161,6 +161,9 @@ writing a competing layout into it.
 - Root `index.md` links to existing monthly indexes, newest first, and lists each
   managed artifact with a short purpose description. Monthly indexes list each
   record once with its date, topic, relative link, and retrieval-oriented scope.
+  Where helpful, retain an established acronym, nickname, or appropriate-to-store
+  identifier that a human would use to ask about the subject. Do not invent tags
+  or duplicate entries for each alias; use the same concise discovery description.
 - Indexes locate documents; they do not synthesize facts or replace reading them.
   Update only affected entries; preserve unrelated content. Keep authorized outputs
   reachable through existing navigation; add a guidance pointer only for a missing

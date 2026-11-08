@@ -35,6 +35,9 @@ practice. Possible outcomes include concise instructions, an existing template
 or reference, a KB record, project documentation, a genuine continuation task,
 a deterministic script/check, or no change. This is not a mandatory stack.
 External links help only when future agents will know when to consult them.
+The resulting rule or conditional pointer must work without loading this skill.
+Use a recognizable situation, subject, or error as its trigger and name the
+specific action/reference; do not require a future lessons review to discover it.
 
 Invocation authorizes a bounded evaluation of **operational learning** and
 directly relevant maintenance already permitted by the request and applicable
@@ -239,6 +242,10 @@ human-owned instructions.
 - Express **when + do/avoid**, adding a short pointer to authoritative docs or
   executable configuration only when necessary. Keep explanations, incidents,
   commands catalogues, and decision histories out of the section.
+- For environment- or version-dependent lessons, retain their applicability and
+  a meaningful recheck condition in the reference. Apply a relevant lesson during
+  ordinary work without starting a maintenance pass or importing it into unrelated
+  projects. Organizational and non-coding procedures follow the same scope rule.
 - Keep the section small and high-signal. Prefer a few reusable constraints to
   many narrow reminders; there is no fixed quota or pressure to add something.
 - Do not copy secrets, personal data, customer information, or restricted

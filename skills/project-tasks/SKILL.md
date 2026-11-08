@@ -27,12 +27,16 @@ brief?"** is yes. A task need not be implementation-ready. Its first screen
 should help the human understand and supervise the work; a fresh agent should be
 able to take the **next permitted action** without the previous conversation.
 
+Use the same contract for engineering, research, organizational approvals, career
+work, and other continuing efforts. Adapt evidence and deliverables to the work;
+a task does not require code, a repository, or automated tests.
+
 This skill owns the *memory of the work* and its handoff, not the work's implementation method.
 `planning` shapes substantial work when plan review is required; engineering or
 other execution workflows perform and verify the work; `project-docs` owns
 settled project understanding. Code, tests, schemas, and observed behavior
 remain authoritative for their respective implementation claims. Do not create
-tasks for ordinary short-lived implementation with no persistence need.
+tasks for ordinary short-lived work with no persistence need.
 
 Saving a task does not approve implementation. Asking to execute a saved task
 authorizes only the actions already permitted by the user's request, project
@@ -119,7 +123,9 @@ material state/priority/next-action change, closure, or reopening. It is a
 - Include links to **all known unfinished tasks**: Active, Blocked, and On Hold.
   Group by `Now`, `Next`, and `Later` priority; show a concise task name, status,
   and meaningful next action or re-entry/blocking condition. Show workstream
-  labels so related work remains discoverable across months. Keep this scannable.
+  labels so related work remains discoverable across months. Retain a recognizable
+  nickname, acronym, or ticket identifier when it helps the human's usual wording
+  find the task; use only established, appropriate-to-store terms. Keep this scannable.
 - Exclude Closed tasks from the live dashboard. Keep their files at their stable
   paths for filename, month, and targeted-content search. Reopening restores
   the entry. Don't create a separate historical catalogue by default.
@@ -141,10 +147,13 @@ or automatic scheduled sweeps are required. A broader task hygiene sweep is a
 separate, explicitly requested operation.
 
 For natural-language continuation such as "where are we with the AWS migration?",
-select the relevant project/index, then read the matching task before its next
-permitted action. Ask only when materially different candidates remain plausible.
-Give a short state/next-action summary. Confirm the relevant code repository from
-the task or a project entry point; a shared task folder does not establish code cwd.
+select the relevant project/index, then read the matching task. An absent index
+entry is not proof of absence: use bounded filename/content search in the confirmed
+task surface, including older months and established aliases. Ask only when
+materially different candidates remain plausible; report material access/search
+limits. Give a short state/next-action summary; a status question does not authorize
+execution. Confirm the relevant working location or external system before acting;
+for code work, a shared task folder does not establish the code repository or cwd.
 
 ## General maintenance request
 
@@ -243,7 +252,7 @@ Combine `Why` with `Goal` or omit empty optional fields on simple tasks. Add
 continuation. Do not turn this outline into a mandatory form.
 
 The goal describes the intended outcome; deliverables name reviewable outputs
-(for example IaC, a validation report, or a PR); the success bar establishes their
+(for example a decision brief, an approval outcome, a validation report, or a PR); the success bar establishes their
 acceptance. Combine these on small tasks rather than requiring three empty fields.
 
 The human should quickly know **what/why, what is decided, what is true now,
@@ -277,6 +286,13 @@ session, linking canonical sources rather than copying competing project truth.
 Rework stale sections instead of appending a session diary. Preserve history only
 where it prevents a recurring mistake or explains a still-binding constraint.
 
+At a material checkpoint, reconcile the affected task's header, body, checklists,
+resume commands, and index entry. Replace obsolete next actions; remove redundant
+instructions or label retained plans as historical and non-actionable. An appended
+outcome does not cancel an earlier instruction on its own. Preserve useful evidence,
+rationale, and unfulfilled acceptance criteria; do not turn this into a historical
+purge or a sweep of unrelated tasks.
+
 Useful optional Detailed sections: `Decisions Locked`, `Grounded Current
 Understanding`, `Implementation Strategy`, `Execution Phases`, `Acceptance and
 Verification`, `Edge Cases and Recovery`, `Stop Conditions`, `Executor
@@ -293,15 +309,17 @@ recall when prior findings could materially inform the work. Read-only retrieval
 does not authorize source maintenance. Keep a small context map with exact paths
 or remote locators, what each source supplies, and when it must be read. Identify
 approved design, observed evidence, procedures, and unresolved investigation
-accurately; code/runtime still controls current implementation claims.
+accurately. Match verification to the claim: an official policy, decision record,
+source artifact, or observed result may be relevant; code/runtime controls current
+implementation claims. Capture time and applicability when they affect reuse.
 
 ```markdown
 ## Resume Context
-- Before implementation: <docs path>#<heading>
+- Before the next action: <docs path>#<heading>
   — approved constraints and rationale.
 - Before validation: <KB locator>
   — observed limitation, scope/version, and remaining uncertainty.
-- Repository: <confirmed code location>.
+- Working location: <confirmed workspace, system, or code repository>.
 - Dependency: <task path> — consumes its verified compatibility report.
 ```
 
@@ -353,19 +371,23 @@ Honor configured locations and narrower write permissions.
 
 When asked to **execute work from a saved task**, load this skill and the task,
 identify its configured project/task surface, read applicable `AGENTS.md` guidance,
-and inspect the relevant current code, docs, and evidence. Reading or using saved
+and inspect the relevant current sources, docs, and evidence, including code when
+applicable. Reading or using saved
 task context alone, including answering a question about it, does not require
 loading this skill or authorize task writes.
-The task is execution intent and memory, **not proof that code or the environment
-still matches it**.
+The task is execution intent and memory, **not proof that the actual work,
+external state, or environment still matches it**.
 
 1. **Check authority and readiness.** Read the status, current direction,
    explicit permission/gates, blockers, next action, dependencies, and success
    bar and deliverables. Read the task's required resume context before dependent
-   work. Resolve contradictions before acting. Distinguish preparing a handoff
+   work. Check later plans and resume commands against the current outcome; do not
+   repeat completed work because an old imperative survives. Resolve contradictions
+   using relevant evidence, asking when intent or permission remains unclear; a
+   recent timestamp alone does not settle a conflict. Distinguish preparing a handoff
    from permission to implement. Do not treat an index entry as authorization.
 2. **Act within the approved scope.** Perform only the next permitted work through
-   the relevant implementation workflow. If current evidence contradicts the
+   the relevant execution workflow. If current evidence contradicts the
    plan or creates a material human-owned decision, stop and surface it rather
    than silently redesigning, spending, deploying, or escalating access.
 3. **Maintain execution memory automatically when authorized.** At meaningful

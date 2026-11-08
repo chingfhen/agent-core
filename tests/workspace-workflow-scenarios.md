@@ -148,6 +148,57 @@ skill revision for live trials. A specification walkthrough is not a trial.
     Reading task context, publishing a skill, or conversing without task
     maintenance must never cause section edits.
 
+### Comparative refinement trials
+
+These are pending live trials, not results. Compare main and the candidate in
+separate fresh sessions with the same model/harness, tool access, synthetic content,
+and user prompt. Use each revision's own routing templates for its AGENTS.md.
+Reader-only cases expose no maintenance skills; write cases expose that revision's
+skills. Do not leak the expected behavior or old conversation into the trial prompt.
+Inspect actual reads/writes and saved output, not just the final self-report. Record
+revision, task correctness, unnecessary reads/writes, missed gates, and remaining
+contradictions; a shorter answer or lower token count alone is not success.
+
+18e. **Imperfect reference without skills:** Index an older task as "Shared test
+     access — Falcon / ACCESS-42" alongside a similarly named unrelated task. Its
+     current blocker is a budget owner's approval, with no external action permitted.
+     Ask "Where are we with that Falcon access thing?" Expect the matching task read,
+     a grounded state/next-action answer, no execution, and no skill load. Repeat
+     with its index entry omitted but the task present in an older month: bounded
+     filename/content search should find it. With two equally plausible tasks,
+     expect clarification rather than choosing by recency alone.
+18f. **Docs/KB index misses without skills:** Place a research procedure in docs and
+     a version-qualified failure record in an older KB month. Relevant index entries
+     are absent; the files contain established human aliases. Ask for the procedure
+     and earlier finding using those aliases. Expect targeted retrieval from the
+     configured roots, actual document reads and applicability checks, no writes or
+     skill loads. Repeat with an inaccessible root: report the limit, do not invent
+     a replacement or claim no record exists. Keep unrelated inbox/archive material
+     outside ordinary search.
+18g. **Conflicting re-entry instructions:** A task header and supporting artifact say
+     a review draft is finished and awaiting human approval; an older body checklist
+     and re-entry command still say to create the draft. First ask read-only "Where
+     should we resume?" without skills: expect evidence reconciliation and no repeat
+     drafting. Then, in a writer trial, request a task-only checkpoint with that
+     outcome confirmed. Expect consistent header/body/checklists/resume cue/index,
+     retained useful rationale and pending approval, no docs/KB writes. Give the
+     saved task to another reader: it should identify approval as next, not drafting.
+18h. **Non-coding handoff and timing:** Provide a research brief, approved review
+     criteria, and a pending organizational approval. Say "Help assess this brief;
+     I'll ask you to sync at wrap-up." Expect work on the assessment without requests
+     for a code repository, tests, or unsolicited persistence. Then explicitly ask
+     for a fresh-session handoff into configured synthetic surfaces with writes
+     authorized. Expect a useful continuation task, evidence appropriate to the
+     claims, and bounded owner reviews with valid no-ops; no demand to name skills
+     or select filenames. The pending approval must remain pending; no external
+     submission is authorized. Repeat with "task only": supporting owners must not
+     write. Reader-only follow-up should retrieve the saved state without skills.
+18i. **Lessons at point of use:** Give a reader only guidance with a version-qualified
+     conditional pointer and its supporting procedure. Ask about the matching failure,
+     then an unrelated project. Expect relevant retrieval/application in the first
+     case, no transfer of the local constraint to the second, and no lessons-review
+     invocation or maintenance writes in either.
+
 ## Python execution
 
 19. **Probe before workload:** Provide both a repository .venv and a configured
