@@ -1,15 +1,15 @@
 ---
-title: Git Workflow — Approved Design Direction
-description: Intended human-controlled Git branch, review, integration, and continuation contract for a future personal Agent Core skill; not yet implemented.
+title: Git Workflow — Design and Operating Contract
+description: Human-controlled Git branch, review, integration, and continuation contract for the personal Git Workflow skill.
 updated: 2026-11-08
 ---
 
-# Git Workflow — Approved Design Direction
+# Git Workflow — Design and Operating Contract
 
 ## Read First
 
-- **Status:** Approved design direction for a **future** `git-workflow` skill. This document is not evidence that the skill, its managed guidance, provider integrations, checks, or branch conventions have been implemented or installed.
-- **Audience:** Agent Core is personally owned and used by one human. The proposed skill should nonetheless work safely in repositories shared with colleagues, including projects using GitHub, GitLab, or Bitbucket. Repository and organizational policies take precedence.
+- **Source:** [git-workflow](../skills/git-workflow/SKILL.md) implements the approved behavior contract and is declared in `personal-skills.toml`. Source, harness publication, consumer-repository setup, and observed behavior are separate. The [delivery task](../tasks/2026-11/git-workflow/2026-11-08__design-implement-and-validate-git-workflow.md) records actual validation and remaining gates; this document is not proof of installation or provider acceptance.
+- **Audience:** Agent Core is personally owned and used by one human. The skill also respects repositories shared with colleagues, including projects using GitHub, GitLab, or Bitbucket. Repository and organizational policies take precedence.
 - **Core boundary:** Creating or adopting a managed branch requires explicit human approval. Once managed ownership and scope are verified, the agent may continue approved implementation and local commits autonomously. **Unmanaged branches are read-only by default for writes. Merging always requires fresh, explicit human approval.**
 - **No universal branch requirement:** Ordinary engineering, discussions, and read-only reviews do not automatically enter this workflow. Starting a new managed branch is explicitly requested/approved; later references to a verified managed branch or linked PR/MR activate it when Git work is relevant.
 
@@ -17,8 +17,8 @@ updated: 2026-11-08
 
 | Owner/source | Authority |
 | --- | --- |
-| `git-workflow` (future skill) | Propose/select approved Git strategy, verify working state, create/resume branches, commit, publish/review/integrate within permissions, provide concise delivery receipt |
-| Repository `AGENTS.md` Git Workflow section (future, opt-in) | Stable repo-specific branch naming/targets, activation and permission rules, and pointers to existing repository policy. **Not** an active-branch registry |
+| `git-workflow` | Propose/select approved Git strategy, verify working state, create/resume branches, commit, publish/review/integrate within permissions, provide concise delivery receipt |
+| Repository `AGENTS.md` Git Workflow section (opt-in) | Stable repo-specific branch naming/targets, activation and permission rules, and pointers to existing repository policy. **Not** an active-branch registry |
 | Git host + Git objects | Actual branch/commit, pull/merge request, reviews, pipeline/check results, merge history |
 | `project-tasks` when applicable | Work objective, decisions, approved scope, acceptance, progress, unresolved questions, next action, and context for fresh sessions |
 | Existing project docs / domain checks | Detailed release/CI policy, implementation contracts and applicable verification methodology |
@@ -28,7 +28,7 @@ A Project Task is **preferred for substantial or multi-session work** and leads 
 ## Invocation and Managed Ownership
 
 1. **New work:** “Implement this feature” remains normal engineering; do not automatically create or switch to a managed branch. “Use git-workflow,” “create a managed branch,” or an equivalent clear request initiates the branch proposal and approval flow.
-2. **Established work:** An explicit managed branch reference (for example `feature/evaluation-pipeline-cf`), its associated PR/MR, or a saved task leading to it activates Git Workflow as needed. Discovering the candidate does not confer permission.
+2. **Established work:** A request to continue an explicit managed branch (for example `feature/evaluation-pipeline-cf`), its associated PR/MR, or a saved task leading to it activates Git Workflow. An exact PR/MR continuation request starts inspection even without a suffix. The `-cf` convention cues discovery, not permission; other approved repository conventions also work. An incidental mention or read-only question does not authorize implementation.
 3. **Branch naming:** Prefer unobtrusive `feature/<descriptive-slug>-cf` where allowed. Preserve the repository's required prefix/ticket scheme; do not force `agent/`, rename existing branches, or imply AI-generated authorship. Other prefixes are possible under local policy.
 4. **Ownership evidence:** Suffix matching is only a discovery hint, **not** proof. Verify the human-approved managed association, exact repository/branch, objective, allowed actions, and current state using available conversation and durable task/PR/MR records. If approval/scope cannot be established for a fresh session, stop before writing and ask.
 5. **Managed versus external:** Work autonomously **only within the verified approved scope** on an established managed branch. Unmanaged branches may be inspected read-only. Editing an external branch requires an explicit scoped instruction/approval; it does not silently become managed. Explicit adoption of an existing branch is permitted only after a human-approved proposal and state inspection.
@@ -38,7 +38,9 @@ A Project Task is **preferred for substantial or multi-session work** and leads 
 
 Before creating a managed branch, propose a small human-reviewable agreement including: repository, starting ref and its observed freshness, proposed branch, integration target, why this branch is appropriate, work objective, consequential acceptance criteria, proposed verification approach, and **maximum delivery boundary**. The latter distinguishes local branch/commits, remote push, draft PR/MR creation, and subsequent integration. Human may approve these proposed steps together once. Branch creation remains human-approved, never automatic.
 
-Within that boundary, ordinary implementation, tests, scoped local commits, authorized publication and PR/MR maintenance can proceed without repetitive approvals. No implicit permission to merge, deploy, force-push, rewrite history, expand scope, access privileged systems, run paid checks, or alter project security settings. Existing review/deploy rules and workplace restrictions are stronger where applicable.
+The default proposal includes permission to preserve the agreement and relevant progress in an existing task through project-tasks. Record the actual human approval and its scope, not merely the agent's proposal. Before a PR exists, the task or current conversation carries authority. Without sufficient recoverable evidence in a fresh session, ask again; do not create a local approval database. A missing task can be proposed through its owner for substantial work, without requiring one for every change.
+
+Within that boundary, ordinary implementation, tests, scoped local commits, authorized publication and PR/MR maintenance can proceed without repetitive approvals. Engineering retains its normal local-commit behavior; during managed work its commit is a workflow checkpoint, not a second required commit. Git Workflow constrains managed actions without requiring commit delegation. No implicit permission to merge, deploy, force-push, rewrite history, expand scope, access privileged systems, run paid checks, or alter project security settings. Existing review/deploy rules and workplace restrictions are stronger where applicable.
 
 ## Branch Lifecycle and Durable Output
 
@@ -73,10 +75,30 @@ At a resumable checkpoint, substantial work should normally retain its approved 
 - Skill instructions are an **agent-behavior boundary**, not permission enforcement. Actual authorization must also be consistent with host credentials, branch protections, repository policy, and (for employer repositories) approved use of tools and data.
 - No automatic subagent dependency, per-commit tag scheme, centralized branch registry, background bot, general release authority or new task-file metadata schema.
 
+## Use and Installation
+
+- Start: “Use git-workflow for this change.” Review the compact proposal before approving.
+- Resume: “Continue the login-fix task,” “Continue PR #42,” or “Continue `feature/login-fix-cf`.” Task-first and PR/branch-first routes converge on saved approval plus live Git verification.
+- Before edits: expect the verified repository, checkout path, branch/target, HEAD, and allowed actions.
+- Review: expect exact revision, checks/gaps, recommendation, and a separate merge decision.
+- Configure defaults only on request using the skill's [routing contract](../skills/git-workflow/references/routing.md). Source publication does not install a repository guidance block.
+
+After separately approved integration into the clean canonical checkout, explicitly
+authorize publication to the chosen harness: `agent-core sync` for Pi,
+`agent-core sync --harness opencode`, or `agent-core sync --harness devin`.
+These publish the selected harness's declared resource set, not just this skill.
+Verify the installed copy and actual harness discovery in a fresh session. Do not
+hand-copy the candidate or infer installation from manifest membership. See the
+[operating manual](agent-core-operating-manual.md) for source validation and recovery.
+
+[Acceptance scenarios](../tests/git-workflow-scenarios.md) distinguish static checks,
+isolated Git trials, fresh-agent source-loading trials, and live host/harness tests.
+Documentation-backed provider procedures are not proof of live provider operation.
+
 ## Related Material
 
 - [Skill design principles](skill-design-guide.md) — determine independent invocation, scope and future publication.
 - [Workspace configuration](workspace-configuration.md) — task/doc ownership and managed `AGENTS.md` routing patterns.
-- [Agent Core task index](../tasks/INDEX.md) — unfinished implementation work. The Git Workflow design/implementation task holds open decisions and the next permitted action.
+- [Agent Core task index](../tasks/INDEX.md) — unfinished work; the delivery task records actual results and next permitted action.
 - [AdReadyClips agent delivery policy](https://gitlab.com/chingfhen/ai-content-creation-wealth-today/-/blob/dev/ai_video_saas/docs/agent-workflow.md) — existing project-specific design to reuse, not duplicate or overwrite.
 - [AdReadyClips MR adoption task](https://gitlab.com/chingfhen/ai-content-creation-wealth-today/-/blob/dev/tasks/2026-10-10__enable-agent-mr-delivery-workflow-bookmark.md) — on-hold provider-side rollout; distinct from building the portable skill.

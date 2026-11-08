@@ -35,14 +35,17 @@ class WorkspaceContractTests(unittest.TestCase):
             ROOT / "docs/workspace-configuration.md",
             ROOT / "docs/skills-catalog.md",
             ROOT / "docs/skill-design-guide.md",
+            ROOT / "docs/git-workflow-design.md",
             ROOT / "docs/agent-core-operating-manual.md",
             ROOT / "tests/workspace-workflow-scenarios.md",
             ROOT / "tests/knowledge-base-scenarios.md",
+            ROOT / "tests/git-workflow-scenarios.md",
             ROOT / "tasks/INDEX.md",
             ROOT / "tasks/2026-10/2026-10-29__skill-owned-agents-sections.md",
         ]
         for skill in ("project-tasks", "project-docs", "knowledge-base",
-                      "manage-python-env", "agent-lessons", "workspace-setup"):
+                       "manage-python-env", "agent-lessons", "workspace-setup",
+                       "git-workflow"):
             files.extend((ROOT / "skills" / skill).rglob("*.md"))
         for source in files:
             # Fenced examples contain deliberately fictional workspace paths.
@@ -69,6 +72,7 @@ class WorkspaceContractTests(unittest.TestCase):
             "knowledge-base/references/routing.md": "KNOWLEDGE BASE",
             "manage-python-env/references/routing.md": "PYTHON ENVIRONMENTS",
             "agent-lessons/SKILL.md": "AGENT LESSONS",
+            "git-workflow/references/routing.md": "GIT WORKFLOW",
         }
         for relative, marker in owners.items():
             text = (ROOT / "skills" / relative).read_text(encoding="utf-8")
