@@ -14,6 +14,9 @@ questions, dependencies, gates, and potentially useful operational learning.
 Distinguish observed, reported, inferred, approved, and untested claims. Use only
 available conversation/context; do not reconstruct lost history by invention.
 Reuse the same findings throughout the review rather than making four summaries.
+This review happens at the human-requested boundary, not continuously during the
+main work. Choose the filing within authorized surfaces; do not ask the human to
+name four skills or allocate findings among files when ownership is clear.
 
 ## 2. Use each owning workflow
 
@@ -61,6 +64,10 @@ only affected index entries, including workstream labels and meaningful next act
 Read back the affected task, index, and references. Can a fresh agent identify
 what to produce, what to read first, what is uncertain, and what it may do next
 without this chat? Check links/locators and authority/readiness consistency.
+Check the whole affected task for stale checklists, plans, and re-entry commands:
+the current outcome must agree with every actionable instruction. Replace obsolete
+actions or explicitly mark retained history as non-actionable, preserving rationale
+and remaining obligations. Do not rely on the newest paragraph to override the rest.
 This is a content review, not evidence of a fresh-agent trial.
 
 For closeout, distinguish completed deliverables from incomplete persistence or

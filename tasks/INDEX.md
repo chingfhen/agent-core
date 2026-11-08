@@ -2,6 +2,7 @@
 
 ## Now
 
+- [Refine Workflow Discovery and Handoff](2026-11/workflow-continuity/2026-11-08__refine-discovery-and-handoff.md) — Active · Workflow continuity. Implement the approved bounded refinements on `refine/workflow-continuity`, verify, and publish for independent human comparison with main.
 - [Synchronize Pi and OpenCode Shortcuts](2026-10/2026-10-28__synchronize-pi-opencode-shortcuts.md) — Active. Next action: test the trial model picker and agent-cycle bindings, F2/F3 and thinking visibility.
 - [Autonomous Task Lifecycle for project-tasks](2026-11/project-tasks-autonomy/2026-11-02__autonomous-task-lifecycle.md) — Active. Human-triggered maintenance is merged; clarify whether the original broader autonomy remains wanted or the task is superseded.
 

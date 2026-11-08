@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-11-03
+updated: 2026-11-08
 ---
 
 # Workspace Configuration
@@ -35,6 +35,20 @@ invoking their maintenance skills. Reading does not authorize maintenance. Consu
 only what the work needs; missing or inaccessible resources are gaps, not permission
 to guess a replacement or initialize one. Applicable guidance is not necessarily
 actually loaded by every harness.
+
+Reader guidance must work without loading maintenance skills. It provides confirmed
+roots, when-to-read cues, and a bounded filename/content-search fallback for imperfect
+references or index misses. Indexes retain recognizable subjects and useful established
+aliases; the underlying document supplies the actual state or evidence. An index miss
+does not prove absence. Material ambiguity or access/search limits remain explicit.
+Keep changing status in tasks/indexes, not standing guidance; verify affected entry
+points during authorized maintenance rather than introducing a second catalogue.
+
+The human controls persistence timing: context retrieval and ordinary progress do not
+trigger docs/KB/lessons maintenance. An explicit maintenance request or coordinated
+handoff invokes the relevant owners once at that boundary. Explicit standing delegation
+may establish other scoped boundaries; ownership alone does not. Authorized saved-task
+bookkeeping retains its existing rules. No background sync is implied.
 
 | Owner | Standing guidance | Detail elsewhere |
 | --- | --- | --- |
@@ -116,7 +130,10 @@ does not migrate this repository or employer workspaces.
 
 The goal describes the intended outcome; deliverables identify reviewable outputs
 or changes; acceptance establishes whether they satisfy the goal. A task can
-deliver IaC, a validation report, or a PR. Small tasks can combine these fields.
+deliver an approval outcome, research brief, validation report, or PR. Small tasks
+can combine these fields. These contracts also cover non-coding work: use relevant
+working locations, authoritative records, and evidence, with repository/runtime
+checks only when the claim or action needs them.
 
 New tasks use one shallow semantic workstream level:
 
@@ -151,13 +168,21 @@ current state, deliverables, and next permitted action. Their context map gives:
 - exact paths/headings or usable remote locators;
 - what each source supplies and when to read it;
 - its role: approved design, observed evidence, procedure, or open investigation;
-- confirmed code repository and specific prerequisite task outputs where relevant.
+- confirmed working location/system (code repository for engineering) and specific
+  prerequisite task outputs where relevant.
 
 Read required sources before dependent work; conditional references wait until
 relevant. An inaccessible essential source is a readiness gap. Task prose is not
-proof of current code/runtime state; resolve material conflicts against the
+proof of current external or implementation state; resolve material conflicts against the
 appropriate authority. Natural-language continuation selects the project/index,
 then reads the matching task; ask when materially different candidates remain.
+
+At material checkpoints, reconcile the affected task's header, body, checklists,
+resume commands, and index entry. Replace obsolete actions or label useful retained
+history as non-actionable; adding a newer outcome paragraph alone is insufficient.
+Preserve rationale, evidence, and remaining obligations. A reader must reconcile
+conflicting instructions before acting rather than treating either an old imperative
+or a newer timestamp as decisive by itself.
 
 ## Coordinated Handoff and Closeout
 

@@ -28,14 +28,16 @@ Creation-time example; use confirmed locations and existing useful entry points:
 ```markdown
 <!-- BEGIN PROJECT DOCS -->
 ## Project Docs
-For questions, decisions, or changes involving project meaning, architecture,
-interfaces, constraints, or established procedures, consult relevant entry points
-below or search the confirmed docs root selectively. Docs establish intended meaning;
-verify current implementation or deployed state against code and runtime evidence as
-appropriate. Reading or using docs does not require project-docs and does not
-authorize maintenance. Ask about ambiguous project identity; report inaccessible
-resources rather than substituting.
-Load project-docs before maintaining documentation or owned guidance.
+For project meaning, decisions, constraints, or established procedures, consult the
+relevant entry points below. For an imperfect reference or missing entry, search
+filenames/content in the confirmed docs root using likely subjects and known aliases.
+Read the actual document; navigation is not authority. Verify consequential claims
+against appropriate evidence (including code/runtime for implementation claims).
+Reading or using docs does not require project-docs or authorize maintenance.
+Ask about materially ambiguous project identity; report inaccessible resources or
+material search limits rather than substituting. Load project-docs when docs
+maintenance is requested or delegated, including an authorized handoff/closeout;
+respect the human's chosen timing.
 
 ### Forecasting
 Docs: .work-context/projects/forecasting/docs/
@@ -48,6 +50,9 @@ Link only a few canonical entry points, each with a consultation cue. A newly
 initialized empty docs root need not have links or fabricated documents. Reading
 project rules is distinct from loading the skill that maintains them. Put deeper
 navigation and procedures in docs, not in this section.
+Keep these reader cues usable without the maintenance skill. Use recognizable
+subject names and existing aliases in entry-point descriptions where helpful;
+verify affected links during maintenance, without cataloguing every document here.
 
 ## Targeted maintenance
 

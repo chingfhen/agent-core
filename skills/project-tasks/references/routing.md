@@ -29,12 +29,15 @@ Creation-time example only; substitute confirmed paths and a useful description:
 ```markdown
 <!-- BEGIN PROJECT TASKS -->
 ## Project Tasks
-When saved task context is relevant to the current work or a workstream reference,
-consult the task index and matching tasks before planning or acting. Use targeted
-search if needed; ask when materially different matches remain. If none match,
-continue within the request and permissions. Reading or using task context does
-not require loading project-tasks. Verify consequential claims against current
-evidence and respect recorded permission boundaries.
+When saved task context is relevant, consult the task index and matching tasks.
+For an imperfect reference or index miss, search filenames/content in the confirmed
+task root across months using likely subjects, known nicknames, or ticket identifiers.
+Ask when materially different matches remain; disclose material access/search limits.
+Read the actual task: reconcile its current state, outcome, and next action before
+following any older plan or resume command. Verify consequential claims against
+relevant evidence; unresolved intent or permission conflicts require clarification.
+Reading or using task context does not require project-tasks or authorize writes
+or execution. If no match is found, continue within the current request and permissions.
 
 Load project-tasks for task maintenance or execution of a saved task.
 Task maintenance is human-triggered. When requested, independently create,
@@ -57,6 +60,10 @@ Legacy workspace-relative paths keep their recorded base until approved migratio
 Keep unfinished-work navigation in INDEX.md and execution state in task files;
 routine progress does not rewrite this section. Initialize index coverage honestly
 under the main skill's rules; never advertise a nonexistent index as saved.
+Keep the discovery and current-state cues usable without loading the maintenance
+skill. Put recognizable workstream terms in index entries rather than growing a
+second task catalogue in AGENTS.md. Verify affected paths/links during authorized
+maintenance; report unavailable targets rather than silently substituting roots.
 
 ## Targeted maintenance
 
