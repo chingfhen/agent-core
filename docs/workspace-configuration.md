@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-11-08
+updated: 2026-11-09
 ---
 
 # Workspace Configuration
@@ -68,6 +68,38 @@ Task/KB indexes stay local. Environment and skill inventories do not become
 standing guidance. Python execution includes interpreter/import probes; reading
 a path/source file is not execution. Selecting a repository script does not
 authorize its repository-local environment.
+
+### Interactive capture and deferred offline memory maintenance
+
+The interactive workflow prioritizes the human's main task. Explicit KB capture
+is typically secondary, at the end of a session, and must stay lean in time and
+token usage: work from the active discussion and selected evidence, reconcile
+only likely matching records, and maintain only affected living knowledge pages.
+Do not add mandatory historical searches, full-corpus reconciliation, or
+background maintenance to ordinary capture.
+
+The KB is independently usable without Project Docs. Its records and knowledge
+pages retain reusable evidence and cross-context understanding; where a project's
+canonical documentation is *already known and relevant*, avoid competing current
+claims and prefer a pointer or qualified synthesis. Project Docs remains the
+authority for its own settled project architecture and contracts; Agent Lessons
+selects only justified behavior-changing guidance. This distinction does not
+require the KB to discover, invoke, or read Project Docs during routine capture.
+
+**Deferred research direction, not an implemented feature:** A future
+Sprite + OpenCode task-delegation capability might permit separately scheduled
+or delegated offline memory reflection ("dreaming"), potentially using a cheaper
+model to reconcile selected memories with accessible source evidence. Explore
+this *outside* interactive capture only after the delegation capability exists,
+with explicit scope, resource budget, source-availability checks, verification,
+and approval boundaries before consequential writes or instruction promotion.
+No autonomous memory-maintenance job, new skill dependency, or production skill
+change is approved by this note. The steward-only
+[memory pilot](memory-pilot.md) is a separate ledger, not this workflow.
+
+Research inspiration: [Anthropic, *The components of agent memory*](https://www.anthropic.com/research/components-of-agent-memory).
+The experiments motivate evaluation, not a presumed win or an implementation
+contract for our agents.
 
 ### Ownership and maintenance
 

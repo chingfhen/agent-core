@@ -12,5 +12,5 @@
 
 ## Later
 
-- [Trustworthy Task Execution Service](2026-11/task-execution-service/2026-11-05__design-trustworthy-cross-project-executor.md) — On Hold (deferred). Resume on request: harden cross-project readiness, permissions, audit/receipt and local-continuation design before any Sprite prototype.
+- [Unified Task Execution + KB Background Synthesis](2026-11/task-execution-service/2026-11-05__design-trustworthy-cross-project-executor.md) — On Hold (deferred). Resume: design one job/queue/dispatch/audit pipeline, with GitHub-triggered Sprite wake-up and KB synthesis as possible first workload. No implementation approved.
 - [ChatGPT Native Thin Skill Loaders](2026-11/chatgpt-skill-loaders/2026-11-05__evaluate-thin-native-skill-loaders.md) — On Hold (deferred). Resume on request: validate canonical GitHub-backed native skill discovery against full-package and GitHub-only options; no implementation approved.
