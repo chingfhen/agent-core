@@ -2,11 +2,11 @@
 
 **File:** `tasks/2026-11/git-workflow/2026-11-08__design-implement-and-validate-git-workflow.md`
 **Created:** 2026-11-08
-**Last Updated:** 2026-11-08
+**Last Updated:** 2026-11-09
 **Priority:** Now
 **Status:** Closed
 
-**Closure:** Completed candidate delivery on 2026-11-08, with explicitly accepted validation limits. This closes implementation delivery, not merge, installation, or full cross-host acceptance.
+**Closure:** Candidate implementation merged into `main` on 2026-11-08 through PR #5. Task closed 2026-11-09 after verifying the actual merge and latest main ancestry. Live GitLab/Bitbucket and installed-harness validation remain deferred; merge does not imply installation or deployment.
 
 **Goal:** Deliver a trusted, portable `git-workflow` skill for the personally owned Agent Core package that makes approved branch-based changes, fresh-session continuation, PR/MR review and human-controlled merging predictable in GitHub, GitLab, and authorized Bitbucket repositories.
 
@@ -20,13 +20,13 @@
 
 **Chosen Direction:** Design and implementation approved on 2026-11-08, with final trigger/continuity decisions below. Canonical contract: [Git Workflow design](../../../docs/git-workflow-design.md). Agent Core is used by this human alone; the skill respects conventions, colleagues and restrictions in repositories it is applied to.
 
-**Current State:** Implementation committed as `8f96f448c15cc5b0f1869ec9551ac3a14787a08d`, pushed to `feature/git-workflow-cf`, and verified as the head of draft [PR #5](https://github.com/chingfhen/agent-core/pull/5) targeting `main` at publication. This closure receipt is the subsequent task-only checkpoint; use live Git/PR for its containing/current head. Repository suite: 130 passed, 1 platform skip; eight behavioral trials completed with the documented checkpoint gap corrected in source and retest deferred. No consumer setup, harness installation or merge occurred.
+**Current State:** Candidate commit `62e5ad1c3b6db483f3adb82982e5efa9fc8dbb32` was merged via PR #5 to `main` as merge commit `4cc026d2cc5548c487868eb0cebdf210518fc2af` on 2026-11-08 15:32:48 UTC. On 2026-11-09, fetched `origin/main` at `403921bd350518b70fd55f0b098e443777596a4d`; verified `4cc026d` is an ancestor. PR API reports closed/merged, target main, exact head SHA above. No deployment or harness sync.
 
-**Next Action:** No further implementation required under the accepted candidate-delivery scope. Human may request review of PR #5's exact current head against `main`, including the recorded validation limits. Merge and harness publication still require separate explicit approval; task closure grants neither.
+**Next Action:** None for this task. Deferred live GitLab/Bitbucket and installed-harness validation require a separate request/authorization. This task closes implementation and GitHub merge only, not complete cross-host acceptance or publication into a runtime harness.
 
-**Blockers:** None for the accepted closed delivery scope. Additional subagent trials and delegated committing hit a service usage limit; the human authorized direct committing and the recorded trial deferrals. Live GitLab/Bitbucket and installed-harness behavior remain unverified, not silently passed.
+**Blockers:** None for the completed implementation/merge scope. Live GitLab/Bitbucket and installed-harness behavior remain unverified, not silently passed. The restarted session found a pre-existing/unknown unstaged edit to `personal-skills.toml` that removes the skill declaration; it was not overwritten or staged. Latest committed `origin/main` contains the manifest entry. Local checkout remains dirty and requires human reconciliation before sync or other clean-checkout-only operations.
 
-**Permission Boundary:** Human approved the new skill, commit/push/draft PR and task closeout. Branch: `feature/git-workflow-cf`, target `main`; scope: new skill/references, directly related manifest/docs/tests and this task/index. Existing engineering/commit skills stay unchanged. Human approved bounded test/commit subagents and this repository's standard Python environment for this task; after the service limit, explicitly approved direct committing with the same safeguards. Human accepted candidate-delivery closure with live GitLab/Bitbucket and installed-harness tests deferred, and separately accepted the two additional trials as unrun. No merge, deployment, credential/security changes, unrelated repository changes, harness installation, or consumer guidance setup is authorized.
+**Permission Boundary:** Human approved the new skill, commits, push, draft PR, merge to main, and task closeout. The restarted session observed PR #5 already merged; no second merge was attempted. No deployment, harness installation/publication, consumer guidance setup, credential/security changes, or unrelated work was authorized. Preserve the unexplained local manifest edit; do not stage it.
 
 ## Final Session Decisions
 
@@ -75,6 +75,27 @@
 - Created [draft PR #5](https://github.com/chingfhen/agent-core/pull/5) using the GitHub REST API and existing Git credentials. Readback verified repository/source/base identity, exact head SHA, open state, `draft=true`, and `merged=false`. No CLI installation, credential change, ready transition, auto-merge, or merge was performed.
 - The PR links back to this task and summarizes genuine approvals, checks, limitations and next human review. `gh`/`glab` absence did not imply GitHub API unavailability. Hosted CI success is not claimed from local test results.
 
+### Merge and current repository state — 2026-11-09
+
+- After the session restart, GitHub API showed PR #5 closed and merged, with the
+  approved source SHA `62e5ad1c3b6db483f3adb82982e5efa9fc8dbb32`, target `main`,
+  merge commit `4cc026d2cc5548c487868eb0cebdf210518fc2af`, and merge time
+  `2026-11-08T15:32:48Z`. No new merge request/action was sent in this session.
+- Fetched `origin/main` at `403921bd350518b70fd55f0b098e443777596a4d`; verified
+  the PR merge commit is its ancestor. `main` has since advanced with unrelated
+  commits, preserved as remote state.
+- GitHub status API showed zero check runs and zero legacy statuses for the PR
+  head; combined status was `pending`. No reviews or comments were present. Branch
+  protection endpoint returned 404 and the PR was mergeable before merge. These
+  are observed gaps; no CI/review approval is claimed. The authorization in chat
+  was an explicit merge approval, but the host already showed it complete when
+  the restarted session resumed.
+- Local `main` fast-forwarded to merge commit `4cc026d`. The working tree has an
+  unstaged `personal-skills.toml` edit whose blob is exactly the branch-created
+  version predating Git Workflow. Its origin/owner is unknown. It was preserved
+  untouched and not staged. Committed `origin/main` contains the `git-workflow`
+  manifest entry; local sync is not safe until the human reconciles the dirty file.
+
 ### Fresh-agent source-loading trials
 
 OpenCode general subagents with no model override; parent session GPT-6 Astra.
@@ -106,11 +127,11 @@ at the subagent service usage limit. **No behavioral pass is claimed for either.
 The human explicitly accepted recording these as unrun. Other adversarial/merge/
 setup cases remain specifications/source-reviewed rules, not observed executions.
 
-### Accepted delivery limits and closeout
+### Remaining validation limits and closeout
 
-- Human explicitly accepted closing after pushed candidate and verified draft PR,
-  with live GitLab/Bitbucket and installed-harness activation testing deferred.
-  Merge, consumer setup and harness installation are separate future approvals.
+- Human explicitly authorized merge to main after draft PR delivery. Live
+  GitLab/Bitbucket and installed-harness activation testing remain deferred.
+  Consumer setup and harness installation are separate future approvals.
 - Candidate is behavior guidance, not an executable permission-enforcement system.
 - Docs integrated in the canonical design/catalogue/workspace surfaces. KB review:
   no additional capture warranted; durable findings already live at their skill
