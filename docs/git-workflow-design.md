@@ -1,58 +1,58 @@
 ---
 title: Git Workflow — Design and Operating Contract
 description: Human-controlled Git branch, review, integration, and continuation contract for the personal Git Workflow skill.
-updated: 2026-11-08
+updated: 2026-11-10
 ---
 
 # Git Workflow — Design and Operating Contract
 
 ## Read First
 
-- **Source:** [git-workflow](../skills/git-workflow/SKILL.md) implements the approved behavior contract and is declared in `personal-skills.toml`. Source, harness publication, consumer-repository setup, and observed behavior are separate. The [delivery task](../tasks/2026-11/git-workflow/2026-11-08__design-implement-and-validate-git-workflow.md) records actual validation and remaining gates; this document is not proof of installation or provider acceptance.
+- **Source:** [git-workflow](../skills/git-workflow/SKILL.md) is the behavior contract and is declared in `personal-skills.toml`. Source, harness publication, consumer-repository setup, and observed behavior are separate. The [original delivery task](../tasks/2026-11/git-workflow/2026-11-08__design-implement-and-validate-git-workflow.md) records historical validation, not validation of later revisions.
 - **Audience:** Agent Core is personally owned and used by one human. The skill also respects repositories shared with colleagues, including projects using GitHub, GitLab, or Bitbucket. Repository and organizational policies take precedence.
-- **Core boundary:** Creating or adopting a managed branch requires explicit human approval. Once managed ownership and scope are verified, the agent may continue approved implementation and local commits autonomously. **Unmanaged branches are read-only by default for writes. Merging always requires fresh, explicit human approval.**
+- **Core boundary:** New managed branches start only on explicit `git-workflow` invocation. Clear authorized work and established defaults permit the normal package without a second ceremonial approval; ambiguous scope or effects require a decision. External branch adoption requires explicit approval. **Merging always requires separate explicit human instruction.**
 - **No universal branch requirement:** Ordinary engineering, discussions, and read-only reviews do not automatically enter this workflow. Starting a new managed branch is explicitly requested/approved; later references to a verified managed branch or linked PR/MR activate it when Git work is relevant.
 
 ## Distinct Responsibilities
 
 | Owner/source | Authority |
 | --- | --- |
-| `git-workflow` | Propose/select approved Git strategy, verify working state, create/resume branches, commit, publish/review/integrate within permissions, provide concise delivery receipt |
+| `git-workflow` | Manage explicitly requested branch/task/PR delivery, verification, human review, integration and guarded cleanup within permissions |
 | Repository `AGENTS.md` Git Workflow section (opt-in) | Stable repo-specific branch naming/targets, activation and permission rules, and pointers to existing repository policy. **Not** an active-branch registry |
 | Git host + Git objects | Actual branch/commit, pull/merge request, reviews, pipeline/check results, merge history |
-| `project-tasks` when applicable | Work objective, decisions, approved scope, acceptance, progress, unresolved questions, next action, and context for fresh sessions |
+| `project-tasks` | Work objective, decisions, approved scope, acceptance, progress, unresolved questions, next action, and context for fresh sessions |
 | Existing project docs / domain checks | Detailed release/CI policy, implementation contracts and applicable verification methodology |
 
-A Project Task is **preferred for substantial or multi-session work** and leads when the user references a saved task. An existing Task can link to a branch or PR/MR in ordinary status/context prose; the PR/MR can link back. No new mandatory `Delivery` section or parallel branch database. A small self-contained change may use its PR/MR as its only durable change record. An MR does not automatically preserve the rationale and pending work that Project Tasks is designed to retain.
+A project task is the default for **every managed PR/MR, including drafts**. Reuse or create it through project-tasks; only the human may opt out. It preserves continuation, while the PR is the human's review surface. Link an accessible task version before merge and its durable destination afterward. No mandatory `Delivery` section or parallel branch registry. Respect narrower project task-write gates.
 
 ## Invocation and Managed Ownership
 
-1. **New work:** “Implement this feature” remains normal engineering; do not automatically create or switch to a managed branch. “Use git-workflow,” “create a managed branch,” or an equivalent clear request initiates the branch proposal and approval flow.
-2. **Established work:** A request to continue an explicit managed branch (for example `feature/evaluation-pipeline-cf`), its associated PR/MR, or a saved task leading to it activates Git Workflow. An exact PR/MR continuation request starts inspection even without a suffix. The `-cf` convention cues discovery, not permission; other approved repository conventions also work. An incidental mention or read-only question does not authorize implementation.
-3. **Branch naming:** Prefer unobtrusive `feature/<descriptive-slug>-cf` where allowed. Preserve the repository's required prefix/ticket scheme; do not force `agent/`, rename existing branches, or imply AI-generated authorship. Other prefixes are possible under local policy.
-4. **Ownership evidence:** Suffix matching is only a discovery hint, **not** proof. Verify the human-approved managed association, exact repository/branch, objective, allowed actions, and current state using available conversation and durable task/PR/MR records. If approval/scope cannot be established for a fresh session, stop before writing and ask.
+1. **New work:** “Implement this feature” remains ordinary engineering. A new managed branch starts only on a direct request to use `git-workflow`; a clear, sufficiently scoped request can authorize its normal delivery package without a second ceremonial approval.
+2. **Established work:** “Continue/status/pause/merge [branch]” for known managed work activates discovery. A PR/MR or saved task remains a valid alternate entry. Read-only requests stay read-only.
+3. **Branch naming:** Prefer `YYYYMMDD-descriptive-slug` using the project's local date, with a small collision suffix. Adapt to required prefixes/tickets and retain existing branch names.
+4. **Ownership evidence:** A date or legacy `-cf` is only a discovery hint, **not** proof. Verify the human-approved managed association, exact repository/branch, objective, allowed actions, and current state using conversation and durable task/PR/MR records. Ask if approval/scope cannot be recovered.
 5. **Managed versus external:** Work autonomously **only within the verified approved scope** on an established managed branch. Unmanaged branches may be inspected read-only. Editing an external branch requires an explicit scoped instruction/approval; it does not silently become managed. Explicit adoption of an existing branch is permitted only after a human-approved proposal and state inspection.
 6. **No per-commit tags/codewords:** Branch identity, commit SHAs, host history, and any existing ticket conventions suffice. Git tags are not used as routine provenance labels.
 
 ## Starting Agreement and Permissions
 
-Before creating a managed branch, propose a small human-reviewable agreement including: repository, starting ref and its observed freshness, proposed branch, integration target, why this branch is appropriate, work objective, consequential acceptance criteria, proposed verification approach, and **maximum delivery boundary**. The latter distinguishes local branch/commits, remote push, draft PR/MR creation, and subsequent integration. Human may approve these proposed steps together once. Branch creation remains human-approved, never automatic.
+Resolve repository, starting ref and freshness, objective, target, checks, delivery, task continuity and post-merge cleanup. When an explicit `git-workflow` request supplies sufficient scope and established defaults, it authorizes the normal package once. Ask before an affected action when permissions or material effects remain unclear; adoption still needs explicit approval.
 
-The default proposal includes permission to preserve the agreement and relevant progress in an existing task through project-tasks. Record the actual human approval and its scope, not merely the agent's proposal. Before a PR exists, the task or current conversation carries authority. Without sufficient recoverable evidence in a fresh session, ask again; do not create a local approval database. A missing task can be proposed through its owner for substantial work, without requiring one for every change.
+The package includes related project-task/index maintenance where local policy permits. Record actual approval and scope. A managed PR/MR requires a linked task unless the human explicitly opts out; if the agent thinks one unnecessary, ask. If the destination, permission or accessible link is unavailable, report the blocker before request creation; do not invent a task root. Before a PR exists, the task or current conversation carries authority.
 
-Within that boundary, ordinary implementation, tests, scoped local commits, authorized publication and PR/MR maintenance can proceed without repetitive approvals. Engineering retains its normal local-commit behavior; during managed work its commit is a workflow checkpoint, not a second required commit. Git Workflow constrains managed actions without requiring commit delegation. No implicit permission to merge, deploy, force-push, rewrite history, expand scope, access privileged systems, run paid checks, or alter project security settings. Existing review/deploy rules and workplace restrictions are stronger where applicable.
+Within that boundary, ordinary implementation, tests, scoped commits, publication and PR maintenance proceed without repeated approvals. A missing optional commit specialist must not strand authorized work; use the commit skill's fallback when delegation was not explicitly required. No implicit merge, deployment, force-push, history rewrite, scope expansion, paid check, or security change. Project and workplace restrictions prevail.
 
 ## Branch Lifecycle and Durable Output
 
 1. Inspect current checkout, remotes, expected base, working tree, unpublished commits and project policy. Check for matching existing managed work and duplicate branches. On ambiguity, conflicts or concurrent writers, preserve work and stop before unsafe mutation.
-2. After approval, create or select the exact approved branch (or safe separate worktree); inspect actual branch/HEAD before edits and commits. The human is **not** expected to switch branches manually.
+2. After explicit invocation and a sufficiently clear approved package, create or select the branch (or safe separate worktree); inspect actual branch/HEAD before edits and commits. The human is **not** expected to switch manually.
 3. Implement and verify using existing engineering/domain practices. Stage only task-scoped changes; preserve unrelated work; inspect outgoing commits/diff before an approved push.
-4. For short changes, publish/open a review-ready PR/MR when implementation and pre-review checks are done, as authorized.
-5. For substantial/multi-session changes, **prefer** an authorized remote checkpoint and early draft PR/MR after the first meaningful committed work, provided push/MR CI, secrets, deployment, cost and preview side effects are safe. Draft means work in progress, **not private**. An MR is not required at the instant a branch is created.
+4. Publish an authorized draft checkpoint after meaningful committed work when side effects are safe; link the accessible task unless the human opted out. A short finished change can proceed to review-ready state after required checks. Draft means work in progress, **not private**.
+5. Make the host PR/MR the human review surface using the [review format](../skills/git-workflow/references/review-presentation.md): purpose, before/after, changes, material effects/risks, checks/gaps, task link and next action. Provide the actual clickable host URL and branch → target; do not hide consequences in the task.
 6. Before marking ready for review, the agreed implementation and required pre-review checks must be complete, with important remaining limitations stated. Mark-ready is a host review state where supported; **not** a merge authorization or proof of acceptance.
 7. Review against agreed success criteria using the latest exact head commit and current target. Present passed/failed/missing checks, relevant before/after comparisons, regressions, meaningful risks, optional advisory ratings and a merge/revise/reject recommendation. Critical required gates cannot be overridden by a favorable rating.
 8. On explicit human merge approval, revalidate branch/head, mergeability, required checks and scope; stop if a material revision invalidates the decision. Merge only the authorized target/change and report the resulting integrated revision. Production deployment/release remains a separate boundary.
-9. After material checkpoints report a **delivery receipt**: repository, branch, target, actual commit SHA, PR/MR link/status (or absent), verified checks and gaps, authorized next action, and where continuation context lives. Reconcile an existing task when its owner authorizes maintenance; do not silently change unrelated task files or delete branches.
+9. After a verified merge, reconcile the task/index with the real outcome and safely remove the exact managed remote/local branches if that cleanup was explicitly authorized and guarded checks pass. Task-only post-merge publication to the configured store may be included in the approved package when allowed; never bypass protection or include unrelated changes. Report any stale state or retained branch.
 
 ## Deterministic Fresh-Session Discovery
 
@@ -62,9 +62,9 @@ Within that boundary, ordinary implementation, tests, scoped local commits, auth
 - Exact PR/MR referenced: Git Workflow retrieves it first, then consults any associated task when needed.
 - Exact branch referenced: Resolve the repository, check branch and its matching PR/MR, and verify managed approval and scope.
 - Ambiguous natural-language change: Search relevant task/index and open PRs/MRs using the known project and terms; reconcile candidates before writing. On MR miss, check remote branches then the current local checkout (if available).
-- No task and no PR/MR: A remote branch offers Git history but may not preserve authorization, pending acceptance or next action. A local-only branch is not portable to another machine. If continuity evidence is insufficient, request direction rather than infer write permission.
+- No task and no PR/MR: A remote branch offers Git history but may not preserve authorization, pending acceptance or next action. A local-only branch is not portable to another machine. If continuity evidence is insufficient, request direction rather than infer write permission. A human may explicitly opt out of the draft-task rule.
 
-At a resumable checkpoint, substantial work should normally retain its approved decisions and next action in Project Tasks, with the corresponding PR/MR referencing it. Small work may use a sufficiently informative PR/MR description. An approved remote publication is needed for cross-machine branch recovery; absent permissions must be reported, not bypassed.
+At a resumable checkpoint, the linked project task preserves approved decisions and next action unless the human opted out. Verify the task and PR are accessible in a fresh session; branch-local tasks need a link that survives or is reconciled after merge. A PR summary is not a substitute for an inaccessible task. Report absent publication permissions, not bypasses.
 
 **Before writing, committing, pushing and integrating**, verify actual repository/remotes, branch/worktree, target, HEAD/outgoing changes, clean-or-understood uncommitted work and authorized scope. Report the verified working context before first edits in a resumed session. Do not silently stash/reset/rebase/force-push or trample another writer's checkout. Worktrees are a useful optional isolation technique, not a universal requirement.
 
@@ -77,10 +77,10 @@ At a resumable checkpoint, substantial work should normally retain its approved 
 
 ## Use and Installation
 
-- Start: “Use git-workflow for this change.” Review the compact proposal before approving.
-- Resume: “Continue the login-fix task,” “Continue PR #42,” or “Continue `feature/login-fix-cf`.” Task-first and PR/branch-first routes converge on saved approval plus live Git verification.
+- Start: “Use git-workflow for this change.” A clear request with established defaults authorizes routine managed delivery; ask only about missing material terms.
+- Resume: “Continue `20261110-login-fix`.” Status, pause, revise, merge and close cues may likewise identify the branch. Legacy branches and task/PR references remain usable.
 - Before edits: expect the verified repository, checkout path, branch/target, HEAD, and allowed actions.
-- Review: expect exact revision, checks/gaps, recommendation, and a separate merge decision.
+- Review: expect a direct host link, exact revision, before/after, checks/gaps and a separate “merge [branch] into [target]” decision.
 - Configure defaults only on request using the skill's [routing contract](../skills/git-workflow/references/routing.md). Source publication does not install a repository guidance block.
 
 After separately approved integration into the clean canonical checkout, explicitly

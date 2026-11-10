@@ -1,31 +1,35 @@
 ---
 name: git-workflow
 description: >
-  Manage an explicitly requested Git branch-to-review workflow and resume approved
-  managed work. Use when asked to use git-workflow, propose/create/adopt a managed
-  branch, continue a branch ending in -cf (or the repository's managed convention),
-  continue its PR/MR, or execute a project task that references managed Git work.
-  An exact PR/MR continuation request starts inspection even without a suffix.
-  References trigger discovery, not write permission. Generic engineering requests
-  and incidental branch mentions do not initiate managed work. Branch creation or
-  adoption needs a human-approved proposal; merging needs separate explicit approval.
+  Manage explicitly requested Git branch-to-review delivery end to end. Start a new
+  managed branch only when the human invokes or asks to use git-workflow. Use for
+  continuation, maintenance, status, or merge of a known managed branch, its PR/MR,
+  or linked project task. Branch/date references cue discovery, not ownership or write
+  permission. Generic engineering does not start this workflow; merge requires a
+  separate explicit human instruction.
 disable-model-invocation: false
 ---
 
 # Git Workflow
 
-Make approved changes easy to find, continue, review, and deliver. Own the Git
-process; use engineering or the relevant domain workflow for implementation and
-checks. One skill can manage many independent changes, normally one branch per
-coherent change. No mandatory task, subagent, branch registry, or per-commit tag.
+Manage the approved branch, task and review request as one coherent delivery. The
+PR/MR is the human's review surface; the project task is continuation memory. Use
+engineering or the relevant domain workflow for implementation and checks. One
+branch normally serves one coherent change; no branch registry or per-commit tags.
 
 ## Entry and authority
 
-- **New work:** Explicit human intent starts a proposal, not branch creation.
-  Ordinary engineering retains its normal local-commit behavior without invoking
-  this workflow. Do not create or switch branches just because it is available.
-- **Continue:** A request to continue a managed branch, its PR/MR, or a task pointing
-  to it activates this workflow. `-cf` is a discovery cue, not approval evidence.
+- **New work:** Only explicit human invocation or a request to use `git-workflow`
+  starts a new managed branch. A clear request for identified work and repository,
+  with applicable defaults and permissions established, authorizes the normal
+  package below—including narrowly scoped post-merge task bookkeeping and safe
+  cleanup of this managed branch—without a second ceremonial approval, unless
+  the human narrows it or applicable rules require otherwise. If scope, target, access,
+  cost or material effects are unclear, ask before the affected action. Ordinary
+  engineering does not start this workflow or create a managed branch.
+- **Continue:** A request to continue, revise, inspect, pause, close or merge a known
+  managed branch, its PR/MR, or a task pointing to it activates this workflow. A
+  date or legacy `-cf` is a discovery cue, not approval or ownership evidence.
   A status/explanation/review request remains read-only; naming a branch alone is
   not an instruction to resume implementation.
 - **Write permission:** Establish the human-approved association between exact
@@ -39,8 +43,10 @@ coherent change. No mandatory task, subagent, branch registry, or per-commit tag
   Adoption requires a state/history audit and an explicitly approved proposal.
   Preserve the name when suitable; never rename somebody else's branch by default.
 - **Limits:** Repository/workplace policies and narrower permissions prevail.
-  No implicit merge, force-push, history rewrite, deployment, release, branch
-  deletion, paid checks, security changes, tool installation, or subagent launch.
+  No implicit merge, force-push, history rewrite, deployment, release, unsafe or
+  unapproved branch deletion, paid checks, security changes, tool installation, or
+  subagent launch. Post-merge cleanup is allowed only within the explicitly
+  authorized package and the guarded conditions below.
   These instructions guide agent behavior; they do not enforce host permissions.
 
 ## 1. Find the work and inspect reality
@@ -66,26 +72,36 @@ otherwise identify freshness as unverified. Detect matching work before proposin
 a duplicate. See [Git operations](references/git-operations.md) when selecting
 commands or handling divergence, dirty trees, and worktrees.
 
-## 2. Propose once; wait for approval
+## 2. Agree scope once
 
-Recommend whether a branch is worthwhile. For creation or adoption, present a
-compact agreement containing the following meaning, without a rigid form:
+Resolve the following as one compact agreement, without a rigid form. A direct,
+clear `use git-workflow for [work]` request accepts the normal package when its
+repository, objective, target, permissions and material effects are established;
+do not demand a redundant approval. When they are not established, propose the
+missing terms and wait. External-branch adoption still needs explicit approval.
+Surface the standard post-merge local/remote branch cleanup in the scope receipt
+and make its opt-out clear; do not hide deletion in a generic delivery label.
 
 - Repository; starting ref/SHA and observed freshness; proposed branch and target.
 - Objective/scope, consequential acceptance criteria, and intended checks.
 - Maximum delivery: local edits/commits, push destination, draft PR/MR creation
   and maintenance, and marking ready when required pre-review checks pass.
-- Continuity: permission to save the agreement and relevant progress in the
-  existing project task through project-tasks, respecting local task-write gates.
+- Continuity: create or maintain the matching project task and index through
+  project-tasks, including post-merge bookkeeping, within applicable write gates.
+- Cleanup: after an approved and verified merge, safely delete the exact managed
+  remote and local branches under the conditions below; the explicit, clear skill
+  invocation accepts this standard term unless the human or policy narrows it.
 - Material known publication effects, such as CI, previews, visibility or cost;
   merge remains a separate explicit decision.
 
-Prefer `feature/<slug>-cf`, adapting prefixes/tickets to actual repository rules.
-The human may approve the package or a narrower subset. Wait before creation or
-adoption. An explicit approval of this exact proposal satisfies the gate; don't
-ask again for routine steps. Material scope, target, or side-effect changes need
-a new decision. Unknown consequential publication effects block publication,
-not otherwise safe authorized local work.
+The human may narrow the package. Material scope, target, or side-effect changes
+need a new decision. Unknown consequential publication effects block publication,
+not otherwise safe authorized local work. Human approval of a merge is separate.
+
+Prefer `YYYYMMDD-short-descriptive-slug` using the local project date; use a small
+collision suffix if needed. Adapt required prefixes/tickets to repository rules.
+Do not add `-cf` to new names or rename existing branches merely to conform. Dates
+and legacy suffixes help discovery, never establish authority.
 
 ## 3. Select the approved branch and work
 
@@ -107,8 +123,18 @@ staged changes. Use coherent checkpoints, not empty or ceremonial commits.
 Engineering's local commit counts as a checkpoint here, not a second required
 commit; the approved Git boundary governs managed work. Use commit delegation
 only when requested/permitted and available, never as a dependency of this skill.
+Routine commits authorized by a managed-work request do not by themselves invoke
+`commit-with-subagent`; when the human explicitly asks to commit, honor that
+skill's trigger and fallback without inferring permission to spawn another agent.
+Before handing over for review or pause, account for all agent-created changes:
+publish the scoped, verified work and task state when authorized, or report exactly
+what remains local, why and how to resume. Never label a dirty or unpushed state
+clean. Preserve pre-existing or ambiguous work; do not reset, stash, discard or
+include it merely to make the checkout clean. A missing optional commit helper must
+not by itself strand authorized work: follow the commit skill's available fallback,
+without inventing an agent or exceeding delegation permissions.
 
-## 4. Checkpoint and publish
+## 4. Task, checkpoint and publish
 
 For substantial/multi-session work, prefer an authorized push and **draft PR/MR
 after the first meaningful committed checkpoint**. Small work can open a normal
@@ -116,25 +142,31 @@ PR/MR once review-ready. Confirm destination, outgoing commits/diff, and publica
 effects before pushing; use [provider operations](references/providers.md) for
 host capabilities. Draft means unfinished, not private or free of CI effects.
 
-Link the existing task using a locator accessible to intended readers. Keep the
-PR description focused on objective, changes, checks/gaps, and current next step;
-link detailed task decisions rather than copying them. Preserve others' PR text.
-Without a task, a small PR may retain the approved scope/actions and enough next
-action context itself. Save only genuine approvals, never secrets or inaccessible
-private task contents into a wider-audience PR. Verify writes by reading back.
+Every managed PR/MR, including a draft, must link an existing or new project task,
+unless the human explicitly says no task is needed. If the agent thinks a
+task unnecessary, ask before opting out. Reuse a matching task; otherwise load
+project-tasks and create one in the confirmed project task surface. The approved
+package includes its task/index maintenance when local rules permit; stricter opt-in
+rules prevail. If the destination, permission, or accessible reference is missing,
+ask or report the blocker before creating the PR/MR; do not invent a task root or
+link. Preflight this before editing where possible. No new task schema or registry.
 
-For substantial work, use project-tasks to retain approved scope, branch/target,
-permissions, progress/check gaps, PR link, and next permitted action in ordinary
-task prose under the starting agreement. If no task exists, propose one through
-its owner; do not silently initialize a task system or mandate a task for every
-change. Do not add a compulsory Delivery section or a second branch database.
+The task preserves the actual human approval, scope, branch/target, progress,
+checks/gaps, and next permitted action. The PR/MR links it and is the human's
+primary review surface. Use the concise format in [review presentation](references/review-presentation.md):
+purpose, before/after, changed areas, consequential effects/risks, verification and
+gaps, task link, state, and next action. Surface consequential changes in the PR,
+not only in the task. On revisions summarize what changed since the prior review.
+Preserve others' PR text; do not expose secrets or restricted task contents. Verify
+host writes by reading back.
 
-Before declaring a published checkpoint resumable elsewhere, verify that the
-needed continuation record is accessible there too. If tasks live in Git, include
-authorized task/index updates in the scoped publication when feasible; otherwise
-explicitly report them as local/unpublished. A pushed code commit does not publish
-uncommitted task progress. Avoid an endless commit loop just to put a task's own
-containing commit SHA inside that task; branch/PR references and Git history suffice.
+Before declaring a checkpoint resumable elsewhere, verify that its task and index
+are accessible there too. If they live on the review branch, publish them with the
+approved work and link to that accessible branch version; after merge, verify the
+durable target and repair the link before deleting any branch needed for access.
+A pushed code commit does not publish uncommitted task progress. Report partial or
+local-only state accurately; avoid an endless commit loop to put a task's containing
+SHA inside itself.
 
 Until a PR exists, the approved task or current conversation carries authority.
 A branch alone is insufficient. If a fresh session cannot recover the approval,
@@ -162,21 +194,54 @@ material differences or target changes require renewed human approval. Use a
 provider expected-head/version guard that binds integration to the reviewed
 revision. If the available operation cannot do that, stop automated integration
 and explain the human-controlled host path; a separate head read does not close
-the race. Respect the repository merge strategy. No protection bypass or implicit
+the race. A head guard does not bind the target: revalidate the target and host
+protections, re-review material movement, and disclose any residual target race.
+If exact-target consistency is required but the host cannot guarantee it, stop
+automated integration and explain the permitted human-controlled path. Respect
+the repository merge strategy. No protection bypass or implicit
 auto-merge/queue enrollment; clarify deferred integration semantics when needed.
 Update a branch from its target only under approved strategy, never by silent
 rebase or merge. Failed checks/conflicts are not permission to rewrite history.
 
 Read back the actual merged state and resulting revision. A queued/accepted
-request is not a completed merge. Do not delete branches or deploy incidentally.
+request is not a completed merge. Update the task/index after verified merge:
+close only if the outcome is complete; otherwise record the remaining work. When
+explicitly included in the approved package and permitted by project/host policy,
+publish a narrowly scoped task/index-only post-merge update to the configured
+task store, including a direct target-branch commit if authorized. Recheck the
+target, index and concurrent changes; no code, unrelated docs, force push or
+protection bypass. If this is blocked, preserve the result, report the stale task
+and the exact unblock; never claim completion or create an unsolicited branch.
+
+After a verified merge, delete the exact local and remote managed branches only if
+that cleanup was explicitly authorized, current host and local refs still match the
+merged reviewed head, no further work is present, and no other checkout or writer
+would be disturbed. If a task or branch-hosted continuation record exists, first
+verify the durable record and repaired PR link before deleting a branch needed for
+access; if this cannot be established, retain that branch. For a human-approved
+task opt-out, record the exception and verify no needed continuation depends on the
+branch. Verify the provider's actual merge strategy, including squash or rebase,
+rather than assuming ancestry proves equivalence. A checked-out branch
+may be switched away from only when safe and authorized; never force or discard.
+Guard both local and remote ref deletion against concurrent movement as described
+in [Git operations](references/git-operations.md); retain the affected ref if
+safe atomic deletion or concurrent-writer exclusion cannot be established.
+Protect unmerged/closed work, unexpected commits, dirty or occupied checkouts, and
+external branches. On uncertainty or unavailable permission, retain and report
+the branch; never infer deletion of unmerged work from permission to close a PR.
+Do not deploy incidentally.
 
 ## Completion and repository setup
 
-At material checkpoints or a blocker, give a short delivery receipt: repository,
-branch/target, current SHA, PR/MR URL/state or absent, actual checks/gaps, allowed
-next action, and task/PR continuation reference. Identify partial results; after
-an uncertain remote mutation, inspect remote state before retrying. Never claim
-provider access, installation, CI success, or fresh-session tests from static prose.
+At material checkpoints or a blocker, give a short delivery receipt: a clickable
+actual host PR/MR link, source branch → target, current SHA and state, concise
+before/after, checks/gaps, task reference, and explicit local/unpushed status. Give
+the human the next branch-based cue: `continue [branch]`, `status of [branch]`,
+`pause [branch]`, `merge [branch] into [target]`, or `close [branch] without
+merging`. These are examples, not magic words. A PR is the one surface the human
+needs to inspect; suggest its Files changed / Changes page, not a required desktop
+app. Report a missing link or partial state instead of inventing one. After an
+uncertain remote mutation, inspect remote state before retrying.
 
 Repository defaults are optional. Only an authorized setup/refresh may maintain
 the small owned AGENTS.md section; follow [routing](references/routing.md).

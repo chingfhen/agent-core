@@ -35,10 +35,10 @@ Local-only work on another machine cannot be found by searching this machine.
 
 ## Create or resume
 
-After the proposal is approved, validate with `git check-ref-format --branch
-<branch>` and confirm no conflicting local/remote branch. Create from the observed
-base SHA with `git switch --no-track -c <branch> <base-sha>`; this avoids treating
-the integration target as the new branch's push upstream.
+After explicit skill invocation establishes an approved, unambiguous work package,
+validate with `git check-ref-format --branch <branch>` and confirm no conflicting
+local/remote branch. Create from the observed base SHA with `git switch --no-track
+-c <branch> <base-sha>`; this avoids treating the target as the push upstream.
 
 For an existing local branch, inspect it before `git switch <branch>`. For a
 remote-only branch, inspect the exact tracking ref, then create a local tracking
@@ -52,8 +52,8 @@ git log --oneline <remote-branch>..<local-branch>
 
 Expected remote-only continuation commits can be fast-forwarded after verifying
 their scope and authorship context. Unexpected commits or divergence need
-reconciliation; no automatic reset, pull merge, rebase, or force-push. A matching
-suffix on another person's branch is not adoption approval.
+reconciliation; no automatic reset, pull merge, rebase, or force-push. A date or
+legacy suffix on another person's branch is not adoption approval.
 
 Use `git worktree add <authorized-path> <branch>` when isolation is useful and
 the branch is not already checked out. Inspect an existing worktree rather than
@@ -95,4 +95,16 @@ Preserve valid local commits if host creation/readiness fails. Retrieve the exac
 PR or search source repository+branch+target before retrying a timed-out creation;
 an error may follow a successful remote mutation. Report existing work and the
 blocked step. Don't delete worktrees, branches, or local changes as cleanup without
-authorization. A review/merge failure never licenses bypassing host protections.
+authorization. After verified merge, cleanup of the exact managed local/remote
+branches is allowed only under the explicitly approved package and the guarded
+conditions in the main skill. Protect against a branch moving between inspection
+and remote deletion: use a provider-supported expected-old-ref guard, or an
+atomic Git deletion lease bound to the verified merged head when supported and
+permitted. If an atomic guard is unavailable, retain the remote branch and report
+the limitation instead of an unguarded delete. For a local ref, first ensure no
+worktree or concurrent writer can use it, then use a supported atomic compare-and-
+delete against its verified expected old value; if exclusion or the guard is not
+available, retain it. Verify the durable task and repaired PR link before deleting
+a branch that provides the continuation record. Never force-delete a local branch
+or discard a checkout to make cleanup work. A review/merge failure never licenses
+bypassing host protections.

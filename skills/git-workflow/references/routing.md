@@ -24,20 +24,21 @@ or omit the policy line if none exists:
 <!-- BEGIN GIT WORKFLOW -->
 ## Git Workflow
 
-Branch convention: feature/<slug>-cf (adapt to required prefixes/tickets).
+Branch convention: YYYYMMDD-<descriptive-slug> (adapt to required prefixes/tickets).
 Default review target: main.
 Policy: [Delivery policy](docs/delivery.md) — consult before publishing or merging.
 
-Use git-workflow for requested managed work or continuation through its branch,
-PR/MR, or project task. A -cf branch reference cues discovery, not write authority;
-verify the saved human approval and live Git state. Generic engineering does not
-start this workflow. Creating/adopting a branch needs an approved proposal; merge
-needs separate explicit human approval. Continue routine work only within the
-approved branch/scope/actions. Use project-tasks for authorized task continuity.
+Start new managed work only on an explicit request to use git-workflow; continue
+known managed work through its branch, PR/MR or project task. A date or legacy
+-cf is a discovery cue, not authority; verify the saved approval and live Git
+state. Generic engineering does not start this workflow. Merge needs separate
+explicit human instruction. Use project-tasks for authorized continuity, and
+follow repository task-write and branch-cleanup policy.
 <!-- END GIT WORKFLOW -->
 ```
 
 Keep live branches, SHAs, PR lists, approval records, check dashboards, and detailed
 Git commands out of this section. Task routing remains owned by project-tasks;
 actual branch/request state belongs to Git/the host. This section grants no blanket
-write permission on external branches and does not make a task mandatory.
+write permission on external branches. Managed PRs require a task unless the human
+explicitly opts out; honor narrower repository task-write gates.
