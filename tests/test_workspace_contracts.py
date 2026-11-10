@@ -45,7 +45,7 @@ class WorkspaceContractTests(unittest.TestCase):
         ]
         for skill in ("project-tasks", "project-docs", "knowledge-base",
                        "manage-python-env", "agent-lessons", "workspace-setup",
-                       "git-workflow"):
+                       "git-workflow", "learning-notebook"):
             files.extend((ROOT / "skills" / skill).rglob("*.md"))
         for source in files:
             # Fenced examples contain deliberately fictional workspace paths.
@@ -73,6 +73,7 @@ class WorkspaceContractTests(unittest.TestCase):
             "manage-python-env/references/routing.md": "PYTHON ENVIRONMENTS",
             "agent-lessons/SKILL.md": "AGENT LESSONS",
             "git-workflow/references/routing.md": "GIT WORKFLOW",
+            "learning-notebook/SKILL.md": "LEARNING NOTEBOOKS",
         }
         for relative, marker in owners.items():
             text = (ROOT / "skills" / relative).read_text(encoding="utf-8")

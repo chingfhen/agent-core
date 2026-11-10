@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-11-09
+updated: 2026-11-10
 ---
 
 # Workspace Configuration
@@ -56,11 +56,13 @@ bookkeeping retains its existing rules. No background sync is implied.
 | project-docs | Docs roots and a few canonical entry points with consultation cues | Project meaning, architecture, rationale, rules, and deeper navigation in docs |
 | knowledge-base | KB/archive roots and established backend/knowledge-page configuration; routing cue | Records, syntheses, content indexes, storage/archival procedures |
 | manage-python-env | Python root beside its before-execution activation cue | Compatibility in manifests/pins/locks/runtime; execution procedure in skill |
+| learning-notebook | Notebook root, discovery and activation cues | Collection index and learning-notebook skill; Python execution belongs to manage-python-env |
 | agent-lessons | Essential pre-action constraints and conditional reference pointers | Settled procedures in docs; reusable findings/evidence in KB |
 | git-workflow | Opt-in branch/target conventions, continuation cue, approval constraints, existing policy pointer | Git lifecycle in skill/references; approved scope and progress in tasks/PRs; live state in Git/host |
 
-The four resource owners define their creation-time shapes in skill-local
-`references/routing.md`; agent-lessons defines its narrow section in SKILL.md.
+The original four resource owners define their creation-time shapes in skill-local
+`references/routing.md`; agent-lessons and learning-notebook define their narrow
+sections in their respective SKILL.md files.
 Git Workflow defines its optional repository section in its own
 [routing reference](../skills/git-workflow/references/routing.md); setup requires
 specific authorization and is not part of ordinary resource initialization.
@@ -104,7 +106,7 @@ contract for our agents.
 ### Ownership and maintenance
 
 Each owner uses its own BEGIN/END marker pair: PROJECT TASKS, PROJECT DOCS,
-KNOWLEDGE BASE, PYTHON ENVIRONMENTS, AGENT LESSONS, or GIT WORKFLOW. Markers, headings, labels,
+KNOWLEDGE BASE, PYTHON ENVIRONMENTS, LEARNING NOTEBOOKS, AGENT LESSONS, or GIT WORKFLOW. Markers, headings, labels,
 and minimal initial activation cues are defaults. Routine maintenance updates
 confirmed paths and affected navigation, preserving customized behavior, outside
 text, other sections, and position. Managed does not mean regenerate.
@@ -156,6 +158,7 @@ Conventional proposals:
     knowledge-base/
     archive/knowledge-base/
     python/<purpose>/
+    learning-notebooks/
 ```
 
 Code organization is unconstrained. Several repositories may form one project.
