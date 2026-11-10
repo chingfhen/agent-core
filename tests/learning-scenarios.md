@@ -3,18 +3,23 @@
 Manual acceptance cases for [learning](../skills/learning/SKILL.md).
 These are specifications, **not** evidence of a model trial. Run with the skill
 loaded; note model/runtime, prompt, output, and any inspected sources. Judge
-the result by the learner's understanding, not exact wording, section count,
-or a rigid response length. Use synthetic code and files.
+the teaching delivered: whether the explanation answers the question, makes the
+mechanism inspectable, and fits the requested depth. Do not infer or score the
+human's comprehension from an output. Use synthetic code and files.
 
 ## Common acceptance checks
 
-- The first line identifies the active mode and alternatives when compatible
-  with the output format.
+- An ordinary learning response identifies the active mode and alternatives
+  at its start when compatible with the output format; an embedded debrief
+  places the marker with that debrief.
 - Quick already contains a real causal bridge; higher modes deepen it.
 - A newcomer does not have to invent the critical follow-up question.
 - Terms, mechanisms, and observed versus inferred details are accurate.
 - Explanations build the ability to predict, verify, or direct work.
 - The agent does not execute, write, persist, or claim verification unasked.
+- The explanation selects a useful representation rather than mechanically
+  filling a template. Examples and terminology keep stable referents.
+- No quiz, teach-back demand, mastery claim, or compulsory exercise.
 
 ## 1. New technical product, Quick
 
@@ -119,6 +124,7 @@ invent a storage path or authorize unrelated capture.
 ## 10. Ordinary implementation stays implementation
 
 **Setup:** User asks an agent to fix a Python bug with no teaching request.
+There is no standing invitation or applicable guidance for ongoing teaching.
 
 **Request:** "Fix the failing test."
 
@@ -146,3 +152,81 @@ concept is established.
 **Expected:** Provide the conceptual role and mark the exact vendor/version
 API unknown until verified. Do not fabricate a signature or imply every
 library uses `register()`.
+
+## 13. Time-constrained explanation preserves the decisive reason
+
+**Setup:** Two clients loaded revision 7. A proposed implementation checks the
+stored revision and later writes the edit in a separate operation. Another
+client can save between those two operations. No implementation is supplied.
+
+**Request:** "Quick, I have a minute: why can't we just check the version and
+then save?"
+
+**Expected:** Explain that a separate check and write can admit a change between
+them; the compare-and-write must be atomic to reject a stale update reliably.
+Use a tiny timeline if helpful and distinguish the intended mechanism from
+verified implementation. No database survey, learner quiz, or automatic Deep.
+
+## 14. A contrast isolates the important distinction
+
+**Request:** "I mix up authentication and authorization. Explain quickly."
+
+**Expected:** Use one situation: a signed-in traveler requests another person's
+private trip. Identity can be established while access is denied. Connect each
+term to its role; do not change users, resources, and permissions all at once
+or stop at two dictionary definitions. No claim that the example is a tested app.
+
+## 15. Deepening adds mechanism instead of restarting
+
+**Setup:** Quick already explained a cache hit/miss with one product-price
+example. The user understands the terms in the visible conversation.
+
+**Request:** "Standard now—how does that become stale?"
+
+**Expected:** Retain the product-price case; show the source update and the cache
+entry that has not been refreshed, then explain the relevant expiry/invalidation
+choice and observable effect. Do not repeat an introduction to caching or jump
+into a catalogue of cache products. No comprehension claim or test of the user.
+
+## 16. Invited proactive debrief stays bounded
+
+**Setup:** User said "teach me as we build, usually Quick." A supplied diff
+changes separate revision checking/writing to a conditional database update.
+A supplied test transcript demonstrates a stale update is rejected. The actual
+implementation workflow's normal completion report is also required.
+
+**Request:** "Finish this slice and tell me where we are."
+
+**Expected:** Preserve the execution receipt and include one brief marked
+teaching debrief explaining why the atomic condition prevents the race, grounded
+in the supplied change and test. Do not claim other paths were tested, teach
+every edit, create a learner profile, or require a response before completion.
+
+## 17. Teaching invitation does not override a current time boundary
+
+**Setup:** The user previously invited ongoing teaching.
+
+**Request:** "Just the result this time; skip the explanation."
+
+**Expected:** Respect the current instruction. No lesson, mode banner for an
+omitted lesson, quiz, or insistence that teaching is required by the skill.
+
+## 18. A counterexample repairs an overbroad analogy
+
+**Setup:** A previous explanation compared database transactions to undoing a
+whole shopping trip. The learner asks whether this undoes an external payment.
+
+**Request:** "So rolling back the database also cancels the card charge?"
+
+**Expected:** Drop or bound the analogy. Explain that a database rollback covers
+its own transaction, whereas an already accepted external payment is a separate
+side effect requiring its own recovery mechanism. Use one literal sequence;
+do not imply an actual provider supports a particular refund/cancellation API.
+
+## 19. A narrow definition does not trigger the whole teaching procedure
+
+**Request:** "What does TTL stand for in this cache setting? One sentence."
+
+**Expected:** Explain time to live and the entry's validity/expiry interval in
+one sentence, with a compact mode marker if compatible. No worked story,
+comparison table, prerequisite lecture, or forced five-part template.

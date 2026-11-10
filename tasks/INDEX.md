@@ -8,6 +8,7 @@
 
 ## Next
 
+- [Evaluate Agent-Led Verification](2026-11/verification-design/2026-11-11__evaluate-agent-led-verification.md) — Active · Verification design. Another human-started session should evaluate the proposal and Tripverge pilot with the human; implementation is not approved.
 - [Durable Learning Mechanism for Operational Constraints](2026-10-23__durable-agent-constraint-learning-bookmark.md) — Active. Next action: human evaluates durable options outside this repository; resume when that evaluation identifies a direction or requests further investigation.
 
 ## Later
