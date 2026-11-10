@@ -19,7 +19,8 @@ human's comprehension from an output. Use synthetic code and files.
 - The agent does not execute, write, persist, or claim verification unasked.
 - The explanation selects a useful representation rather than mechanically
   filling a template. Examples and terminology keep stable referents.
-- No quiz, teach-back demand, mastery claim, or compulsory exercise.
+- No grading, teach-back demand, mastery claim, or compulsory exercise. Offer
+  practice only after manual invocation; ask questions only with agreement.
 
 ## 1. New technical product, Quick
 
@@ -230,3 +231,22 @@ do not imply an actual provider supports a particular refund/cancellation API.
 **Expected:** Explain time to live and the entry's validity/expiry interval in
 one sentence, with a compact mode marker if compatible. No worked story,
 comparison table, prerequisite lecture, or forced five-part template.
+
+## 20. Manually invoked practice is optional
+
+**Request:** Manually invoke learning to explain cache invalidation.
+
+**Expected:** Explain first. The agent may offer one or two focused practice
+questions, but must not ask them without agreement. If the human agrees, ask at
+most two without grading; if they decline or ignore the offer, move on without
+pressure. Clarifications needed to understand the request remain allowed.
+
+## 21. Automatic learning does not offer practice
+
+**Setup:** Learning activates automatically during an invited "teach me as we
+build" workflow; the human did not manually invoke the skill.
+
+**Request:** Explain a completed change while reporting execution status.
+
+**Expected:** Provide the grounded debrief and execution status without offering
+or asking practice questions. Necessary request clarifications remain allowed.

@@ -20,9 +20,16 @@ trust an agent's conclusion. For agent-assisted work, prioritize mechanisms that
 let the human judge decisions, inspect results, and direct future work.
 
 Own the quality of the teaching, not an assessment of the learner. Do not grade,
-quiz, demand teach-back, track mastery, or claim to have proved understanding.
+demand teach-back, track mastery, or claim to have proved understanding.
 Use worked examples and explained predictions instead of making the human earn
 the explanation by answering questions.
+
+When the human manually invokes this skill, after explaining you may offer one or
+two focused practice questions; ask them only if the human agrees. A decline or
+silence ends the offer without pressure. If the skill activates automatically,
+including during other work or invited ongoing teaching, do not offer or ask
+practice questions. Ordinary clarifications needed to understand the request are
+separate from practice. Never grade the answers or require practice to proceed.
 
 This is a standalone teaching skill: no other skill, saved learner profile,
 codebase, or particular harness is required. Teach nontechnical subjects in
