@@ -20,7 +20,8 @@ human's comprehension from an output. Use synthetic code and files.
 - The explanation selects a useful representation rather than mechanically
   filling a template. Examples and terminology keep stable referents.
 - No grading, teach-back demand, mastery claim, or compulsory exercise. Offer
-  practice only after manual invocation; ask questions only with agreement.
+  practice with a yes-or-no question only after manual invocation; ask exactly
+  two multiple-choice questions only with agreement.
 
 ## 1. New technical product, Quick
 
@@ -236,10 +237,11 @@ comparison table, prerequisite lecture, or forced five-part template.
 
 **Request:** Manually invoke learning to explain cache invalidation.
 
-**Expected:** Explain first. The agent may offer one or two focused practice
-questions, but must not ask them without agreement. If the human agrees, ask at
-most two without grading; if they decline or ignore the offer, move on without
-pressure. Clarifications needed to understand the request remain allowed.
+**Expected:** Explain first. The agent may offer practice with a yes-or-no
+question, but must not ask practice questions without agreement. If the human
+says yes, ask exactly two focused multiple-choice questions without grading; if
+they decline or ignore the offer, move on without pressure. Clarifications needed
+to understand the request remain allowed.
 
 ## 21. Automatic learning does not offer practice
 
