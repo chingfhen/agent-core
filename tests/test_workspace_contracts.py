@@ -45,7 +45,7 @@ class WorkspaceContractTests(unittest.TestCase):
         ]
         for skill in ("project-tasks", "project-docs", "knowledge-base",
                        "manage-python-env", "agent-lessons", "workspace-setup",
-                       "git-workflow", "learning-notebook"):
+                       "git-workflow", "learning-notebook", "blind-comparison"):
             files.extend((ROOT / "skills" / skill).rglob("*.md"))
         for source in files:
             # Fenced examples contain deliberately fictional workspace paths.

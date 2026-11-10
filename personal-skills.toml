@@ -12,6 +12,7 @@ skills = [
     "human-unblock",
     "readability",
     "reasoned-advocacy",
+    "blind-comparison",
     "grilling",
     "approval-gate",
     "commit-with-subagent",
