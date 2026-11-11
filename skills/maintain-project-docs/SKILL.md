@@ -1,0 +1,311 @@
+---
+name: maintain-project-docs
+description: On a docs-maintenance request or authorized handoff, maintain settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Reading or using docs does not require this skill or authorize maintenance. Establish its own routing when needed, integrate durable meaning into its canonical authority, and allow a no-change outcome.
+disable-model-invocation: false
+---
+
+# Project Docs
+
+## Purpose
+
+Maintain the project understanding and operating guidance that future participants should inherit after the current task and conversation disappear.
+
+Docs may own intended architecture, product meaning, exclusions, rationale, ownership boundaries, invariants, and constraints that code does not express. They are not merely prose summaries of code.
+
+Project understanding also includes research methods, agreed organizational
+procedures, and confirmed personal or career facts within the project's scope.
+Use evidence appropriate to the claim; software-specific authorities are conditional,
+not prerequisites for maintaining non-coding projects.
+
+A request to `sync to docs` means:
+
+> Evaluate the current work for settled project understanding and durable operating behavior, then integrate what matters into the configured owned documentation surfaces.
+
+A sync may correctly produce no changes. Do not create or modify a document merely to demonstrate activity.
+
+The human controls maintenance timing. A docs request or an authorized coordinated
+handoff/closeout triggers this workflow; reading context or making progress does
+not. A separate explicit standing delegation may permit updates at stated boundaries;
+honor its scope and timing rather than treating ownership alone as permission.
+During ordinary work, concentrate on the requested outcome instead of repeatedly
+running persistence reviews.
+
+Documentation is not active task state, a transcript, raw evidence, status history, a backlog, or a record of everything that happened. Preserve settled meaning and behavior whose absence would cause worse decisions, repeated investigation, recurring mistakes, or loss of important project intent.
+
+## Surface Ownership
+
+This skill writes only to the project's explicitly configured documentation surface
+and to project-guidance files explicitly assigned to this workflow.
+
+Before managing documentation, read the docs routing in applicable `AGENTS.md`.
+Resolve the project from the requested work, not solely the session's current
+working directory. One project may span several repositories. Use its `Docs`
+location; new section-relative paths resolve against the declaring AGENTS.md
+directory, while legacy workspace-relative paths retain their recorded base.
+Read applicable repository guidance too. For missing routing, an authorized routing
+change, or an authorized discovery-cue refresh, read
+[Docs routing](references/routing.md). During a human-authorized docs-maintenance
+pass, minimally refresh a missing or outdated cue in the owned section when its
+guidance is within authorized scope; no separate refresh request is needed. Ask about
+conflicting or ambiguous project identity/ownership. If a configured location
+is inaccessible, report the problem rather than substitute another destination.
+A confirmed but not-yet-created directory may be created during an authorized write.
+
+There is no automatic `docs/` fallback and no `projects.toml` workflow. This skill
+can establish its own resources without workspace-setup. Maintain only its owned
+docs-root/entry-point section for authorized routing or cue changes; do not scan for
+a substitute surface or rewrite legacy central blocks without migration approval.
+An explicit human-selected destination for this operation is allowed; it does not
+silently change the saved map. Ordinary work does not require invoking setup again.
+
+Paths such as `docs/architecture.md` remain logical paths inside the configured
+surface, for example `.work-context/projects/smart-search/docs/architecture.md`.
+The surface can be inside or outside a Git repository. Preserve the existing
+ownership boundaries and report every exact physical path changed.
+
+### README and Agent Guidance
+
+`README`, `AGENTS.md`, `CLAUDE.md`, and similar guidance files are not owned merely because they are visible in a nearby or nested repository.
+
+Edit one only when:
+
+- it is inside the configured docs surface and serves that role there;
+- the human explicitly identifies it as an owned target for the operation; or
+- project configuration or established project guidance assigns it to this documentation workflow.
+
+Do not silently edit guidance in a nested or shared repository. Other project surfaces may be read as context, but this skill does not silently mutate them.
+
+## What Each Surface Owns
+
+- **Project docs:** settled architecture, product semantics, interfaces, workflows, invariants, durable decisions, rationale, exclusions, ownership boundaries, and non-obvious constraints.
+- **Explicitly owned README:** orientation, entry points, setup, usage, navigation, and onboarding.
+- **Explicitly owned agent guidance:** concise stable behavior that should shape an agent before it acts.
+- **Code, tests, schemas, configuration, and runtime evidence:** machine-defined or observed claims within their respective scopes.
+- **Active tasks:** current progress, open investigation, remaining work, uncertainty, and fresh-session continuation.
+- **Backlog:** deferred work, not current project truth.
+- **Source or evidence surfaces:** supporting material that may ground a conclusion but is not automatically canonical project meaning.
+- **Archive:** historical or superseded material that should not drive current work by default.
+- **Knowledge base:** retained evidence and synthesized understanding under its own workflow; a docs sync does not automatically capture or curate KB content.
+
+One durable claim should have one primary authority. Other surfaces may link to it or state a concise consequence when needed rather than maintain competing full explanations.
+
+## Optional Project North Star
+
+A project may designate a canonical `north-star.md` within its
+configured documentation surface, or an equivalent existing document.
+
+The north star preserves the project's long-term purpose, intended
+outcomes, strategic direction, guiding principles, and boundaries.
+It describes what the project aims to become, not necessarily what
+the current implementation does.
+
+- Do not create a north star automatically. Use one only when the
+  project or human explicitly establishes it.
+- Treat an established north star as the canonical authority for
+  strategic intent. Avoid competing vision or direction documents.
+- Consult it when evaluating significant product or architectural
+  decisions. Surface material conflicts rather than silently
+  changing the project's direction.
+- Do not substantively change the north star's strategic direction
+  through routine documentation sync without explicit human approval.
+- Where agent guidance is owned by this workflow, maintain a concise
+  reference encouraging agents to consult the north star when relevant.
+  Do not require reading it for unrelated routine work.
+
+## Admission and Routing
+
+Before writing, determine whether the work produced settled project understanding, stable operating behavior, or neither.
+
+### Project Understanding
+
+Preserve understanding when it is likely to remain useful and materially affects how the project should be interpreted, changed, operated, or evaluated. Strong candidates include:
+
+- intended architecture and component ownership;
+- product meaning and deliberate exclusions;
+- durable decisions and rationale not recoverable from implementation alone;
+- important interfaces, workflows, and invariants;
+- constraints or failure behavior that affect future changes;
+- confirmed fixes or lessons that would otherwise cause recurring mistakes;
+- external contracts whose consequences the project must preserve.
+
+Expensive rediscovery is a useful test, but it is not the only admission rule. Preserve settled project meaning even when code cannot express it.
+
+Do not promote open-ended ideation, unresolved alternatives, temporary workarounds, one-off status, or tentative conclusions as established truth.
+
+### Durable Behavior
+
+Use agent guidance when a stable instruction should shape action before a future agent would normally read deeper documentation and omission would create material risk, recurring error, inconsistency, or wasted work.
+
+Keep the guidance concise. Put explanatory truth and rationale in canonical docs and link to it when useful. Prefer executable enforcement through tests, CI, schemas, hooks, or tooling when behavior can be enforced reliably; do not expand a docs sync into implementation merely to add enforcement.
+
+### Routing Table
+
+| Destination | Put here |
+| --- | --- |
+| Configured docs surface | Project understanding, intended behavior, architecture, rationale, constraints, interfaces, workflows, durable decisions |
+| Explicitly owned README | Orientation, setup, usage, navigation, onboarding |
+| Explicitly owned agent guidance | Stable behavior needed before action |
+| Active task workflow | Progress, open questions, pending decisions, next actions, validation still required |
+| Backlog workflow | Deferred future work |
+| Source/evidence workflow | Logs, imported notes, experiments, external references, supporting records |
+| Archive | Superseded or historical material retained for reference |
+| Executable authority | Machine-defined values, schemas, enforced behavior, current implementation |
+
+Follow the owning workflow for any destination outside this skill. Do not create alternate docs, task, source, archive, guidance, or KB structures merely to complete a sync.
+
+## Autonomous Integration Within Ownership
+
+When the destination and authority are clear, choose and update the appropriate existing owned document without asking the human which file or heading to use. Prefer improving a current canonical page over creating another one.
+
+Ask only when a material product, architecture, ownership, security, privacy, or other durable decision remains unresolved, when authorities conflict in a way evidence cannot settle, or when the operation would exceed configured ownership. Routine wording, headings, placement, and link repair are executor-owned.
+
+Autonomy does not expand write scope. A request to sync docs authorizes evaluation and integration only within the owned surfaces and current request.
+
+If nothing settled or durable needs preservation, report that the sync produced no documentation change. Do not manufacture a page, decision, or rule.
+
+## Canonical Authority and Conflicts
+
+Documentation is not automatically stronger than every other source. Identify authority by claim:
+
+| Claim | Usually strongest authority |
+| --- | --- |
+| Current implementation | Code; direct runtime verification when relevant |
+| Expected or tested behavior | Tests and explicit contracts |
+| Accepted structures or values | Schemas, types, parsers |
+| Deployed or environment state | Deployment/configuration plus runtime evidence |
+| Intended architecture or design constraint | Canonical design docs or ADRs |
+| Product semantics or deliberate project decision | Canonical project docs |
+| Stable agent operating behavior | Canonical agent guidance |
+| Personal facts, ownership, or preferences | Relevant primary records and explicit human confirmation; retain verification limits |
+| Organizational process or approval state | Responsible authority's policy, decision, or approval record, qualified by date and scope |
+| External protocol, vendor, or regulatory requirement | The authoritative external source, with project consequences documented locally |
+
+This is a reasoning aid, not a rigid global precedence order.
+
+When sources conflict:
+
+1. determine the claim type and intended authority;
+2. inspect enough evidence to distinguish stale prose, an implementation bug, environment drift, an obsolete decision, or unresolved intent;
+3. update only the authority or summary that is actually stale;
+4. do not rewrite intended design to normalize an implementation bug;
+5. do not preserve stale prose when executable authority clearly controls the claim;
+6. keep unresolved work in the task or investigation surface. Mark `Needs validation` in canonical docs only when the uncertainty itself is durable and readers would otherwise be misled.
+
+A local copy of an external source can still be authoritative for the external claim it records; local storage alone does not make it canonical project authority.
+
+Use this distillation path:
+
+```text
+evidence -> understanding -> settled conclusion -> canonical authority
+```
+
+Persist conclusions and useful rationale, not raw investigation history. Preserve evidence separately when future decisions may need to reassess it.
+
+## Writing and Maintenance
+
+- Prefer rewriting stale sections over appending updates.
+- Preserve current understanding rather than session chronology.
+- Improve an existing canonical surface before creating a new page.
+- Give each document one coherent durable scope.
+- Keep the first screen short and useful.
+- Put conclusions and invariants before supporting detail.
+- Keep README material orientation-focused and agent guidance behavior-focused.
+- Link to canonical detail instead of duplicating it.
+- Use stable implementation references when they reduce rediscovery without making prose brittle.
+- Do not copy task summaries into docs.
+- Do not write uncertainty as established fact.
+- Do not let source material, backlog notes, or archive content silently become current truth.
+- Do not include secrets, passwords, tokens, private keys, live credentials, or sensitive source content that does not belong in project documentation.
+- Do not turn a routine sync into an audit of unrelated areas.
+
+Keep useful outputs reachable through existing entry points; update directly affected indexes and links when authorized. Add a guidance pointer only when it provides a missing durable entry point or trigger, not for every document. When a canonical document is renamed, moved, split, merged, or materially rescoped, update directly affected indexes and links in the same change.
+
+### Markdown Conventions
+
+Follow the established convention inside the resolved documentation surface when one exists.
+
+Otherwise, canonical Markdown docs created or materially maintained by this skill use:
+
+```markdown
+---
+title: [Doc Title]
+description: [One sentence defining the document's canonical knowledge boundary.]
+updated: YYYY-MM-DD
+---
+```
+
+Change `updated` only when durable meaning changes.
+
+Use this shape when it helps:
+
+```markdown
+# [Doc Title]
+
+## Read First
+
+- Current fact, decision, or invariant.
+
+## Scope
+
+What belongs here.
+
+## Not Here
+
+What belongs elsewhere.
+
+## Current Contract
+
+Stable behavior, interfaces, workflows, schemas, commands, or rules.
+
+## Related Surfaces
+
+| Surface | Path / System | Why It Matters |
+| --- | --- | --- |
+
+## Decisions
+
+| Date | Decision | Rationale |
+| --- | --- | --- |
+```
+
+Small documents should omit sections that do not help. Use a compact diagram only when it clarifies structure better than prose.
+
+## Sync Workflow
+
+Use this workflow at the authorized maintenance boundary to evaluate changed
+understanding or behavior. The trigger authorizes the review, not a mandatory write.
+
+1. **Resolve ownership.** Identify the configured docs surface and any explicitly owned README or guidance target. Inspect relevant existing docs, task context, and authority surfaces.
+2. **Evaluate admission.** Determine what settled project understanding or durable behavior should survive. It is valid to select nothing.
+3. **Resolve authority.** Investigate material conflicts rather than silently choosing the most convenient source.
+4. **Route.** Put explanatory project meaning in docs or an owned README, concise stable behavior in owned guidance, current state in tasks, evidence in its source workflow, and machine-defined claims in executable authorities.
+5. **Integrate.** Choose the appropriate existing canonical document autonomously when clear. Rewrite affected sections and create a new page only when it deserves an independent durable scope.
+6. **Repair.** Update directly affected indexes and links without expanding into an unrelated audit.
+7. **Verify and report.** Check the changed surfaces and affected links proportionately. Report material changes, rerouting, unresolved uncertainty, or a valid no-op, plus every exact resolved path mutated.
+
+Within that review, integrate only settled, material results directly related to
+the request. If the human reserved syncing for wrap-up, wait for that trigger;
+do not interrupt execution with automatic docs maintenance.
+
+A sync is complete when durable meaning is clear in its canonical home, transient state was excluded, authority conflicts were resolved or honestly preserved, and no stale directly affected guidance competes with the result.
+
+## Scoped Audit or Cleanup
+
+Use a broader `verify`, `trim`, migration, or documentation health pass only when explicitly requested.
+
+Within the requested scope:
+
+- compare docs, owned README/guidance, executable authorities, tasks, and supporting evidence as relevant;
+- find stale claims, broken assumptions, duplicate authority, obsolete guidance, broken links, and orphan pages;
+- choose one canonical authority for each durable claim;
+- replace duplication with pointers or concise behavioral consequences;
+- remove historical residue after preserving any lesson that still matters;
+- check conventions, frontmatter, indexes, and links;
+- preserve useful current understanding while reducing maintenance burden;
+- mark durable unresolved uncertainty as `Needs validation`.
+
+Do not broaden a routine sync into this audit without authorization.
+
+## Final Test
+
+A good documentation update leaves future participants with the settled project meaning and stable behavior they need, in the owned canonical surfaces, without copying active task state or manufacturing documentation. The result identifies the right authority for each claim, replaces stale material, preserves intended design when implementation is wrong, and reports either the exact changed paths or an honest no-change outcome.

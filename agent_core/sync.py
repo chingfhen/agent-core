@@ -32,7 +32,7 @@ CLAUDE_SKILL_BASE = Path(".claude/skills")
 PI_BASES = {"agents": Path(".pi/agent/agents"), "prompts": Path(".pi/agent/prompts")}
 LEGACY_PI_BASES = {"agents": Path(".agents/agents"), "prompts": Path(".agents/prompts")}
 RETIRED_PI_RESOURCES = {"prompts": {"commit-with-subagent"}}
-PYTHON_SKILL_REPLACEMENT = "manage-python-env"
+PYTHON_SKILL_REPLACEMENT = "run-and-manage-python"
 RETIRED_PYTHON_SKILLS = ("manage-python-agent-envs", "manage-python-uv")
 LEGACY_GUIDANCE_DESTINATIONS = {
     "pi": Path(".pi/agent/AGENTS.md"),

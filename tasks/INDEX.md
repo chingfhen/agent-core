@@ -2,6 +2,7 @@
 
 ## Now
 
+- [Clarify Selected Skill Names](2026-11/skill-naming/2026-11-11__clarify-skill-names.md) — Blocked · Skill naming. [Draft PR #6](https://github.com/chingfhen/agent-core/pull/6) has renamed sources; finish reference/behavior checks and resolve the historical-task link failure within task-write permissions.
 - [Refine Workflow Discovery and Handoff](2026-11/workflow-continuity/2026-11-08__refine-discovery-and-handoff.md) — Blocked · Workflow continuity. Candidate implemented and published on `refine/workflow-continuity`; next: independent human comparison with main and review direction. No merge or harness installation yet.
 - [Synchronize Pi and OpenCode Shortcuts](2026-10/2026-10-28__synchronize-pi-opencode-shortcuts.md) — Active. Next action: test the trial model picker and agent-cycle bindings, F2/F3 and thinking visibility.
 - [Autonomous Task Lifecycle for project-tasks](2026-11/project-tasks-autonomy/2026-11-02__autonomous-task-lifecycle.md) — Active. Human-triggered maintenance is merged; clarify whether the original broader autonomy remains wanted or the task is superseded.

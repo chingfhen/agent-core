@@ -28,7 +28,7 @@ The burden of proof is on a *new* skill, not on keeping the old skill untouched.
 
 ## Naming and invocation
 
-Choose a short, literal, memorable name that suggests an action or outcome: `learning`, `project-tasks`, `human-unblock`.
+Choose a literal, memorable name that makes the job and relevant scope clear to a human deciding when to use it. Prefer explicit, plain-language wording over brevity or an internal implementation detail; keep the name as concise as that clarity permits. For example, a technical design comparison should say both that it is technical and that it compares options. Keep useful familiar shorthand as an invocation cue when appropriate, rather than requiring it in the name.
 
 Avoid internal implementation terminology that the human would never naturally reach for. A name is a user interface, not just a directory.
 
@@ -48,15 +48,15 @@ actual discovery/loading separately from permission to perform the workflow.
 Use **one skill per job**. Similar *steps* do not imply duplicate skills when outcomes differ.
 
 Keep these boundaries clear:
-- `design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
+- `tech-design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
 - `code-design`: shape or review a bounded code structure when requested; ordinary execution does not require it.
-- `project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
-- `project-docs`: maintain settled project truth.
-- `knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
-- `agent-lessons`: improve future behavior; keep concise guards/pointers in guidance and use docs/KB for supporting detail.
+- `manage-project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
+- `maintain-project-docs`: maintain settled project truth.
+- `maintain-knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
+- `improve-agent-workflows`: improve future behavior; keep concise guards/pointers in guidance and use docs/KB for supporting detail.
 - `learning`: develop human understanding from mechanisms, examples, and judgment; no automatic KB persistence or code changes.
-- `approval-gate`: support a consequential approval.
-- `human-unblock`: clear a human-owned obstacle during execution.
+- `review-before-approval`: support a consequential approval.
+- `resolve-human-blockers`: clear a human-owned obstacle during execution.
 
 Docs and KB remain standalone. Tasks may coordinate their use and lessons review
 for a requested handoff/closeout; lessons may use their owning workflows for detail.
@@ -105,9 +105,35 @@ A skill can be **retained but uninstalled** when it is useful rarely. Don't dele
 - `personal-skills.toml` is the **authoritative personal installation list**. Only its declared skills are published by `agent-core sync`; merely placing a folder in `skills/` does not install it.
 - `archive/skills/` holds historical, superseded content, not active invocation targets.
 
-Use these statuses in the catalogue: **Active (installed)**, **Dormant (retained, not installed)**, **Archived (historical)**.
+Use these statuses in the catalogue: **Selected in the manifest**, **Retained but not selected**, and **Archived (historical)**. Selection alone does not establish installation or current harness availability.
 
 The manifest reflects skills the human actively uses **or deliberately wants available to their agents**. Occasional skills may remain dormant. Do not infer manifest membership automatically.
+
+### Skill naming migration
+
+The following source names were renamed for human clarity. In older guidance or
+task history, interpret the former name as a historical reference; use the new
+name for the current canonical skill. `commit-changes` is the general commit
+workflow, not a requirement to delegate to a subagent.
+
+| Former name | Current source name |
+| --- | --- |
+| `design-options` | `tech-design-options` |
+| `agent-lessons` | `improve-agent-workflows` |
+| `human-unblock` | `resolve-human-blockers` |
+| `mermaid-markdown` | `create-markdown-diagrams` |
+| `project-tasks` | `manage-project-tasks` |
+| `project-docs` | `maintain-project-docs` |
+| `knowledge-base` | `maintain-knowledge-base` |
+| `git-workflow` | `git-branch-to-review` |
+| `readability` | `improve-readability` |
+| `approval-gate` | `review-before-approval` |
+| `manage-python-env` | `run-and-manage-python` |
+| `commit-with-subagent` | `commit-changes` |
+
+This maps canonical source identities, not installed state. A normal sync does
+not remove installed copies merely because their old names left the manifest;
+old and new workflows may coexist until an explicitly supported retirement.
 
 Removing a manifest entry does **not** automatically uninstall an already published copy: current sync is non-destructive for removed entries. Do not promise that a removed skill disappears locally without explicit retirement or clean-up.
 
