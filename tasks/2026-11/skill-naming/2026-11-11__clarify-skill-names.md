@@ -3,15 +3,15 @@
 **Created:** 2026-11-11
 **Last Updated:** 2026-11-11
 **Priority:** Now
-**Status:** Blocked — review-ready validation incomplete
+**Status:** Closed — Completed with accepted validation limitation
 
 **Goal:** Apply the human-approved names consistently to canonical skills and direct consumers, while preserving cross-harness sync and ownership behavior.
 **Why:** Names should help a person understand when to use a skill without first learning agent-specific terminology.
-**Current State:** Managed branch `20261111-clarify-skill-names` is published as [draft PR #6](https://github.com/chingfhen/agent-core/pull/6), targeting `main`. Approved source directories have been renamed, Python sync's replacement selector updated, and a source-name mapping added to the skill guide; cross-reference reconciliation and behavioral validation remain incomplete. The human approved and the agent merged newer `main` (`e34939f`) into this branch; this did not merge the branch into `main`. GitHub CLI is installed and authenticated. An initial push was rejected; a command-scoped authenticated GitHub CLI credential helper succeeded without changing global Git configuration. The existing in-repository `.agent-envs/verification` environment's Python 3.10.18 interpreter was verified; its recipe is excluded locally and not backed up in Git. The full suite ran 131 tests with one failure and one skip: a broken link in the separate historical `tasks/2026-10/2026-10-29__skill-owned-agents-sections.md`. The human requested docs mapping instead of approving that task edit. A subsequent focused run passed 12 Python retirement tests, including a new check that the immediate predecessor is preserved by default.
-**Next Action:** Finish the reference and behavior audit, resolve the historical-link failure without exceeding task-write permissions, and rerun relevant validation. Update PR #6 for review; do not merge without separate approval. Close only after the requested work and verification are complete.
-**Blockers:** The old link in an unrelated historical task remains broken and causes the workspace contract check to fail. Do not change that task without explicit authorization. Review delivery and full verification remain outstanding.
+**Current State:** Approved source names and documentation were merged into `main` via [PR #6](https://github.com/chingfhen/agent-core/pull/6). The newer Git-workflow changes were preserved. The human accepted the broken historical-task link and requested merge. The existing in-repository `.agent-envs/verification` environment's Python 3.10.18 interpreter was verified; its recipe is excluded locally and not backed up in Git. The reconciled suite had one accepted failure and one skip; focused Python retirement tests passed. Harness installation and old-copy retirement were not performed.
+**Next Action:** None for this task. Harness publication and installed-copy retirement remain separately authorized operations.
+**Blockers:** None for the human-accepted source delivery. The old link in an unrelated historical task remains broken; do not change that task without explicit authorization.
 
-**Reconciliation update:** On the human's request to reconcile and merge, `origin/main` at `2cc72f3` was merged into the review branch; conflicts were resolved by preserving its newer Git/worktree lifecycle behavior under the renamed skill. The workspace contract check was rerun after resolution and still failed on the unchanged historical task link. The PR remains a draft until the failure and remaining verification are resolved; integration into `main` has not occurred.
+**Outcome:** PR #6 was merged into `main` as `c0c368b623cb120fcc94423ee06f166b5a6dc9cd` after preserving the newer Git/worktree lifecycle behavior. The human accepted the unchanged historical-link failure for this source delivery. On the reconciled head the suite ran 132 tests with one failure (that historical link) and one skip. Source names are not proof of harness installation, and removed manifest names do not uninstall old copies.
 
 ## Approved scope
 
