@@ -11,6 +11,8 @@
 **Next Action:** Finish the reference and behavior audit, resolve the historical-link failure without exceeding task-write permissions, and rerun relevant validation. Update PR #6 for review; do not merge without separate approval. Close only after the requested work and verification are complete.
 **Blockers:** The old link in an unrelated historical task remains broken and causes the workspace contract check to fail. Do not change that task without explicit authorization. Review delivery and full verification remain outstanding.
 
+**Reconciliation update:** On the human's request to reconcile and merge, `origin/main` at `2cc72f3` was merged into the review branch; conflicts were resolved by preserving its newer Git/worktree lifecycle behavior under the renamed skill. The workspace contract check was rerun after resolution and still failed on the unchanged historical task link. The PR remains a draft until the failure and remaining verification are resolved; integration into `main` has not occurred.
+
 ## Approved scope
 
 The human explicitly requested the `git-workflow` managed branch, approved production skill renames, direct references, docs sync, and task closeout. Normal branch push/PR review is authorized; merge remains separately gated. Standard guarded post-merge branch cleanup applies unless the human opts out. Do not publish to a harness or remove installed copies without separate scope.
