@@ -123,7 +123,7 @@ Successful output is intentionally brief. For example:
 ```text
 agent-core sync: OK (abcdef012345)
 Harness: pi
-Skills (13): project-tasks, project-docs, ..., commit-with-subagent
+Skills (13): manage-project-tasks, maintain-project-docs, ..., commit-changes
 Agents (1): commit-agent
 Prompts (0): none
 Migrated legacy entries: 14
@@ -177,8 +177,8 @@ The file intentionally contains only one string array:
 
 ```toml
 skills = [
-    "project-tasks",
-    "project-docs",
+    "manage-project-tasks",
+    "maintain-project-docs",
     "tech-design-options",
     "<skill-name>",
 ]

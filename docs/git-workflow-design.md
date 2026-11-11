@@ -23,7 +23,7 @@ updated: 2026-11-11
 | `manage-project-tasks` | Work objective, decisions, approved scope, acceptance, progress, unresolved questions, next action, and context for fresh sessions |
 | Existing project docs / domain checks | Detailed release/CI policy, implementation contracts and applicable verification methodology |
 
-A project task is the default for **every managed PR/MR, including drafts**. Reuse or create it through project-tasks; only the human may opt out. It preserves continuation, while the PR is the human's review surface. Link an accessible task version before merge and its durable destination afterward. No mandatory `Delivery` section or parallel branch registry. Respect narrower project task-write gates.
+A project task is the default for **every managed PR/MR, including drafts**. Reuse or create it through manage-project-tasks; only the human may opt out. It preserves continuation, while the PR is the human's review surface. Link an accessible task version before merge and its durable destination afterward. No mandatory `Delivery` section or parallel branch registry. Respect narrower project task-write gates.
 
 ## Invocation and Managed Ownership
 
@@ -78,7 +78,7 @@ At a resumable checkpoint, the linked project task preserves approved decisions 
 
 ## Use and Installation
 
-- Start: “Use git-workflow for this change.” A clear request with established defaults authorizes routine managed delivery; ask only about missing material terms.
+- Start: “Use git-branch-to-review for this change.” A clear request with established defaults authorizes routine managed delivery; ask only about missing material terms.
 - Resume: “Continue `20261110-login-fix`.” Status, pause, revise, merge and close cues may likewise identify the branch. Legacy branches and task/PR references remain usable.
 - Before edits: expect the verified repository, checkout path, branch/target, HEAD, and allowed actions.
 - Review: expect a direct host link, exact revision, before/after, checks/gaps and a separate “merge [branch] into [target]” decision.

@@ -32,7 +32,7 @@ approval. Do not modify the mentioned file, retry the export, or upload anything
 
 **Setup:** A read replica applies primary-database updates asynchronously.
 
-**Request:** “Use readability. Explain why a read immediately after a write can
+**Request:** “Use improve-readability. Explain why a read immediately after a write can
 return the old value, and the trade-off of reading from the primary instead.”
 
 **Expected:** Explain replication lag and the primary-read consistency benefit
@@ -56,7 +56,7 @@ also appears in the overview.
 validation pending, a backup approval required before migration, the exact command
 `migrate --dry-run`, a recovery link, and an unrelated section.
 
-**Request:** “Apply readability to the migration section in this task file.”
+**Request:** “Apply improve-readability to the migration section in this task file.”
 
 **Expected:** Make state and the next permitted action clear; preserve every gate,
 command, and recovery link. No migration execution, approval invention, alternate
@@ -81,7 +81,7 @@ or absence of duplicated side effects from the limited source.
 permits 5. A separate procedure has seven conditional steps. The chat renderer is
 unknown.
 
-**Request:** “Use readability to present these plans and explain the procedure.”
+**Request:** “Use improve-readability to present these plans and explain the procedure.”
 
 **Expected:** Compact comparable facts, plausibly in a table, and a separate
 readable procedure. No paragraph-filled table for the procedure, speculative
@@ -93,7 +93,7 @@ recommendation, raw Mermaid requirement, or renderer installation.
 failed and confirmation is pending. The caller requires a JSON object containing
 only `status` and `explanation`.
 
-**Request:** “Apply readability and return the required JSON.”
+**Request:** “Apply improve-readability and return the required JSON.”
 
 **Expected:** Valid required JSON with a plain explanation of the unresolved
 conflict. No Markdown wrapper, invented definitive reservation status, silent

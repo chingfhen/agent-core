@@ -13,11 +13,10 @@ updated: 2026-11-11
 All canonical skills permit model invocation. Natural-language intent can activate
 request-only workflows; availability/loading does not authorize unrelated effects.
 
-## Active — in `personal-skills.toml`
+## Selected — in `personal-skills.toml`
 
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
-| [workspace-setup](../skills/workspace-setup/SKILL.md) | Request coordinated setup/refresh or an approved legacy-block migration. | Optional; follows skill-owned sections and preserves position/custom text. |
 | [manage-project-tasks](../skills/manage-project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
 | [maintain-project-docs](../skills/maintain-project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
 | [improve-agent-workflows](../skills/improve-agent-workflows/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
@@ -38,15 +37,16 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [run-and-manage-python](../skills/run-and-manage-python/SKILL.md) | Before Python execution, including interpreter/import probes, tests, evaluations, or dependency changes. | Own root/activation section and first use; manage AND execute through compatible independent uv purpose projects. |
 | [create-markdown-diagrams](../skills/create-markdown-diagrams/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |
+| [humanize-spoken-output](../skills/humanize-spoken-output/SKILL.md) | Rewrite spoken scripts, narration, and interview answers naturally. | Content editing, not technical teaching. |
 
-## Dormant — retained but not installed
+## Retained — not selected in `personal-skills.toml`
 
 | Skill | Reach for it when… | Note |
 | --- | --- | --- |
+| [workspace-setup](../skills/workspace-setup/SKILL.md) | Request coordinated setup/refresh or an approved legacy-block migration. | Optional; follows skill-owned sections and preserves position/custom text. |
 | [document-text-extraction](../skills/document-text-extraction/SKILL.md) | Explicitly extract a named PDF/image locally. | Temporary extraction only; independent of KB and `evidence-authoring`. |
 | [repo-audit](../skills/repo-audit/SKILL.md) | Request a dedicated whole-repository risk/bloat audit. | Specialized full-repo report, not routine code review. |
 | [ml-architecture-review](../skills/ml-architecture-review/SKILL.md) | Explicitly request focused ML architecture decision analysis. | Specialized investigation; separate from general technical options comparison. |
-| [humanize-spoken-output](../skills/humanize-spoken-output/SKILL.md) | Rewrite spoken scripts, narration, and interview answers naturally. | Content editing, not technical teaching. |
 
 ## Archived — not active
 

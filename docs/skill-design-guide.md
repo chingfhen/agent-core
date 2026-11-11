@@ -105,7 +105,7 @@ A skill can be **retained but uninstalled** when it is useful rarely. Don't dele
 - `personal-skills.toml` is the **authoritative personal installation list**. Only its declared skills are published by `agent-core sync`; merely placing a folder in `skills/` does not install it.
 - `archive/skills/` holds historical, superseded content, not active invocation targets.
 
-Use these statuses in the catalogue: **Active (installed)**, **Dormant (retained, not installed)**, **Archived (historical)**.
+Use these statuses in the catalogue: **Selected in the manifest**, **Retained but not selected**, and **Archived (historical)**. Selection alone does not establish installation or current harness availability.
 
 The manifest reflects skills the human actively uses **or deliberately wants available to their agents**. Occasional skills may remain dormant. Do not infer manifest membership automatically.
 

@@ -125,6 +125,19 @@ class PythonSkillRetirementTests(unittest.TestCase):
         self.publish("pi")
         self.assertTrue(self.target("pi", sync.RETIRED_PYTHON_SKILLS[0]).is_dir())
 
+    def test_previous_python_skill_name_is_not_pruned_by_rename(self):
+        previous_name = "manage-python-env"
+        write_skill(self.checkout, previous_name, "previous Python workflow")
+        write_config(self.checkout, [previous_name, *sync.RETIRED_PYTHON_SKILLS])
+        commit_all(self.checkout, "publish previous Python skill")
+        self.publish("pi")
+        self.replace_manifest()
+        self.publish("pi")
+        self.assertTrue(self.target("pi", previous_name).is_dir())
+        self.assertTrue(self.target("pi", sync.PYTHON_SKILL_REPLACEMENT).is_dir())
+        for old in sync.RETIRED_PYTHON_SKILLS:
+            self.assertFalse(self.target("pi", old).exists())
+
     def test_legacy_owned_predecessors_retired_by_pi_only(self):
         self.publish("pi")
         state_path = sync.global_state_path(self.home)

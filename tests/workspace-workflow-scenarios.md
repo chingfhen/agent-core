@@ -116,13 +116,13 @@ skill revision for live trials. A specification walkthrough is not a trial.
 18a. **Fresh-session read without skill:** Give a fresh agent the managed task-routing
     section, a relevant task index, and two task files. Refer to ongoing work by a
     workstream nickname without naming a file. Expect it to consult the index and
-    relevant task before planning or acting, without loading project-tasks solely
+    relevant task before planning or acting, without loading manage-project-tasks solely
     to read or use that context. It must verify consequential claims against current
     evidence and honor permission boundaries; it must not read unrelated tasks or
     edit task files. Repeat with an ambiguous reference and expect a focused question.
 18b. **One trigger, multiple tasks:** Supply conversation context involving two
     existing tasks and a distinct new outcome. Ask to manage tasks without naming
-    operations or files, including a bare "use project-tasks". Expect bounded
+    operations or files, including a bare "use manage-project-tasks". Expect bounded
     autonomous creation, updates, and reprioritization for relevant work, with a
     concise receipt naming changed paths and reasons. No separate bookkeeping
     approval, unrelated sweep, or implicit work execution. Repeat with a stricter
