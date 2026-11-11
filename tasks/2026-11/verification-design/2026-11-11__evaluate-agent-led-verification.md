@@ -12,13 +12,13 @@
 
 **Deliverables:** An evidence-grounded, human-reviewable recommendation: chosen ownership model, activation and stop conditions, boundaries, a concrete Tripverge pilot, and success criteria. If the human subsequently approves implementation, record its exact authorized scope before editing production skills or consumer projects.
 
-**Success Bar:** The human can judge what the capability does beyond current engineering, who remains accountable, what causes it to run, what it may change, when it stops, and how a real feature would demonstrate its value. It is acceptable to recommend strengthening engineering instead of a new skill. A polished skill file alone is not the desired outcome.
+**Success Bar:** The human can judge what the capability adds beyond ordinary execution and current guidance, who remains accountable, what causes it to run, what it may change, when it stops, and how a real feature would demonstrate its value. A polished skill file alone is not the desired outcome.
 
-**Chosen Direction:** Unresolved. The previous agent recommended a focused `verification` skill connected to engineering; this is a proposal, not an approved design or implementation instruction.
+**Chosen Direction:** Unresolved. The previous agent proposed a focused `verification` skill connected to the former engineering workflow; this is not an approved design or implementation instruction.
 
-**Current State:** No verification skill, engineering integration, consumer guidance, runtime instrumentation, or pilot has been implemented by this work. Existing engineering already requires focused checks, important failure paths, reproduction before fixes, bounded diagnostics, and honest limitations. Tripverge's inspected docs describe intended behavior; no working application or browser-testing setup was established in this assessment.
+**Current State:** No verification skill, consumer guidance, runtime instrumentation, or pilot has been implemented by this work. The former engineering skill has been retired; its archived instructions are historical evidence, not current execution ownership. The main agent and applicable guidance remain responsible for ordinary delivery and verification. Tripverge's inspected docs describe intended behavior; no working application or browser-testing setup was established in this assessment.
 
-**Next Action:** In a human-started follow-up session, read the context below, inspect relevant current execution guidance and Tripverge evidence, and present/refine a bounded recommendation with the human. The engineering source is not selected in the personal manifest; use `design-options` only if the human requests a substantive comparison of technical approaches. Do not create the skill or begin the pilot without subsequent explicit approval.
+**Next Action:** In a human-started follow-up session, read the context below, inspect relevant current execution guidance and Tripverge evidence, and present/refine a bounded recommendation with the human. Use `design-options` only if the human requests a substantive comparison of technical approaches. Do not create the skill or begin the pilot without subsequent explicit approval.
 
 **Blockers:** None for discussion/read-only investigation. Implementation is gated on the human selecting and approving a direction; missing runtime capability must be established rather than assumed.
 
@@ -49,7 +49,7 @@ Observability is supporting infrastructure: logs, request traces, state inspecti
 
 ### Ownership hypothesis to challenge
 
-- `engineering` owns delivery and final completion. It cannot shed verification accountability because another skill was not loaded.
+- The main agent owns delivery and final completion under applicable guidance. It cannot shed verification accountability because another skill was not loaded.
 - A separate skill could own evidence planning and failure-discovery execution while using the same agent and existing tools.
 - Relevant verification should shape substantial runtime work early enough to avoid an untestable design, then continue through completion. Trivial changes retain lightweight checks.
 - Existing project tasks preserve real unfinished gaps; established project docs can hold settled run/inspection instructions under their own authorization. No new verification registry, mandatory report for every change, or competing task system.
@@ -59,7 +59,7 @@ Observability is supporting infrastructure: logs, request traces, state inspecti
 
 Resolve evidence first and ask one consequential question at a time; do not begin with a large questionnaire.
 
-1. Does the missing behavior require a distinct reusable skill, or a focused extension to engineering and project setup? Compare outcomes and triggers, not just overlapping steps.
+1. Does the missing behavior require a distinct reusable skill, or a focused change to execution guidance and project setup? Compare outcomes and triggers, not just overlapping steps.
 2. What is the smallest useful activation rule that gives initiative without running a broad audit for every edit? Does explicit invocation also support standalone investigation with no repair authority?
 3. What observation-enabling work falls inside feature implementation, and what requires a separately approved infrastructure or privacy decision?
 4. What counts as sufficient evidence for each relevant type of change? Distinguish static checks, unit/integration tests, browser behavior, real external hosts, and production-only claims.
@@ -107,7 +107,7 @@ At a natural checkpoint ask whether the human still had to lead discovery, wheth
 Read first:
 - [Agent Core guidance](../../../AGENTS.md) — canonical ownership and explicit edit/publication gates.
 - [Skill design guide](../../../docs/skill-design-guide.md) — burden of proof for a separate skill and standalone scope.
-- [Engineering](../../../skills/engineering/SKILL.md) — existing delivery, verification, debugging, and stop conditions; inspect current content rather than assuming it is unchanged.
+- [Former engineering skill](../../../archive/skills/2026-11-11__engineering-SKILL.md) — historical delivery and verification proposal evidence, not active guidance; inspect current execution guidance separately.
 - [Learning](../../../skills/learning/SKILL.md) and [teaching-revision audit](../learning-design/2026-11-11__strengthen-learning-teaching-method.md) — separate teaching responsibility and its actual implementation state.
 - [Git workflow task](../git-workflow/2026-11-08__design-implement-and-validate-git-workflow.md) — only if resolving the prior scoped exclusion or delivery ownership.
 

@@ -14,7 +14,7 @@ disable-model-invocation: false
 
 Manage the approved branch, task and review request as one coherent delivery. The
 PR/MR is the human's review surface; the project task is continuation memory. Use
-engineering or the relevant domain workflow for implementation and checks. One
+ordinary authorized execution or the relevant domain workflow for implementation and checks. One
 branch normally serves one coherent change; no branch registry or per-commit tags.
 
 ## Entry and authority
@@ -120,7 +120,7 @@ Implement and verify within the approved scope. Before editing, committing,
 pushing or merging, recheck the affected live Git state against the agreement.
 Stage only scoped paths/hunks; inspect the staged diff and preserve unrelated
 staged changes. Use coherent checkpoints, not empty or ceremonial commits.
-Engineering's local commit counts as a checkpoint here, not a second required
+A local commit counts as a checkpoint here, not a second required
 commit; the approved Git boundary governs managed work. Use commit delegation
 only when requested/permitted and available, never as a dependency of this skill.
 Routine commits authorized by a managed-work request do not by themselves invoke

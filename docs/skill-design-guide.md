@@ -49,7 +49,7 @@ Use **one skill per job**. Similar *steps* do not imply duplicate skills when ou
 
 Keep these boundaries clear:
 - `design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
-- `engineering`: implement approved work.
+- `code-design`: shape or review a bounded code structure when requested; ordinary execution does not require it.
 - `project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
 - `project-docs`: maintain settled project truth.
 - `knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
