@@ -1,6 +1,6 @@
 ---
-name: design-options
-description: Compare genuinely different technical solution designs for a consequential, unresolved software or product-system decision and recommend a leading approach. Use when the human requests that comparison, exploration, or challenge, or explicitly invokes design-options; not for routine planning, implementation, or already-settled decisions.
+name: tech-design-options
+description: Compare genuinely different technical solution designs for a consequential, unresolved software or product-system decision and recommend a leading approach. Use when the human requests that comparison, exploration, or challenge, or explicitly invokes tech-design-options; not for routine planning, implementation, or already-settled decisions.
 disable-model-invocation: false
 ---
 

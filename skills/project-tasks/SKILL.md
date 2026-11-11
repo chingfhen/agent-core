@@ -33,7 +33,7 @@ a task does not require code, a repository, or automated tests.
 
 This skill owns the *memory of the work* and its handoff, not the work's implementation method.
 Ordinary decision work shapes substantial work when plan review is required;
-`design-options` can compare technical approaches when the human requests it.
+`tech-design-options` can compare technical approaches when the human requests it.
 Execution workflows perform and verify the work; `project-docs` owns
 settled project understanding. Code, tests, schemas, and observed behavior
 remain authoritative for their respective implementation claims. Do not create

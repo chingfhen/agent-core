@@ -23,7 +23,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [agent-lessons](../skills/agent-lessons/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
 | [project-scripts](../skills/project-scripts/SKILL.md) | Explicitly review recent work for worthwhile personal scripts; create, repair, consolidate, or retire them. | Request-only personal script stewardship in one configured Project Scripts Root; not automatically part of engineering or handoffs. |
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
-| [design-options](../skills/design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |
+| [tech-design-options](../skills/tech-design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |
 | [code-design](../skills/code-design/SKILL.md) | Design or review a bounded code area's ownership, interfaces, and changeability. | Request-led structural judgment; ordinary implementation and prose editing do not activate it. Source/manifest inclusion does not establish installation. |
 | [git-workflow](../skills/git-workflow/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
@@ -54,7 +54,7 @@ Historical sources live in `archive/skills/`, named by retirement date:
 
 - Superseded by KB: `evidence-authoring`.
 - Covered by project-tasks and ordinary decision work: `execution-readiness`, `execution-topology`.
-- Replaced by `design-options` on 2026-11-11: [planning](../archive/skills/2026-11-11__planning-SKILL.md) (the replacement has a narrower job).
+- Replaced by `tech-design-options` on 2026-11-11: [planning](../archive/skills/2026-11-11__planning-SKILL.md) (the replacement has a narrower job).
 - Replaced by `code-design` on 2026-11-11: [engineering](../archive/skills/2026-11-11__engineering-SKILL.md) (ordinary execution remains with the main agent; the replacement has a narrower job).
 - Covered by `yagni`: `yagni-review`.
 - Earlier technical teaching line, now consolidated into `learning`: `quick-orientation`, `human-technical-orientation`, `technical-coach`, `debrief` (via `explain-tech`).

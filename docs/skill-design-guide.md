@@ -28,7 +28,7 @@ The burden of proof is on a *new* skill, not on keeping the old skill untouched.
 
 ## Naming and invocation
 
-Choose a short, literal, memorable name that suggests an action or outcome: `learning`, `project-tasks`, `human-unblock`.
+Choose a literal, memorable name that makes the job and relevant scope clear to a human deciding when to use it. Prefer explicit, plain-language wording over brevity or an internal implementation detail; keep the name as concise as that clarity permits. For example, a technical design comparison should say both that it is technical and that it compares options. Keep useful familiar shorthand as an invocation cue when appropriate, rather than requiring it in the name.
 
 Avoid internal implementation terminology that the human would never naturally reach for. A name is a user interface, not just a directory.
 
@@ -48,7 +48,7 @@ actual discovery/loading separately from permission to perform the workflow.
 Use **one skill per job**. Similar *steps* do not imply duplicate skills when outcomes differ.
 
 Keep these boundaries clear:
-- `design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
+- `tech-design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
 - `code-design`: shape or review a bounded code structure when requested; ordinary execution does not require it.
 - `project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
 - `project-docs`: maintain settled project truth.

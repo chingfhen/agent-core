@@ -179,7 +179,7 @@ The file intentionally contains only one string array:
 skills = [
     "project-tasks",
     "project-docs",
-    "design-options",
+    "tech-design-options",
     "<skill-name>",
 ]
 ```
