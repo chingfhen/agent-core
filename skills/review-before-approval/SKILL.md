@@ -1,5 +1,5 @@
 ---
-name: approval-gate
+name: review-before-approval
 description: >
   Provide a concise, neutral approval check before consequential work.
   Use when the user asks for an approval check/review, or before taking a

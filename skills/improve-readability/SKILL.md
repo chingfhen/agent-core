@@ -1,5 +1,5 @@
 ---
-name: readability
+name: improve-readability
 description: >
   Improve human readability for readability-focused requests: rewrite a hard-to-read
   response or document, review its readability, or make a new answer or artifact

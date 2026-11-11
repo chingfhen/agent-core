@@ -114,7 +114,7 @@ Sources: [Cloud PR API](https://developer.atlassian.com/cloud/bitbucket/rest/api
 
 Report exactly what is available: local Git, remote Git, host read access, host
 write/readiness/merge access. Continue independently safe approved work. Ask for
-the smallest needed access/action through human-unblock when blocked; no token
+the smallest needed access/action through resolve-human-blockers when blocked; no token
 requests in chat, assumed provider parity, fake PR URL, or bypass. If creation
 times out, check whether it succeeded before retrying. Record documentation review,
 synthetic trials, and real provider operations separately in verification evidence.

@@ -55,8 +55,8 @@ Keep these boundaries clear:
 - `knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
 - `agent-lessons`: improve future behavior; keep concise guards/pointers in guidance and use docs/KB for supporting detail.
 - `learning`: develop human understanding from mechanisms, examples, and judgment; no automatic KB persistence or code changes.
-- `approval-gate`: support a consequential approval.
-- `human-unblock`: clear a human-owned obstacle during execution.
+- `review-before-approval`: support a consequential approval.
+- `resolve-human-blockers`: clear a human-owned obstacle during execution.
 
 Docs and KB remain standalone. Tasks may coordinate their use and lessons review
 for a requested handoff/closeout; lessons may use their owning workflows for detail.

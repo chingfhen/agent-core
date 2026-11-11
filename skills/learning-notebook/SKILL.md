@@ -106,7 +106,7 @@ result. Do not automatically archive, delete, migrate, or create a second index.
 ## Teach through the notebook
 
 Load `learning` to select the mental model, useful depth, causal explanation and
-judgment; use `readability` when dedicated writing review would help. Infer a
+judgment; use `improve-readability` when dedicated writing review would help. Infer a
 small coherent lesson from a clear request instead of demanding a syllabus.
 Ground changing product behavior in reliable current sources and relevant project
 evidence; cite useful sources in or near the lesson. Distinguish observed results

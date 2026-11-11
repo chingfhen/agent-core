@@ -7,9 +7,9 @@
 
 **Goal:** Apply the human-approved names consistently to canonical skills and direct consumers, while preserving cross-harness sync and ownership behavior.
 **Why:** Names should help a person understand when to use a skill without first learning agent-specific terminology.
-**Current State:** Managed branch `20261111-clarify-skill-names` from `main` at `e8f776d7b1034a6c5994a4148f0f338062c72163`. The naming criterion is recorded in `docs/skill-design-guide.md`; `tech-design-options` has been renamed in source with initial direct references, but the migration and other approved renames remain incomplete and unverified. GitHub CLI is unavailable; the human said they will enable it, but readiness has not been confirmed.
+**Current State:** Managed branch `20261111-clarify-skill-names` from `main` at `e8f776d7b1034a6c5994a4148f0f338062c72163`. The naming criterion and initial source renames for tech-design-options, diagrams, readability, approval, human blockers, and commits are underway; mappings and cross-references remain incomplete and unverified. GitHub CLI was installed with winget and authenticated as `chingfhen`.
 **Next Action:** Implement and validate the approved mappings below, including migration-specific contracts; then push and open a linked review request if host access is available. Do not merge without separate approval. Close only after the requested work and verification are complete.
-**Blockers:** Review-host tooling is unavailable in this session; the human will enable `gh`. Local implementation is not blocked by that alone.
+**Blockers:** None established for continuing local implementation; an approved Python environment root is needed before Python tests can run.
 
 ## Approved scope
 

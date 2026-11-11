@@ -28,15 +28,15 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [git-workflow](../skills/git-workflow/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
 | [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and manage-python-env for teaching and the shared personal environment. |
-| [human-unblock](../skills/human-unblock/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
-| [readability](../skills/readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
+| [resolve-human-blockers](../skills/resolve-human-blockers/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
+| [improve-readability](../skills/improve-readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
 | [reasoned-advocacy](../skills/reasoned-advocacy/SKILL.md) | Build or challenge a defensible position, evaluate counterarguments, or prepare for stakeholder questions. | Quick or Deep; reasoning and spoken defense, not implementation planning or automatic persistence. |
 | [blind-comparison](../skills/blind-comparison/SKILL.md) | Request an independent, anonymized comparison or ranking of alternatives. | Delegates to a reviewer; reports its ratings and limitations and may propose changes without silently implementing them. |
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
-| [approval-gate](../skills/approval-gate/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
-| [commit-with-subagent](../skills/commit-with-subagent/SKILL.md) | Explicitly create local commits, using the commit-agent specialist when available. | User-triggered only; direct fallback if unavailable unless specialist delegation was explicitly required; never pushes. |
+| [review-before-approval](../skills/review-before-approval/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
+| [commit-changes](../skills/commit-changes/SKILL.md) | Explicitly create a scoped local Git commit. | Preserves unrelated work and reviews the staged diff; never pushes automatically. |
 | [manage-python-env](../skills/manage-python-env/SKILL.md) | Before Python execution, including interpreter/import probes, tests, evaluations, or dependency changes. | Own root/activation section and first use; manage AND execute through compatible independent uv purpose projects. |
-| [mermaid-markdown](../skills/mermaid-markdown/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
+| [create-markdown-diagrams](../skills/create-markdown-diagrams/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |
 
 ## Dormant — retained but not installed
@@ -63,11 +63,11 @@ Historical sources live in `archive/skills/`, named by retirement date:
 
 ## Replaced writing prompt
 
-[readability](../skills/readability/SKILL.md) replaces `prompts/anti-mannered-prose.md`.
+[improve-readability](../skills/improve-readability/SKILL.md) replaces `prompts/anti-mannered-prose.md`.
 It includes the prompt's useful plain-language guidance and adds reader-focused
 ordering, explanation, presentation, and meaning-preservation checks. The original
 prompt is retained in [archive](../archive/prompts/2026-10-19__anti-mannered-prose.md),
-not maintained as a second active instruction. `learning` and `mermaid-markdown` remain independent specialist skills, not dependencies.
+not maintained as a second active instruction. `learning` and `create-markdown-diagrams` remain independent specialist skills, not dependencies.
 
 ## Before making another skill
 

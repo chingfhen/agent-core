@@ -1,5 +1,5 @@
 ---
-name: human-unblock
+name: resolve-human-blockers
 description: Use during execution when progress is blocked, or likely to stall, on an action or information only the human can provide—for example access approval, interactive authentication, an inaccessible system, a permission change, or a required decision. Help the human unblock the agent quickly; do not apply to ordinary solvable errors.
 ---
 

@@ -124,7 +124,7 @@ A local commit counts as a checkpoint here, not a second required
 commit; the approved Git boundary governs managed work. Use commit delegation
 only when requested/permitted and available, never as a dependency of this skill.
 Routine commits authorized by a managed-work request do not by themselves invoke
-`commit-with-subagent`; when the human explicitly asks to commit, honor that
+`commit-changes`; when the human explicitly asks to commit, honor that
 skill's trigger and fallback without inferring permission to spawn another agent.
 Before handing over for review or pause, account for all agent-created changes:
 publish the scoped, verified work and task state when authorized, or report exactly
