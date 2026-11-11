@@ -2,7 +2,7 @@
 name: git-branch-to-review
 description: >
   Manage explicitly requested Git branch-to-review delivery end to end. Start a new
-  managed branch only when the human invokes or asks to use git-workflow. Use for
+  managed branch only when the human invokes or asks to use git-branch-to-review. Use for
   continuation, maintenance, status, or merge of a known managed branch, its PR/MR,
   or linked project task. Branch/date references cue discovery, not ownership or write
   permission. Generic engineering does not start this workflow; merge requires a
@@ -19,7 +19,7 @@ branch normally serves one coherent change; no branch registry or per-commit tag
 
 ## Entry and authority
 
-- **New work:** Only explicit human invocation or a request to use `git-workflow`
+- **New work:** Only explicit human invocation or a request to use `git-branch-to-review`
   starts a new managed branch. A clear request for identified work and repository,
   with applicable defaults and permissions established, authorizes the normal
   package below—including narrowly scoped post-merge task bookkeeping and safe
@@ -60,7 +60,7 @@ Follow the user's entry point:
 
 | Reference | First action |
 | --- | --- |
-| Task or workstream | Read configured task/index and matching task first; use project-tasks for execution/authorized maintenance. Follow its managed branch/PR reference here. |
+| Task or workstream | Read configured task/index and matching task first; use manage-project-tasks for execution/authorized maintenance. Follow its managed branch/PR reference here. |
 | Exact PR/MR | Retrieve that request in the identified repository first; then read linked task context needed for scope and continuation. |
 | Exact branch | Resolve repository and exact local/remote ref, then its matching PR/MR and approval record. |
 | Imprecise change | Bounded search of relevant tasks and open PRs/MRs by known project/terms; on miss inspect remote branches then accessible local refs. |
@@ -80,7 +80,7 @@ commands or handling divergence, dirty trees, and worktrees.
 ## 2. Agree scope once
 
 Resolve the following as one compact agreement, without a rigid form. A direct,
-clear `use git-workflow for [work]` request accepts the normal package when its
+clear `use git-branch-to-review for [work]` request accepts the normal package when its
 repository, objective, target, permissions and material effects are established;
 do not demand a redundant approval. When they are not established, propose the
 missing terms and wait. External-branch adoption still needs explicit approval.
@@ -92,7 +92,7 @@ and make its opt-out clear; do not hide deletion in a generic delivery label.
 - Maximum delivery: local edits/commits, push destination, draft PR/MR creation
   and maintenance, and marking ready when required pre-review checks pass.
 - Continuity: create or maintain the matching project task and index through
-  project-tasks, including post-merge bookkeeping, within applicable write gates.
+  manage-project-tasks, including post-merge bookkeeping, within applicable write gates.
 - Cleanup: after an approved and verified merge, safely delete the exact managed
   remote and local branches under the conditions below; the explicit, clear skill
   invocation accepts this standard term unless the human or policy narrows it.
@@ -130,13 +130,13 @@ commit; the approved Git boundary governs managed work. Use commit delegation
 only when requested/permitted and available, never as a dependency of this skill.
 Routine commits authorized by a managed-work request do not by themselves invoke
 `commit-changes`; when the human explicitly asks to commit, honor that
-skill's trigger and fallback without inferring permission to spawn another agent.
+skill's trigger without inferring permission to spawn another agent.
 Before handing over for review or pause, account for all agent-created changes:
 publish the scoped, verified work and task state when authorized, or report exactly
 what remains local, why and how to resume. Never label a dirty or unpushed state
 clean. Preserve pre-existing or ambiguous work; do not reset, stash, discard or
 include it merely to make the checkout clean. A missing optional commit helper must
-not by itself strand authorized work: follow the commit skill's available fallback,
+not by itself strand authorized work: follow the commit skill's scoped instructions,
 without inventing an agent or exceeding delegation permissions.
 
 ## 4. Task, checkpoint and publish
@@ -150,7 +150,7 @@ host capabilities. Draft means unfinished, not private or free of CI effects.
 Every managed PR/MR, including a draft, must link an existing or new project task,
 unless the human explicitly says no task is needed. If the agent thinks a
 task unnecessary, ask before opting out. Reuse a matching task; otherwise load
-project-tasks and create one in the confirmed project task surface. The approved
+manage-project-tasks and create one in the confirmed project task surface. The approved
 package includes its task/index maintenance when local rules permit; stricter opt-in
 rules prevail. If the destination, permission, or accessible reference is missing,
 ask or report the blocker before creating the PR/MR; do not invent a task root or

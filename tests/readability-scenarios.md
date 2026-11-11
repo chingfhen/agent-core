@@ -1,6 +1,6 @@
 # Readability behavioral scenarios
 
-Manual acceptance cases for [readability](../skills/readability/SKILL.md).
+Manual acceptance cases for [improve-readability](../skills/improve-readability/SKILL.md).
 These are not automated tests or evidence of reliable behavior across models.
 For a trial, supply the setup and request, load the skill, and compare the output
 and tool trace with the expectations. Record the model/runtime and distinguish

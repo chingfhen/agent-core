@@ -18,16 +18,16 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
 | [workspace-setup](../skills/workspace-setup/SKILL.md) | Request coordinated setup/refresh or an approved legacy-block migration. | Optional; follows skill-owned sections and preserves position/custom text. |
-| [project-tasks](../skills/project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
-| [project-docs](../skills/project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
-| [agent-lessons](../skills/agent-lessons/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
+| [manage-project-tasks](../skills/manage-project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
+| [maintain-project-docs](../skills/maintain-project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
+| [improve-agent-workflows](../skills/improve-agent-workflows/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
 | [project-scripts](../skills/project-scripts/SKILL.md) | Explicitly review recent work for worthwhile personal scripts; create, repair, consolidate, or retire them. | Request-only personal script stewardship in one configured Project Scripts Root; not automatically part of engineering or handoffs. |
-| [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
+| [maintain-knowledge-base](../skills/maintain-knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
 | [tech-design-options](../skills/tech-design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |
 | [code-design](../skills/code-design/SKILL.md) | Design or review a bounded code area's ownership, interfaces, and changeability. | Request-led structural judgment; ordinary implementation and prose editing do not activate it. Source/manifest inclusion does not establish installation. |
-| [git-workflow](../skills/git-workflow/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
+| [git-branch-to-review](../skills/git-branch-to-review/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
-| [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and manage-python-env for teaching and the shared personal environment. |
+| [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and run-and-manage-python for teaching and the shared personal environment. |
 | [resolve-human-blockers](../skills/resolve-human-blockers/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
 | [improve-readability](../skills/improve-readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
 | [reasoned-advocacy](../skills/reasoned-advocacy/SKILL.md) | Build or challenge a defensible position, evaluate counterarguments, or prepare for stakeholder questions. | Quick or Deep; reasoning and spoken defense, not implementation planning or automatic persistence. |
@@ -35,7 +35,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
 | [review-before-approval](../skills/review-before-approval/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
 | [commit-changes](../skills/commit-changes/SKILL.md) | Explicitly create a scoped local Git commit. | Preserves unrelated work and reviews the staged diff; never pushes automatically. |
-| [manage-python-env](../skills/manage-python-env/SKILL.md) | Before Python execution, including interpreter/import probes, tests, evaluations, or dependency changes. | Own root/activation section and first use; manage AND execute through compatible independent uv purpose projects. |
+| [run-and-manage-python](../skills/run-and-manage-python/SKILL.md) | Before Python execution, including interpreter/import probes, tests, evaluations, or dependency changes. | Own root/activation section and first use; manage AND execute through compatible independent uv purpose projects. |
 | [create-markdown-diagrams](../skills/create-markdown-diagrams/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |
 
@@ -53,7 +53,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 Historical sources live in `archive/skills/`, named by retirement date:
 
 - Superseded by KB: `evidence-authoring`.
-- Covered by project-tasks and ordinary decision work: `execution-readiness`, `execution-topology`.
+- Covered by manage-project-tasks and ordinary decision work: `execution-readiness`, `execution-topology`.
 - Replaced by `tech-design-options` on 2026-11-11: [planning](../archive/skills/2026-11-11__planning-SKILL.md) (the replacement has a narrower job).
 - Replaced by `code-design` on 2026-11-11: [engineering](../archive/skills/2026-11-11__engineering-SKILL.md) (ordinary execution remains with the main agent; the replacement has a narrower job).
 - Covered by `yagni`: `yagni-review`.

@@ -43,9 +43,9 @@ class WorkspaceContractTests(unittest.TestCase):
             ROOT / "tasks/INDEX.md",
             ROOT / "tasks/2026-10/2026-10-29__skill-owned-agents-sections.md",
         ]
-        for skill in ("project-tasks", "project-docs", "knowledge-base",
-                       "manage-python-env", "agent-lessons", "workspace-setup",
-                       "git-workflow", "learning-notebook", "blind-comparison"):
+        for skill in ("manage-project-tasks", "maintain-project-docs", "maintain-knowledge-base",
+                       "run-and-manage-python", "improve-agent-workflows", "workspace-setup",
+                       "git-branch-to-review", "learning-notebook", "blind-comparison"):
             files.extend((ROOT / "skills" / skill).rglob("*.md"))
         for source in files:
             # Fenced examples contain deliberately fictional workspace paths.
@@ -67,12 +67,12 @@ class WorkspaceContractTests(unittest.TestCase):
 
     def test_owner_templates_have_one_balanced_section(self):
         owners = {
-            "project-tasks/references/routing.md": "PROJECT TASKS",
-            "project-docs/references/routing.md": "PROJECT DOCS",
-            "knowledge-base/references/routing.md": "KNOWLEDGE BASE",
-            "manage-python-env/references/routing.md": "PYTHON ENVIRONMENTS",
-            "agent-lessons/SKILL.md": "AGENT LESSONS",
-            "git-workflow/references/routing.md": "GIT WORKFLOW",
+            "manage-project-tasks/references/routing.md": "PROJECT TASKS",
+            "maintain-project-docs/references/routing.md": "PROJECT DOCS",
+            "maintain-knowledge-base/references/routing.md": "KNOWLEDGE BASE",
+            "run-and-manage-python/references/routing.md": "PYTHON ENVIRONMENTS",
+            "improve-agent-workflows/SKILL.md": "AGENT LESSONS",
+            "git-branch-to-review/references/routing.md": "GIT WORKFLOW",
             "learning-notebook/SKILL.md": "LEARNING NOTEBOOKS",
         }
         for relative, marker in owners.items():

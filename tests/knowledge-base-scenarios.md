@@ -1,6 +1,6 @@
 # Knowledge-base behavioral scenarios
 
-Manual regression cases for [the skill](../skills/knowledge-base/SKILL.md).
+Manual regression cases for [the skill](../skills/maintain-knowledge-base/SKILL.md).
 These are acceptance criteria, not an automated test suite or evidence that an
 agent has passed them. Use explicitly configured disposable synthetic KBs, never a live personal KB.
 For a maintenance trial, provide the setup/request and load the skill and applicable

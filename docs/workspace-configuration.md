@@ -11,10 +11,10 @@ updated: 2026-11-10
 - Canonical skills implement lean, independently owned AGENTS.md routing and
   explicit coordinated task handoff/closeout. Publication and workspace adoption
   are separate; source edits do not update installed skills or external guidance.
-- `project-docs`, `knowledge-base`, and `project-scripts` are independently
-  usable resource skills. `project-tasks` coordinates task continuity and
+- `maintain-project-docs`, `maintain-knowledge-base`, and `project-scripts` are independently
+  usable resource skills. `manage-project-tasks` coordinates task continuity and
   KB/docs/operational-lessons review for explicit handoff/closeout.
-  `agent-lessons` coordinates bounded improvements to future agent behavior,
+  `improve-agent-workflows` coordinates bounded improvements to future agent behavior,
   using relevant owning skills without making those skills depend on it.
   Coordinators must respect owner permissions and avoid recursive invocation.
   There is no mandatory setup skill or new lessons registry.
@@ -52,19 +52,19 @@ bookkeeping retains its existing rules. No background sync is implied.
 
 | Owner | Standing guidance | Detail elsewhere |
 | --- | --- | --- |
-| project-tasks | Task roots and descriptive INDEX.md links; activation cue | Workstream navigation in INDEX.md; deliverables, state, gates, context map in tasks |
-| project-docs | Docs roots and a few canonical entry points with consultation cues | Project meaning, architecture, rationale, rules, and deeper navigation in docs |
-| knowledge-base | KB/archive roots and established backend/knowledge-page configuration; routing cue | Records, syntheses, content indexes, storage/archival procedures |
-| manage-python-env | Python root beside its before-execution activation cue | Compatibility in manifests/pins/locks/runtime; execution procedure in skill |
-| learning-notebook | Notebook root, discovery and activation cues | Collection index and learning-notebook skill; Python execution belongs to manage-python-env |
-| agent-lessons | Essential pre-action constraints and conditional reference pointers | Settled procedures in docs; reusable findings/evidence in KB |
-| git-workflow | Opt-in branch/target conventions, continuation cue, approval constraints, existing policy pointer | Git lifecycle in skill/references; approved scope and progress in tasks/PRs; live state in Git/host |
+| manage-project-tasks | Task roots and descriptive INDEX.md links; activation cue | Workstream navigation in INDEX.md; deliverables, state, gates, context map in tasks |
+| maintain-project-docs | Docs roots and a few canonical entry points with consultation cues | Project meaning, architecture, rationale, rules, and deeper navigation in docs |
+| maintain-knowledge-base | KB/archive roots and established backend/knowledge-page configuration; routing cue | Records, syntheses, content indexes, storage/archival procedures |
+| run-and-manage-python | Python root beside its before-execution activation cue | Compatibility in manifests/pins/locks/runtime; execution procedure in skill |
+| learning-notebook | Notebook root, discovery and activation cues | Collection index and learning-notebook skill; Python execution belongs to run-and-manage-python |
+| improve-agent-workflows | Essential pre-action constraints and conditional reference pointers | Settled procedures in docs; reusable findings/evidence in KB |
+| git-branch-to-review | Opt-in branch/target conventions, continuation cue, approval constraints, existing policy pointer | Git lifecycle in skill/references; approved scope and progress in tasks/PRs; live state in Git/host |
 
 The original four resource owners define their creation-time shapes in skill-local
-`references/routing.md`; agent-lessons and learning-notebook define their narrow
+`references/routing.md`; improve-agent-workflows and learning-notebook define their narrow
 sections in their respective SKILL.md files.
 Git Workflow defines its optional repository section in its own
-[routing reference](../skills/git-workflow/references/routing.md); setup requires
+[routing reference](../skills/git-branch-to-review/references/routing.md); setup requires
 specific authorization and is not part of ordinary resource initialization.
 Task/KB indexes stay local. Environment and skill inventories do not become
 standing guidance. Python execution includes interpreter/import probes; reading
@@ -121,7 +121,7 @@ pointer only for a missing durable entry point or trigger, not for every output.
 
 Reread before mutation. Refuse ambiguous, duplicate, incomplete, or nested markers
 and unsafe paths; reconcile concurrent edits safely, read back, and verify scoped
-changes and links. General project-docs guidance ownership does not override
+changes and links. General maintain-project-docs guidance ownership does not override
 another skill's section. Partial routing/index failures are reported without
 discarding valid primary work or claiming everything succeeded.
 
@@ -232,7 +232,7 @@ operational-lessons review. The human need not name four skills or say "full".
 Narrower requests and local write gates prevail. The cue does not spawn agents
 or authorize implementation, commits, publication, or resource migration.
 
-The [handoff workflow](../skills/project-tasks/references/handoff.md) governs:
+The [handoff workflow](../skills/manage-project-tasks/references/handoff.md) governs:
 
 1. Identify what must survive: decisions/rationale, evidence, deliverables, actual
    results, uncertainty, dependencies, permission boundaries, and useful lessons.
@@ -255,7 +255,7 @@ work remains pending until completed or explicitly waived/cancelled.
 ## Operational Lessons
 
 Explicit natural-language lessons requests and coordinated handoff/closeout cues
-activate a bounded behavioral-improvement review. `agent-lessons` diagnoses
+activate a bounded behavioral-improvement review. `improve-agent-workflows` diagnoses
 improvement opportunities, judges likely benefit and interference, and selects
 only justified interventions: guidance, docs, KB, a genuine continuation task,
 a concrete deterministic personal script/check, or no change. It delegates

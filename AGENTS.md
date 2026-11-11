@@ -15,7 +15,7 @@
 - `agent-core sync` defaults to Pi-native publication. `agent-core sync --harness devin` explicitly publishes shared skills and declared Devin agents under `%APPDATA%\devin\`; `--harness opencode` publishes shared skills under `~/.config/opencode/skills/`. Global guidance and harness settings stay unmanaged.
 - Do not hand-maintain managed copies. Sync owns exact declared per-harness resources recorded in `~/.agent-core-state/ownership.json`; verified previously managed `.agents/` copies and registered Claude aliases are safely retired only by Pi migration.
 - `docs/agent-core-operating-manual.md` is the canonical human command reference.
-- Before editing `tasks/`, load `project-tasks`. Before editing docs, README, or agent guidance outside another skill's marked section, load `project-docs`. Each skill owns only its declared routing section; `agent-lessons` owns the marked lessons section.
+- Before editing `tasks/`, load `manage-project-tasks` (or its currently installed predecessor `project-tasks` during migration). Before editing docs, README, or agent guidance outside another skill's marked section, load `maintain-project-docs` (or its currently installed predecessor `project-docs` during migration). Each skill owns only its declared routing section; `improve-agent-workflows` owns the marked lessons section.
 - Prefer durable guidance updates in `AGENTS.md`, `docs/`, and `prompts/` over production skill edits. `global/AGENTS.md` is retained but no longer published by sync.
 
 ## Autonomous State And Memory Routing
@@ -46,8 +46,8 @@ material search limits rather than guessing another root. Other machines must
 explicitly select their accessible checkout or the remote repository, branch,
 and directory above; verify remote hits at that ref.
 
-Reading does not require loading `knowledge-base` or authorize writes. Load
-`knowledge-base` for capture, inbox processing, managed artifacts, or routing
+Reading does not require loading `maintain-knowledge-base` or authorize writes. Load
+`maintain-knowledge-base` for capture, inbox processing, managed artifacts, or routing
 maintenance; use its applicable backend and authoring references for mutations.
 <!-- END KNOWLEDGE BASE -->
 
@@ -63,10 +63,10 @@ likely subjects and known aliases. Read the actual task; reconcile current state
 outcome, and next action before following older plans or resume commands. Verify
 consequential claims against relevant evidence and clarify unresolved intent or
 permission conflicts. Ask when materially different matches remain; report
-material access/search limits. Reading needs no project-tasks invocation and
+material access/search limits. Reading needs no manage-project-tasks invocation and
 authorizes neither edits nor execution.
 
-Load project-tasks for requested maintenance or saved-task execution. Task writes
+Load manage-project-tasks for requested maintenance or saved-task execution. Task writes
 remain explicitly opt-in under this repository's steward rules; maintain only the
 authorized task(s) and affected index entries, reporting meaningful changes.
 <!-- END PROJECT TASKS -->
@@ -107,7 +107,7 @@ Installed or generated surfaces include:
 - Require every configured skill source to match tracked committed content. Do not require `global/AGENTS.md` for sync.
 - Preflight each configured skill, harness-specific agent/template, and ownership record. OpenCode publication is shared-skills-only. Do not inspect or modify global system guidance or harness settings.
 - The committed manifests are authoritative for exactly declared destinations in the selected harness: overwrite different installed files/directories, even if unmanaged or locally edited. Refuse unsupported file types and unsafe parents. Legacy `.agents/` migration still requires verified fingerprints and remains Pi-only.
-- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default; a named one-time resource migration may retire only its unchanged fingerprint-owned predecessor. Selecting `manage-python-env` retires the two old Python skill names only for the selected harness; modified/unowned obsolete copies block with exact paths. Pi-only legacy/alias retirement retains its verification boundary.
+- Preserve unrelated files under every parent directory. Removing manifest entries remains non-destructive by default; a named one-time resource migration may retire only its unchanged fingerprint-owned predecessor. Selecting `run-and-manage-python` retires the two old Python skill names only for the selected harness; modified/unowned obsolete copies block with exact paths. Pi-only legacy/alias retirement retains its verification boundary.
 - Stage, fingerprint and verify selected resources; migrate verified legacy-owned copies and registered aliases through the same rollback transaction; atomically publish ownership last. Preserve unrelated, unowned and unselected resources.
 - Default sync publishes selected files only under `~/.pi/agent/{skills,agents,prompts}/`. The explicit Devin harness publishes only under `%APPDATA%\devin\{skills,agents}\`; explicit OpenCode sync publishes only under `~/.config/opencode/skills/`; never target another harness implicitly.
 - Never modify project `.gitignore`, project source, credentials, MCP settings, or harness security configuration during global sync.
@@ -129,9 +129,9 @@ The canonical contract is [workspace configuration](docs/workspace-configuration
 - Core resource skills own lean routing sections and can establish their own resources. `workspace-setup` is an optional request-triggered convenience. Preserve human wording, outside content, and block positions; migrate legacy central blocks only with approval.
 - AGENTS.md routing replaces `projects.toml`. Reuse confirmed resources; absent resources need an initialization proposal/approval. New relative paths use the declaring guidance directory; legacy paths retain their recorded base. Ask about ambiguity and report inaccessible resources.
 - `.work-context/` is the setup convention, with shared `knowledge-base/`, `archive/knowledge-base/`, `projects/<project>/{docs,tasks}/`, and flat `python/<purpose>/`. Existing layouts require approved migration; code repository organization is unconstrained.
-- `manage-python-env` owns Python environment management AND actual workload execution. `knowledge-base` owns capture-first, verified archival and inbox cleanup. Keep detailed procedures in those skills, not duplicated in managed guidance.
-- `project-tasks` owns execution continuity, deliverables, context pointers, and its index. Explicit handoff/closeout requests coordinate KB/docs/lessons through their owning workflows; ordinary task updates do not. KB and docs remain standalone.
-- `agent-lessons` owns its marked essential-rule/conditional-pointer section. Supporting detail uses docs/KB through their owners; no new lessons companion. Explicit lessons requests or coordinated handoff/closeout activate review, subject to local write gates.
+- `run-and-manage-python` owns Python environment management AND actual workload execution. `maintain-knowledge-base` owns capture-first, verified archival and inbox cleanup. Keep detailed procedures in those skills, not duplicated in managed guidance.
+- `manage-project-tasks` owns execution continuity, deliverables, context pointers, and its index. Explicit handoff/closeout requests coordinate KB/docs/lessons through their owning workflows; ordinary task updates do not. KB and docs remain standalone.
+- `improve-agent-workflows` owns its marked essential-rule/conditional-pointer section. Supporting detail uses docs/KB through their owners; no new lessons companion. Explicit lessons requests or coordinated handoff/closeout activate review, subject to local write gates.
 - All canonical skills permit model invocation. Natural-language activation does not broaden the request's permissions.
 - Agent Core's canonical `docs/` and `tasks/` remain its explicitly owned steward surfaces; this repository is not migrated by publishing the workspace workflow. Tasks remain read-only unless specifically authorized.
 
@@ -141,14 +141,14 @@ The canonical contract is [workspace configuration](docs/workspace-configuration
 - Route steward-ledger operations through `uv run scripts/memory.py`, not direct ledger edits.
 - New ledger topic creation requires explicit human approval. Existing active ledger topics may be updated autonomously within scope.
 - Memory tooling is steward-only. Global sync does not create or infer project memory configuration.
-- The canonical knowledge-base workflow is `skills/knowledge-base/SKILL.md`, selected in `personal-skills.toml`. It owns reusable Markdown records and explicitly requested managed artifacts, not this memory ledger. Retrieval may be proactive when relevant; capture, inbox processing, and artifact writes require an explicit request. The former Drive workflow is no longer authoritative; changing the skill does not migrate KB content.
+- The canonical knowledge-base workflow is `skills/maintain-knowledge-base/SKILL.md`, selected in `personal-skills.toml`. It owns reusable Markdown records and explicitly requested managed artifacts, not this memory ledger. Retrieval may be proactive when relevant; capture, inbox processing, and artifact writes require an explicit request. The former Drive workflow is no longer authoritative; changing the skill does not migrate KB content.
 
 ## Steward Rules
 
 - Keep `skills/` production-ready and hand-edited.
 - Do not edit production workflow skills autonomously.
 - Keep durable architecture in `README.md` and detailed stable contracts in focused docs.
-- Use `tasks/` only for active execution handoff under `project-tasks`.
+- Use `tasks/` only for active execution handoff under `manage-project-tasks`.
 - Prefer `uv` for maintainer workflows, while preserving the dependency-free installed runtime.
 - Do not rely on checked-in virtual environments or manual `pip install` state.
 - Preserve the canonical/installed boundary when adding cross-harness access.

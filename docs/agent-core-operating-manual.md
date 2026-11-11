@@ -104,7 +104,7 @@ Three allowlists select what is published:
 
 OpenCode uses the shared-skill allowlist only; this repository has no OpenCode-specific agent or command manifest.
 
-Pi and Devin discover their native locations automatically, as does OpenCode for skills. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-with-subagent` are installed as skills. They are model-callable; committing still requires an explicit human request.
+Pi and Devin discover their native locations automatically, as does OpenCode for skills. Install `pi-subagents`, enable Devin subagents where required, and configure model credentials separately; sync never installs extensions, changes settings, or manages cloud Playbooks/plugins. Devin has no file-based prompt-template destination, so cross-harness reusable commands such as `commit-changes` are installed as skills. They are model-callable; committing still requires an explicit human request.
 
 The first sync upgrades older ownership records (versions 2 through 5). For **selected** resources, an unchanged previously managed `~/.agents/` copy is moved to Pi by the guarded transaction. A previously managed Claude skill alias pointing exactly to that old copy can also be retired. Pi-native declared skills, agents and templates are overwritten when they differ, regardless of previous ownership or local edits; identical content is adopted without rewriting. Legacy managed `.agents/` copies must still be unchanged to qualify for automatic removal. Unselected or unowned old resources are preserved.
 
@@ -199,7 +199,7 @@ agent-core sync
 
 Agent Core refuses ignored, untracked, missing, linked, or uncommitted files inside configured sources.
 
-Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. Selecting `manage-python-env` is a named exception: it safely retires unchanged fingerprint-owned `manage-python-agent-envs` and `manage-python-uv` copies for the selected harness. Modified, unowned, or unsafe obsolete copies are preserved and reported as exact-path conflicts; resolve them explicitly rather than expecting sync to delete them. Pi additionally handles verified legacy copies and registered aliases. The `commit-with-subagent` prompt-to-skill migration is another narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
+Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. Selecting `run-and-manage-python` is a named exception: it safely retires unchanged fingerprint-owned `manage-python-agent-envs` and `manage-python-uv` copies for the selected harness. Modified, unowned, or unsafe obsolete copies are preserved and reported as exact-path conflicts; resolve them explicitly rather than expecting sync to delete them. Pi additionally handles verified legacy copies and registered aliases. The `commit-with-subagent` prompt-to-skill migration is another narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
 
 ## Set Up Or Refresh A Workspace
 
@@ -212,14 +212,14 @@ Removing a name from any personal manifest normally stops future updates without
 
 Each resource skill owns a lean marked section with confirmed locations and a few useful entry points. Setup follows those owner contracts and returns saved paths plus material gaps. It preserves custom wording and block positions; moving the old central block into separate sections requires explicit migration approval. The optional factual startup cue is approved once outside the sections. Setup is not a per-session prerequisite.
 
-To review operational learning, ask naturally, for example "capture the lessons from this session". `agent-lessons` maintains essential rules and conditional pointers in its marked section; supporting detail uses docs/KB through their owning workflows. It may correctly make no changes. No new `agent-lessons.md` companion is created.
+To review operational learning, ask naturally, for example "capture the lessons from this session". `improve-agent-workflows` maintains essential rules and conditional pointers in its marked section; supporting detail uses docs/KB through their owning workflows. It may correctly make no changes. No new `agent-lessons.md` companion is created.
 
-The setup convention is `.work-context/{knowledge-base,archive/knowledge-base,projects,python}/`. The confirmed AGENTS.md locations are authoritative, not the convention itself. The old `projects.toml` workflow is retired and its files are left untouched. No setup action moves old `cf-workspace` content or configures backup without explicit approval. `manage-python-env` both maintains environments and runs Python workloads through them. See [workspace configuration](workspace-configuration.md).
+The setup convention is `.work-context/{knowledge-base,archive/knowledge-base,projects,python}/`. The confirmed AGENTS.md locations are authoritative, not the convention itself. The old `projects.toml` workflow is retired and its files are left untouched. No setup action moves old `cf-workspace` content or configures backup without explicit approval. `run-and-manage-python` both maintains environments and runs Python workloads through them. See [workspace configuration](workspace-configuration.md).
 
 ### Hand Work to the Next Session or Close It Out
 
 Say "hand this off to a fresh session", "prepare the next tasks for another agent",
-or "we're done; close this task" in project-task context. `project-tasks` evaluates
+or "we're done; close this task" in project-task context. `manage-project-tasks` evaluates
 KB capture, docs integration, and operational lessons through the owning skills,
 verifies supporting material, then saves the task/context map and index. You need
 not name four skills. Each supporting review can be a valid no-op; missing access
@@ -235,7 +235,7 @@ spawning agents, implementation, or publication beyond the actual request.
 
 ## Knowledge Base Workflow
 
-The canonical workflow is [`skills/knowledge-base/SKILL.md`](../skills/knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
+The canonical workflow is [`skills/maintain-knowledge-base/SKILL.md`](../skills/maintain-knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
 
 Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed write effects, optional retrieval guidance, and first-use routing rules. It can propose `.work-context/knowledge-base/` and, when processing needs it, `.work-context/archive/knowledge-base/`; neither is a fallback. Established remote locations and optional knowledge-page roots remain valid. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
 

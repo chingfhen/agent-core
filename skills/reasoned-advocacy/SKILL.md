@@ -148,7 +148,7 @@ second summary. Do not produce a lengthy word-for-word script unless requested.
 
 - Do not implement a decision, create task plans, edit files, or persist content
   solely because this skill was invoked.
-- Readability and knowledge-base skills may be used separately but are not
+- `improve-readability` and `maintain-knowledge-base` may be used separately but are not
   dependencies. If a managed artifact is requested, its owning workflow handles
   saving, identity, links, and lifecycle.
 - Never send employer-confidential or customer information to unauthorized tools.
