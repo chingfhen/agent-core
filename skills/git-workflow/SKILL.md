@@ -5,8 +5,8 @@ description: >
   managed branch only when the human invokes or asks to use git-workflow. Use for
   continuation, maintenance, status, or merge of a known managed branch, its PR/MR,
   or linked project task. Branch/date references cue discovery, not ownership or write
-  permission. Generic engineering does not start this workflow; merge requires a
-  separate explicit human instruction.
+  permission. Generic engineering does not start this workflow; integration into
+  the target requires separate explicit human instruction.
 disable-model-invocation: false
 ---
 
@@ -43,7 +43,7 @@ branch normally serves one coherent change; no branch registry or per-commit tag
   Adoption requires a state/history audit and an explicitly approved proposal.
   Preserve the name when suitable; never rename somebody else's branch by default.
 - **Limits:** Repository/workplace policies and narrower permissions prevail.
-  No implicit merge, force-push, history rewrite, deployment, release, unsafe or
+  No implicit integration into the target, force-push, history rewrite, deployment, release, unsafe or
   unapproved branch deletion, paid checks, security changes, tool installation, or
   subagent launch. Post-merge cleanup is allowed only within the explicitly
   authorized package and the guarded conditions below.
@@ -93,15 +93,19 @@ and make its opt-out clear; do not hide deletion in a generic delivery label.
   and maintenance, and marking ready when required pre-review checks pass.
 - Continuity: create or maintain the matching project task and index through
   project-tasks, including post-merge bookkeeping, within applicable write gates.
+- Maintenance: necessary target-to-managed-branch updates and unambiguous conflict
+  resolution are included; default to history-preserving merge where policy permits.
+  Worktrees are an explicit exception: obtain approval and record their lifecycle
+  in the task before creation. Approval includes safe agent-owned retirement.
 - Cleanup: after an approved and verified merge, safely delete the exact managed
   remote and local branches under the conditions below; the explicit, clear skill
   invocation accepts this standard term unless the human or policy narrows it.
 - Material known publication effects, such as CI, previews, visibility or cost;
-  merge remains a separate explicit decision.
+  integration into the target remains a separate explicit decision.
 
 The human may narrow the package. Material scope, target, or side-effect changes
 need a new decision. Unknown consequential publication effects block publication,
-not otherwise safe authorized local work. Human approval of a merge is separate.
+not otherwise safe authorized local work. Human approval of target integration is separate.
 
 Prefer `YYYYMMDD-short-descriptive-slug` using the local project date; use a small
 collision suffix if needed. Adapt required prefixes/tickets to repository rules.
@@ -110,9 +114,13 @@ and legacy suffixes help discovery, never establish authority.
 
 ## 3. Select the approved branch and work
 
-Create/select the exact approved branch from the verified base. Choose a safe
-checkout or separate worktree inside authorized locations; the human should not
-have to switch manually. Do not silently stash/reset, force a checkout, or write
+Create/select the exact approved branch from the verified base. Prefer an existing
+safe checkout; the human should not have to switch manually. A new worktree needs
+explicit human approval of its purpose, path and agent-owned lifecycle, plus a
+linked task recording repository, branch/base, approval, owner, preservation and
+cleanup plan before creation. This task is required even if a PR-task opt-out was
+previously granted; if tracking/write permission is unavailable, stop creation.
+Do not silently stash/reset, force a checkout, or write
 into another writer's worktree. Dirty state is not an automatic failure when
 understood and safely separable; ambiguous ownership or overlapping changes stop
 affected writes. Check for concurrent changes again at mutation boundaries.
@@ -120,6 +128,17 @@ affected writes. Check for concurrent changes again at mutation boundaries.
 Before first edits, including resumed work, show a brief verified context receipt:
 
 > Repository, checkout path, branch → target, actual HEAD, allowed actions.
+
+Own routine reconciliation: when needed, fetch the approved target and integrate
+it into the managed branch under repository policy, without asking merely because
+Git reports a conflict. Default to a history-preserving merge; a policy requiring
+rewriting history needs an explicitly approved strategy. Preserve both established
+intentions where possible, including renamed paths; never blindly choose ours/theirs.
+Ask only when investigation cannot resolve conflicting intended behavior, scope,
+ownership or authority. Verify combined behavior even when Git merges cleanly,
+refresh review evidence after head changes, and publish only within existing
+permission and known side effects. This does not authorize the reverse integration
+into the target, force-pushing, or changing another writer's checkout.
 
 Implement and verify within the approved scope. Before editing, committing,
 pushing or merging, recheck the affected live Git state against the agreement.
@@ -192,7 +211,7 @@ regressions or before/after comparisons, and merge/revise/reject advice. Review-
 requests do not authorize fixes or posting host reviews/comments. Ratings are
 optional advice and never override a failed mandatory gate.
 
-**Merging always requires separate explicit human approval of the reviewed change
+**Integration into the target always requires separate explicit human approval of the reviewed change
 and target.** Revalidate current head, target, scope, required checks/reviews,
 mergeability, and merge side effects. Any head change requires renewed review;
 material differences or target changes require renewed human approval. Use a
@@ -205,8 +224,8 @@ If exact-target consistency is required but the host cannot guarantee it, stop
 automated integration and explain the permitted human-controlled path. Respect
 the repository merge strategy. No protection bypass or implicit
 auto-merge/queue enrollment; clarify deferred integration semantics when needed.
-Update a branch from its target only under approved strategy, never by silent
-rebase or merge. Failed checks/conflicts are not permission to rewrite history.
+Target-to-managed-branch maintenance follows section 3; report those updates and
+their verification. Failed checks/conflicts are not permission to rewrite history.
 
 Read back the actual merged state and resulting revision. A queued/accepted
 request is not a completed merge. Update the task/index after verified merge:
@@ -237,6 +256,18 @@ the branch; never infer deletion of unmerged work from permission to close a PR.
 Do not deploy incidentally.
 
 ## Completion and repository setup
+
+Own each approved worktree through retirement, not just creation. Keep its task
+current at pauses: exact path, branch/HEAD, publication state, active ownership,
+remaining reconciliation and next cleanup action. A fresh agent reconciles that
+record with live worktrees before reuse or removal; a directory name is not authority.
+When no longer needed, verify commits and continuation records are preserved at
+their approved durable destination, inspect tracked/untracked/ignored files and
+active use, then remove only the owned clean worktree without force. Worktree
+removal is separate from branch deletion and never authorizes deleting unmerged
+work. Verify removal and update the task from a surviving location; keep the task
+open if cleanup remains blocked. Report exact retained paths and reasons rather
+than assigning cleanup to the human. See the Git operations reference for checks.
 
 At material checkpoints or a blocker, give a short delivery receipt: a clickable
 actual host PR/MR link, source branch → target, current SHA and state, concise
