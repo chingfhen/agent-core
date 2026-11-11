@@ -48,7 +48,7 @@ actual discovery/loading separately from permission to perform the workflow.
 Use **one skill per job**. Similar *steps* do not imply duplicate skills when outcomes differ.
 
 Keep these boundaries clear:
-- `planning`: select and justify the direction.
+- `design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
 - `engineering`: implement approved work.
 - `project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
 - `project-docs`: maintain settled project truth.

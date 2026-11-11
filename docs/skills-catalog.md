@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # Skills Catalogue
@@ -23,8 +23,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [agent-lessons](../skills/agent-lessons/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
 | [project-scripts](../skills/project-scripts/SKILL.md) | Explicitly review recent work for worthwhile personal scripts; create, repair, consolidate, or retire them. | Request-only personal script stewardship in one configured Project Scripts Root; not automatically part of engineering or handoffs. |
 | [knowledge-base](../skills/knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
-| [planning](../skills/planning/SKILL.md) | You want to evaluate options and agree on a build direction. | Decide before implementing. |
-| [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code; proceed with an agreed change. Direct requests work without a task file. | Quick by default; Deep for requested depth or concrete risk/uncertainty. Same quality floor and authorized scope. |
+| [design-options](../skills/design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |
 | [git-workflow](../skills/git-workflow/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
 | [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and manage-python-env for teaching and the shared personal environment. |
@@ -43,9 +42,10 @@ request-only workflows; availability/loading does not authorize unrelated effect
 
 | Skill | Reach for it when… | Note |
 | --- | --- | --- |
+| [engineering](../skills/engineering/SKILL.md) | Implement, debug, fix, refactor, or review code. | Retained source, not selected in the personal manifest. |
 | [document-text-extraction](../skills/document-text-extraction/SKILL.md) | Explicitly extract a named PDF/image locally. | Temporary extraction only; independent of KB and `evidence-authoring`. |
 | [repo-audit](../skills/repo-audit/SKILL.md) | Request a dedicated whole-repository risk/bloat audit. | Specialized full-repo report, not routine code review. |
-| [ml-architecture-review](../skills/ml-architecture-review/SKILL.md) | Explicitly request focused ML architecture decision analysis. | Specialized investigation; planning remains general-purpose. |
+| [ml-architecture-review](../skills/ml-architecture-review/SKILL.md) | Explicitly request focused ML architecture decision analysis. | Specialized investigation; separate from general technical options comparison. |
 | [humanize-spoken-output](../skills/humanize-spoken-output/SKILL.md) | Rewrite spoken scripts, narration, and interview answers naturally. | Content editing, not technical teaching. |
 
 ## Archived — not active
@@ -53,7 +53,8 @@ request-only workflows; availability/loading does not authorize unrelated effect
 Historical sources live in `archive/skills/`, named by retirement date:
 
 - Superseded by KB: `evidence-authoring`.
-- Covered by project-tasks / planning: `execution-readiness`, `execution-topology`.
+- Covered by project-tasks and ordinary decision work: `execution-readiness`, `execution-topology`.
+- Replaced by `design-options` on 2026-11-11: [planning](../archive/skills/2026-11-11__planning-SKILL.md) (the replacement has a narrower job).
 - Covered by `yagni`: `yagni-review`.
 - Earlier technical teaching line, now consolidated into `learning`: `quick-orientation`, `human-technical-orientation`, `technical-coach`, `debrief` (via `explain-tech`).
 - Replaced by `learning` on 2026-10-21: `explain-tech`, `learning-markdown` ([archived explain-tech](../archive/skills/2026-10-21__explain-tech-SKILL.md), [archived learning-markdown](../archive/skills/2026-10-21__learning-markdown-SKILL.md)).

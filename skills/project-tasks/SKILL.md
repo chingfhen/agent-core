@@ -32,8 +32,9 @@ work, and other continuing efforts. Adapt evidence and deliverables to the work;
 a task does not require code, a repository, or automated tests.
 
 This skill owns the *memory of the work* and its handoff, not the work's implementation method.
-`planning` shapes substantial work when plan review is required; engineering or
-other execution workflows perform and verify the work; `project-docs` owns
+Ordinary decision work shapes substantial work when plan review is required;
+`design-options` can compare technical approaches when the human requests it.
+Execution workflows perform and verify the work; `project-docs` owns
 settled project understanding. Code, tests, schemas, and observed behavior
 remain authoritative for their respective implementation claims. Do not create
 tasks for ordinary short-lived work with no persistence need.
@@ -298,7 +299,7 @@ Understanding`, `Implementation Strategy`, `Execution Phases`, `Acceptance and
 Verification`, `Edge Cases and Recovery`, `Stop Conditions`, `Executor
 Discretion`, and `Context Pointers`. Use only those that earn their space.
 
-When substantial planning requires review, use `planning` and wait for approval.
+When substantial planning requires review, present the plan and wait for approval.
 Persist an approved plan without re-requesting ceremonial approval; do not
 execute future investigations or preflight checks merely to write the task.
 

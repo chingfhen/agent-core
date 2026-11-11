@@ -8,7 +8,6 @@
 
 ## Next
 
-- [Replace Planning with Design Options](2026-11/targeted-design-skills/2026-11-11__replace-planning-with-design-options.md) — Active · Targeted design skills. Selected vision: request-led comparison of materially different technical approaches; implement on a later explicit request.
 - [Replace Engineering with Code Design](2026-11/targeted-design-skills/2026-11-11__replace-engineering-with-code-design.md) — Active · Targeted design skills. Selected vision: bounded code ownership/interface/changeability work; implement on a later explicit request.
 - [Evaluate Agent-Led Verification](2026-11/verification-design/2026-11-11__evaluate-agent-led-verification.md) — Active · Verification design. Another human-started session should evaluate the proposal and Tripverge pilot with the human; implementation is not approved.
 - [Durable Learning Mechanism for Operational Constraints](2026-10-23__durable-agent-constraint-learning-bookmark.md) — Active. Next action: human evaluates durable options outside this repository; resume when that evaluation identifies a direction or requests further investigation.

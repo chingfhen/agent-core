@@ -4,7 +4,7 @@
 **Created:** 2026-11-11
 **Last Updated:** 2026-11-11
 **Priority:** Next
-**Status:** Active
+**Status:** Closed — Completed
 
 **Goal:** Replace the general `planning` skill with **`design-options`**, a request-led skill for generating and discriminating genuinely different approaches to consequential software/product-system design decisions.
 
@@ -16,13 +16,17 @@
 
 **Chosen Direction:** **Selected by the author under the human's explicit delegation to make the final design/name call.** Name: `design-options`. Job: compare technical solution designs before consequential commitment. Request-led activation; no automatic linkage to implementation. This task replaces the proposed role of the old planning skill completely, rather than adding a special mode to it.
 
-**Current State:** Task/design only; no replacement skill implemented. On 2026-11-11 Agent Core was clean on `main` at `25522dfa4462640ed0f59d0aaa534a4d19d70039`. `personal-skills.toml` excludes both `planning` and `engineering`, while their canonical source directories still exist and some docs/skills still reference them. Both old skills are unavailable to this session and must not be invoked. Their presence on disk is not active authorization or proof of harness installation.
+**Current State:** The replacement exists at `skills/design-options/SKILL.md`, is selected in `personal-skills.toml`, and the former planning source is archived at `archive/skills/2026-11-11__planning-SKILL.md`. Direct routing and catalogue references were reconciled. Source selection is not harness installation; removing an old manifest entry does not remove previously installed copies.
 
-**Next Action:** Wait for a human request to implement this task. Then inspect current repository state and direct references, implement the selected design, and retire/reconcile the old source within the approved scope. Do not restart broad design exploration unless new evidence exposes a concrete conflict with this brief.
+**Next Action:** None for this completed source task. Harness publication and any installed-copy retirement require separately authorized operations.
 
-**Blockers:** None for understanding this handoff. Production edits and installation are not authorized by the current task-writing request.
+**Blockers:** None for the completed source work. Live behavioral validation and harness adoption have not been established.
 
-## Permission and decision ownership
+**Verification:** An independent anonymized reviewer preferred the new skill to the archived predecessor for the intended specialist job (5/5 versus 2/5 for options quality and activation precision; 5/5 versus 4/5 for convergence). The review assessed instruction text only, not runtime behavior. Focused cases are specified in `tests/design-options-scenarios.md`; they have not been executed as live trials. Git blob hashes confirm the archived source matches its predecessor; manifest/metadata checks and `git diff --check` passed. Source publication and harness adoption are separate.
+
+## Historical design and decision ownership
+
+The following original brief preserves design rationale, not current execution instructions. The human subsequently authorized implementation, independent comparison, task closeout, and push to main; installation remains separately scoped.
 
 - Current authorization: research, choose the vision/name, and write this task plus its sibling and affected index entries in `C:\Users\tanch\.agent-core`. **No implementation now.**
 - A later request to implement this task should authorize its explicitly described source and direct-reference changes. Commit, push, harness publication/removal, paid tools, and consumer-repository changes remain separately scoped actions. Recheck the actual request and repository guidance at that time.
@@ -114,7 +118,7 @@ Once the human has selected the approach, stop exploring unless new evidence con
 
 The human's concern about premature model convergence is a design motivation, not a measured diagnosis of this model. This research did not establish that one agent proposing several options removes anchoring or reliably improves decisions. Web search returned no results for several targeted queries, including LLM anchoring; the usable evidence came from directly retrieved primary sources. No broad/current-market coverage or empirical debiasing result is claimed. Two attempted Fowler pages on refactoring returned 404 and were not used as evidence.
 
-## Implementation and replacement work — future, not executed
+## Historical implementation plan — completed or superseded
 
 1. **Reconcile the live scope:** Read applicable Agent Core guidance, this brief, current source/manifest/catalogue, and direct references. Treat old planning instructions as historical migration input, not an execution prerequisite. Preserve unrelated changes.
 2. **Write the focused skill:** Encode the trigger boundary and the distinctive option-generation/comparison method. Keep operational boilerplate out. The description itself must make it hard to activate on ordinary planning or skill editing.
@@ -138,7 +142,7 @@ The human's concern about premature model convergence is a design motivation, no
 
 Evaluate whether candidates differ materially, receive fair scrutiny, and lead to an actionable recommendation; evaluate false activation and unnecessary extra work as failures too. A scenario written in this task is not a performed trial.
 
-## Resume context and completion boundary
+## Historical resume context
 
 - Working repository: `C:\Users\tanch\.agent-core`.
 - Read first: [AGENTS.md](../../../AGENTS.md), [Skill Design Guide](../../../docs/skill-design-guide.md), and [Skills Catalogue](../../../docs/skills-catalog.md). The catalogue currently overstates active availability of the old skills; the manifest/session availability are separate evidence.
@@ -146,4 +150,4 @@ Evaluate whether candidates differ materially, receive fair scrutiny, and lead t
 - Related selected vision: [code-design](2026-11-11__replace-engineering-with-code-design.md). Neither task requires the other to be implemented first.
 - Product examples are illustrative, informed by Tripverge at `C:\Users\tanch\Documents\Github\tripverge`; consult that repository's current guidance/docs before making real product decisions. This task approves no Tripverge change.
 
-This writing pass preserves the selected design and research; it does not implement, retire, install, or test the skill. The task remains Active for future requested implementation. Resume with: **"Implement the design-options replacement task in Agent Core."**
+The original writing pass did not implement or test the skill. The later implementation and review are summarized in Current State and Verification above; the original resume instruction is superseded.

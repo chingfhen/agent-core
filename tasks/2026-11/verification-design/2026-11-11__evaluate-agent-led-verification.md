@@ -18,7 +18,7 @@
 
 **Current State:** No verification skill, engineering integration, consumer guidance, runtime instrumentation, or pilot has been implemented by this work. Existing engineering already requires focused checks, important failure paths, reproduction before fixes, bounded diagnostics, and honest limitations. Tripverge's inspected docs describe intended behavior; no working application or browser-testing setup was established in this assessment.
 
-**Next Action:** In a human-started follow-up session, load planning, read the context below, inspect current engineering and relevant Tripverge evidence, and present/refine a bounded recommendation with the human. Do not create the skill or begin the pilot without subsequent explicit approval.
+**Next Action:** In a human-started follow-up session, read the context below, inspect relevant current execution guidance and Tripverge evidence, and present/refine a bounded recommendation with the human. The engineering source is not selected in the personal manifest; use `design-options` only if the human requests a substantive comparison of technical approaches. Do not create the skill or begin the pilot without subsequent explicit approval.
 
 **Blockers:** None for discussion/read-only investigation. Implementation is gated on the human selecting and approving a direction; missing runtime capability must be established rather than assumed.
 
