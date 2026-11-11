@@ -48,6 +48,11 @@ branch normally serves one coherent change; no branch registry or per-commit tag
   subagent launch. Post-merge cleanup is allowed only within the explicitly
   authorized package and the guarded conditions below.
   These instructions guide agent behavior; they do not enforce host permissions.
+- **Provider setup:** Reuse working authorized host access first. If necessary,
+  propose the appropriate provider tool and request yes/no installation approval;
+  after approval handle setup and initiate authentication when possible. The human
+  completes any required interactive authorization. Follow the provider reference;
+  never request secrets in chat or bypass policy.
 
 ## 1. Find the work and inspect reality
 
