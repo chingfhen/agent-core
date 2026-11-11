@@ -1,5 +1,5 @@
 ---
-name: project-tasks
+name: manage-project-tasks
 description: >
   Preserve unfinished project work as portable human-agent execution memory.
   Use to create, checkpoint, pause for a fresh session, prepare, revise,
@@ -34,7 +34,7 @@ a task does not require code, a repository, or automated tests.
 This skill owns the *memory of the work* and its handoff, not the work's implementation method.
 Ordinary decision work shapes substantial work when plan review is required;
 `tech-design-options` can compare technical approaches when the human requests it.
-Execution workflows perform and verify the work; `project-docs` owns
+Execution workflows perform and verify the work; `maintain-project-docs` owns
 settled project understanding. Code, tests, schemas, and observed behavior
 remain authoritative for their respective implementation claims. Do not create
 tasks for ordinary short-lived work with no persistence need.
@@ -158,7 +158,7 @@ for code work, a shared task folder does not establish the code repository or cw
 
 ## General maintenance request
 
-When the human generally invokes project-tasks, such as "use project-tasks" or
+When the human generally invokes manage-project-tasks, such as "use manage-project-tasks" or
 "manage the tasks", without specifying an operation, start a bounded maintenance
 review; do not ask the human to name files or actions. Review the current work
 context and relevant saved tasks. Resolve the project and consult its index and
@@ -462,7 +462,7 @@ related-but-distinct work and dependencies instead of creating competing plans.
 Do not combine genuinely independently continuable outcomes just to reduce
 file count.
 
-Route settled project knowledge to `project-docs` when authorized; a task may
+Route settled project knowledge to `maintain-project-docs` when authorized; a task may
 record that docs sync remains required without silently writing docs. KB capture
 requires a capture request or the explicit coordinated handoff/closeout intent
 above; ordinary task maintenance does not authorize it. A broader sweep to identify

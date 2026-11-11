@@ -68,7 +68,7 @@ For existing learning notebooks, consult the root's INDEX.md or search the
 collection by subject and known aliases. Ask if materially different matches
 remain; report inaccessible paths or material search limits. Reading does not
 authorize edits. Load learning-notebook to create, open, extend, or manage a
-learning notebook; use manage-python-env for Python execution and environments.
+learning notebook; use run-and-manage-python for Python execution and environments.
 <!-- END LEARNING NOTEBOOKS -->
 ```
 
@@ -129,7 +129,7 @@ them; update the notebook when requested, distinguishing findings from expectati
 
 ## Environment, verification, and opening
 
-1. Load `manage-python-env` before any Python execution, interpreter probe, or
+1. Load `run-and-manage-python` before any Python execution, interpreter probe, or
    dependency operation. Follow its root resolution, approval, compatibility,
    coordination, package-policy and execution rules. Use one designated personal
    purpose project across learning notebooks: use the purpose recorded in the
@@ -143,7 +143,7 @@ them; update the notebook when requested, distinguishing findings from expectati
    environment cannot safely be changed, propose a safe option and ask before an
    incompatible change or additional environment. Never modify a team `.venv` or
    team dependencies without the separate authorization that skill requires.
-2. Verify the selected interpreter through `manage-python-env`. Start or reuse a
+2. Verify the selected interpreter through `run-and-manage-python`. Start or reuse a
    suitable Jupyter server with localhost binding and authentication intact. Check
    any existing launcher/server for root, authentication and environment suitability;
    do not assume its kernel matches the server. Select a kernel and verify its actual

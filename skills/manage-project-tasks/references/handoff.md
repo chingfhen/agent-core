@@ -22,11 +22,11 @@ name four skills or allocate findings among files when ownership is clear.
 
 Load the available owning skills and perform a bounded evaluation:
 
-- **knowledge-base:** retain reusable findings, evidence, and useful uncertainty
+- **maintain-knowledge-base:** retain reusable findings, evidence, and useful uncertainty
   when capture adds value. Follow its authoring, navigation, and verification rules.
-- **project-docs:** integrate settled project understanding into its canonical
+- **maintain-project-docs:** integrate settled project understanding into its canonical
   home; preserve intended design separately from current implementation.
-- **agent-lessons:** evaluate future behavioral improvements. Reuse the sources
+- **improve-agent-workflows:** evaluate future behavioral improvements. Reuse the sources
   just saved; use its owning workflows for any additional supporting detail.
 
 Each may produce a valid no-op. Persist supporting sources before adding pointers

@@ -88,7 +88,7 @@ When authoring or materially changing a script, read [CLI craftsmanship](referen
 - **Observability:** concise normal summary, actionable failure diagnostics, optional extra detail (`--verbose`) where it helps. Prefer primary/machine-readable output on stdout and progress/errors on stderr so pipelines remain usable. Do not require JSON logs, dashboards, telemetry, or always-on log files.
 - **Safety:** explicit targets and side effects; prefer read-only defaults; preview/dry-run for consequential mutations where useful; avoid overwriting, deleting, secret exposure, and uncontrolled retries. Never assume creating a script grants permission to run it on real resources.
 - **Maintainability:** use the simplest suitable language and standard library where practical; keep dependencies explicit, isolate I/O from testable logic when valuable, and avoid frameworks/plugin systems/configuration layers without demonstrated need.
-- **Proportionate verification:** test help, representative success, invalid input, and important failure behavior. Verify safe reruns and effects when applicable. Use temporary data, mocks, or a sandbox rather than risking actual project/user data. Follow `manage-python-env` and any other applicable runtime contract for Python execution.
+- **Proportionate verification:** test help, representative success, invalid input, and important failure behavior. Verify safe reruns and effects when applicable. Use temporary data, mocks, or a sandbox rather than risking actual project/user data. Follow `run-and-manage-python` and any other applicable runtime contract for Python execution.
 
 Scripts should be pleasant for a person to run directly and easy for a coding agent to call without reconstructing procedural detail.
 

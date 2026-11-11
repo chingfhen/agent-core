@@ -6,7 +6,7 @@ Read when creating or materially changing a personal script. Apply these as **de
 
 - **Existing command/task-runner:** Prefer it when it already expresses the action, including its failure semantics, clearly.
 - **Shell script:** Good for a short sequence of commands and light glue on a known shell/platform. Keep quoting explicit and propagate failures. Prefer a structured language when branching, parsing, portability, or data transformation grows.
-- **Python:** A practical cross-platform default for nontrivial file operations, structured processing, and argument-driven CLIs. Prefer standard-library `argparse`, `pathlib`, `logging`, `subprocess`, and `json` where sufficient. Follow the workspace's `manage-python-env` workflow for execution; don't bypass it with system Python or ad hoc environments.
+- **Python:** A practical cross-platform default for nontrivial file operations, structured processing, and argument-driven CLIs. Prefer standard-library `argparse`, `pathlib`, `logging`, `subprocess`, and `json` where sufficient. Follow the workspace's `run-and-manage-python` workflow for execution; don't bypass it with system Python or ad hoc environments.
 - **JavaScript/TypeScript/PowerShell/etc.:** Choose when the user's existing platform, dependencies, or APIs make them materially simpler. Avoid introducing a language solely to standardize the collection.
 
 Use the fewest dependencies consistent with reliable behavior. Personal scripts can target other projects via arguments while remaining stored in the configured Project Scripts Root.

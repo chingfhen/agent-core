@@ -1,5 +1,5 @@
 ---
-name: git-workflow
+name: git-branch-to-review
 description: >
   Manage explicitly requested Git branch-to-review delivery end to end. Start a new
   managed branch only when the human invokes or asks to use git-workflow. Use for

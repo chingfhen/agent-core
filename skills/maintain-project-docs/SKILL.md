@@ -1,5 +1,5 @@
 ---
-name: project-docs
+name: maintain-project-docs
 description: On a docs-maintenance request or authorized handoff, maintain settled project understanding in confirmed documentation surfaces and stable agent behavior in explicitly owned guidance. Reading or using docs does not require this skill or authorize maintenance. Establish its own routing when needed, integrate durable meaning into its canonical authority, and allow a no-change outcome.
 disable-model-invocation: false
 ---

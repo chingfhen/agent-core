@@ -1,5 +1,5 @@
 ---
-name: manage-python-env
+name: run-and-manage-python
 description: >
   Manage and execute Python through reusable, independent uv purpose projects
   under a confirmed Python Environment Root. Load before all Python execution,

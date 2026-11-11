@@ -1,5 +1,5 @@
 ---
-name: knowledge-base
+name: maintain-knowledge-base
 description: >
   Preserve reusable context in a Markdown knowledge base. Use when
   the user says "sync to KB", "capture this" in a KB context, asks to process,

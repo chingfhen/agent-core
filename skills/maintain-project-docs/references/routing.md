@@ -33,9 +33,9 @@ relevant entry points below. For an imperfect reference or missing entry, search
 filenames/content in the confirmed docs root using likely subjects and known aliases.
 Read the actual document; navigation is not authority. Verify consequential claims
 against appropriate evidence (including code/runtime for implementation claims).
-Reading or using docs does not require project-docs or authorize maintenance.
+Reading or using docs does not require maintain-project-docs or authorize maintenance.
 Ask about materially ambiguous project identity; report inaccessible resources or
-material search limits rather than substituting. Load project-docs when docs
+material search limits rather than substituting. Load maintain-project-docs when docs
 maintenance is requested or delegated, including an authorized handoff/closeout;
 respect the human's chosen timing.
 

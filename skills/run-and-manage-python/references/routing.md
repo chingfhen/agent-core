@@ -29,7 +29,7 @@ Creation-time example; use the confirmed root:
 ## Python Environments
 Python Environment Root: .work-context/python/
 
-Load manage-python-env before Python execution or environment changes,
+Load run-and-manage-python before Python execution or environment changes,
 including interpreter checks and import probes.
 <!-- END PYTHON ENVIRONMENTS -->
 ```

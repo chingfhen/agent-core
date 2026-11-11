@@ -1,5 +1,5 @@
 ---
-name: agent-lessons
+name: improve-agent-workflows
 description: >
   On explicit request, learn from recent agent work or conversation to improve
   future agent behavior. Investigate friction, first-time discoveries, mistakes,
@@ -52,7 +52,7 @@ local approval gate. Do not infer approval for unrelated implementation, broad
 cleanup, destructive actions, security changes, skill rewrites, commits,
 deployment, or external publication. Do permitted work and report blockers.
 
-When project-tasks coordinates the request, reuse its findings and saved sources;
+When manage-project-tasks coordinates the request, reuse its findings and saved sources;
 return learning changes/gaps to it rather than recursively initiating a handoff.
 
 ## Discover lessons
@@ -151,8 +151,8 @@ when that genuinely helps future work. Do not force every discovery into
 
 When the chosen intervention involves another owned resource, use its relevant
 owning skill or workflow to evaluate and maintain it. Applicable capabilities
-may include `knowledge-base` for reusable evidence, `project-docs` for settled
-project procedures, `project-tasks` for genuine unfinished follow-up, and
+may include `maintain-knowledge-base` for reusable evidence, `maintain-project-docs` for settled
+project procedures, `manage-project-tasks` for genuine unfinished follow-up, and
 `project-scripts` for a worthwhile deterministic personal utility. This skill
 knows how to delegate to them; they need not know about or depend on this skill.
 Do not invoke every capability, start a broad hygiene sweep, or create redundant

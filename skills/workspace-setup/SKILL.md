@@ -55,11 +55,11 @@ Python compatibility comes from recipes and runtime, not a setup inventory.
 Read [Defaults](references/defaults.md) for the admission rule and optional startup
 cue. Each owner supplies its own minimal creation-time section:
 
-- project-tasks: task roots and descriptive INDEX.md links;
-- project-docs: docs roots and a few existing canonical entry points with cues;
-- knowledge-base: KB/archive and any established backend/knowledge-page routing;
-- manage-python-env: Python root beside its before-execution activation cue;
-- agent-lessons: existing essential rules and conditional pointers; no seeded lessons.
+- manage-project-tasks: task roots and descriptive INDEX.md links;
+- maintain-project-docs: docs roots and a few existing canonical entry points with cues;
+- maintain-knowledge-base: KB/archive and any established backend/knowledge-page routing;
+- run-and-manage-python: Python root beside its before-execution activation cue;
+- improve-agent-workflows: existing essential rules and conditional pointers; no seeded lessons.
 
 Keep procedures, live task lists, environment inventories, skill catalogues, and
 last-check dashboards out of newly created routing. Preserve customized wording

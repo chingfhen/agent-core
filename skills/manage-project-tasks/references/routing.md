@@ -36,10 +36,10 @@ Ask when materially different matches remain; disclose material access/search li
 Read the actual task: reconcile its current state, outcome, and next action before
 following any older plan or resume command. Verify consequential claims against
 relevant evidence; unresolved intent or permission conflicts require clarification.
-Reading or using task context does not require project-tasks or authorize writes
+Reading or using task context does not require manage-project-tasks or authorize writes
 or execution. If no match is found, continue within the current request and permissions.
 
-Load project-tasks for task maintenance or execution of a saved task.
+Load manage-project-tasks for task maintenance or execution of a saved task.
 Task maintenance is human-triggered. When requested, independently create,
 update, checkpoint, reprioritize, and close verified-Completed tasks for relevant
 work, maintaining INDEX.md without separate routine bookkeeping approval.
