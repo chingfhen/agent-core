@@ -1,7 +1,7 @@
 ---
 title: Git Workflow — Design and Operating Contract
 description: Human-controlled Git branch, review, integration, and continuation contract for the personal Git Workflow skill.
-updated: 2026-11-10
+updated: 2026-11-11
 ---
 
 # Git Workflow — Design and Operating Contract
@@ -72,6 +72,7 @@ At a resumable checkpoint, the linked project task preserves approved decisions 
 
 - No general-purpose verification skill is required for v1. Use relevant existing engineering, documentation, ML/evaluation, UI, infrastructure and project CI checks. Early acceptance criteria are human-approved at the consequential level; the agent chooses proportionate concrete checks, surfacing material changes or missing gates.
 - Commands such as `git status --short --branch`, `git remote -v`, `git fetch` (when permitted), `git branch --show-current`, `git diff`, `git log`, `git switch`, `git add <scoped-path>`, `git commit` and `git push` can form a *short verified-operation reference*, not a rigid script. Verify actual remote/local status and unknown push side effects before using commands. Separate provider adapters for GitHub PR, GitLab MR, and Bitbucket PR creation, readback and review states; do not assume any particular CLI/provider API, version, credential, or draft capability is present.
+- Reuse working authorized host access. When unavailable, the agent proposes a suitable provider tool for yes/no installation approval, performs permitted setup, and initiates interactive sign-in when possible; the human handles required browser authorization. Prefer `gh` for GitHub if a tool is needed. Policy and security boundaries apply; detailed setup and fallback rules live in the [provider reference](../skills/git-workflow/references/providers.md).
 - Skill instructions are an **agent-behavior boundary**, not permission enforcement. Actual authorization must also be consistent with host credentials, branch protections, repository policy, and (for employer repositories) approved use of tools and data.
 - No automatic subagent dependency, per-commit tag scheme, centralized branch registry, background bot, general release authority or new task-file metadata schema.
 

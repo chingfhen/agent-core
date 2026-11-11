@@ -3,9 +3,33 @@
 Read only the relevant host section before using its review API/CLI. Generic Git
 access does not establish PR access. Verify the host/product/version, approved
 tools, authenticated identity and repository permissions without printing tokens.
-Use available authorized CLI/API/MCP tools; no mandatory adapter package. Check
-current command help/API docs before mutation. Don't install tools, broaden
-credentials, or change organization settings merely to complete the workflow.
+Use a working authorized CLI/API/MCP connection first; no mandatory adapter
+package. Check current command help/API docs before mutation. If host access is
+missing, continue independently safe approved work and handle setup as follows:
+
+1. For GitHub prefer the official `gh` CLI; for GitLab prefer `glab` when suited to
+   the host; for Bitbucket select a supported authorized API or tool for the actual
+   product. Check policy and official installation/authentication guidance. Do not
+   assume a universal Bitbucket CLI or install a tool when a working connection is
+   already sufficient.
+2. If installation is necessary and permitted, propose the exact tool, trusted
+   source, method, location and material effects, and ask for yes/no approval. Do
+   not install without approval, elevate implicitly, change organization settings,
+   or broaden credentials without separate authorization. If declined or prohibited,
+   report the remaining blocker rather than bypass it.
+3. Once installation is approved, perform it and the setup the environment permits.
+   An already-installed tool may need authentication without any installation;
+   obtain consent for sign-in if it is not already authorized. Start the provider's
+   supported interactive authentication flow yourself where possible and direct
+   the human to its official authorization page and prompt.
+   Do not request passwords, tokens or private keys in chat; keep device codes out
+   of chat and expose them only through an appropriate interactive prompt. Ask the
+   human to run a command only if the environment cannot run or present the flow;
+   explain the limitation. Never claim sign-in succeeded without checking.
+4. Verify the authenticated host, identity and required repository access, then
+   resume authorized work. Report a precise remaining blocker if installation,
+   interaction, permissions or policy prevent completion. Authentication does not
+   itself authorize publication or merge.
 
 For every host: explicitly identify source repository/branch, destination
 repository/branch, current head SHA, request identifier and state. Check existing

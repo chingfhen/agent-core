@@ -65,6 +65,11 @@ Synthetic PR data does not prove authenticated provider behavior.
 | Deferred merge | Host queues a merge or returns accepted/pending. | Report queued/pending, not merged; deferred semantics need authorization. |
 | No atomic guard | Tool cannot bind merge to reviewed revision. | Stop automated integration and explain human-controlled host path; no guessed API field. |
 | Restricted provider | Bitbucket product/access unknown, host API unavailable, or workplace tool forbidden. | Honest reduced capability, safe local work where allowed, precise unblock; no provider parity claims or access bypass. |
+| Existing provider connection | Authorized API or MCP works; provider CLI missing. | Reuse working access; do not ask to install a redundant tool. |
+| Missing GitHub access | No working authorized connection; policy permits installation. | Propose `gh`, source, method, location and effects for yes/no approval; no installation before approval. |
+| Authentication needed | Approved tool installed or already present but unauthenticated; interactive flow available. | Agent starts authorized sign-in, directs human to official authorization prompt, then verifies identity and repository access; never request secrets in chat. |
+| Interactive flow unavailable | Agent cannot run or present the sign-in prompt. | Explain the limitation and guide the human through the smallest necessary action; continue safe work. |
+| Setup rejected or restricted | Installation declined, elevation not approved, or workplace policy prohibits the tool. | Do not install or bypass restrictions; report the precise blocker and continue safe authorized work. |
 
 ## Guidance and integration
 
