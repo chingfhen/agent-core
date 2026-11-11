@@ -55,11 +55,38 @@ their scope and authorship context. Unexpected commits or divergence need
 reconciliation; no automatic reset, pull merge, rebase, or force-push. A date or
 legacy suffix on another person's branch is not adoption approval.
 
-Use `git worktree add <authorized-path> <branch>` when isolation is useful and
+Only after explicit worktree approval and the required task record, use
+`git worktree add <authorized-path> <branch>` when isolation is useful and
 the branch is not already checked out. Inspect an existing worktree rather than
 forcing the branch into a second one. Do not relocate the human's dirty work or
 run a second writer in the same checkout. Verify the actual new cwd/HEAD before
 edits; submodules and nested repositories need their own authorized scope.
+
+Necessary updates from the approved target into a managed branch are included in
+managed delivery, distinct from divergence on that branch's own remote tracking
+ref. Verify the fetched target SHA, clean/owned index and absence of another writer
+before a history-preserving merge. Resolve conflicts by established intent, test
+the combined result, and report the new head. Ask about unresolved product/authority
+choices, not routine conflict markers. Never rewrite history or discard edits to
+make an update work. Preserve unfinished resolution in the task if blocked.
+
+## Worktree retirement
+
+Approval to create the worktree includes its safe retirement; it is not permission
+to remove another checkout or delete a branch. Before `git worktree remove <path>`:
+
+- Match the exact registered path and HEAD to the task; confirm no active writer,
+  process, submodule work or unresolved Git operation would be disturbed.
+- Inspect `git status --porcelain=v1 --untracked-files=all` and
+  `git ls-files --others --ignored --exclude-standard`; a clean ordinary status
+  alone does not account for ignored material. Preserve unknown/unpublished files.
+- Verify all needed commits and task records at the approved durable destination;
+  publish the record before removal and arrange a surviving location for closure.
+  A detached HEAD is not disposable merely because it has no branch name.
+- Remove without force only when no needed files remain. Verify both the path and
+  `git worktree list --porcelain`, then close the task's cleanup obligation. On
+  uncertainty retain the checkout and record the exact next action. Do not prune
+  arbitrary registrations or make the human perform routine cleanup.
 
 ## Commit and push
 
