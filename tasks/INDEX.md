@@ -13,5 +13,6 @@
 
 ## Later
 
+- [Audit Define Success Adoption](2026-11/define-success/2026-11-15__evaluate-define-success.md) — On Hold · Outcome discovery. On human request, evaluate the new skill's effectiveness and questioning/scope discipline; no trial performed yet.
 - [Unified Task Execution + KB Background Synthesis](2026-11/task-execution-service/2026-11-05__design-trustworthy-cross-project-executor.md) — On Hold (deferred). Resume: design one job/queue/dispatch/audit pipeline, with GitHub-triggered Sprite wake-up and KB synthesis as possible first workload. No implementation approved.
 - [ChatGPT Native Thin Skill Loaders](2026-11/chatgpt-skill-loaders/2026-11-05__evaluate-thin-native-skill-loaders.md) — On Hold (deferred). Resume on request: validate canonical GitHub-backed native skill discovery against full-package and GitHub-only options; no implementation approved.

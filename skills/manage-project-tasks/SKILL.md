@@ -224,6 +224,16 @@ useful depth through handoff; compress completed or superseded mechanics as
 work proceeds without discarding still-binding decisions, acceptance criteria,
 or important failure lessons.
 
+### Optional outcome discovery
+
+When a substantial task is being prepared for execution and its goal or success
+bar has consequential uncertainty, **offer** a define-success discussion with
+the human. Invoke that skill only if the human accepts; do not convert task
+creation into a mandatory discovery session. When an agreed definition already
+exists, preserve its success conditions and unresolved choices faithfully
+rather than rediscovering them. A Brief task may capture an early idea before
+its success bar is settled.
+
 ## Task contract
 
 Keep the first screen useful before any long plan. A normal new task has:

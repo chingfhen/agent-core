@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-11-11
+updated: 2026-11-15
 ---
 
 # Skills Catalogue
@@ -18,6 +18,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
 | [manage-project-tasks](../skills/manage-project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
+| [define-success](../skills/define-success/SKILL.md) | "Let's define the goal/success", "what would good look like?", or challenge incomplete success criteria together. | Request-led collaborative outcome discovery and selective questioning; no automatic task writes, implementation, or tests. |
 | [maintain-project-docs](../skills/maintain-project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
 | [improve-agent-workflows](../skills/improve-agent-workflows/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
 | [project-scripts](../skills/project-scripts/SKILL.md) | Explicitly review recent work for worthwhile personal scripts; create, repair, consolidate, or retire them. | Request-only personal script stewardship in one configured Project Scripts Root; not automatically part of engineering or handoffs. |
