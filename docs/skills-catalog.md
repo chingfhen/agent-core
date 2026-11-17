@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-11-15
+updated: 2026-11-17
 ---
 
 # Skills Catalogue
@@ -18,6 +18,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
 | [manage-project-tasks](../skills/manage-project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
+| [ease-into-work](../skills/ease-into-work/SKILL.md) | "Help me get into TripVerge", "I have ten minutes to reconnect", or "what could I explore tonight?" | Read-only, choice-preserving re-entry using saved project tasks; execution and stopping remain with their owning workflows. |
 | [define-success](../skills/define-success/SKILL.md) | "Let's define the goal/success", "what would good look like?", or challenge incomplete success criteria together. | Request-led collaborative outcome discovery and selective questioning; no automatic task writes, implementation, or tests. |
 | [maintain-project-docs](../skills/maintain-project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
 | [improve-agent-workflows](../skills/improve-agent-workflows/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
