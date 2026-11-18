@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-11-17
+updated: 2026-11-18
 ---
 
 # Skills Catalogue
@@ -26,6 +26,13 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [maintain-knowledge-base](../skills/maintain-knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
 | [tech-design-options](../skills/tech-design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |
 | [code-design](../skills/code-design/SKILL.md) | Design or review a bounded code area's ownership, interfaces, and changeability. | Request-led structural judgment; ordinary implementation and prose editing do not activate it. Source/manifest inclusion does not establish installation. |
+| [fastapi-practices](../skills/fastapi-practices/SKILL.md) | Implement or review actual FastAPI routes, Pydantic models, dependencies, and endpoint contracts. | Version-matched framework patterns; no framework upgrade, automatic dependency changes, or blanket refactor. |
+| [mcp-tool-development](../skills/mcp-tool-development/SKILL.md) | Build or review agent-facing MCP tools and host integration. | Tool usability, typed contracts, consent, failure behavior and actual host evidence; no implied deployment or registration. |
+| [react-nextjs-practices](../skills/react-nextjs-practices/SKILL.md) | Write or review React/Next.js code with relevant data, state, rendering and bundle considerations. | Focused rules, not the full performance checklist; preserves project cache/security decisions. |
+| [frontend-design](../skills/frontend-design/SKILL.md) | Design a concrete screen or flow with deliberate visual hierarchy and product-specific aesthetics. | Create design direction; not a required redesign for ordinary code maintenance. |
+| [web-interface-review](../skills/web-interface-review/SKILL.md) | Audit a named interface or substantial interaction for accessibility, responsive behavior and honest states. | Evidence-based UI review; distinct from visual design, React implementation and general code review. |
+| [security-hardening](../skills/security-hardening/SKILL.md) | Implement or review sensitive trust boundaries, authorization, private data, uploads or agent mutations. | Scoped threat model and testable controls; no unauthorized security/configuration changes or blanket audit. |
+| [code-review-quality](../skills/code-review-quality/SKILL.md) | Review a code diff or PR for material bugs and change quality, especially before review or merge. | Risk-focused findings; no automatic edits, independent-review claims, or merge authority. |
 | [git-branch-to-review](../skills/git-branch-to-review/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
 | [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and run-and-manage-python for teaching and the shared personal environment. |
@@ -70,6 +77,10 @@ It includes the prompt's useful plain-language guidance and adds reader-focused
 ordering, explanation, presentation, and meaning-preservation checks. The original
 prompt is retained in [archive](../archive/prompts/2026-10-19__anti-mannered-prose.md),
 not maintained as a second active instruction. `learning` and `create-markdown-diagrams` remain independent specialist skills, not dependencies.
+
+## Specialist evidence and maintenance
+
+These adapted skills are narrowly scoped engineering guidance, not validated performance improvements for the user's current agent. Compare actual outcomes before adding blanket enforcement. Upstream examples are linked in the individual skill sources; FastAPI's source skill and framework documentation are version-sensitive. Do not mistake selection in the manifest for a completed local harness sync.
 
 ## Before making another skill
 
