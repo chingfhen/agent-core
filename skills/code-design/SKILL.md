@@ -1,6 +1,6 @@
 ---
 name: code-design
-description: Design, review, or restructure a bounded area of software code for clear ownership, useful interfaces, and safe, understandable change. Use when explicitly invoked or asked for that structural design job, such as reviewing coupling or giving a domain rule one owner; not for ordinary implementation, debugging, generic review, or editing prose.
+description: Design, review, or restructure a bounded area of software code for clear ownership, useful interfaces, and safe, understandable change. Use when explicitly invoked or asked for that structural design job, such as reviewing coupling, giving a domain rule one owner, or designing a bounded API/interface contract; not for ordinary implementation, debugging, generic review, or editing prose.
 disable-model-invocation: false
 ---
 
@@ -19,5 +19,17 @@ Follow the requested action: design or review is read-only; an authorized refact
 3. **Compare with leaving it alone.** Describe the smallest coherent change, if any, and briefly walk through a real required or credible upcoming change: what would its owner and callers need to change? Scale the trace to the decision. Explain what knowledge or coordination is removed and what indirection or other cost is added. The future change is a thought experiment, not permission to build speculative extension points. Do not force shared abstractions on similar code with independent meanings, or split a cohesive function solely because it is long. Keeping the design is a valid outcome.
 4. **When code changes are authorized**, preserve observable contracts and failure behavior unless the request explicitly changes them. Separate behavioral changes from structural movement where useful. Use relevant existing checks; add a focused characterization or regression check when it protects uncertain or material behavior. Expand checks for affected contracts or evidence, not ceremony. Passing checks do not by themselves establish better design; a read-only design review does not inherently require tests.
 5. **Show the consequence and stop.** For review, give evidence, practical impact, and a proportionate recommendation or a grounded no-change conclusion. For implementation, explain the important before/after ownership or interface and the concrete change it makes easier; report checks actually performed and meaningful limits. Do not manufacture findings, quantify maintainability gains without evidence, or broaden into unrelated cleanup.
+
+## When the boundary is an API or public interface
+
+For a specifically requested API/interface design or review, apply the same ownership test above and additionally:
+
+- Trace a real caller and the data crossing the boundary. State request/response types, validation, identity/authorization expectations, side effects, and observable failure or conflict semantics. Distinguish a read, proposal, and committed mutation.
+- Keep public contracts predictable: consistent naming and errors, explicit version/revision behavior, and stable compatibility with existing clients. Prefer an additive change when a public client could depend on current behavior.
+- Prefer source-generated types when an existing schema (for example FastAPI OpenAPI) is authoritative. Do not create a second independently maintained client contract or expose internal/private fields.
+- Check an example of incorrect input, a rejected/unauthorized request, and a stale write when relevant. Report what needs runtime proof instead of implying interface design alone establishes concurrency or security.
+- Avoid adding future-proof abstractions, global versioning frameworks, or generalized error layers without a credible present requirement.
+
+This is not a second API-design workflow: it is a targeted lens within `code-design`. During actual FastAPI or MCP implementation, `fastapi-practices` and `mcp-tool-development` provide narrower implementation techniques; neither inherits this skill's request-only design authority.
 
 Local design alternatives do not require `tech-design-options`, which compares consequential solution approaches when requested. Minimal code is not necessarily the lowest reasoning burden; `yagni` is a separate requested minimalism lens. Neither skill is a prerequisite for ordinary execution or for the other.
