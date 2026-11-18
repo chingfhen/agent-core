@@ -4,7 +4,7 @@
 **Created:** 2026-11-18  
 **Last Updated:** 2026-11-18  
 **Priority:** Now  
-**Status:** Active — source delivery authorized; no runtime pilot authorized
+**Status:** Closed — canonical source delivered; runtime effectiveness untested
 
 **Goal:** Provide a small, reusable cross-harness Agent Core skill that recognizes when bounded **implementation-worker subagents** can help an otherwise capable main agent, chooses not to delegate when it cannot justify the benefit, and executes a **single human-approved delegation plan** using explicitly cheaper worker model(s), without replacing Project Tasks or Git Workflow.
 
@@ -65,6 +65,18 @@ The human already uses `manage-project-tasks` and Git as cross-session durabilit
 - [OpenCode agent documentation](https://opencode.ai/docs/agents) — current per-agent model and subagent tools need runtime confirmation.
 - [When Sub-Agents Work in Parallel (2026)](https://arxiv.org/abs/2610.10263) — cited in discussion for gains on long-horizon tasks and regressions/costs on bounded coding tasks; do not infer benefit on this exact harness without trials.
 - [Recent enterprise-style multi-agent research](https://arxiv.org/) — discussion noted high token overhead in a particular comparison; no benchmark result here should be treated as a verified budget for this task.
+
+## Delivery result — 2026-11-18
+
+**Completed:** Added [`delegate-implementation`](../../../skills/delegate-implementation/SKILL.md) to Agent Core `main`, selected it in [`personal-skills.toml`](../../../personal-skills.toml), and indexed it in the [Skills Catalogue](../../../docs/skills-catalog.md). The skill implements a selective *implementation-worker-first* workflow: no-delegation decision; actual cheaper-model preflight (DeepSeek/Luna preferred when available); one conversational approval covering all bounded workers in a plan; isolation/no overlapping writes; main-agent integration and check ownership; optional but compatible Project Tasks integration. Existing Git workflow approvals and publication boundaries remain unchanged.
+
+**GitHub commits:** [Skill source](https://github.com/chingfhen/agent-core/commit/4422ca8dfe37b0a9b5c991d3e5cb615c3cedce38); [selected manifest](https://github.com/chingfhen/agent-core/commit/d9a7c812fb1a5fbcb8b3d87c649cd926e11a0d38); [catalogue](https://github.com/chingfhen/agent-core/commit/c8c892ae8793f08166450fbabef6fbf28f2db0bd). The final task status/index bookkeeping is a separate commit.
+
+**Checks actually performed:** Remote GitHub read-back of skill/manifest/catalogue/task/index; inspected critical trigger, approval, hard cheaper-model refusal, optional Project Tasks dependency, worker isolation and Git ownership text; confirmed selected name is unique and catalogue links to the skill. These are **structural checks**, not a model/harness behavior trial.
+
+**Not verified:** No execution in OpenCode or Pi, no lower-cost provider lookup in the user's installed harness, no live child launch, no real resource savings or token metering, no isolation/merge integration test, no fresh-session skill triggering, and no automated Python test suite or CI status claimed. No extra consumer repository, KB, model configuration or installed harness was changed.
+
+**Next action:** None required to finish this source-delivery task. If desired later, run `agent-core sync --harness opencode` on the user's machine and inspect loaded skills; a separately authorized real feature trial can then evaluate correct refusal, one-shot approval, cheaper model routing, cost and integration evidence. Do not treat this delivery task as automatic permission to initiate that trial or create a second open evaluation task.
 
 ## Completion and evidence
 
