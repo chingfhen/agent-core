@@ -1,7 +1,7 @@
 ---
 title: Skill Design Guide
 description: Canonical criteria for designing, invoking, consolidating, publishing, and retiring Agent Core skills.
-updated: 2026-10-30
+updated: 2026-11-18
 ---
 
 # Skill Design Guide
@@ -25,6 +25,20 @@ A good skill is easy to reach, scoped enough to trust, and cheap to maintain. Mo
 5. Confirm the target tool/harness and dependencies can actually support the proposed behavior.
 
 The burden of proof is on a *new* skill, not on keeping the old skill untouched.
+
+## Evidence-led selection of specialist engineering skills
+
+When adding a skill for a strong coding model, judge **marginal benefit over normal agent execution**, not the popularity of its repository or the number of best practices it contains. Use five questions alongside the job/ownership test above:
+
+1. **Missing behavior:** What plausible failure does the model otherwise overlook on this workload?
+2. **Actionable technique:** What concrete procedure, tool choice, compatibility detail, or check makes the outcome more reliable?
+3. **Scope:** Can it run only where relevant, without required irrelevant tests, lengthy reports, new dependencies, infrastructure, or broad refactoring?
+4. **Overlap:** Does an existing skill, code contract, CI check, or project instruction already own the same outcome? Prefer amending its owning source when so.
+5. **Evidence:** Is a benefit measured on matching tasks/models/harnesses, merely observed in project work, or just predicted? Keep those states distinct.
+
+**Research basis:** [SkillsBench (2026)](https://arxiv.org/abs/2602.12670) reported meaningful average benefit from curated skills across varied domains, while the [October 2026 revision of SWE-Skills-Bench](https://arxiv.org/abs/2603.15401) found most tested software-engineering skills produced no statistically significant gain across its configurations; some were harmful. [Agent Skills Can Be Harmful (2026)](https://arxiv.org/abs/2608.11888) documents interference and expensive mandatory procedures. The findings concern those studied versions and configurations; they do not establish the effectiveness of skills authored here.
+
+Prefer narrowly activated, version-compatible, outcome-specific guidance and executable controls where possible. A new skill may justifiably be selected on a plausible but untested benefit when an important gap exists; label it **unvalidated**, avoid claiming a proven gain, and reassess when actual agent behavior supplies evidence. Do not require a benchmark before every legitimate skill addition or force an evaluation during unrelated work. An invocation-routing problem can be improved after it is observed; do not add speculative AGENTS.md rules to every project at adoption time.
 
 ## Naming and invocation
 
