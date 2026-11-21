@@ -23,3 +23,7 @@ Comparison alone authorizes neither implementation nor persistence, spending, pr
 5. **Converge.** Recommend the leading approach, decisive reasons, accepted tradeoff, and evidence or circumstances that would reverse the recommendation. If a consequential unknown leaves a genuine tie, retain the leaders and identify the smallest useful discriminator. Normally give a compact decision brief: decision, credible alternatives, recommendation and tradeoff, and material uncertainty or next decision. Do not leave an unranked menu or ask the human to do the synthesis.
 
 The work ends when the selected decision is settled, paused, or replaced. Deepen its rationale when asked without reopening settled choices absent contrary evidence. Local code organization can be considered directly without automatically invoking another skill; requested persistence and implementation follow their own workflows and permissions.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

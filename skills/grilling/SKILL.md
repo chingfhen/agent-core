@@ -10,3 +10,7 @@ Ask one question at a time. Each question should follow from the current answers
 Explore the codebase instead of asking when the answer can be discovered from available evidence.
 
 Continue until the important branches, dependencies, assumptions, and trade-offs are resolved.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

@@ -22,6 +22,11 @@ disable-model-invocation: false
 - **Resource economy is part of the decision.** Cheaper per token does not ensure lower total cost. Factor in extra context, coordination, verification and retries. Use a conservative initial worker count (often one), limited attempts, and no speculative swarms. If a credible saving or work-quality benefit cannot be articulated, keep the main agent.
 - **No hidden authority expansion.** An approval to delegate does not authorize an unapproved feature, extra files, branch creation, credential exposure, security changes, cloud costs, publication, deployment, force push, merge, or destructive action. Respect narrower repo, harness and human gates.
 
+
+## Required early delegation decision
+
+For substantial implementation when this skill is invoked, decide **before substantive coding**, and state once in the conversation: `Delegation decision: propose workers / execute previously approved workers / main-agent execution / blocked — [decisive evidence-based reason]`. Evaluate separability, expected net benefit, actual cheaper model/tool availability, isolation, and authorization; mark unknowns explicitly. Even when no worker is appropriate, explain the decisive reason rather than silently proceeding. Do not ask permission merely to decline delegation. The statement does not authorize launching workers or bypass any approval or repository gate below. Avoid ceremonial receipts if this skill was invoked for a small or irrelevant task.
+
 ## 1. Decide whether any delegation is worthwhile
 
 Use the existing user request, accepted design/contracts, repository state, and (when present) relevant Project Task. A large or long-running task by itself does **not** warrant subagents. The goal is *implementation delegation*, not handing all early exploration to scouts: the user typically investigates goals and design with the main agent first.
@@ -73,3 +78,7 @@ This is a cross-harness behavioral workflow with OpenCode as its first likely co
 Related Agent Core owners: `manage-project-tasks` (continuity), `git-branch-to-review` (Git delivery), `code-review-quality` and applicable checks (review), `define-success` (explicit outcome exploration). This skill does not automatically invoke those workflows for unrelated work.
 
 Research motivation: [When Sub-Agents Work in Parallel (2026)](https://arxiv.org/abs/2610.10263) describes both selective long-horizon benefit and regressions/overhead, supporting a strong **no-delegation** option and explicit resource gates; these are not measured results for this Agent Core implementation.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

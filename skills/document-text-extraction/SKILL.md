@@ -47,3 +47,7 @@ Statuses:
 Temporary outputs under `tmp/` are disposable but remain available for inspection. Do not stage or commit them, and do not write into any knowledge-base evidence, inbox, or knowledge folders.
 
 An extraction request authorizes **extraction only**. If the human later asks to capture or preserve the result, provide the original source, extraction, and quality report to the **separately selected authoritative knowledge-base workflow**. That later workflow owns any authoring or persistence. This skill has no runtime dependency on another skill.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

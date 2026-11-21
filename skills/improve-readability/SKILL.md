@@ -199,3 +199,7 @@ outstanding. Do not run the migration until the owner approves the backup.
 “Run `pytest tests/test_parser.py`. If it fails, stop and report the failure.”
 
 Do not add headings, a table, a diagram, or a second summary.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

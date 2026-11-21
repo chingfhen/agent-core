@@ -309,3 +309,7 @@ Do not broaden a routine sync into this audit without authorization.
 ## Final Test
 
 A good documentation update leaves future participants with the settled project meaning and stable behavior they need, in the owned canonical surfaces, without copying active task state or manufacturing documentation. The result identifies the right authority for each claim, replaces stale material, preserves intended design when implementation is wrong, and reports either the exact changed paths or an honest no-change outcome.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

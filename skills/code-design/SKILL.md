@@ -33,3 +33,7 @@ For a specifically requested API/interface design or review, apply the same owne
 This is not a second API-design workflow: it is a targeted lens within `code-design`. During actual FastAPI or MCP implementation, `fastapi-practices` and `mcp-tool-development` provide narrower implementation techniques; neither inherits this skill's request-only design authority.
 
 Local design alternatives do not require `tech-design-options`, which compares consequential solution approaches when requested. Minimal code is not necessarily the lowest reasoning burden; `yagni` is a separate requested minimalism lens. Neither skill is a prerequisite for ordinary execution or for the other.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

@@ -374,3 +374,7 @@ supporting records for consequential claims. Disclose material search limits.
   limitations. Distinguish local changes, remote persistence, and drafts. Completion
   means the requested records/output and navigation exist, with cleanup complete
   only when its archival and source-removal checks succeeded.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

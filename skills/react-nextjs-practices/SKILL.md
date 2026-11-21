@@ -19,3 +19,7 @@ Improve correctness and understandable performance of an actual React/Next.js ch
 
 ## References
 Use the relevant part of [Vercel's React Best Practices](https://github.com/vercel-labs/agent-skills/tree/main/skills/react-best-practices), which groups guidance by waterfalls, bundles, server and client behavior, re-renders, and rendering. Its broad rule list is a lookup resource, not a checklist to exhaust. For visual direction use `frontend-design`; for a dedicated UI audit use `web-interface-review`.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

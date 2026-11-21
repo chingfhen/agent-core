@@ -18,3 +18,7 @@ Find observable interface problems that could confuse, exclude, or mislead real 
 
 ## Stop condition
 The review covers the affected user flows with honest evidence levels and a prioritized, nonduplicated set of findings (or a grounded no-issue conclusion). No mandatory report for unaffected pages.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.

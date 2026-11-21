@@ -106,3 +106,7 @@ Never initialize Git, stage, commit, push, install skills, modify harness settin
 or configure backup incidentally. Publication and resource-content migration are
 separate operations. Saved routing and a startup path cue do not prove harness
 loading, compliance, interpreter health, or automatic cross-session reload.
+
+## Decision visibility
+
+When this skill makes a consequential choice—selecting, declining, or deferring a path, or applying a material scope, permission, cost, safety, or verification gate—make the chosen outcome and its evidence-based reason visible in the normal conversation (a compact `Decision: ... — ...` is sufficient). State it before acting when permission or cost depends on the choice, otherwise at the relevant handoff. An explanation already clearly given counts; do not add a duplicate status line, routine no-op receipts, a separate log, or private reasoning. Merely loading a skill is not evidence that its decision was applied.
