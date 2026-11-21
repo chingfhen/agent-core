@@ -37,13 +37,21 @@ to execute, investigate in depth, or save something.
 
 1. Identify the project from the human's words and known context. Follow its
    applicable `AGENTS.md` routing. When available, read the project's task
-   index and one or two directly relevant task briefs. Read-only task discovery
-   does **not** require loading `manage-project-tasks`.
-2. Recover the human-relevant goal, current priority, last recorded progress,
-   blocker or uncertainty, and next *permitted* step. Consult relevant project
-   docs only as needed. Inspect current code or an active PR when an accurate
-   suggested entry point depends on current implementation; otherwise avoid
-   expensive full-repo exploration, testing, and preflight.
+   index and select one or two task briefs that explain the intended outcome
+   and current milestone. Choose by relevance to the human's goal, not merely
+   index order or a `Now` label. If a foundation task points to a larger
+   experiment or consuming task, read that linked outcome before offering
+   directions. Read-only task discovery does **not** require loading
+   `manage-project-tasks`.
+2. Reconstruct the through-line: the overall intended outcome, the latest
+   evidenced milestone toward it, and the next *permitted* step, blocker or
+   uncertainty. Distinguish a dependent implementation slice from the outcome
+   it serves, and a parallel validation track from the central experiment.
+   Task priority indicates work order, not which goal matters most. If the
+   parent outcome remains unclear, consult one focused project goal, MVP or
+   north-star document as needed. Inspect current code or an active PR only
+   when an accurate entry point depends on current implementation; otherwise
+   avoid expensive full-repo exploration, testing, and preflight.
 3. Treat saved tasks as dated execution memory, not proof of current code or
    permission. Qualify stale or unverified state. If task context is missing,
    use available authoritative context, say what is unknown, and offer a modest
@@ -51,8 +59,9 @@ to execute, investigate in depth, or save something.
 
 ## Open one or two doors
 
-- Begin with a brief, welcoming orientation: what matters now and where things
-  stand. Do **not** dump the backlog or repeat an entire specification.
+- Begin with a brief, welcoming orientation that names the intended outcome
+  and locates the current milestone within it. Do **not** mistake a high-priority
+  dependency for the whole goal, dump the backlog or repeat a specification.
 - Offer **one or two** concrete, appealing, outcome-relevant directions, tied
   to the project's real goals and saved priorities. For each, explain why it
   matters and a small optional first move. An investigation or design thought
