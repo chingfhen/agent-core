@@ -234,6 +234,43 @@ exists, preserve its success conditions and unresolved choices faithfully
 rather than rediscovering them. A Brief task may capture an early idea before
 its success bar is settled.
 
+### Implementation delegation is decided while planning
+
+When the human explicitly asks to consider subagents, or when authoring or
+substantially revising a **substantial, implementation-ready Project Task** with
+plausibly separable implementation work, invoke `delegate-implementation` **during
+planning**. It owns the research-informed strategic choice, harness/model/effort
+proposal, coordination design and fallback. The planner may choose **delegation,
+no delegation, or defer**; choosing workers is never compulsory. For a small,
+obviously indivisible edit or an early investigation with unsettled architecture,
+do not force a specialist pass or inflate the task. An explicit human request to
+plan delegation still merits a decision, including a concise "no" if warranted.
+
+Preserve the decision in the **same Project Task**, not a new registry:
+- For **no delegation**, one line with the decisive rationale is enough.
+- For **delegation**, retain the intended execution harness, bounded worker
+  responsibilities, model and thinking/effort selections with verified versus
+  proposed/unknown capabilities, parent ownership, source interfaces, write
+  isolation, coordination order, verification, expected benefit/resource
+  tradeoff, fallback/stop rules, and **actual human approval state**. Keep it
+  proportional and readable; the planner chooses technical details and presents
+  a concise receipt so the human can adjust them.
+- For **defer**, record what decision/contract must be settled before the
+  delegation strategy can be locked. Do not represent the task as ready when
+  a required human design choice remains open.
+
+Human approval of a **surfaced** task implementation plan including these
+specific delegation assignments can count as one approval covering its named
+workers; an independently approved delegation plan also counts. Merely saving
+the task, silence, or broad permission to use agents does not. Do not solicit a
+second ceremonial worker approval when the specific plan was already approved.
+Task approval does not grant otherwise prohibited spending, tools, credentials,
+branch/worktree, merge, publication or deployment rights.
+
+**At execution, do not re-invoke `delegate-implementation` to reconsider the
+strategy.** Follow its saved task contract with the execution checks below;
+replanning requires a separately authorized planning pass.
+
 ## Task contract
 
 Keep the first screen useful before any long plan. A normal new task has:
@@ -397,6 +434,14 @@ external state, or environment still matches it**.
    using relevant evidence, asking when intent or permission remains unclear; a
    recent timestamp alone does not settle a conflict. Distinguish preparing a handoff
    from permission to implement. Do not treat an index entry as authorization.
+   If the task records a delegation decision, treat it as planning-owned strategy:
+   confirm that the **specific worker plan was actually human-approved**, not
+   merely written. Validate the actual target harness, worker/model/effort controls,
+   tools, cost/quotas, safe write isolation and current interfaces before launch.
+   Do **not** load the delegation planning skill or redo its strategic choice.
+   Follow an expressly authorized fallback on an operational blocker, stating
+   the deviation; otherwise stop for replanning/approval. No recorded delegation
+   plan means normal main-agent execution, not ad hoc worker invention.
 2. **Act within the approved scope.** Perform only the next permitted work through
    the relevant execution workflow. If current evidence contradicts the
    plan or creates a material human-owned decision, stop and surface it rather
@@ -405,9 +450,13 @@ external state, or environment still matches it**.
    checkpoints, blocked transitions, handoffs, and completion, update the same
    task's current state, decisions affected, blockers, verification actually
    performed, material deviations, remaining uncertainty, and next action;
-   refresh its index entry. Do not record every command or trivial progress.
-   If a stricter rule withholds task-write permission, report what needs an
-   update instead of editing.
+   refresh its index entry. For delegated work, preserve a compact
+   planned-versus-actual receipt with actual worker identity/model/effort if
+   known, child-session and artifact references, integration checks, observed
+   usage or unknown, any approved fallback, and remaining work; do not copy full
+   transcripts or substitute child claims for verification. Do not record every
+   command or trivial progress. If a stricter rule withholds task-write
+   permission, report what needs an update instead of editing.
 4. **Close honestly.** Close when the required outcome and verification are
    complete, or the human explicitly cancels/supersedes the remaining work.
    For an explicit closeout request, complete the coordinated review first.
