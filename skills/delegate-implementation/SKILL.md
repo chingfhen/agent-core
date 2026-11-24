@@ -7,10 +7,10 @@ description: >
   an implementation-ready Project Task with plausible separable work. Select an
   intended execution harness, worker responsibilities, model and thinking effort
   where support is known, coordination, verification and fallback; persist the
-  decision in an authorized Project Task and show it to the human. For execution
-  of an existing approved plan, follow its contract and check live prerequisites
-  without reopening the delegation strategy. Not for routine task bookkeeping,
-  small edits, or compulsory subagent invocation.
+  decision in an authorized Project Task and show it to the human. Planning only:
+  the executing agent follows the persisted contract through the Project Tasks
+  workflow, without re-invoking this skill or reopening strategy. Not for
+  routine task bookkeeping, small edits, or compulsory subagent invocation.
 disable-model-invocation: false
 ---
 
@@ -22,7 +22,7 @@ disable-model-invocation: false
 
 - **Planning-time invocation:** Load when the human says to plan delegation, including "use the delegation skill", or when preparing/substantially revising a **substantial implementation-ready Project Task** where meaningful bounded work might be separable. The planning agent makes the decision itself using this skill; no mandatory meta-planner subagent. For small or obviously indivisible work, a one-sentence no-delegation result suffices. Do not invoke on ordinary maintenance, read-only task discovery, early goals without settled implementation constraints, or merely because a task exists.
 - **Planning output:** Choose **delegate**, **no delegation**, or **defer** when essential design facts are unresolved. Show the decision and concise rationale to the human. When task-authoring rights exist, record it in that Project Task **before implementation**; when they do not, report it in the conversation and do not mutate the task. This skill neither creates a task store nor grants task-write permission.
-- **Execution-time use:** If a saved task includes a current, approved delegation contract, the executor consults **this skill's execution sections only** to apply its operational checks, run authorized workers, integrate, and account. It does **not** redo economic/strategic delegation analysis. A stale/unsafe plan follows its documented fallback or returns for replanning; no unrecorded substitution.
+- **Execution-time boundary:** **Do not load this skill merely to execute a saved Project Task.** The executor uses the approved, self-contained task contract and the ordinary `manage-project-tasks` execution workflow. It does **not** redo delegation strategy. A stale/unsafe plan follows its documented fallback or returns for replanning; no unrecorded substitution.
 - **No planned delegation:** Implement normally. An executor must not decide to create an opportunistic worker plan just because it can call subagents. A human may explicitly commission a new planning pass before affected implementation.
 
 The planning agent owns strategic choice; the executing parent agent remains responsible for the final code and verification. The human can change a proposed worker, model, effort, harness, or scope before authorizing execution. A planning decision is **not permission** to launch workers or to edit unrelated files.
@@ -68,18 +68,17 @@ For an implementation-ready Project Task, add a concise **Delegation Decision** 
 
 **Authority:** A plan in a task is not itself execution permission. Explicit human approval of the **surfaced task implementation plan including its delegation arrangement** counts as the single approval for all named workers; do **not** ask again at execution or per worker. A separately explicit approval of this delegation plan also counts. Silence, merely saving a task, or general enthusiasm for delegation do not. The recorded approval must actually be traceable; if absent or contradicted, do not launch. Tool-level authorization prompts still apply. Approval never expands implementation scope, write access, branch/PR authority, credential access, deployment, or spending gates. Material model, effort, worker-count, cost, scope, or permission changes require a new human decision unless the approved plan **explicitly** includes the bounded alternative.
 
-## Execution: apply, verify, and report; do not replan
+## Encode the executor's protocol during planning
 
-When an approved Project Task calls for delegated execution:
+The saved plan must be sufficiently explicit that a fresh execution agent can act **without loading this skill or choosing a strategy**:
 
-1. **Read the current authoritative task and approval.** Identify the intended harness and each worker's immutable contract, source/target revision assumptions, parent's retained work, exact fallback, limits, and permitted next action. Recheck actual requested execution authority against repository/harness rules. A stale task is not permission.
-2. **Preflight operational reality only:** Confirm selected worker ID/model and effort/variant if the plan requires them, tools, access, actual cost/quota limitations, working tree/branch/dirty state, independent workspace requirements, and no overlapping writers. A child session is not necessarily a separate filesystem. If the planned configuration is unavailable, follow a **preapproved** equivalent or main-agent fallback if explicitly documented; otherwise **stop and report**. Do not quietly choose a new strategy, worker, model, or effort.
-3. **Issue focused worker briefs** from the saved contract: objective and success criteria, accepted interface and authoritative context references, exact/bounded read/write paths, tools, tests, prohibited actions, expected output and evidence receipt, budget/attempt limit and stop/escalation conditions. Avoid copying huge transcripts or transmitting secrets. No recursive delegation absent explicit plan authorization.
-4. **Coordinate without duplicated work:** Avoid parent implementation of a worker's assigned slice. Let bounded workers finish without routine conversational micromanagement; handle genuine blockers. Serialize conflicting writes; concurrent mutating workers require verified separate worktrees/workspaces or equivalent, and follow `git-branch-to-review` where applicable (including its independent branch/worktree gates).
-5. **Own integration and acceptance:** Inspect actual changed files/diff against baseline, verify claimed checks, test combined behavior including important failure cases, and reconcile dependencies. Worker self-reports are not proof. Repair only within existing authorization and retry limits; do not silently spawn replacements, expand scope, or promote a costly model.
-6. **Checkpoint with existing owners:** When task changes are authorized, use `manage-project-tasks` to record planned-versus-actual workers/models/effort, relevant child-session identifiers, commit/diff/check references, **observed** usage if available (otherwise unknown), results, deviations, verified gaps, and next permitted action. When writes are barred, return this concise receipt for authorized task maintenance. Do not invent a second registry or store transcripts in the task.
+1. **Operational preflight:** Verify the recorded human authorization, intended harness, actual model/effort support, permissions, source revision, tools, resource limits and safe file/workspace isolation. Model inheritance and separate chat sessions do not prove cheap execution or isolated files. If a hard prerequisite fails, use the **specifically approved** fallback or stop and report; do not invent a replacement.
+2. **Worker handoff:** Provide bounded objectives, accepted contracts and source pointers, allowed read/write paths and tools, acceptance checks, stop conditions, limits and the required short evidence receipt. No huge context dumps or recursive delegation by default.
+3. **Coordination:** No competing parent work on delegated files; parallel mutating workers only with verified isolated writes, otherwise serialize or stop. Retain parent ownership of integration, security/consistency invariants and end-to-end acceptance. Follow Git workflow's independent permissions for branches/worktrees.
+4. **Verification:** Inspect actual diffs/artifacts and run the applicable combined checks. A child's "done" claim is not proof. Respect retry/attempt budgets; no silent additional worker, expanded scope, or upgraded model.
+5. **Trace:** When authorized, checkpoint in the **same Project Task**: intended-versus-actual workers, harness/model/effort, child session and artifact references, tests, observed usage or *unknown*, deviations, fallback and next action. If writes are barred, report the receipt without altering the file.
 
-**Stop or fall back** on unapproved material deviations, missing capability, unsafe isolation, interface drift, ambiguous side effects, blocked permission, exceeded attempt/budget limit, or repeated failure. Only use a fallback the human previously authorized; otherwise stop and request replanning/approval. Do not treat a good-sounding alternative as approved. If the fallback is main-agent execution, state that before continuing and mark the deviation in the task where permitted.
+**Fallback policy:** Planning must explicitly select the fallback when practical: e.g., approved parent implementation if a worker is unavailable, or stop for replanning when delegation is essential, scope changed, or a material model/effort substitution is needed. The executor must state when the fallback is activated. Do not silently replace a recorded multi-worker strategy with a new one.
 
 ## Research and boundaries
 
@@ -95,4 +94,4 @@ This is a **cross-harness planning and execution contract**, not a runtime orche
 
 ## Decision visibility
 
-During **planning**, state `Delegation decision: delegate / main-agent execution / defer — [decisive reason]` and show the worker outline if selected. During **execution**, state only `Delegation execution: following approved plan / authorized fallback / blocked — [material evidence]` at the relevant boundary. Merely loading this skill is not evidence that its decision or execution happened.
+During **planning**, state `Delegation decision: delegate / main-agent execution / defer — [decisive reason]` and show the worker outline if selected. The Project Task must contain any consequential execution receipt requirement so the executor can report `following approved plan / authorized fallback / blocked` without re-invoking this skill. Merely loading this skill is not evidence the planning decision was made.
