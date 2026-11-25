@@ -11,12 +11,12 @@
 **Success Bar:** The approved module contract is cohesive with the foundation, source behavior is preserved or explicitly changed, and relevant acceptance/permission conditions are clear.
 **Chosen Direction:** Modular Agent Builder; foundation approved 2026-11-25. Read canonical shared contracts; module details require human agreement.
 **Current State:** Foundation approved; no production implementation or tests, worker launch, publication or workspace migration performed. Module design not yet approved.
-**Next Action:** When the human starts this module, discuss complete Python integration and before-execution activation, alongside script stewardship.
+**Next Action:** When the human starts this module, discuss script stewardship and complete Python integration, including safe routine utilization without skill loading, mandatory maintenance routing and exact mutation boundaries.
 **Blockers:** Awaiting human-started module design; foundation prerequisite satisfied.
 
 ## Permission and scope
 
-Preserve team isolation, recipe/pin/lock, safe targeting, concurrency and runtime checks; no transient fallback. Keep familiar environment-creation and execution cues; test mandatory routing before retiring the old skill. Saving this task is not approval to implement, publish/install, migrate, or run workers.
+Preserve team isolation, recipe/pin/lock, safe targeting, concurrency and runtime checks; no transient fallback. Keep familiar environment-creation and execution cues; test safe routine utilization and mandatory maintenance routing before retiring the old skill. Saving this task is not approval to implement, publish/install, migrate, or run workers.
 
 Intentional change: known-compatible environment discovery/reuse and execution do not need the skill. Specify exact safe utilization vs mutation boundary and standing AGENTS.md targeting/verification instructions. Create/change/repair loads root + python.md. Preserve actual utilization, no transient fallback and all relevant uv safety.
 

@@ -11,7 +11,7 @@
 **Success Bar:** The approved module contract is cohesive with the foundation, source behavior is preserved or explicitly changed, and relevant acceptance/permission conditions are clear.
 **Chosen Direction:** Modular Agent Builder; foundation approved 2026-11-25. Read canonical shared contracts; module details require human agreement.
 **Current State:** Foundation approved; no production implementation or tests, worker launch, publication or workspace migration performed. Module design not yet approved.
-**Next Action:** When the human starts this module, discuss records, synthesis, managed artifacts, backends, retrieval, indexes and selected-source archive capture.
+**Next Action:** When the human starts this module, discuss records, managed artifacts, backends, retrieval, indexes, selected-source archive capture and explicit compatibility for deprecated synthesis/inbox resources.
 **Blockers:** Awaiting human-started module design; foundation prerequisite satisfied.
 
 ## Permission and scope
