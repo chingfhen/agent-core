@@ -42,7 +42,7 @@ to execute, investigate in depth, or save something.
    index order or a `Now` label. If a foundation task points to a larger
    experiment or consuming task, read that linked outcome before offering
    directions. Read-only task discovery does **not** require loading
-   `manage-project-tasks`.
+   `agent-builder` with `references/tasks.md`.
 2. Reconstruct the through-line: the overall intended outcome, the latest
    evidenced milestone toward it, and the next *permitted* step, blocker or
    uncertainty. Distinguish a dependent implementation slice from the outcome
@@ -81,7 +81,7 @@ to execute, investigate in depth, or save something.
 If the human chooses a direction and asks to act, use the ordinary relevant
 workflow and its permission checks. If the human says "make it easy for me to
 return", "checkpoint this", or requests a fresh-session handoff, use
-`manage-project-tasks` for the existing task and index, subject to repository
+`agent-builder` with `references/tasks.md` for the existing task and index, subject to repository
 write gates. Do **not** create a second memory or stopping mechanism.
 An unchanged task may already be sufficient; don't checkpoint trivial movement
 merely because a session is ending.

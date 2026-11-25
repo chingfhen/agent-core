@@ -1,314 +1,87 @@
 ---
 title: Workspace Configuration
-description: Canonical skill-owned routing, task continuity, and coordinated handoff contract.
-updated: 2026-11-10
+description: Current persistent-workspace routing, continuity, maintenance and migration contract.
+updated: 2026-11-26
 ---
 
 # Workspace Configuration
 
 ## Read First
 
-- Canonical skills implement lean, independently owned AGENTS.md routing and
-  explicit coordinated task handoff/closeout. Publication and workspace adoption
-  are separate; source edits do not update installed skills or external guidance.
-- `maintain-project-docs`, `maintain-knowledge-base`, and `project-scripts` are independently
-  usable resource skills. `manage-project-tasks` coordinates task continuity and
-  KB/docs/operational-lessons review for explicit handoff/closeout.
-  `improve-agent-workflows` coordinates bounded improvements to future agent behavior,
-  using relevant owning skills without making those skills depend on it.
-  Coordinators must respect owner permissions and avoid recursive invocation.
-  There is no mandatory setup skill or new lessons registry.
-- The [implementation task](../tasks/2026-10/2026-10-29__skill-owned-agents-sections.md)
-  records delivery and actual verification. Static checks and saved instructions
-  do not establish fresh-session harness compliance.
+- [Agent Builder](../skills/agent-builder/SKILL.md) is the canonical workspace maintenance source. Its [approved design](agent-builder-design.md) preserves the rationale; individual references own detailed procedures. Source integration and manifest selection are complete; actual harness behavior and workspace adoption are not established by publication.
+- Agent Builder owns persistent workspace context. Ask to set up or refresh the agent, register a project, sync tasks/docs/KB, capture lessons, maintain scripts or a Python environment, or hand off/close out work. It loads the relevant reference for maintenance; ordinary discovery and compatible Python utilization need no maintenance skill. Human controls timing and scope; narrower permissions prevail. It uses one managed AGENT BUILDER block for newly configured workspaces, with confirmed locators and selective utilization cues. Existing resource locations, legacy owner blocks and custom instructions remain valid until explicitly migrated; sync does not modify workspace guidance, Git configuration, or resources. Preserve employer confidentiality and do not transfer work material to personal storage.
+- Previous independent resource skills remain unselected historical comparison/rollback source. For old guidance, use the matching Agent Builder reference and preserve established paths and gates. Existing workspaces are not automatically migrated.
+- Git Workflow and Learning Notebook retain their own independent instruction ownership, caller-specific gates and procedures.
 
 ## Skill-Owned Guidance
 
 ### Guidance admission
 
-AGENTS.md contains confirmed routing, selective entry points with when-to-read
-cues, and essential before-action constraints. Detailed procedures stay in their
-owning skills or selectively read references. No line quota replaces this judgment.
-When applicable guidance and resources are available, agents can discover, read,
-and use relevant docs, KB material, task context, and existing lessons without
-invoking their maintenance skills. Reading does not authorize maintenance. Consult
-only what the work needs; missing or inaccessible resources are gaps, not permission
-to guess a replacement or initialize one. Applicable guidance is not necessarily
-actually loaded by every harness.
-
-Reader guidance must work without loading maintenance skills. It provides confirmed
-roots, when-to-read cues, and a bounded filename/content-search fallback for imperfect
-references or index misses. Indexes retain recognizable subjects and useful established
-aliases; the underlying document supplies the actual state or evidence. An index miss
-does not prove absence. Material ambiguity or access/search limits remain explicit.
-Keep changing status in tasks/indexes, not standing guidance; verify affected entry
-points during authorized maintenance rather than introducing a second catalogue.
-
-The human controls persistence timing: context retrieval and ordinary progress do not
-trigger docs/KB/lessons maintenance. An explicit maintenance request or coordinated
-handoff invokes the relevant owners once at that boundary. Explicit standing delegation
-may establish other scoped boundaries; ownership alone does not. Authorized saved-task
-bookkeeping retains its existing rules. No background sync is implied.
-
-| Owner | Standing guidance | Detail elsewhere |
-| --- | --- | --- |
-| manage-project-tasks | Task roots and descriptive INDEX.md links; activation cue | Workstream navigation in INDEX.md; deliverables, state, gates, context map in tasks |
-| maintain-project-docs | Docs roots and a few canonical entry points with consultation cues | Project meaning, architecture, rationale, rules, and deeper navigation in docs |
-| maintain-knowledge-base | KB/archive roots and established backend/knowledge-page configuration; routing cue | Records, syntheses, content indexes, storage/archival procedures |
-| run-and-manage-python | Python root beside its before-execution activation cue | Compatibility in manifests/pins/locks/runtime; execution procedure in skill |
-| learning-notebook | Notebook root, discovery and activation cues | Collection index and learning-notebook skill; Python execution belongs to run-and-manage-python |
-| improve-agent-workflows | Essential pre-action constraints and conditional reference pointers | Settled procedures in docs; reusable findings/evidence in KB |
-| git-branch-to-review | Opt-in branch/target conventions, continuation cue, approval constraints, existing policy pointer | Git lifecycle in skill/references; approved scope and progress in tasks/PRs; live state in Git/host |
-
-The original four resource owners define their creation-time shapes in skill-local
-`references/routing.md`; improve-agent-workflows and learning-notebook define their narrow
-sections in their respective SKILL.md files.
-Git Workflow defines its optional repository section in its own
-[routing reference](../skills/git-branch-to-review/references/routing.md); setup requires
-specific authorization and is not part of ordinary resource initialization.
-Task/KB indexes stay local. Environment and skill inventories do not become
-standing guidance. Python execution includes interpreter/import probes; reading
-a path/source file is not execution. Selecting a repository script does not
-authorize its repository-local environment.
+One canonical editable workspace AGENTS.md, with one Agent Builder-managed block when adopted. Confirm workspace scope with the human; do not infer it from cwd, Git root, repository or harness. Keep essential before-action constraints, resource locators, a few when-to-read cues and concise behavior/lesson projections. Detailed procedures remain in the root and references. Read relevant docs, actual tasks/evidence, KB records, applicable behaviors/lessons and existing scripts proactively when useful; no maintenance activation is required for recall or compatible routine Python use. A found path is not proof of actual harness loading. Read-only discovery grants no write or execution authority.
 
 ### Interactive capture and deferred offline memory maintenance
 
-The interactive workflow prioritizes the human's main task. Explicit KB capture
-is typically secondary, at the end of a session, and must stay lean in time and
-token usage: work from the active discussion and selected evidence, reconcile
-only likely matching records, and maintain only affected living knowledge pages.
-Do not add mandatory historical searches, full-corpus reconciliation, or
-background maintenance to ordinary capture.
-
-The KB is independently usable without Project Docs. Its records and knowledge
-pages retain reusable evidence and cross-context understanding; where a project's
-canonical documentation is *already known and relevant*, avoid competing current
-claims and prefer a pointer or qualified synthesis. Project Docs remains the
-authority for its own settled project architecture and contracts; Agent Lessons
-selects only justified behavior-changing guidance. This distinction does not
-require the KB to discover, invoke, or read Project Docs during routine capture.
-
-**Deferred research direction, not an implemented feature:** A future
-Sprite + OpenCode task-delegation capability might permit separately scheduled
-or delegated offline memory reflection ("dreaming"), potentially using a cheaper
-model to reconcile selected memories with accessible source evidence. Explore
-this *outside* interactive capture only after the delegation capability exists,
-with explicit scope, resource budget, source-availability checks, verification,
-and approval boundaries before consequential writes or instruction promotion.
-No autonomous memory-maintenance job, new skill dependency, or production skill
-change is approved by this note. The steward-only
-[memory pilot](memory-pilot.md) is a separate ledger, not this workflow.
-
-Research inspiration: [Anthropic, *The components of agent memory*](https://www.anthropic.com/research/components-of-agent-memory).
-The experiments motivate evaluation, not a presumed win or an implementation
-contract for our agents.
+Human-triggered maintenance selects relevant references and smallest useful changes. Capture reusable agent-facing records with provenance and uncertainty; retain selected originals, no automatic inbox cleanup or new synthesis layer. Legacy knowledge pages remain readable, with consequential claims checked against evidence. Managed artifacts require explicit intent. Offline reflection/dreaming remains deferred; no background sync or worker launch is implied. The [memory pilot](memory-pilot.md) is independent.
 
 ### Ownership and maintenance
 
-Each owner uses its own BEGIN/END marker pair: PROJECT TASKS, PROJECT DOCS,
-KNOWLEDGE BASE, PYTHON ENVIRONMENTS, LEARNING NOTEBOOKS, AGENT LESSONS, or GIT WORKFLOW. Markers, headings, labels,
-and minimal initial activation cues are defaults. Routine maintenance updates
-confirmed paths and affected navigation, preserving customized behavior, outside
-text, other sections, and position. Managed does not mean regenerate.
+One primary authority per claim. Tasks own unfinished work; docs own settled project meaning; records own reusable findings; behaviors own explicit personal persistent instructions; lessons own evidenced operational improvement; scripts own reusable deterministic utilities; Python recipes/pins/locks own purpose environments; code/config/tests and observed evidence own actual implementation claims. Independently owned repository guidance stays independent. Docs may maintain explicitly assigned guidance, subject to other owners and local restrictions.
 
-During a human-authorized docs or KB maintenance pass, an owner may minimally
-refresh a missing or outdated discovery cue when that guidance is within the
-authorized scope; an explicit cue-only refresh is also valid. Preserve customized
-wording and stricter gates, ask about conflicts, and leave equivalent cues unchanged.
-Reading, source edits, and publication alone do not authorize workspace changes.
-Keep useful outputs reachable through existing indexes and links; add a guidance
-pointer only for a missing durable entry point or trigger, not for every output.
-
-Reread before mutation. Refuse ambiguous, duplicate, incomplete, or nested markers
-and unsafe paths; reconcile concurrent edits safely, read back, and verify scoped
-changes and links. General maintain-project-docs guidance ownership does not override
-another skill's section. Partial routing/index failures are reported without
-discarding valid primary work or claiming everything succeeded.
+Preserve custom wording, position and outside text. Read before mutation; refuse ambiguous/duplicate/incomplete/nested markers or unsafe paths; reconcile concurrent changes and verify scoped diffs. Existing separate owner blocks remain authoritative until explicitly approved migration. Translate only confirmed path bases, preserve custom restrictions and remove superseded duplicate routing together, without moving contents. Supporting persistence precedes pointers. Report partial failures, don't weaken gates.
 
 ### Resource resolution and first use
 
-1. Use established configuration, including operation-specific human-selected
-   destinations without silently changing saved routing.
-2. During authorized operational use, inspect/reuse a clearly identifiable
-   compatible conventional resource and register missing configuration without
-   redundant adoption approval. Read-only inspection authorizes no writes.
-3. If neither configuration nor a suitable resource exists, propose the relevant
-   conventional location and obtain one approval for initialization/registration.
-4. Ask about ambiguity and report inaccessible configured resources rather than
-   substituting another destination. Preserve narrower local permission gates.
+Prefer an explicit operation destination, then confirmed routing. Discover a verified compatible existing resource using bounded metadata/content; reuse without changing configuration during read-only work. Register unambiguous existing resources during authorized maintenance; obtain approval for new resource initialization and new project identity. Report inaccessible configured resources rather than inventing alternatives. New relative paths resolve from the declaring AGENTS.md; preserve legacy bases, remote locators and backends.
 
-Folder existence alone proves neither identity nor ownership. Python adoption
-requires actual recipe/independence inspection. Initialize only the invoking
-skill's resources. An archive is needed for inbox processing, not ordinary recall.
-KB/Python need no project identity; preserve explicit cross-project task surfaces.
-
-New section-relative paths resolve from the directory containing the declaring
-AGENTS.md, including nested scopes, never cwd. Legacy workspace-relative mappings
-retain their recorded base until approved migration. Preserve explicit layouts,
-remote KB locators/backends, and optional external knowledge-page destinations.
-Confirm workspace scope from the human/guidance, not a Git root or cwd alone.
-
-Conventional proposals:
+Default proposals only:
 
 ```text
-<workspace>/
-  AGENTS.md
-  .work-context/
-    projects/<project>/{docs,tasks}/
-    knowledge-base/
-    archive/knowledge-base/
-    python/<purpose>/
-    learning-notebooks/
+<workspace>/AGENTS.md
+<workspace>/.work-context/
+  projects/<project>/tasks/index.md
+  projects/<project>/tasks/YYYY-MM/<workstream>/YYYY-MM-DD--description.md
+  projects/<project>/docs/
+  knowledge-base/index.md
+  knowledge-base/records/YYYY-MM/index.md
+  knowledge-base/managed/
+  archive/YYYY-MM/
+  behaviors.md
+  lessons/index.md
+  scripts/index.md
+  python/<purpose>/
 ```
 
-Code organization is unconstrained. Several repositories may form one project.
-Agent Core retains its explicitly owned `docs/` and `tasks/`; publishing skills
-does not migrate this repository or employer workspaces.
+No empty collections or competing indexes required. Established uppercase INDEX.md, dated names, archive/knowledge-base and learning-notebook locations remain valid. Register repositories by verified identity and checkout separately; multiple repositories or no repository per project are valid. Registration grants no mutation or transfer authority.
 
 ## Task Continuity and Deliverables
 
-The goal describes the intended outcome; deliverables identify reviewable outputs
-or changes; acceptance establishes whether they satisfy the goal. A task can
-deliver an approval outcome, research brief, validation report, or PR. Small tasks
-can combine these fields. These contracts also cover non-coding work: use relevant
-working locations, authoritative records, and evidence, with repository/runtime
-checks only when the claim or action needs them.
-
-New tasks use one shallow semantic workstream level:
-
-```text
-tasks/
-  INDEX.md
-  YYYY-MM/
-    aws-migration/
-      YYYY-MM-DD__validate-cutover.md
-      YYYY-MM-DD__prepare-rollback.md
-    dataset-evaluation/
-      YYYY-MM-DD__agree-evaluation-criteria.md
-```
-
-Dates are creation dates. Reuse literal workstream names across months. Paths stay
-stable through completion or deferral; existing tasks remain usable in place.
-Use one task per coherent outcome and split independently continuable deliverables,
-not conversations or ordinary steps. Shared effort overviews are created only when
-they reduce meaningful duplication; no monthly indexes or taxonomy framework.
-
-INDEX.md retains all known unfinished work under Now/Next/Later, with workstream
-labels, status, and a meaningful next action or re-entry condition. Closed files
-stay in place and leave the live index; reopening restores them. Report incomplete
-initial inventory coverage. Routine progress does not rewrite AGENTS.md.
+Use [tasks.md](../skills/agent-builder/references/tasks.md) for task maintenance and saved-task execution, not reading. One stable file per independently continuable outcome. The unfinished-work index preserves priority, state and next action/re-entry; closed files stay discoverable. Select Brief/Standard/Detailed as useful. Keep evidence, deliverables, approval and actual verification distinct; priority and a saved plan grant no implementation permission.
 
 ### Resume context
 
-Task creation/resumption consults relevant docs and selectively recalls KB context
-when prior findings matter. Tasks retain their supervisable goal, constraints,
-current state, deliverables, and next permitted action. Their context map gives:
-
-- exact paths/headings or usable remote locators;
-- what each source supplies and when to read it;
-- its role: approved design, observed evidence, procedure, or open investigation;
-- confirmed working location/system (code repository for engineering) and specific
-  prerequisite task outputs where relevant.
-
-Read required sources before dependent work; conditional references wait until
-relevant. An inaccessible essential source is a readiness gap. Task prose is not
-proof of current external or implementation state; resolve material conflicts against the
-appropriate authority. Natural-language continuation selects the project/index,
-then reads the matching task; ask when materially different candidates remain.
-
-At material checkpoints, reconcile the affected task's header, body, checklists,
-resume commands, and index entry. Replace obsolete actions or label useful retained
-history as non-actionable; adding a newer outcome paragraph alone is insufficient.
-Preserve rationale, evidence, and remaining obligations. A reader must reconcile
-conflicting instructions before acting rather than treating either an old imperative
-or a newer timestamp as decisive by itself.
+Use known task or index then bounded search across dates and aliases; read the actual task and required sources, verify consequential live state and reconcile stale instructions. Recommend next task when several meaningful tracks exist. Preserve goal, constraints, rationale, evidence, blockers and next permitted action. An inaccessible required source is a readiness gap; status orientation stays read-only.
 
 ## Coordinated Handoff and Closeout
 
-In project-task context, requests such as "hand this off to a fresh session",
-"prepare/delegate the next tasks to another agent", and "we're done; close this
-task" authorize bounded KB capture, docs integration, task maintenance, and
-operational-lessons review. The human need not name four skills or say "full".
-Narrower requests and local write gates prevail. The cue does not spawn agents
-or authorize implementation, commits, publication, or resource migration.
-
-The [handoff workflow](../skills/manage-project-tasks/references/handoff.md) governs:
-
-1. Identify what must survive: decisions/rationale, evidence, deliverables, actual
-   results, uncertainty, dependencies, permission boundaries, and useful lessons.
-2. Load the owning skills and evaluate KB capture, docs integration, and lessons.
-   Each may correctly make no change. Route each claim to its primary authority;
-   reuse sources and findings rather than writing four overlapping summaries.
-3. Persist and verify supporting material before adding pointers or shortening
-   existing detail; save tasks/context/dependencies and affected index entries.
-4. Read back and check that the next agent can identify what to produce, read,
-   decide, and do without the old chat. This review is not a fresh-agent trial.
-5. Report exact resumption paths, meaningful source changes/no-ops, material gaps,
-   and the next action or closure result.
-
-Routine progress updates and execution bookkeeping do not trigger this review.
-Meaningful checkpoints preserve decisions before context is lost. Missing skills,
-configuration, or access are reported; preserve valid task state and incomplete
-closeout steps without inventing storage or claiming success. Required incomplete
-work remains pending until completed or explicitly waived/cancelled.
+Explicit pause/handoff/closeout authorizes bounded relevant maintenance, not launching workers, implementation, publication or migration. Load tasks.md and only justified additional references. Preserve supporting material before pointers, reconcile actual task and index, keep required incomplete work pending unless explicitly waived, and provide a short resume cue. Narrower "task only" and repository rules prevail. Routine checkpoints do not trigger a whole-context review.
 
 ## Operational Lessons
 
-Explicit natural-language lessons requests and coordinated handoff/closeout cues
-activate a bounded behavioral-improvement review. `improve-agent-workflows` diagnoses
-improvement opportunities, judges likely benefit and interference, and selects
-only justified interventions: guidance, docs, KB, a genuine continuation task,
-a concrete deterministic personal script/check, or no change. It delegates
-resource maintenance to the relevant owning skill through a bounded request.
-An owner may accept authorized delegated work without knowing the caller's
-identity. Delegation does not override local write gates or create permission
-to modify unrelated resources. A task handoff may still invoke lessons review;
-the lessons review must not recursively start another handoff.
-
-The marked lessons section keeps essential pre-action rules and conditional
-pointers to specific headings. It never requires reading every reference at
-session start. Maintain affected rules by consolidating, narrowing, or retiring
-them when justified; consequential changes should consider possible unintended
-behavior and use proportionate verification. No change is a valid outcome.
-
-Detailed project procedures live in project docs; reusable findings and evidence
-live in KB; personal deterministic utilities belong to Project Scripts. These
-remain independently usable. No new `agent-lessons.md` companion or lessons
-registry is needed. Preserve existing companion material until any authorized
-migration saves its replacement. Save and verify supporting detail before
-shortening guidance. Generic skill procedures stay in their owning skills;
-fix missed activation cues at the owner instead of adding duplicate lessons.
+Use [behaviors.md](../skills/agent-builder/references/behaviors.md) for explicitly requested persistent preferences and [lessons.md](../skills/agent-builder/references/lessons.md) for evidence-based operational learning. Admit useful behavior-changing knowledge, choose the smallest intervention, check applicability/interference and preserve no-change outcomes. Do not invent human-owned permissions or strategic choices. Essential universal rules appear in guidance as concise consistent projections; conditional detail stays in its authority. Scripts have a separate human-triggered stewardship boundary.
 
 ## Optional Setup and Invocation
 
-workspace-setup is an optional, request-triggered initializer/refresh coordinator.
-It follows owner contracts, proposes only the requested scope, obtains approval,
-preserves customization/position, and reports saved paths and gaps briefly.
-It creates no skill catalogue or environment snapshot and does not run content
-capture just to configure locations.
+Setup and registration are explicit requests, not per-session preflight. Select actual harness and verify guidance loading on fresh entry points. Routine compatible Python execution follows confirmed guidance and exact selected interpreter; load [python.md](../skills/agent-builder/references/python.md) when maintenance, missing guidance or incompatibility requires it. Protect independent team environments, verify runtime, and never silently fall back.
 
-Migrating a legacy central block requires exact targets and approval. Preserve
-human Behavior/Use for wording and repository annotations; translate relative
-paths only from their known bases and leave no competing destination tables.
-No content moves or external workspace migration are implicit.
-
-One separately approved startup instruction outside owner sections may request
-`AGENTS.md: <applicable path(s)>`. Owners preserve it rather than inserting copies.
-It is recognition, not compliance proof or a promise of cross-session reload.
-
-All canonical skills permit model invocation. Natural-language requests activate
-request-only operations; availability does not broaden authorization. Supported
-harness discovery/trigger settings and actual installed content still matter.
-Publication uses the existing manual allowlists and selected-harness sync; it
-does not run setup or change global guidance/settings.
+Git persistence and recovery are optional explicit requests. Default-deny allowlist assistance must review actual candidate/index paths, nested repositories, overrides, secrets and generated state; ignore rules are not security controls. Local storage, history and remote transfer are separate decisions. Prefer the real workspace-root AGENTS.md as sole editable authority. Indirection requires proven compatibility and approval. Preserve employer boundaries; sync must not configure workspace Git, backup, global guidance or credentials. Verify actual fresh-session loading and recovery before making strong claims.
 
 ## Planned Agent Builder consolidation
 
-The human has accepted the direction of a modular persistent-agent lifecycle; see [Agent Builder design direction](agent-builder-design.md). This is a planned replacement, not the current runtime contract. The separate ownership markers, skills, and current KB/uv procedures above remain authoritative until an approved migration is validated.
+Historical design is now delivered at source scope; see [Task 08](../tasks/2026-11/agent-builder/2026-11-25__integration-and-migration.md). The human elected controlled personal use instead of extensive synthetic validation. Runtime validation remains unperformed. Use the [operating manual](agent-core-operating-manual.md#set-up-or-refresh-a-workspace) for adoption and conflict handling; do not claim all harnesses verified.
 
 ## Related
 
 - [Operating manual](agent-core-operating-manual.md)
 - [Skill design guide](skill-design-guide.md)
-- [Workspace scenarios](../tests/workspace-workflow-scenarios.md)
 - [Distribution and migration](consumer-repo-enrollment.md)
+- [Approved design](agent-builder-design.md)

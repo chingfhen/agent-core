@@ -1,12 +1,10 @@
 ---
 name: agent-builder
-description: Maintain a persistent workspace agent's durable project and personal context. Use for setup, explicit Git persistence or recovery assistance, project or repository registration, human-triggered tasks/docs/KB/behavior/lessons/scripts maintenance, handoff or closeout, saved-task execution, and Python environment maintenance. Select the relevant references; ordinary context discovery and use do not require this skill.
+description: Maintain a persistent workspace agent's durable project and personal context. Use for setup, explicit Git persistence or recovery assistance, project or repository registration, human-triggered tasks/docs/KB/behavior/lessons/scripts maintenance, handoff or closeout, saved-task execution, and Python environment maintenance. Select the relevant references; ordinary context discovery and use do not require this skill. Replaces legacy project-task, project-docs, knowledge-base/inbox, agent-lessons, scripts, Python and workspace-setup workflows.
 disable-model-invocation: false
 ---
 
 # Agent Builder
-
-> Development status: initial source, not an adopted runtime workflow. Tasks, docs, KB/archive, behaviors, lessons, scripts and Python are authored; routing/setup/continuity and persistence/recovery are authored; integration and runtime validation remain pending. Do not install, migrate, or replace existing workflows from this partial source. The repository's approved foundation and remaining Agent Builder tasks govern its completion. Remove this development note only after authorized integration and validation.
 
 ## Job and boundaries
 
@@ -82,6 +80,8 @@ For a natural request such as 'let's continue' or 'continue <project>', resume t
 
 ## Activation and routing
 
+This skill replaces the former `manage-project-tasks`, `maintain-project-docs`, `maintain-knowledge-base`, `improve-agent-workflows`, `project-scripts`, `run-and-manage-python` and `workspace-setup` skills. Treat those names (and earlier project-tasks, project-docs, knowledge-base, agent-lessons and manage-python-env names) in saved tasks, human requests or legacy guidance as cues to the corresponding reference or root procedure, not a reason to load an obsolete skill or bypass stricter local gates. Retain confirmed legacy paths and scope. If a legacy instruction explicitly requires Python safety checks, honor the checks; only the ordinary mandatory skill-load rule changes. A request to process an inbox uses selected-source capture, not automatic cleanup.
+
 A human maintenance request authorizes a bounded pass over directly relevant context, subject to local restrictions. The named capability is primary, not necessarily exclusive; explicit limits (e.g. docs only, task only, read-only) prevail. Select additional modules only when their outputs materially help. Load this root and actually read each applicable reference before its maintenance procedure. Do not run every module, require the human to file individual findings or recursively start handoffs. Merely asking to load this skill without maintenance intent does not authorize writes.
 
 | Cue | Procedure |
@@ -91,13 +91,11 @@ A human maintenance request authorizes a bounded pass over directly relevant con
 | Sync tasks / manage or execute a saved task | [tasks.md](references/tasks.md) |
 | Sync docs / maintain documentation | [docs.md](references/docs.md) |
 | Handoff / closeout / general maintenance | Root coordination; tasks.md for task handoff/closeout; other justified references |
-| Sync KB / capture / selected archive capture / managed artifact | [knowledge-base.md](references/knowledge-base.md) |
+| Sync KB / capture / selected archive capture / process, clear or sweep inbox (legacy cue) / managed artifact | [knowledge-base.md](references/knowledge-base.md) |
 | Remember this behavior / update future behavior / clear persistent human instruction | [behaviors.md](references/behaviors.md) |
 | Capture lessons / agent lessons / learn from this session / improve future agent behavior | [lessons.md](references/lessons.md) |
 | Project scripts / automate what we did / make a repeatable personal script / script maintenance | [scripts.md](references/scripts.md) |
 | Create a Python environment for X / manage Python environments / create, change, sync or repair a purpose environment | [python.md](references/python.md) |
-
-During development do not claim that the new workflow is active or substitute invented procedures for missing downstream integration. Preserve live legacy workflows until transition. The persistence/recovery contract is authored below; integration/adoption and behavioral validation remain downstream.
 
 Clear human intent to remember, change or remove a persistent behavior is a maintenance cue; an ordinary preference statement about the current task is not. Review-only requests do not authorize edits. If a cue mixes explicit persistent intent with operational learning, choose both references only as needed. Ordinary work and read-side retrieval do not trigger automatic context maintenance. Explicit standing permissions can establish scoped boundaries; otherwise wait for the human cue. Executing an authorized saved task may include that task's checkpoint/index bookkeeping, subject to stricter local rules, but does not imply general maintenance or implementation permission. A request to pause/handoff unfinished project work is a maintenance cue, not authorization to implement. A concrete Python maintenance need during authorized execution is a scoped exception: load root and python.md, maintain the established personal resource autonomously within its compatibility and permission boundaries, then complete the workload. Routine compatible environment use is not maintenance. Script stewardship retains human-triggered timing; ordinary temporary scripts and reuse are execution, not durable collection maintenance. No automatic purpose deletion. No continuous audit, background sync, automatic worker launch, spending, destructive action, relocation, external transfer, commit/push, publication or deployment is implied. Respect explicit backend save boundaries.
 
@@ -147,4 +145,4 @@ On explicit recovery, establish the intended workspace and approved local/remote
 
 ## Verification and decision visibility
 
-Verify the actual changed artifacts, claims and relevant locators proportionately; use the specialized reference's outcome checks. Do not audit unrelated surfaces by default. For consequential choices state the selected route and reason, scope/permission, material uncertainties and actual deviations. A concise ordinary response or existing receipt is sufficient; no duplicate logs or private reasoning. Report exact resolved paths/locators changed, material gaps, verification actually performed and meaningful no-change outcomes. Distinguish proposed from saved, verified content from demonstrated behavior, and complete from partial success. Static checks do not establish fresh-session invocation/compliance. Preserve existing installed workflows until approved representative validation and migration.
+Verify the actual changed artifacts, claims and relevant locators proportionately; use the specialized reference's outcome checks. Do not audit unrelated surfaces by default. For consequential choices state the selected route and reason, scope/permission, material uncertainties and actual deviations. Surface a choice and reason before acting when permission or cost depends on it; otherwise at the relevant handoff. A concise ordinary response or existing receipt is sufficient; no duplicate logs or private reasoning. Report exact resolved paths/locators changed, material gaps, verification actually performed and meaningful no-change outcomes. Distinguish proposed from saved, verified content from demonstrated behavior, and complete from partial success. Static checks do not establish fresh-session invocation/compliance. Publication and actual workspace adoption are distinct; report unverified harness behavior and preserve the option to roll back. Do not migrate existing workspace guidance or resources without explicit approval.

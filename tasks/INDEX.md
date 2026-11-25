@@ -8,8 +8,6 @@
 
 ## Next
 
-- [Agent Builder — Integration, validation and migration](2026-11/agent-builder/2026-11-25__integration-and-migration.md) — Active · Agent Builder. Tasks 01–07 complete at source scope; await human-started integration design and scoped acceptance approval. No live adoption or retirement approved.
-
 - [Evaluate Agent-Led Verification](2026-11/verification-design/2026-11-11__evaluate-agent-led-verification.md) — Active · Verification design. Another human-started session should evaluate the proposal and Tripverge pilot with the human; implementation is not approved.
 - [Durable Learning Mechanism for Operational Constraints](2026-10-23__durable-agent-constraint-learning-bookmark.md) — Active. Next action: human evaluates durable options outside this repository; resume when that evaluation identifies a direction or requests further investigation.
 

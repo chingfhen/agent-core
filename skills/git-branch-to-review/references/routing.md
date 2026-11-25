@@ -34,13 +34,13 @@ known managed work through its branch, PR/MR or project task. A date or legacy
 state. Generic engineering does not start this workflow. Integration into the
 target needs separate explicit human instruction; routine target-to-branch
 maintenance is agent-owned. New worktrees require explicit approval and task-backed
-lifecycle ownership through safe cleanup. Use manage-project-tasks for authorized continuity, and
+lifecycle ownership through safe cleanup. Use Agent Builder's tasks reference for authorized continuity, and
 follow repository task-write and branch-cleanup policy.
 <!-- END GIT WORKFLOW -->
 ```
 
 Keep live branches, SHAs, PR lists, approval records, check dashboards, and detailed
-Git commands out of this section. Task routing remains owned by manage-project-tasks;
+Git commands out of this section. Task routing remains owned by Agent Builder's tasks reference;
 actual branch/request state belongs to Git/the host. This section grants no blanket
 write permission on external branches. Managed PRs require a task unless the human
 explicitly opts out; honor narrower repository task-write gates.

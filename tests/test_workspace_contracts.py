@@ -18,6 +18,12 @@ class WorkspaceContractTests(unittest.TestCase):
         for old in ("manage-python-agent-envs", "manage-python-uv"):
             self.assertFalse((ROOT / "skills" / old).exists())
 
+    def test_agent_builder_replaces_predecessors_in_manifest(self):
+        from agent_core.sync import RETIRED_AGENT_BUILDER_SKILLS
+        selected = set(load_skill_names(ROOT / "personal-skills.toml"))
+        self.assertIn("agent-builder", selected)
+        self.assertFalse(selected.intersection(RETIRED_AGENT_BUILDER_SKILLS))
+
     def test_all_canonical_skills_allow_model_invocation(self):
         for source in (ROOT / "skills").glob("*/SKILL.md"):
             frontmatter = source.read_text(encoding="utf-8").split("---", 2)[1]
@@ -43,7 +49,7 @@ class WorkspaceContractTests(unittest.TestCase):
             ROOT / "tasks/INDEX.md",
             ROOT / "tasks/2026-10/2026-10-29__skill-owned-agents-sections.md",
         ]
-        for skill in ("manage-project-tasks", "maintain-project-docs", "maintain-knowledge-base",
+        for skill in ("agent-builder", "manage-project-tasks", "maintain-project-docs", "maintain-knowledge-base",
                        "run-and-manage-python", "improve-agent-workflows", "workspace-setup",
                        "git-branch-to-review", "learning-notebook", "blind-comparison"):
             files.extend((ROOT / "skills" / skill).rglob("*.md"))

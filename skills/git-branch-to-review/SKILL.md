@@ -60,7 +60,7 @@ Follow the user's entry point:
 
 | Reference | First action |
 | --- | --- |
-| Task or workstream | Read configured task/index and matching task first; use manage-project-tasks for execution/authorized maintenance. Follow its managed branch/PR reference here. |
+| Task or workstream | Read configured task/index and matching task first; use Agent Builder's tasks reference for execution/authorized maintenance. Follow its managed branch/PR reference here. |
 | Exact PR/MR | Retrieve that request in the identified repository first; then read linked task context needed for scope and continuation. |
 | Exact branch | Resolve repository and exact local/remote ref, then its matching PR/MR and approval record. |
 | Imprecise change | Bounded search of relevant tasks and open PRs/MRs by known project/terms; on miss inspect remote branches then accessible local refs. |
@@ -92,7 +92,7 @@ and make its opt-out clear; do not hide deletion in a generic delivery label.
 - Maximum delivery: local edits/commits, push destination, draft PR/MR creation
   and maintenance, and marking ready when required pre-review checks pass.
 - Continuity: create or maintain the matching project task and index through
-  manage-project-tasks, including post-merge bookkeeping, within applicable write gates.
+  Agent Builder's tasks reference, including post-merge bookkeeping, within applicable write gates.
 - Maintenance: necessary target-to-managed-branch updates and unambiguous conflict
   resolution are included; default to history-preserving merge where policy permits.
   Worktrees are an explicit exception: obtain approval and record their lifecycle
@@ -169,7 +169,7 @@ host capabilities. Draft means unfinished, not private or free of CI effects.
 Every managed PR/MR, including a draft, must link an existing or new project task,
 unless the human explicitly says no task is needed. If the agent thinks a
 task unnecessary, ask before opting out. Reuse a matching task; otherwise load
-manage-project-tasks and create one in the confirmed project task surface. The approved
+Agent Builder's tasks reference and create one in the confirmed project task surface. The approved
 package includes its task/index maintenance when local rules permit; stricter opt-in
 rules prevail. If the destination, permission, or accessible reference is missing,
 ask or report the blocker before creating the PR/MR; do not invent a task root or

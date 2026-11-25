@@ -38,7 +38,7 @@ existing approved decisions and applicable constraints.
 Invocation alone authorizes neither task/document/KB writes nor code,
 architecture changes, tests, experiments, deployment, or other execution.
 Discussion may end with no artifact. Saving the agreed result uses the
-separately authorized owning workflow (such as manage-project-tasks).
+separately authorized owning workflow (such as Agent Builder's tasks reference).
 
 ## Discover and converge
 
@@ -121,11 +121,11 @@ a formal document, score, rigid headings, or compulsory approval ceremony.
 Stop once the human has a usable agreement, a clearly marked provisional
 definition, or a specific unresolved decision needing further evidence.
 Do not keep inventing questions to appear thorough. On explicit request,
-hand the agreed definition to manage-project-tasks or another owning
+hand the agreed definition to Agent Builder's tasks reference or another owning
 workflow for persistence. A task can also be saved as an early idea without
 invoking this skill.
 
-**Boundary with nearby work:** manage-project-tasks preserves execution state;
+**Boundary with nearby work:** Agent Builder's tasks reference preserves execution state;
 tech-design-options compares technical approaches; approval review evaluates
 a consequential authorization; verification discovers and exercises evidence
 against the agreed claims. They can consume this result without this skill

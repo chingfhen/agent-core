@@ -123,7 +123,7 @@ Successful output is intentionally brief. For example:
 ```text
 agent-core sync: OK (abcdef012345)
 Harness: pi
-Skills (13): manage-project-tasks, maintain-project-docs, ..., commit-changes
+Skills (...): agent-builder, ..., commit-changes
 Agents (1): commit-agent
 Prompts (0): none
 Migrated legacy entries: 14
@@ -177,8 +177,7 @@ The file intentionally contains only one string array:
 
 ```toml
 skills = [
-    "manage-project-tasks",
-    "maintain-project-docs",
+    "agent-builder",
     "tech-design-options",
     "<skill-name>",
 ]
@@ -199,47 +198,27 @@ agent-core sync
 
 Agent Core refuses ignored, untracked, missing, linked, or uncommitted files inside configured sources.
 
-Removing a name from any personal manifest normally stops future updates without deleting the installed copy or ownership record. Selecting `run-and-manage-python` is a named exception: it safely retires unchanged fingerprint-owned `manage-python-agent-envs` and `manage-python-uv` copies for the selected harness. Modified, unowned, or unsafe obsolete copies are preserved and reported as exact-path conflicts; resolve them explicitly rather than expecting sync to delete them. Pi additionally handles verified legacy copies and registered aliases. The `commit-with-subagent` prompt-to-skill migration is another narrow exception: Pi sync removes that old prompt only when it is still fingerprint-identical to the managed copy. This preserves local edits while avoiding duplicate commands. There is no default global force or prune command.
+Removing a name from any personal manifest normally stops future updates without deleting its installed copy or record. Selecting `agent-builder` triggers the named Agent Builder consolidation: for the selected harness only, retire exact unchanged fingerprint-owned predecessors (the seven original workflows and the known historical names `project-tasks`, `project-docs`, `knowledge-base`, `agent-lessons`, `manage-python-env`, `manage-python-agent-envs`, `manage-python-uv`). Modified, unowned, or unsafe copies block with exact paths before publication; do not delete them automatically. Pi additionally handles its verified legacy `.agents/` copies and registered Claude aliases. Retirement and publication share the existing rollback transaction; unrelated skills and other harnesses are untouched. The prior named Python-only migration remains supported when `run-and-manage-python` alone is selected. Ordinary manifest removal still does not prune. The existing Pi prompt-to-skill migration remains supported. No global force/prune command.
 
 ## Set Up Or Refresh A Workspace
 
-1. Run `agent-core sync` (Pi), `agent-core sync --harness devin`, or `agent-core sync --harness opencode`.
-2. Verify that the updated skills are exposed in the target harness.
-3. Open your normal workspace root. Each resource skill can establish its own
-   routing; ask `workspace-setup` when you want a coordinated setup/refresh.
-4. Resolve ambiguous ownership/locations, inspect the proposed sections, and
-   approve initialization or any legacy-block migration.
+1. Run `agent-core sync` (Pi), `agent-core sync --harness devin`, or `agent-core sync --harness opencode`, matching your actual harness. Confirm the printed commit and selected skills; restart the session.
+2. Open the normal workspace root and ask Agent Builder to inspect existing routing, read applicable guidance and confirm the current resources. Existing legacy blocks and paths stay authoritative; explicit approval is required before migrating them to its one managed block.
+3. Check that an ordinary context question discovers and uses the relevant existing sources without writing. Try a narrow maintenance cue and a fresh-session handoff when useful. Confirm the correct interpreter before Python execution. Report real issues rather than treating skill installation as proof of compliance.
 
-Each resource skill owns a lean marked section with confirmed locations and a few useful entry points. Setup follows those owner contracts and returns saved paths plus material gaps. It preserves custom wording and block positions; moving the old central block into separate sections requires explicit migration approval. The optional factual startup cue is approved once outside the sections. Setup is not a per-session prerequisite.
+Agent Builder owns persistent workspace context. Ask to set up or refresh the agent, register a project, sync tasks/docs/KB, capture lessons, maintain scripts or a Python environment, or hand off/close out work. It loads the relevant reference for maintenance; ordinary discovery and compatible Python utilization need no maintenance skill. Human controls timing and scope; narrower permissions prevail. It uses one managed AGENT BUILDER block for newly configured workspaces, with confirmed locators and selective utilization cues. Existing resource locations, legacy owner blocks and custom instructions remain valid until explicitly migrated; sync does not modify workspace guidance, Git configuration, or resources. Preserve employer confidentiality and do not transfer work material to personal storage.
 
-To review operational learning, ask naturally, for example "capture the lessons from this session". `improve-agent-workflows` maintains essential rules and conditional pointers in its marked section; supporting detail uses docs/KB through their owning workflows. It may correctly make no changes. No new `agent-lessons.md` companion is created.
-
-The setup convention is `.work-context/{knowledge-base,archive/knowledge-base,projects,python}/`. The confirmed AGENTS.md locations are authoritative, not the convention itself. The old `projects.toml` workflow is retired and its files are left untouched. No setup action moves old `cf-workspace` content or configures backup without explicit approval. `run-and-manage-python` both maintains environments and runs Python workloads through them. See [workspace configuration](workspace-configuration.md).
+If sync reports a modified/unowned obsolete copy, stop and review the exact path; preserve custom work and decide manually how to resolve the conflict. Do not force-delete or hand-copy managed skills. For rollback, restore the previous approved canonical manifest/source revision in the canonical checkout through an authorized Git operation and sync the selected harness. Ordinary removal of agent-builder does not uninstall it: after restoring originals, explicitly resolve that exact installed copy with ownership verification, without pruning unrelated skills. Transaction rollback on publication failure is automatic; rollback of a successful adoption is separate.
 
 ### Hand Work to the Next Session or Close It Out
 
-Say "hand this off to a fresh session", "prepare the next tasks for another agent",
-or "we're done; close this task" in project-task context. `manage-project-tasks` evaluates
-KB capture, docs integration, and operational lessons through the owning skills,
-verifies supporting material, then saves the task/context map and index. You need
-not name four skills. Each supporting review can be a valid no-op; missing access
-or incomplete persistence is reported rather than hidden. "Task only" narrows scope.
-
-Tasks name deliverables, acceptance, current state, context sources with read
-triggers, and the next permitted action. New files use
-`tasks/YYYY-MM/<workstream>/YYYY-MM-DD__name.md`; existing files keep their paths.
-The root INDEX.md navigates unfinished work across months. Resume by task path or
-workstream; the agent reads the selected task and required context before acting.
-Routine progress updates do not run the full closeout. Handoff does not authorize
-spawning agents, implementation, or publication beyond the actual request.
+Say "hand this off to a fresh session" or "close this task". Agent Builder reads tasks.md and only other justified references, saves verified supporting material before updating the task/index, preserves unfinished obligations and reports actual next permitted action. "Task only" narrows scope. No worker launch or execution permission is implied. New paths use YYYY-MM/workstream/YYYY-MM-DD--description.md and index.md; established filenames and uppercase INDEX.md stay intact.
 
 ## Knowledge Base Workflow
 
-The canonical workflow is [`skills/maintain-knowledge-base/SKILL.md`](../skills/maintain-knowledge-base/SKILL.md), selected in `personal-skills.toml`. Publish source changes through the normal committed-source sync above; do not hand-copy installed files. A manifest edit alone does not install or reload a skill.
+Use [Agent Builder](../skills/agent-builder/SKILL.md) and its [KB reference](../skills/agent-builder/references/knowledge-base.md). "Sync to KB" captures reusable records; "capture these files" selects originals without moving them; legacy inbox cues explain the changed workflow without deleting inputs. Managed artifacts require explicit intent. Existing KB roots, archives, records and legacy knowledge pages remain in place. Ordinary recall is read-only and can occur without loading the maintenance skill. No new synthesis layer, automatic cleanup, remote transfer or backend substitution.
 
-Use `sync to KB` to capture/update records, `clear my inbox` to capture and archive raw inputs, and `create/update a managed artifact` for human-facing Markdown outputs. The skill owns the detailed write effects, optional retrieval guidance, and first-use routing rules. It can propose `.work-context/knowledge-base/` and, when processing needs it, `.work-context/archive/knowledge-base/`; neither is a fallback. Established remote locations and optional knowledge-page roots remain valid. The archive is separate from the KB directory but may share its Git worktree; ordinary recall excludes it. Processing verifies retention before removing originals. Archival does not authorize committing or pushing raw sources.
-
-The former Drive workflow is no longer canonical; existing KB content remains where it is until a separate migration is requested. GitHub-connected web apps need an explicitly selected repository/ref/directory and scoped read tools for recall; maintenance also requires access to the canonical skill and applicable references. Connector access does not guarantee skill discovery, writes, or external archival. Updating Agent Core does not configure those integrations or replace user-managed global guidance that may still point to Drive.
+The former Drive workflow is not canonical. Remote use requires confirmed repository/ref/directory and scoped access. Publication does not configure connectors or migrate existing resources.
 
 ## Maintain Global Guidance Separately
 

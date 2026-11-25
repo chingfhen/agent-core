@@ -1,7 +1,7 @@
 ---
 title: Skills Catalogue
 description: Human- and agent-readable map of Agent Core skills, invocation cues, and personal installation status.
-updated: 2026-11-24
+updated: 2026-11-26
 ---
 
 # Skills Catalogue
@@ -17,13 +17,9 @@ request-only workflows; availability/loading does not authorize unrelated effect
 
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
-| [manage-project-tasks](../skills/manage-project-tasks/SKILL.md) | Save, resume, checkpoint, hand off, or close out work. | Deliverables and execution continuity; explicit handoff/closeout coordinates KB/docs/lessons and verified context pointers. |
+| [agent-builder](../skills/agent-builder/SKILL.md) | Set up or recover a workspace agent; sync tasks/docs/KB, remember behavior, capture lessons, maintain scripts or Python environments, hand off or close out. | Request-scoped maintenance; selective reference loading, proactive read/use, existing paths and narrower gates preserved. |
 | [ease-into-work](../skills/ease-into-work/SKILL.md) | "Help me get into TripVerge", "I have ten minutes to reconnect", or "what could I explore tonight?" | Read-only, choice-preserving re-entry using saved project tasks; execution and stopping remain with their owning workflows. |
 | [define-success](../skills/define-success/SKILL.md) | "Let's define the goal/success", "what would good look like?", or challenge incomplete success criteria together. | Request-led collaborative outcome discovery and selective questioning; no automatic task writes, implementation, or tests. |
-| [maintain-project-docs](../skills/maintain-project-docs/SKILL.md) | Maintain durable project decisions, contracts, or owned guidance. | Standalone settled understanding; owns lean docs routing and independent first use. |
-| [improve-agent-workflows](../skills/improve-agent-workflows/SKILL.md) | Request lessons review directly or through task handoff/closeout. | Essential rules/conditional pointers in its marked section; supporting detail through docs/KB, no new companion. |
-| [project-scripts](../skills/project-scripts/SKILL.md) | Explicitly review recent work for worthwhile personal scripts; create, repair, consolidate, or retire them. | Request-only personal script stewardship in one configured Project Scripts Root; not automatically part of engineering or handoffs. |
-| [maintain-knowledge-base](../skills/maintain-knowledge-base/SKILL.md) | "Sync to KB", process the KB inbox, or create/update a managed artifact. | Selective recall is independent of maintenance invocation; requested persistence includes bounded page maintenance and verified archival. |
 | [tech-design-options](../skills/tech-design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |
 | [code-design](../skills/code-design/SKILL.md) | Design or review a bounded code area's ownership, API/interface contracts, and changeability. | Request-led structure and contract judgment; actual FastAPI/MCP implementation uses its specialist guidance. Source/manifest inclusion does not establish installation. |
 | [fastapi-practices](../skills/fastapi-practices/SKILL.md) | Implement or review actual FastAPI routes, Pydantic models, dependencies, and endpoint contracts. | Version-matched framework patterns; no framework upgrade, automatic dependency changes, or blanket refactor. |
@@ -36,7 +32,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [delegate-implementation](../skills/delegate-implementation/SKILL.md) | While planning a substantial implementation-ready Project Task (or on explicit request), choose delegation or no delegation and persist an observable worker strategy. | Planner owns harness, workers, model/effort choices (cheaper preferred, not required), coordination and fallback; execution follows the approved task contract without re-invoking planning. |
 | [git-branch-to-review](../skills/git-branch-to-review/SKILL.md) | Explicitly request new managed branch delivery, or continue a known managed branch, its PR/MR, or linked task. | Date-prefixed branches; linked task by default; direct review link; explicit merge and guarded approved cleanup. Source/manifest inclusion does not establish installation. |
 | [learning](../skills/learning/SKILL.md) | "Help me understand/learn", explain a system or error, debrief an agent change, or create a learning lesson. | Quick default; Standard / Deep; concrete mechanisms and independent judgment; no automatic persistence. |
-| [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and run-and-manage-python for teaching and the shared personal environment. |
+| [learning-notebook](../skills/learning-notebook/SKILL.md) | Create, find, open, or extend a guided learning notebook. | Owns notebook routing and discovery; uses learning and Agent Builder's Python contract for teaching and the shared personal environment. |
 | [resolve-human-blockers](../skills/resolve-human-blockers/SKILL.md) | The agent cannot progress without access, authentication, approval, or a human decision. | Give the human a precise action and resume; not general preflight. |
 | [improve-readability](../skills/improve-readability/SKILL.md) | Explicitly make an answer or artifact easier to read, or review its readability. | Independent editing guidance; preserves task requirements and meaning. Chat invocation does not authorize file edits. |
 | [reasoned-advocacy](../skills/reasoned-advocacy/SKILL.md) | Build or challenge a defensible position, evaluate counterarguments, or prepare for stakeholder questions. | Quick or Deep; reasoning and spoken defense, not implementation planning or automatic persistence. |
@@ -44,7 +40,6 @@ request-only workflows; availability/loading does not authorize unrelated effect
 | [grilling](../skills/grilling/SKILL.md) | "Grill my plan" with one consequential question at a time. | Explicit design interrogation, not ordinary planning. |
 | [review-before-approval](../skills/review-before-approval/SKILL.md) | "Final approval check" before consequential unapproved action. | Approval brief, not execution or unblock. |
 | [commit-changes](../skills/commit-changes/SKILL.md) | Explicitly create a scoped local Git commit. | Preserves unrelated work and reviews the staged diff; never pushes automatically. |
-| [run-and-manage-python](../skills/run-and-manage-python/SKILL.md) | Before Python execution, including interpreter/import probes, tests, evaluations, or dependency changes. | Own root/activation section and first use; manage AND execute through compatible independent uv purpose projects. |
 | [create-markdown-diagrams](../skills/create-markdown-diagrams/SKILL.md) | Add or improve a Mermaid diagram or chart in Markdown. | Visualization of understood material, not architecture decisions. |
 | [yagni](../skills/yagni/SKILL.md) | "Simplify", "do less", "avoid overengineering", "YAGNI". | Deliberate minimalism; still meet correctness and safety. |
 | [humanize-spoken-output](../skills/humanize-spoken-output/SKILL.md) | Rewrite spoken scripts, narration, and interview answers naturally. | Content editing, not technical teaching. |
@@ -53,17 +48,20 @@ request-only workflows; availability/loading does not authorize unrelated effect
 
 | Skill | Reach for it when… | Note |
 | --- | --- | --- |
-| [workspace-setup](../skills/workspace-setup/SKILL.md) | Request coordinated setup/refresh or an approved legacy-block migration. | Optional; follows skill-owned sections and preserves position/custom text. |
 | [document-text-extraction](../skills/document-text-extraction/SKILL.md) | Explicitly extract a named PDF/image locally. | Temporary extraction only; independent of KB and `evidence-authoring`. |
 | [repo-audit](../skills/repo-audit/SKILL.md) | Request a dedicated whole-repository risk/bloat audit. | Specialized full-repo report, not routine code review. |
 | [ml-architecture-review](../skills/ml-architecture-review/SKILL.md) | Explicitly request focused ML architecture decision analysis. | Specialized investigation; separate from general technical options comparison. |
+
+## Superseded — retained source for comparison and rollback, not selected
+
+`manage-project-tasks`, `maintain-project-docs`, `maintain-knowledge-base`, `improve-agent-workflows`, `project-scripts`, `run-and-manage-python`, and `workspace-setup` are replaced by Agent Builder. Their source remains recoverable in the repository; do not install or invoke them alongside the replacement. Selected-harness sync retires exact fingerprint-owned installed predecessors; existing workspace resources are not migrated automatically.
 
 ## Archived — not active
 
 Historical sources live in `archive/skills/`, named by retirement date:
 
 - Superseded by KB: `evidence-authoring`.
-- Covered by manage-project-tasks and ordinary decision work: `execution-readiness`, `execution-topology`.
+- Covered by Agent Builder's tasks reference and ordinary decision work: `execution-readiness`, `execution-topology`.
 - Replaced by `tech-design-options` on 2026-11-11: [planning](../archive/skills/2026-11-11__planning-SKILL.md) (the replacement has a narrower job).
 - Replaced by `code-design` on 2026-11-11: [engineering](../archive/skills/2026-11-11__engineering-SKILL.md) (ordinary execution remains with the main agent; the replacement has a narrower job).
 - Covered by `yagni`: `yagni-review`.

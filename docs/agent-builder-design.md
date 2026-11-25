@@ -1,6 +1,6 @@
 ---
 title: Agent Builder — Approved Foundation and Shared Contracts
-description: Human-approved architecture for a modular persistent workspace agent; proposed replacement, not the live runtime contract.
+description: Human-approved architecture for a modular persistent workspace agent; source-integrated replacement; runtime adoption remains a separate human action.
 updated: 2026-11-26
 ---
 
@@ -9,7 +9,7 @@ updated: 2026-11-26
 ## Read First
 
 - **Consolidation without regression.** The human approved the foundation on 2026-11-25, including deliberate changes to maintenance autonomy, Python activation, naming and knowledge synthesis. Module design, implementation, publication, installation and migration are NOT approved by this decision.
-- The current [workspace configuration](workspace-configuration.md), individual skills, manifests and installed guidance remain live until separately approved and validated replacement. This document is the authority for intended Agent Builder architecture.
+- This document is the approved design rationale. On 2026-11-26 the human authorized final source integration, manifest selection, named safe retirement on their next selected-harness sync, and closure of Task 08 at source scope; they elected real usage in their own OCBC workspace instead of further synthetic evaluation. Current operating guidance is [workspace configuration](workspace-configuration.md) and Agent Builder source. Existing installed copies and workspace guidance remain unchanged until the human acts. Runtime validation is not established.
 - The human works normally, chooses when to trigger context maintenance (typically wrap-up), and the agent chooses how to maintain and subsequently utilize relevant context. The human is not expected to identify missed context or operational lessons.
 - Follow the [Skill Design Guide](skill-design-guide.md): research as reusable expertise, concise consequential decision/outcome observability, selective loading, and proportionate verification. YAGNI: ordinary Git/Markdown/native uv; no speculative service or registry.
 
@@ -172,7 +172,7 @@ Maintain a temporary source-contract coverage map: preserved, centralized, inten
 
 Intentional changes: one managed block; modular skill; broader agent-selected maintenance within human-triggered timing; standardized new names without path migration; no new knowledge synthesis layer or inbox; dedicated human-reviewable behavior file and indexed living lessons collection with hybrid guidance; Python utilization without mandatory skill read. All other substantive safety/outcome contracts remain unless separately approved.
 
-Keep old skills and installed workflows until replacement passes representative fresh-session activation, context utilization, permissions, handoff, consistency, safe Python execution/maintenance, failure and recovery checks. Static checks cannot prove invocation or improved behavior. Preserve dependency callers and manual manifests; ordinary sync does not uninstall removed entries. No automatic merge, installation, publication or retirement.
+Task 08 qualitative review identified narrow regressions and integration gaps; source fixes, caller updates and the named fingerprint-safe selected-harness retirement are the authorized source delivery. The human explicitly elected to close source work and perform controlled real-world adoption instead of the planned comprehensive pre-adoption runtime trials. Preserve former sources unselected for comparison/rollback. The next human-initiated sync selects Agent Builder and handles exact owned predecessor retirement transactionally; no workspace content/guidance migration follows from sync. Fresh-session activation, context utilization, permissions, handoff, Python execution, recovery and actual retirement remain runtime checks, not demonstrated outcomes. Static review cannot establish improved behavior.
 
 Research at design time; encode actionable practices and useful source links in modules, recheck changing facts and new evidence only when material. Verify representative behavior. Show consequential route/scope choices and actual outcome/deviations, exact persistence/verification and material gaps in ordinary conversation; no duplicate receipts, dashboards or mandatory logging.
 

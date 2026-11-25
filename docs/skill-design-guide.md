@@ -64,15 +64,12 @@ Use **one skill per job**. Similar *steps* do not imply duplicate skills when ou
 Keep these boundaries clear:
 - `tech-design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
 - `code-design`: shape or review a bounded code structure when requested; ordinary execution does not require it.
-- `manage-project-tasks`: make unfinished work portable, including deliverables/context and explicit coordinated handoff/closeout.
-- `maintain-project-docs`: maintain settled project truth.
-- `maintain-knowledge-base`: capture/retrieve reusable context and maintain explicitly requested Markdown artifacts.
-- `improve-agent-workflows`: improve future behavior; keep concise guards/pointers in guidance and use docs/KB for supporting detail.
+- `agent-builder`: maintain a persistent workspace's tasks, docs, KB/archive, behaviors, lessons, scripts, Python environments, routing and explicit persistence/recovery. Select applicable references; ordinary utilization does not require maintenance invocation.
 - `learning`: develop human understanding from mechanisms, examples, and judgment; no automatic KB persistence or code changes.
 - `review-before-approval`: support a consequential approval.
 - `resolve-human-blockers`: clear a human-owned obstacle during execution.
 
-Docs and KB remain standalone. Tasks may coordinate their use and lessons review
+Docs and KB remain independently usable resources under Agent Builder. Tasks may coordinate their use and lessons review
 for a requested handoff/closeout; lessons may use their owning workflows for detail.
 Keep common findings at one primary authority and avoid recursive coordination.
 Usability/routing instructions should stay small; put less frequent procedures
@@ -152,6 +149,8 @@ workflow, not a requirement to delegate to a subagent.
 | `approval-gate` | `review-before-approval` |
 | `manage-python-env` | `run-and-manage-python` |
 | `commit-with-subagent` | `commit-changes` |
+
+The seven Agent Builder predecessors and their exact known aliases now route to `agent-builder` and its appropriate references. The former sources remain retained, unselected comparison/rollback material pending observed adoption; do not treat them as parallel current authorities. Named retirement during selected-harness sync follows the distribution contract.
 
 This maps canonical source identities, not installed state. A normal sync does
 not remove installed copies merely because their old names left the manifest;

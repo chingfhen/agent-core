@@ -20,10 +20,10 @@ updated: 2026-11-11
 | `git-branch-to-review` | Manage explicitly requested branch/task/PR delivery, verification, human review, integration and guarded cleanup within permissions |
 | Repository `AGENTS.md` Git Workflow section (opt-in) | Stable repo-specific branch naming/targets, activation and permission rules, and pointers to existing repository policy. **Not** an active-branch registry |
 | Git host + Git objects | Actual branch/commit, pull/merge request, reviews, pipeline/check results, merge history |
-| `manage-project-tasks` | Work objective, decisions, approved scope, acceptance, progress, unresolved questions, next action, and context for fresh sessions |
+| Agent Builder's tasks reference | Work objective, decisions, approved scope, acceptance, progress, unresolved questions, next action, and context for fresh sessions |
 | Existing project docs / domain checks | Detailed release/CI policy, implementation contracts and applicable verification methodology |
 
-A project task is the default for **every managed PR/MR, including drafts**. Reuse or create it through manage-project-tasks; only the human may opt out. It preserves continuation, while the PR is the human's review surface. Link an accessible task version before merge and its durable destination afterward. No mandatory `Delivery` section or parallel branch registry. Respect narrower project task-write gates.
+A project task is the default for **every managed PR/MR, including drafts**. Reuse or create it through Agent Builder's tasks reference; only the human may opt out. It preserves continuation, while the PR is the human's review surface. Link an accessible task version before merge and its durable destination afterward. No mandatory `Delivery` section or parallel branch registry. Respect narrower project task-write gates.
 
 ## Invocation and Managed Ownership
 
