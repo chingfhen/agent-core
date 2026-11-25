@@ -8,8 +8,7 @@
 
 ## Next
 
-- [Agent Builder — Routing, setup and continuity](2026-11/agent-builder/2026-11-25__routing-and-continuity.md) — Blocked · Agent Builder. Make a fresh workspace agent discover projects, repositories and relevant active work without unnecessary scans. Foundation approved; await human-started module design.
-- [Agent Builder — Persistence and recovery](2026-11/agent-builder/2026-11-25__persistence-and-recovery.md) — Blocked · Agent Builder. Ensure the canonical instruction source and agent state can be recovered and loaded reliably. Foundation approved; await human-started module design.
+- [Agent Builder — Persistence and recovery](2026-11/agent-builder/2026-11-25__persistence-and-recovery.md) — Blocked · Agent Builder. Ensure the canonical instruction source and agent state can be recovered and loaded reliably. Task 06 complete; await human-started Task 07 design.
 
 - [Evaluate Agent-Led Verification](2026-11/verification-design/2026-11-11__evaluate-agent-led-verification.md) — Active · Verification design. Another human-started session should evaluate the proposal and Tripverge pilot with the human; implementation is not approved.
 - [Durable Learning Mechanism for Operational Constraints](2026-10-23__durable-agent-constraint-learning-bookmark.md) — Active. Next action: human evaluates durable options outside this repository; resume when that evaluation identifies a direction or requests further investigation.

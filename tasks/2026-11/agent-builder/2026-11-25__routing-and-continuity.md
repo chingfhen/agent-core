@@ -4,30 +4,27 @@
 **Created:** 2026-11-25
 **Last Updated:** 2026-11-25
 **Priority:** Next
-**Status:** Blocked
+**Status:** Closed — Completed (scoped source and static verification)
 
 **Goal:** Make a fresh workspace agent discover projects, repositories and relevant active work without unnecessary scans.
-**Deliverables:** Agreed scoped design and implementation-ready handoff (after approval); preserve source contracts and verify representative outcomes.
-**Success Bar:** The approved module contract is cohesive with the foundation, source behavior is preserved or explicitly changed, and relevant acceptance/permission conditions are clear.
-**Chosen Direction:** Modular Agent Builder; foundation approved 2026-11-25. Read canonical shared contracts; module details require human agreement.
-**Current State:** Foundation approved; no production implementation or tests, worker launch, publication or workspace migration performed. Module design not yet approved.
-**Next Action:** When the human starts this module, design setup, registration, continuity, discovery and user-visible receipts.
-**Blockers:** Awaiting human-started module design; foundation prerequisite satisfied.
+**Deliverables:** Approved setup/routing/continuity design; existing root extended; task/docs default guidance fragments; verified source and next-session handoff.
+**Success Bar:** Correct identity and ownership, low-friction setup, proactive relevant utilization, reliable continuation, efficient maintenance, non-destructive guidance and honest gap reporting. Task 06 establishes these as source contracts; actual fresh-session behavior remains subject to Tasks 07–08.
+**Chosen Direction:** Human approved the proposed design and hybrid natural-language continuation on 2026-11-25, and explicitly authorized scoped implementation.
+**Current State:** Root and two references authored and verified at source commit `c4b3f96aa8d2faf42de0d9a5e7ea02139acda80e`; canonical design and handoff reconciled. Other five module contracts unchanged. No runtime installation, migration, worker launch or harness trials.
+**Next Action:** Human may start [Task 07 — Persistence and recovery](./2026-11-25__persistence-and-recovery.md) for discussion of reliable canonical loading and recovery; no Task 07 implementation approved.
+**Blockers:** None for Task 06 source closure. Actual harness behavior and replacement/adoption remain downstream.
 
-## Permission and scope
+## Approved contract and source
 
-Human chooses workspace/project identity; agent organizes children. Repos can be external; use verified paths and concise AGENTS.md routing, no automatic write authority. Preserve remote KB access and cross-harness limitations. Saving this task is not approval to implement, publish/install, migrate, or run workers.
+- [Canonical design](../../../docs/agent-builder-design.md) owns the settled Task 06 direction and continuation rule.
+- [Agent Builder root](../../../skills/agent-builder/SKILL.md) owns targeted setup, registration, resource resolution, hybrid orientation, managed-block integration, coordination and verification.
+- [Tasks](../../../skills/agent-builder/references/tasks.md) and [docs](../../../skills/agent-builder/references/docs.md) now supply default guidance fragments alongside the other five modules. No new routing/setup/continuity reference or registry.
+- Legacy [workspace configuration](../../../docs/workspace-configuration.md) and original skills remain live until authorized transition. Preserve existing paths, remote KB locators and independent instructions; registration is not access or mutation authority.
 
-Root SKILL.md owns setup, project/repository registration, instruction management and continuity; no separate workspace.md/continuity.md by default. Exactly one managed block with first-class actionable utilization/discovery instructions. Human controls timing; named maintenance reference required and additional references agent-selected.
+## Verification and remaining acceptance
 
-## Resume Context
+At the source commit, reread the root and all seven module references. Confirmed all seven fragments and root links, hybrid continuation and human-choice fallback, legacy marker/conflict protection, no write authority from discovery, selective maintenance efficiency and downstream scope. Root/task/docs source commits were saved on main; transient GitHub write failures on docs were resolved using a verified candidate commit and successful non-force ref update. This establishes saved source content, not observed invocation, runtime safety or harness compliance. Task 07 owns concrete canonical instruction loading and recovery; Task 08 owns full source-contract regression, fresh-session cases (clear continuation, ambiguous tracks, relevant/unrelated lookup, external repository/multiple checkout, legacy setup, permission/partial failure), integration and separately authorized adoption.
 
-- [Design direction](../../../docs/agent-builder-design.md) — shared accepted direction and scope; read first.
-- [Skill design guide](../../../docs/skill-design-guide.md) — research as reusable expertise and concise decision/verification observability.
-- [Workspace configuration](../../../docs/workspace-configuration.md) — current contract, not yet replaced.
-- [Foundation task](./2026-11-25__foundation-and-shared-contracts.md) — completed design approval, initial inventory and acceptance conditions; read before module design.
-- Read the relevant original skill(s) and all applicable references before porting.
+## Maintenance and delegation
 
-## Delegation decision
-
-Defer — foundation is agreed, but this module's interfaces and implementation plan are not yet ready. Parent owns the foundation and integration; later planning may choose bounded workers with verified harness/model/effort/isolation and single human approval. No worker is approved or launched. Revisit only during authorized implementation planning.
+Main agent: tightly coupled Markdown changes, no worker approval or launch. Canonical design and task continuity are the appropriate authorities; no separate KB capture or standing lesson warranted (the transient connector issue is already covered by the existing verify-before-retry/partial-failure contract). No changes to live legacy guidance, manifests, installs, employer resources or Git/backup mechanisms.

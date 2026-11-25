@@ -10,9 +10,9 @@
 **Deliverables:** Agreed scoped design and implementation-ready handoff (after approval); preserve source contracts and verify representative outcomes.
 **Success Bar:** The approved module contract is cohesive with the foundation, source behavior is preserved or explicitly changed, and relevant acceptance/permission conditions are clear.
 **Chosen Direction:** Modular Agent Builder; foundation approved 2026-11-25. Read canonical shared contracts; module details require human agreement.
-**Current State:** Foundation approved; no production implementation or tests, worker launch, publication or workspace migration performed. Module design not yet approved.
+**Current State:** Tasks 01–06 completed at agreed source scope. Task 06 root and guidance fragments saved and statically verified; canonical loading and recovery mechanism not selected or tested. No worker launch, installation, publication to a harness or workspace migration performed. Task 07 design not yet approved.
 **Next Action:** When the human starts this module, compare root Git allowlist, tracked context source materialized at root and supported alternatives; verify actual harness behavior when authorized.
-**Blockers:** Awaiting human-started module design; foundation prerequisite satisfied.
+**Blockers:** Awaiting human-started Task 07 design; Task 06 routing prerequisite satisfied.
 
 ## Permission and scope
 
@@ -26,6 +26,8 @@ Preserve one canonical instruction authority, reliable actual loading, recovery 
 - [Skill design guide](../../../docs/skill-design-guide.md) — research as reusable expertise and concise decision/verification observability.
 - [Workspace configuration](../../../docs/workspace-configuration.md) — current contract, not yet replaced.
 - [Foundation task](./2026-11-25__foundation-and-shared-contracts.md) — completed design approval, initial inventory and acceptance conditions; read before module design.
+- [Task 06 — Routing, setup and continuity](./2026-11-25__routing-and-continuity.md) — completed source contract and verification limits.
+- [Agent Builder root](../../../skills/agent-builder/SKILL.md) — existing setup/routing/continuity and one canonical managed block; extend, do not recreate.
 - Read the relevant original skill(s) and all applicable references before porting.
 
 ## Delegation decision
