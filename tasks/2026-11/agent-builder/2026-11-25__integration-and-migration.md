@@ -4,7 +4,7 @@
 **Created:** 2026-11-25
 **Last Updated:** 2026-11-26
 **Priority:** Next
-**Status:** Ready — design discussion
+**Status:** Active
 
 **Goal:** Integrate modules and prove consolidation without regression before retiring originals.
 **Deliverables:** Agreed scoped design and implementation-ready handoff (after approval); preserve source contracts and verify representative outcomes.
