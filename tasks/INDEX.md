@@ -8,7 +8,6 @@
 
 ## Next
 
-- [Agent Builder — Behaviors and lessons](2026-11/agent-builder/2026-11-25__behaviors-and-lessons.md) — Blocked · Agent Builder. Establish distinct human-directed behavior and evidence-driven lessons capabilities. Foundation approved; await human-started module design.
 - [Agent Builder — Scripts and Python](2026-11/agent-builder/2026-11-25__scripts-and-python.md) — Blocked · Agent Builder. Preserve reusable agent-owned scripts and purpose-specific uv environments, including actual Python execution. Foundation approved; await human-started module design.
 - [Agent Builder — Routing, setup and continuity](2026-11/agent-builder/2026-11-25__routing-and-continuity.md) — Blocked · Agent Builder. Make a fresh workspace agent discover projects, repositories and relevant active work without unnecessary scans. Foundation approved; await human-started module design.
 - [Agent Builder — Persistence and recovery](2026-11/agent-builder/2026-11-25__persistence-and-recovery.md) — Blocked · Agent Builder. Ensure the canonical instruction source and agent state can be recovered and loaded reliably. Foundation approved; await human-started module design.
