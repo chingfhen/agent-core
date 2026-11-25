@@ -8,14 +8,12 @@
 
 ## Next
 
-- [Agent Builder — Persistence and recovery](2026-11/agent-builder/2026-11-25__persistence-and-recovery.md) — Blocked · Agent Builder. Ensure the canonical instruction source and agent state can be recovered and loaded reliably. Task 06 complete; await human-started Task 07 design.
+- [Agent Builder — Integration, validation and migration](2026-11/agent-builder/2026-11-25__integration-and-migration.md) — Ready · Agent Builder. Tasks 01–07 complete at source scope; await human-started integration design and scoped acceptance approval. No live adoption or retirement approved.
 
 - [Evaluate Agent-Led Verification](2026-11/verification-design/2026-11-11__evaluate-agent-led-verification.md) — Active · Verification design. Another human-started session should evaluate the proposal and Tripverge pilot with the human; implementation is not approved.
 - [Durable Learning Mechanism for Operational Constraints](2026-10-23__durable-agent-constraint-learning-bookmark.md) — Active. Next action: human evaluates durable options outside this repository; resume when that evaluation identifies a direction or requests further investigation.
 
 ## Later
-
-- [Agent Builder — Integration, validation and migration](2026-11/agent-builder/2026-11-25__integration-and-migration.md) — Blocked · Agent Builder. Integrate modules and prove consolidation without regression before retiring originals. Foundation approved; await module outcomes and authorized implementation/acceptance planning.
 
 - [Audit Define Success Adoption](2026-11/define-success/2026-11-15__evaluate-define-success.md) — On Hold · Outcome discovery. On human request, evaluate the new skill's effectiveness and questioning/scope discipline; no trial performed yet.
 - [Unified Task Execution + KB Background Synthesis](2026-11/task-execution-service/2026-11-05__design-trustworthy-cross-project-executor.md) — On Hold (deferred). Resume: design one job/queue/dispatch/audit pipeline, with GitHub-triggered Sprite wake-up and KB synthesis as possible first workload. No implementation approved.
