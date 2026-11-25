@@ -87,3 +87,20 @@ A routine docs sync is not an audit or continuous background process. A broader 
 ## Completion test
 
 Future participants can find settled project meaning in the owned canonical surface, distinguish intended from actual and accepted from tentative, understand consequential rationale, and retrieve relevant evidence. Transient task state and competing authority were excluded or reconciled. Verify only affected claims and navigation unless broader review was explicitly authorized. A material persistence or authority gap is reported, never hidden by polished prose.
+
+## Default AGENTS.md guidance fragment
+
+Root owns the single managed block. Use confirmed docs roots and a few existing canonical entry points with when-to-read cues, including an established north star when relevant. Preserve local ownership and stricter constraints; omit absent locators.
+
+    Docs: [confirmed docs root]
+    [Canonical entry point] — [what it owns and when to consult it].
+    Before substantial project work or dependent decisions, consult relevant
+    accepted project meaning, constraints and procedures. Use known paths,
+    entry points or bounded filename/content search on misses. Read actual
+    sources, distinguish intended design from current implementation, and
+    verify consequential claims against the appropriate authority.
+    Reading/using docs needs no Agent Builder and authorizes no maintenance.
+    Load Agent Builder + docs.md for requested docs maintenance or justified
+    integration during authorized maintenance; respect local scope and limits.
+
+Keep deeper navigation in docs; no full inventory, automatic north star or mandatory index. Root integrates common cues without weakening constraints.
