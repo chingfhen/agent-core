@@ -4,30 +4,37 @@
 **Created:** 2026-11-25
 **Last Updated:** 2026-11-25
 **Priority:** Now
-**Status:** Active
+**Status:** Closed
 
 **Goal:** Preserve project execution continuity and settled project truth under one lifecycle.
-**Deliverables:** Agreed scoped design and implementation-ready handoff (after approval); preserve source contracts and verify representative outcomes.
-**Success Bar:** The approved module contract is cohesive with the foundation, source behavior is preserved or explicitly changed, and relevant acceptance/permission conditions are clear.
-**Chosen Direction:** Modular Agent Builder; foundation approved 2026-11-25. Read canonical shared contracts; module details require human agreement.
-**Current State:** Foundation approved; no production implementation or tests, worker launch, publication or workspace migration performed. Module design not yet approved.
-**Next Action:** Discuss and agree detailed task/docs module contracts with the human; no implementation. Preserve source contracts while applying new shared naming, agent-selected maintenance and proactive utilization. Prepare implementation handoff only after design agreement.
-**Blockers:** None for human-started design discussion; implementation requires separate approval.
+**Deliverables:** Approved scoped design, initial Agent Builder root, tasks.md and docs.md.
+**Success Bar:** Cohesive approved module contracts, source behavior preserved or intentionally changed, scoped source saved and checked; full integration validation remains Task 08.
+**Chosen Direction:** Shared lifecycle with specialized references; human approved design and explicitly authorized scoped authoring on 2026-11-25.
+**Current State:** Completed scoped design and initial source authoring. Commit [ee55a35](https://github.com/chingfhen/agent-core/commit/ee55a356e4d9eaa9c2be9b4ecaefec03789b0068) adds root and two references only.
+**Next Action:** None for this closed task. Continue Task 03 on human cue; Task 08 owns full regression/coverage and adoption.
+**Blockers:** None for scoped completion.
+**Closure:** Completed (scoped source delivery, not runtime adoption).
 
-## Permission and scope
+## Decisions and verification
 
-Preserve stable paths, priority/status distinction, explicit execution permissions, next permitted action, task/index consistency, delegation receipts, canonical docs and provenance; no mass rename. Saving this task is not approval to implement, publish/install, migrate, or run workers.
-
-Apply lowercase index.md and double-hyphen dated filenames to new conventional resources; preserve existing index/path compatibility. Direct sync tasks/docs names a primary capability; agent may select other justified references within human-triggered maintenance unless explicitly limited. Read-side retrieval remains independent of skill.
+- Unfinished-only index; stable closed files; legacy paths and gates preserved.
+- Agent chooses Brief/Standard/Detailed; Standard fallback, no compulsory mode announcement.
+- Routine reprioritization within established human direction; no autonomous strategic change or cancellation.
+- Semantic living docs, authority by claim type, selective provenance, optional established north star protected from unapproved strategic change.
+- Human-triggered, relevance-driven maintenance; root coordinates; tasks/docs own specialist procedures.
+- Research-informed operational techniques embedded in references; no repeated literature review requirement.
+- Remote commit and three files read back, diff scope, reference links, selected contracts and unchanged installation manifest verified. No fresh-session behavioral tests or exhaustive source-contract audit performed. Carry these to Task 08.
+- No workers, installation, retirement or workspace migration. Existing workflows remain live.
 
 ## Resume Context
 
-- [Design direction](../../../docs/agent-builder-design.md) — shared accepted direction and scope; read first.
-- [Skill design guide](../../../docs/skill-design-guide.md) — research as reusable expertise and concise decision/verification observability.
-- [Workspace configuration](../../../docs/workspace-configuration.md) — current contract, not yet replaced.
-- [Foundation task](./2026-11-25__foundation-and-shared-contracts.md) — completed design approval, initial inventory and acceptance conditions; read before module design.
-- Read the relevant original skill(s) and all applicable references before porting.
+- [Approved design](../../../docs/agent-builder-design.md)
+- [Initial root](../../../skills/agent-builder/SKILL.md)
+- [Tasks reference](../../../skills/agent-builder/references/tasks.md)
+- [Docs reference](../../../skills/agent-builder/references/docs.md)
+- [Next module](./2026-11-25__knowledge-and-archive.md)
+- [Integration and migration](./2026-11-25__integration-and-migration.md)
 
 ## Delegation decision
 
-Defer — foundation is agreed, but this module's interfaces and implementation plan are not yet ready. Parent owns the foundation and integration; later planning may choose bounded workers with verified harness/model/effort/isolation and single human approval. No worker is approved or launched. Revisit only during authorized implementation planning.
+Main-agent execution for scoped initial authoring; no workers launched. Future module delegation requires its own approved plan.

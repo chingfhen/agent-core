@@ -143,6 +143,12 @@ Load Agent Builder and python.md for creating, changing dependencies/pin/lock or
 
 New design removes inbox as staging queue and the living knowledge synthesis layer. Human places originals in a predictable archive month folder and selects the source for capture; preserve original in place, record verified source identity/locator and provenance; no default archive scan, move, rename or deletion. Preserve fidelity, scoped backend access, safe retries and privacy. Records and docs retain distinct authority; managed artifacts require explicit intent. Current inbox workflow, existing pages and old paths remain live/untouched until authorized module transition.
 
+## Incremental module delivery
+
+Human-approved 2026-11-25: each module session discusses and settles its assigned design, then implements its scoped source on a separate human cue, verifies the saved changes and syncs the handoff. Extend the existing Agent Builder root and relevant references incrementally; do not defer all authoring to Task 08 or reopen accepted contracts without a material conflict. Task 08 owns integration, exhaustive source-contract coverage, representative behavioral validation and separately authorized adoption/retirement. Draft source commits are not installation or migration approval.
+
+Task 02 decisions: task index contains unfinished work only; stable closed files remain discoverable. Brief/Standard/Detailed remain available, Standard is the fallback, and the agent selects depth autonomously absent explicit direction. No mandatory mode announcement. Routine reprioritization respects established human direction. Docs use semantic living documents with selective provenance and optional established north-star authority; no automatic north-star creation or strategic change without approval. Specialist references encode research-informed operational judgment, not repeated research prerequisites. Maintenance selection is relevance-driven. Start with one tasks and one docs reference.
+
 ## Migration and acceptance
 
 Maintain a temporary source-contract coverage map: preserved, centralized, intentionally changed or retired with reason. Inventory original skills and applicable references, direct dependents, manifests, sync/retirement and test contracts before porting. No wholesale summarization. See [foundation task](../tasks/2026-11/agent-builder/2026-11-25__foundation-and-shared-contracts.md) for initial inventory and acceptance.

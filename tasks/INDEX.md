@@ -2,7 +2,7 @@
 
 ## Now
 
-- [Agent Builder — Tasks and docs migration](2026-11/agent-builder/2026-11-25__tasks-and-docs.md) — Active · Agent Builder. Foundation approved; next: human-started task/docs module design, no implementation.
+- [Agent Builder — Knowledge and archive migration](2026-11/agent-builder/2026-11-25__knowledge-and-archive.md) — Active · Agent Builder. Next: human-led design, then scoped source authoring on explicit cue; no runtime adoption.
 
 - [Refine Workflow Discovery and Handoff](2026-11/workflow-continuity/2026-11-08__refine-discovery-and-handoff.md) — Blocked · Workflow continuity. Candidate implemented and published on `refine/workflow-continuity`; next: independent human comparison with main and review direction. No merge or harness installation yet.
 - [Synchronize Pi and OpenCode Shortcuts](2026-10/2026-10-28__synchronize-pi-opencode-shortcuts.md) — Active. Next action: test the trial model picker and agent-cycle bindings, F2/F3 and thinking visibility.
@@ -10,7 +10,6 @@
 
 ## Next
 
-- [Agent Builder — Knowledge and archive migration](2026-11/agent-builder/2026-11-25__knowledge-and-archive.md) — Blocked · Agent Builder. Preserve shared agent-scoped knowledge and simplify raw artifact capture. Foundation approved; await human-started module design.
 - [Agent Builder — Behaviors and lessons](2026-11/agent-builder/2026-11-25__behaviors-and-lessons.md) — Blocked · Agent Builder. Establish distinct human-directed behavior and evidence-driven lessons capabilities. Foundation approved; await human-started module design.
 - [Agent Builder — Scripts and Python](2026-11/agent-builder/2026-11-25__scripts-and-python.md) — Blocked · Agent Builder. Preserve reusable agent-owned scripts and purpose-specific uv environments, including actual Python execution. Foundation approved; await human-started module design.
 - [Agent Builder — Routing, setup and continuity](2026-11/agent-builder/2026-11-25__routing-and-continuity.md) — Blocked · Agent Builder. Make a fresh workspace agent discover projects, repositories and relevant active work without unnecessary scans. Foundation approved; await human-started module design.

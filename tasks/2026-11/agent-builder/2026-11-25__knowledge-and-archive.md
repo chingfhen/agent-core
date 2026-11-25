@@ -3,16 +3,16 @@
 **File:** `tasks/2026-11/agent-builder/2026-11-25__knowledge-and-archive.md`
 **Created:** 2026-11-25
 **Last Updated:** 2026-11-25
-**Priority:** Next
-**Status:** Blocked
+**Priority:** Now
+**Status:** Active
 
 **Goal:** Preserve shared agent-scoped knowledge and simplify raw artifact capture.
-**Deliverables:** Agreed scoped design and implementation-ready handoff (after approval); preserve source contracts and verify representative outcomes.
+**Deliverables:** Agreed scoped design followed by implementation of knowledge-base.md and necessary scoped root changes on explicit human cue; verify saved source and preserve source contracts.
 **Success Bar:** The approved module contract is cohesive with the foundation, source behavior is preserved or explicitly changed, and relevant acceptance/permission conditions are clear.
 **Chosen Direction:** Modular Agent Builder; foundation approved 2026-11-25. Read canonical shared contracts; module details require human agreement.
-**Current State:** Foundation approved; no production implementation or tests, worker launch, publication or workspace migration performed. Module design not yet approved.
+**Current State:** Foundation and Task 02 approved; initial Agent Builder root and tasks/docs references authored in ee55a35. Knowledge/archive design and source authoring remain pending. No runtime adoption.
 **Next Action:** When the human starts this module, discuss records, managed artifacts, backends, retrieval, indexes, selected-source archive capture and explicit compatibility for deprecated synthesis/inbox resources.
-**Blockers:** Awaiting human-started module design; foundation prerequisite satisfied.
+**Blockers:** None for human-started design discussion; implementation requires separate cue.
 
 ## Permission and scope
 
@@ -26,6 +26,8 @@ New design excludes knowledge/ synthesis and inbox. Design explicit preservation
 - [Skill design guide](../../../docs/skill-design-guide.md) — research as reusable expertise and concise decision/verification observability.
 - [Workspace configuration](../../../docs/workspace-configuration.md) — current contract, not yet replaced.
 - [Foundation task](./2026-11-25__foundation-and-shared-contracts.md) — completed design approval, initial inventory and acceptance conditions; read before module design.
+- [Existing Agent Builder root](../../../skills/agent-builder/SKILL.md) — extend rather than recreate.
+- [Completed Task 02](./2026-11-25__tasks-and-docs.md) — scoped authoring precedent and verification limits.
 - Read the relevant original skill(s) and all applicable references before porting.
 
 ## Delegation decision
