@@ -76,7 +76,7 @@ remains unchanged. Secret exclusion patterns are not a substitute for data revie
 
 A concrete need during authorized execution or a human maintenance request permits ordinary maintenance of established personal purpose projects: select/create a compatible purpose, add necessary compatible dependencies, choose a suitable pinned Python for a new purpose, restore/sync/repair known owned state, and actually run the workload. First initialization of a new resource root follows root approval; do not silently change workspace routing or install uv/other machine tools. Respect repository/employer/network/package policy. Prefer a separate compatible purpose rather than changing an existing environment in a way that may break other consumers. Inspect affected dependencies/consumers and lock changes; no blanket upgrades, disruptive removals or incompatible pin changes to a shared purpose without human authority. No destructive cleanup or automatic maintenance of unrelated environments.
 
-Treat environments as shared across sessions. Before any command that can sync, modify or rebuild, establish that no conflicting run or mutation is using that environment; even uv run --locked may sync. Coordinate or stop if uncertain; do not invent a locking service or duplicate environments just to avoid waiting. Recheck ownership, target and current recipe immediately before mutation; reconcile concurrent edits. If repair fails, preserve recipe, explain the blocker and never fall back to system/transient/team Python. 
+Treat environments as shared across sessions. Before any command that can sync, modify or rebuild, establish that no conflicting run or mutation is using that environment; even uv run --locked may sync. Coordinate or stop if uncertain; do not invent a locking service or duplicate environments just to avoid waiting. Recheck ownership, target and current recipe immediately before mutation; reconcile concurrent edits. If repair fails, preserve recipe, explain the blocker and never fall back to system/transient/team Python.
 
 ## Target every uv operation
 
@@ -162,8 +162,7 @@ After maintenance verify the actual recipe/pin/lock, generated-state placement a
 Diagnose errors using the selected project's pin, dependencies, lock and command.
 Never fall back to root/system Python, delete the lock, relax constraints blindly,
 or bypass package policy. Rebuild a broken `.venv` only when known owned and idle,
-preserving the recipe. Report purpose, created/reused, absolute project/interpreter
-paths, Python version, lock path, dependency changes, and actual workload result.
+preserving the recipe.
 For maintenance report actual created/reused purpose, project/interpreter and lock paths, Python version, dependency changes and actual workload outcome. Ordinary reuse needs no separate maintenance receipt; disclose consequential deviations or gaps. Inventory-only requests list purpose folders, pins, direct dependencies and lock/interpreter presence without claiming runtime verification or writing a second registry. Runtime use does not require rewriting AGENTS.md routing.
 
 ## Explicit team/root mode
@@ -197,8 +196,10 @@ Use confirmed locators only in the single root-owned block, not a competing sect
     check target/pin and required installed versions against recipe/lock.
     Reuse sufficient current locked-sync/runtime evidence; otherwise inspect
     metadata (uv pip list/check --python <absolute interpreter>) and lock.
-    Only use lock/sync check flags when their installed-version non-mutation is
-    established and target is valid; never use --locked alone or --no-sync as
+    For project-level check commands use --project <absolute env>, scoped
+    UV_PROJECT_ENVIRONMENT=<absolute env>/.venv, no interpreter downloads and
+    offline checks; clear conflicting uv overrides. Only use check flags when
+    installed-version non-mutation is established and target is valid; never use --locked alone or --no-sync as
     proof of compatibility. Stop on uncertainty, drift, mismatch or concurrent
     mutation; load Agent Builder and python.md for necessary maintenance.
     Execute requested workload through the verified interpreter; inspect result.
