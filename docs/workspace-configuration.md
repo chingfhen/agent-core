@@ -302,6 +302,10 @@ harness discovery/trigger settings and actual installed content still matter.
 Publication uses the existing manual allowlists and selected-harness sync; it
 does not run setup or change global guidance/settings.
 
+## Planned Agent Builder consolidation
+
+The human has accepted the direction of a modular persistent-agent lifecycle; see [Agent Builder design direction](agent-builder-design.md). This is a planned replacement, not the current runtime contract. The separate ownership markers, skills, and current KB/uv procedures above remain authoritative until an approved migration is validated.
+
 ## Related
 
 - [Operating manual](agent-core-operating-manual.md)

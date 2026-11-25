@@ -1,7 +1,7 @@
 ---
 title: Skill Design Guide
 description: Canonical criteria for designing, invoking, consolidating, publishing, and retiring Agent Core skills.
-updated: 2026-11-18
+updated: 2026-11-25
 ---
 
 # Skill Design Guide
@@ -99,6 +99,14 @@ Prefer concrete behavioral instructions to slogans. Each rule should change the 
 - new abstractions added only for imagined future needs.
 
 Require verifiable completion where it matters, but do not turn ordinary work into ceremony.
+
+## Research as reusable expertise
+
+For consequential or unfamiliar skill design, investigate the applicable evidence and existing practices once, compare alternatives against the actual problem, and critically select the durable techniques that materially improve the intended outcome. Encode the selected, actionable procedure, gates and limitations in the canonical skill or its selectively loaded references, with useful source links. Do not make future agents redo the same research as a routine invocation prerequisite. Recheck material changing facts, version-specific constraints, new evidence or observed failures when relevant. Do not treat published findings as proof that our skill works; verify representative behavior proportionately. Simple changes need no ceremonial literature review.
+
+## Observability is part of the deliverable
+
+Design skills to make consequential choices and actual outcomes visible to the human in ordinary conversation: what route, action or approach was selected and why; relevant scope/authority, costs or uncertainty; whether the agreed plan was followed, including actual deviations/fallbacks; and what was verified or remains incomplete. Use compact decision statements or existing completion receipts when they add information. The human should be able to spot a wrong direction and revisit evidence without asking for a separate report. Do not require verbose logs, private reasoning, duplicate status lines, automatic dashboards, or a receipt for trivial no-ops. Observability is not evidence of successful execution; retain the checks that establish actual outcomes.
 
 ## Consolidation and retirement
 
