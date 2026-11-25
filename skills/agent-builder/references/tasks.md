@@ -109,3 +109,20 @@ The rules above operationalize selected practices rather than requiring a litera
 - [The Kanban Guide](https://kanbanguides.org/the-kanban-guide/2025.5/): visible unfinished work, explicit transition policies and finishing/clearing work before indiscriminately starting more. Adopt lightweight priority and blocker semantics, not compulsory WIP limits, metrics or forecasting.
 
 These inform design, not proof of behavior on our harnesses. Reassess material changing facts or observed failures; test representative fresh-session scenarios before replacement.
+
+## Default AGENTS.md guidance fragment
+
+Root owns the single managed block. Use confirmed task root/index, preserve legacy index names and shared task surfaces; omit absent locators.
+
+    Tasks: [confirmed task root and index locator] — unfinished work and next actions.
+    For continuation read the actual task: known path, index or bounded search
+    across months, workstreams and aliases. An index miss is not absence.
+    Reconcile required sources, current evidence, blockers and next permitted action.
+    For 'let us continue', resume clearly established work; if materially different
+    tracks remain, orient briefly, recommend a next task and let the human choose.
+    Priority/status are not permission. Ordinary discovery and status do not need
+    Agent Builder or authorize writes. Load Agent Builder + tasks.md for maintenance
+    or saved-task execution; honor human timing and local gates. Handoff/closeout
+    may coordinate relevant modules; routine checkpoints need no full pass.
+
+Keep changing priorities and state in tasks/index. Root integrates common cues without weakening constraints.
