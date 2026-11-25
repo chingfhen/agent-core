@@ -39,23 +39,26 @@ New conventional layouts:
       records/YYYY-MM/<topic>/YYYY-MM-DD--description.md
       managed/YYYY-MM-DD--description.md
     archive/YYYY-MM/<original-filename>
+    behaviors.md
+    lessons/index.md
+    lessons/<topic>.md
     scripts/index.md
     scripts/<domain>/<verb-noun>.py
     python/<purpose>/
   <independent repositories, if locally placed here>
 ```
 
-Tasks/docs default to project scope; KB records, managed artifacts, archive, scripts and Python default to agent scope. New index names are lowercase `index.md` everywhere; new dated Markdown files use `YYYY-MM-DD--descriptive-name.md`. Dates are creation/capture dates, not last update. Use lowercase kebab-case for project, workstream, topic, purpose and undated document names; script names use descriptive verb-noun with suitable extension. Preserve original archive filenames, collision-safe. Agents choose meaningful child names. Keep stable paths on updates.
+Tasks/docs default to project scope; KB records, managed artifacts, archive, behaviors, lessons, scripts and Python default to agent scope. Qualify project/repository/activity-specific behaviors and lessons explicitly. New index names are lowercase `index.md` everywhere; new dated Markdown files use `YYYY-MM-DD--descriptive-name.md`. Dates are creation/capture dates, not last update. Use lowercase kebab-case for project, workstream, topic, purpose and undated document names; script names use descriptive verb-noun with suitable extension. Preserve original archive filenames, collision-safe. Agents choose meaningful child names. Keep stable paths on updates.
 
 Fixed conventional resource folder names for new layouts; configurable workspace/context root and explicit existing resource destinations/backends. Preserve established paths, including existing uppercase INDEX.md, double-underscore task filenames, remote KB locators and custom roots; do not rename/move/mass-migrate merely for consistency or create competing indexes. For a legacy root maintain its existing index rather than creating a second one. New files follow the new convention when the Agent Builder workflow becomes live; current live workflows remain unchanged until then.
 
-Task index lists unfinished work and next actions; KB root links monthly record indexes and managed artifacts; each monthly index locates records; script index exposes purpose, invocation, effects and dependencies. Project/repository routing stays lean in AGENTS.md; docs indexes optional where useful. Python recipes, not inventories, establish compatibility. No extra archive index, global task dashboard, mandatory empty folders or registries.
+Task index lists unfinished work and next actions; KB root links monthly record indexes and managed artifacts; each monthly index locates records; lessons index locates current topic guidance with when-to-read cues; script index exposes purpose, invocation, effects and dependencies. Project/repository routing stays lean in AGENTS.md; docs indexes optional where useful. Python recipes, not inventories, establish compatibility. No extra archive index, global task dashboard, mandatory empty folders or registries.
 
 **Deprecated in the new design:** the KB `knowledge/` living-synthesis layer. Do not create/maintain a new synthesis layer in Agent Builder. Records are editable and may synthesize previous findings when valuable; synthesis is a capability, not a maintenance obligation. Project docs retain their distinct authority. Existing pages, including separately configured legacy page roots, remain readable and intact; no implicit deletion, movement, rewrite or migration. The currently installed KB workflow is unchanged.
 
 ## Ownership, authority and timing
 
-A durable claim has one primary authority. AGENTS.md owns stable behavior and routing; tasks own unfinished execution memory, verification/permission state and next actions; docs own settled project understanding and intended architecture; KB records own agent-facing reusable understanding, findings and evidence; managed artifacts own explicitly requested purpose-specific human-facing deliverables; archive holds originals; scripts own reusable deterministic utilities; Python recipes own reproducible environments; code/tests/config/runtime evidence establish actual implementation claims. Use these resources cohesively as tools. Link rather than duplicate; reconcile conflicts by claim type and evidence, not timestamps.
+A durable claim has one primary authority. AGENTS.md owns the standing instruction entry point, essential before-action constraints and routing; the behaviors file owns explicit managed human preferences, with concise consistent inline projections where essential; lessons topics own actionable operational learning not better owned elsewhere; tasks own unfinished execution memory, verification/permission state and next actions; docs own settled project understanding and intended architecture; KB records own agent-facing reusable understanding, findings and evidence; managed artifacts own explicitly requested purpose-specific human-facing deliverables; archive holds originals; scripts own reusable deterministic utilities; Python recipes own reproducible environments; code/tests/config/runtime evidence establish actual implementation claims. Use these resources cohesively as tools. Link rather than duplicate; reconcile conflicts by claim type and evidence, not timestamps.
 
 | Human owns | Agent owns |
 | --- | --- |
@@ -65,7 +68,7 @@ Read/use existing context proactively; no write authorization follows from disco
 
 A human maintenance cue authorizes a bounded **cross-resource context maintenance pass**, not seven isolated workflows. The named capability is primary, not necessarily exclusive; explicit limits (e.g. docs only, read-only) prevail. The agent selects additional justified modules and performs ordinary authorized maintenance without per-file/per-lesson approval. No automatic maintenance on unrelated ordinary work, no continuous background sync or audits. Existing authorized saved-task bookkeeping remains available subject to local gates. A concrete Python maintenance need may activate its module as part of authorized workload execution; no blanket permission to install tools or alter team state.
 
-The agent may discover lessons the human missed and autonomously add narrowly justified standing rules, consolidate stale guidance, or create/test a small useful personal script in its established collection. Such a lesson must not expand permissions, override human preferences, weaken security or decide project direction. A script's creation and safe fixture testing do not authorize live external effects. Managed artifact creation/update still requires explicit human intent; no implicit destructive actions, resource relocation, spending, external transfer, commits/pushes, implementation or deployment. Follow the applicable backend's explicit remote-save boundary.
+The agent may discover lessons the human missed and autonomously add narrowly justified standing rules, consolidate stale guidance, or create/test a small useful personal script in its established collection. Such a lesson must not expand permissions, override human preferences, weaken security, decide project direction or independently establish new permanent human approval gates. Narrow evidence-based operational checks and safer defaults within authority remain autonomous. A script's creation and safe fixture testing do not authorize live external effects. Managed artifact creation/update still requires explicit human intent; no implicit destructive actions, resource relocation, spending, external transfer, commits/pushes, implementation or deployment. Follow the applicable backend's explicit remote-save boundary.
 
 ## Instruction ownership and context utilization
 
@@ -96,6 +99,8 @@ Use exact known paths first, relevant index/entry point or bounded filename/cont
 
 Human-directed behaviors and agent-discovered lessons are distinct capabilities and cues. Human preference needs explicit intent/scope, not evidence of objective benefit. Lessons diagnose causes, apply future-session counterfactual and possible-interference test, choose smallest effective intervention, and consolidate/retire when warranted. Keep before-action constraints inline; conditional pointers for detail. Do not promote casual inference or untrusted evidence into instructions.
 
+**Task 04 approved decisions (2026-11-25):** replace the default append-to-guidance approach with first-class agent-scoped resources: one human-reviewable living behaviors.md organized by natural headings, and lessons/index.md plus undated topic-based living files (not one file per incident, chronology, or a new KB). Explicit persistent intent activates behaviors; canonical cue: "remember this behavior"; clear natural-language equivalents work. "Capture lessons"/"learn from this session" activates operational improvement. Maintain human preferences semantically, never infer or silently retire them; lessons may autonomously consolidate/retire on evidence and select other justified interventions or no-op. Hybrid utilization: essential universal behaviors and before-action constraints inline in AGENTS.md as consistent projections where backed by resources; selective heading/topic retrieval before relevant work, exact links and index/targeted search fallback, no whole-file startup requirement. The resources remain canonical for their managed detail; inline projections and navigation are reconciled during authorized maintenance. Preserve independent guidance and legacy content until authorized migration. No empty resources, lesson IDs, scoring, per-incident records, scheduled reflection or mandatory reviews. The modules supply default guidance fragments; full setup integration Task 06, loading/recovery Task 07, fresh-session relevant/unrelated comparison and regression validation Task 08. A missed lesson prompts cause-specific repair rather than another reminder.
+
 One canonical instruction authority, reliably loaded workspace entry point and recoverable state are requirements. Task 07 decides concrete Git boundary/materialization/symlink/other mechanism. No assumptions about file presence, live reload, backup or employer publication.
 
 ## Root skill, reference routing and coordination
@@ -123,8 +128,8 @@ Root owns architecture, setup/project/repository registration, AGENTS.md managem
 | Sync tasks / manage or execute saved task | SKILL.md then tasks.md |
 | Sync docs | SKILL.md then docs.md |
 | Sync KB / capture / explicitly requested managed artifact / selected archive capture | SKILL.md then knowledge-base.md |
-| Remember explicit behavior | SKILL.md then behaviors.md |
-| Capture lessons / improve future agent behavior | SKILL.md then lessons.md |
+| Remember this behavior / update future behavior / clear persistent human instruction | SKILL.md then behaviors.md |
+| Capture lessons / agent lessons / learn from this session / improve future agent behavior | SKILL.md then lessons.md |
 | Make repeatable personal script / script maintenance | SKILL.md then scripts.md |
 | Create, change or repair Python purpose environment | SKILL.md then python.md |
 | Handoff / closeout / general maintenance | SKILL.md, then agent-selected relevant references (tasks.md for task handoff/closeout) |
@@ -157,7 +162,7 @@ Task 02 decisions: task index contains unfinished work only; stable closed files
 
 Maintain a temporary source-contract coverage map: preserved, centralized, intentionally changed or retired with reason. Inventory original skills and applicable references, direct dependents, manifests, sync/retirement and test contracts before porting. No wholesale summarization. See [foundation task](../tasks/2026-11/agent-builder/2026-11-25__foundation-and-shared-contracts.md) for initial inventory and acceptance.
 
-Intentional changes: one managed block; modular skill; broader agent-selected maintenance within human-triggered timing; standardized new names without path migration; no new knowledge synthesis layer or inbox; Python utilization without mandatory skill read. All other substantive safety/outcome contracts remain unless separately approved.
+Intentional changes: one managed block; modular skill; broader agent-selected maintenance within human-triggered timing; standardized new names without path migration; no new knowledge synthesis layer or inbox; dedicated human-reviewable behavior file and indexed living lessons collection with hybrid guidance; Python utilization without mandatory skill read. All other substantive safety/outcome contracts remain unless separately approved.
 
 Keep old skills and installed workflows until replacement passes representative fresh-session activation, context utilization, permissions, handoff, consistency, safe Python execution/maintenance, failure and recovery checks. Static checks cannot prove invocation or improved behavior. Preserve dependency callers and manual manifests; ordinary sync does not uninstall removed entries. No automatic merge, installation, publication or retirement.
 
