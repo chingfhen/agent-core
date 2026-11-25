@@ -6,7 +6,7 @@ disable-model-invocation: false
 
 # Agent Builder
 
-> Development status: initial source, not an adopted runtime workflow. Tasks and docs are authored; other modules, final routing/recovery and integration remain pending. Do not install, migrate, or replace existing workflows from this partial source. The repository's approved foundation and remaining Agent Builder tasks govern its completion. Remove this development note only after authorized integration and validation.
+> Development status: initial source, not an adopted runtime workflow. Tasks, docs and KB/archive are authored; other modules, final routing/recovery and integration remain pending. Do not install, migrate, or replace existing workflows from this partial source. The repository's approved foundation and remaining Agent Builder tasks govern its completion. Remove this development note only after authorized integration and validation.
 
 ## Job and boundaries
 
@@ -25,8 +25,8 @@ One primary authority per durable claim. Link or state a concise consequence els
 | AGENTS.md | Stable behavior and resource routing |
 | Project tasks | Unfinished execution memory, actual verification/permission state and next permitted actions |
 | Project docs | Settled project meaning, intended architecture and rationale |
-| KB records | Reusable findings and evidence |
-| Managed artifacts | Explicitly requested human-facing deliverables |
+| KB records | Agent-facing reusable understanding, findings and evidence |
+| Managed artifacts | Explicitly requested purpose-specific human-facing deliverables |
 | Archive | Originals |
 | Scripts | Reusable deterministic utilities |
 | Python recipes | Reproducible purpose environments |
@@ -68,7 +68,7 @@ A human maintenance request authorizes a bounded pass over directly relevant con
 | Sync tasks / manage or execute a saved task | [tasks.md](references/tasks.md) |
 | Sync docs / maintain documentation | [docs.md](references/docs.md) |
 | Handoff / closeout / general maintenance | Root coordination; tasks.md for task handoff/closeout; other justified references |
-| Sync KB / capture / selected archive capture / managed artifact | knowledge-base.md (pending) |
+| Sync KB / capture / selected archive capture / managed artifact | [knowledge-base.md](references/knowledge-base.md) |
 | Remember explicit behavior | behaviors.md (pending) |
 | Capture lessons / improve future behavior | lessons.md (pending) |
 | Make a repeatable personal script / script maintenance | scripts.md (pending) |
@@ -79,6 +79,8 @@ Pending module names are reserved for subsequent implementation, not available p
 Ordinary work and read-side retrieval do not trigger automatic context maintenance. Explicit standing permissions can establish scoped boundaries; otherwise wait for the human cue. Executing an authorized saved task may include that task's checkpoint/index bookkeeping, subject to stricter local rules, but does not imply general maintenance or implementation permission. A request to pause/handoff unfinished project work is a maintenance cue, not authorization to implement. A concrete Python maintenance need during authorized execution is a scoped exception; routine compatible environment use is not maintenance. No continuous audit, background sync, automatic worker launch, spending, destructive action, relocation, external transfer, commit/push, publication or deployment is implied. Respect explicit backend save boundaries.
 
 ## Coordinate one maintenance pass
+
+Autonomy means choosing necessary work, including doing less. Reuse available discussion, findings and verification; do not restart research, scan other resources merely to prove no change, or load references without a concrete contribution. A narrow cue needs only the relevant context and smallest useful changes. Batch related persistence when supported; reuse sufficient write/verification evidence, perform only additional checks that resolve meaningful uncertainty, and stop when the requested outcome is established. This does not relax permissions, fidelity, required navigation or safety checks.
 
 1. Resolve affected project/resources, the actual work context, scope and applicable permissions. Identify decisions, evidence, verification, uncertainty, ongoing outcomes and potential durable improvements once. Distinguish observed, reported, inferred, approved and untested claims.
 2. Determine primary authority for each material finding. Load primary and additional justified references; select changes, not mandatory writes. Respect unresolved human-owned decisions and narrower gates. Do not manufacture a task, document or lesson to show activity.
@@ -91,7 +93,7 @@ For fresh-session handoff, preserve goal, deliverables, decisions and rationale,
 
 Exactly one Agent Builder-owned block in canonical workspace AGENTS.md, bounded by BEGIN AGENT BUILDER and END AGENT BUILDER HTML comment markers. Use lean sections as applicable: Workspace and Resources; Projects and Repositories; Continuity and Resource Discovery; Agent Behaviors; Agent Lessons. No separate module blocks, second catalogues or status snapshots. Preserve human-authored text, outside owners, independent repository guidance, custom restrictions and block position; managed does not mean regenerate.
 
-Include confirmed locators, a task index per project and a few useful docs entry points with when-to-read cues. Make ordinary utilization actionable without loading maintenance references: relevant docs before dependent decisions; actual task and required context before continuing; bounded search on index/entry-point miss; distinguish actual state from claims; no write/execute authority from discovery. Keep essential before-action constraints inline; link detail when conditional. Do not put detailed maintenance procedures, task lists, full docs or inventories in guidance.
+Include confirmed locators, a task index per project, a few useful docs entry points with when-to-read cues, and a concise KB retrieval cue using the default in [knowledge-base.md](references/knowledge-base.md) when a KB is configured. On authorized initialization create missing AGENTS.md with the applicable managed content; adapt defaults to confirmed paths and existing instructions, never paste unresolved placeholders or replace human text. Full setup/template integration remains downstream. Make ordinary utilization actionable without loading maintenance references: relevant docs before dependent decisions; actual task and required context before continuing; bounded search on index/entry-point miss; distinguish actual state from claims; no write/execute authority from discovery. Keep essential before-action constraints inline; link detail when conditional. Do not put detailed maintenance procedures, task lists, full docs or inventories in guidance.
 
 During authorized maintenance minimally refresh missing/outdated cues within ownership; skip equivalent guidance. Read immediately before mutation; refuse ambiguous, duplicate, incomplete or nested markers and unsafe paths. Reconcile concurrent edits rather than clobbering. Verify the scoped diff, readback and affected locators. Save and verify supporting material before replacing it with a pointer. Existing separately owned sections are not implicitly absorbed or migrated. Concrete harness loading, persistence and recovery are pending downstream work; locating guidance is not proof that a harness loaded or followed it.
 
