@@ -178,6 +178,16 @@ Research at design time; encode actionable practices and useful source links in 
 
 Parent owns shared architecture, arbitration, integration and final verification. Defer delegation until module contracts and implementation plan are ready, then use delegate-implementation to verify intended harness/model/effort/isolation and propose bounded assignments for human approval. No workers approved here.
 
+## Strategic context: evolving managed agent platforms
+
+On 2026-11-26 the human agreed that emerging managed personal agents (e.g. ChatGPT Dots) should inform subsequent Agent Core decisions. This is a strategic consideration, not a change to the approved design or an authorization to implement, integrate, migrate or retire anything.
+
+Distinguish portable, human-controlled operational intelligence (project meaning, knowledge, skills, preferences, lessons and policies) from increasingly commoditized execution infrastructure (scheduling, orchestration, runtime environments and session recovery). Before investing substantially in new infrastructure, compare current native capabilities against the actual unmet need; favor minimal, reversible integration over duplication. Consider retiring custom mechanisms only when an alternative demonstrably satisfies the relevant contracts and the human authorizes the transition.
+
+A managed personal agent may eventually coordinate or consume Agent Builder's durable workspace resources rather than replace them. Evaluate actual instruction loading, compliance, access, permissions, state ownership/export, reliability, cost/limits and portability; preserve local-only and employer confidentiality boundaries. No Dots integration or replacement is currently established by testing. Existing Agent Builder contracts remain unchanged.
+
+Supporting discussion and rationale: [Managed personal agents and Agent Core's durable role](https://github.com/chingfhen/knowledge-base/blob/main/knowledge-base/records/2026-11/agent-workflows/2026-11-26--managed-agent-platforms-and-agent-core.md).
+
 ## Related
 
 - [01 — Foundation and shared contracts](../tasks/2026-11/agent-builder/2026-11-25__foundation-and-shared-contracts.md)
