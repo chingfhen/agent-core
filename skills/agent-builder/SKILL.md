@@ -1,6 +1,6 @@
 ---
 name: agent-builder
-description: Maintain a persistent workspace agent's durable project and personal context. Use for setup, explicit Git persistence or recovery assistance, project or repository registration, human-triggered tasks/docs/KB/behavior/lessons/scripts maintenance, handoff or closeout, saved-task execution, and Python environment maintenance. Select the relevant references; ordinary context discovery and use do not require this skill. Replaces legacy project-task, project-docs, knowledge-base/inbox, agent-lessons, scripts, Python and workspace-setup workflows.
+description: Maintain a persistent workspace agent's durable project and personal context. Use for setup, explicit Git persistence or recovery assistance, project or repository registration, human-triggered tasks/docs/KB (including managed artifact retirement/restoration)/behavior/lessons/scripts maintenance, handoff or closeout, saved-task execution, and Python environment maintenance. Select the relevant references; ordinary context discovery and use do not require this skill. Replaces legacy project-task, project-docs, knowledge-base/inbox, agent-lessons, scripts, Python and workspace-setup workflows.
 disable-model-invocation: false
 ---
 
@@ -27,6 +27,7 @@ One primary authority per durable claim. Link or state a concise consequence els
 | Project docs | Settled project meaning, intended architecture and rationale |
 | KB records | Agent-facing reusable understanding, findings and evidence |
 | Managed artifacts | Explicitly requested purpose-specific human-facing deliverables |
+| Retired artifacts | Former managed artifacts, preserved for selective KB retrieval; no routine maintenance |
 | Archive | Originals |
 | Scripts | Reusable deterministic utilities |
 | Python recipes | Reproducible purpose environments |
@@ -43,6 +44,8 @@ New default layout (context root configurable, stable once chosen):
       knowledge-base/records/YYYY-MM/index.md
       knowledge-base/records/YYYY-MM/<topic>/YYYY-MM-DD--description.md
       knowledge-base/managed/YYYY-MM-DD--description.md
+      knowledge-base/retired/index.md
+      knowledge-base/retired/YYYY-MM-DD--description.md
       archive/YYYY-MM/<original-filename>
       behaviors.md
       lessons/index.md
@@ -91,7 +94,7 @@ A human maintenance request authorizes a bounded pass over directly relevant con
 | Sync tasks / manage or execute a saved task | [tasks.md](references/tasks.md) |
 | Sync docs / maintain documentation | [docs.md](references/docs.md) |
 | Handoff / closeout / general maintenance | Root coordination; tasks.md for task handoff/closeout; other justified references |
-| Sync KB / capture / selected archive capture / process, clear or sweep inbox (legacy cue) / managed artifact | [knowledge-base.md](references/knowledge-base.md) |
+| Sync KB / capture / selected archive capture / process, clear or sweep inbox (legacy cue) / managed artifact / retire or restore managed artifacts | [knowledge-base.md](references/knowledge-base.md) |
 | Remember this behavior / update future behavior / clear persistent human instruction | [behaviors.md](references/behaviors.md) |
 | Capture lessons / agent lessons / learn from this session / improve future agent behavior | [lessons.md](references/lessons.md) |
 | Project scripts / automate what we did / make a repeatable personal script / script maintenance | [scripts.md](references/scripts.md) |

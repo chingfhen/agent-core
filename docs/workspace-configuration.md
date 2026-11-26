@@ -17,11 +17,11 @@ updated: 2026-11-26
 
 ### Guidance admission
 
-One canonical editable workspace AGENTS.md, with one Agent Builder-managed block when adopted. Confirm workspace scope with the human; do not infer it from cwd, Git root, repository or harness. Keep essential before-action constraints, resource locators, a few when-to-read cues and concise behavior/lesson projections. Detailed procedures remain in the root and references. Read relevant docs, actual tasks/evidence, KB records, applicable behaviors/lessons and existing scripts proactively when useful; no maintenance activation is required for recall or compatible routine Python use. A found path is not proof of actual harness loading. Read-only discovery grants no write or execution authority.
+One canonical editable workspace AGENTS.md, with one Agent Builder-managed block when adopted. Confirm workspace scope with the human; do not infer it from cwd, Git root, repository or harness. Keep essential before-action constraints, resource locators, a few when-to-read cues and concise behavior/lesson projections. Detailed procedures remain in the root and references. Read relevant docs, actual tasks/evidence, KB records and relevant active/retired artifacts, applicable behaviors/lessons and existing scripts proactively when useful; no maintenance activation is required for recall or compatible routine Python use. A found path is not proof of actual harness loading. Read-only discovery grants no write or execution authority.
 
 ### Interactive capture and deferred offline memory maintenance
 
-Human-triggered maintenance selects relevant references and smallest useful changes. Capture reusable agent-facing records with provenance and uncertainty; retain selected originals, no automatic inbox cleanup or new synthesis layer. Legacy knowledge pages remain readable, with consequential claims checked against evidence. Managed artifacts require explicit intent. Offline reflection/dreaming remains deferred; no background sync or worker launch is implied. The [memory pilot](memory-pilot.md) is independent.
+Human-triggered maintenance selects relevant references and smallest useful changes. Capture reusable agent-facing records with provenance and uncertainty; retain selected originals, no automatic inbox cleanup or new synthesis layer. Legacy knowledge pages remain readable, with consequential claims checked against evidence. Managed artifact creation/update/retirement/restoration requires explicit intent. Retirement moves selected artifacts to searchable retired/; the root links its index and lists active managed artifacts only. No routine retired-artifact updates. Offline reflection/dreaming remains deferred; no background sync or worker launch is implied. The [memory pilot](memory-pilot.md) is independent.
 
 ### Ownership and maintenance
 
@@ -44,6 +44,7 @@ Default proposals only:
   knowledge-base/index.md
   knowledge-base/records/YYYY-MM/index.md
   knowledge-base/managed/
+  knowledge-base/retired/index.md
   archive/YYYY-MM/
   behaviors.md
   lessons/index.md

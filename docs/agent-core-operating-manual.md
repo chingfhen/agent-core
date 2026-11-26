@@ -216,7 +216,7 @@ Say "hand this off to a fresh session" or "close this task". Agent Builder reads
 
 ## Knowledge Base Workflow
 
-Use [Agent Builder](../skills/agent-builder/SKILL.md) and its [KB reference](../skills/agent-builder/references/knowledge-base.md). "Sync to KB" captures reusable records; "capture these files" selects originals without moving them; legacy inbox cues explain the changed workflow without deleting inputs. Managed artifacts require explicit intent. Existing KB roots, archives, records and legacy knowledge pages remain in place. Ordinary recall is read-only and can occur without loading the maintenance skill. No new synthesis layer, automatic cleanup, remote transfer or backend substitution.
+Use [Agent Builder](../skills/agent-builder/SKILL.md) and its [KB reference](../skills/agent-builder/references/knowledge-base.md). "Sync to KB" captures reusable records; "capture these files" selects originals without moving them; legacy inbox cues explain the changed workflow without deleting inputs. Managed artifacts require explicit intent. Ask to "retire/deprecate these artifacts" to move approved files into searchable retired/ without losing their contents, or "restore this artifact" to return it to managed/. Retired artifacts stay available for recall but out of the active human list; discard is separate. Existing KB roots, archives, records and legacy knowledge pages remain in place. Ordinary recall is read-only and can occur without loading the maintenance skill. No new synthesis layer, automatic cleanup, remote transfer or backend substitution.
 
 The former Drive workflow is not canonical. Remote use requires confirmed repository/ref/directory and scoped access. Publication does not configure connectors or migrate existing resources.
 
