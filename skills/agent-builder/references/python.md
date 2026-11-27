@@ -178,7 +178,7 @@ work. This exception is not permission to bypass missing workspace configuration
 
 ## Default AGENTS.md guidance fragment
 
-Use confirmed locators only in the single root-owned block, not a competing section. This is actionable standing guidance for ordinary use, not a demand to read the maintenance skill on every invocation.
+Use confirmed locators in the root-owned block or an authoritative retained legacy section during approved incremental adoption; never duplicate routing. This is actionable standing guidance for ordinary use, not a demand to read the maintenance skill on every invocation.
 
     Python Environment Root: [confirmed locator]
     Before Python work (including import/interpreter probes, tests, notebooks
@@ -203,6 +203,8 @@ Use confirmed locators only in the single root-owned block, not a competing sect
     proof of compatibility. Stop on uncertainty, drift, mismatch or concurrent
     mutation; load Agent Builder and python.md for necessary maintenance.
     Execute requested workload through the verified interpreter; inspect result.
+    Legacy uv run --locked recipes may sync; do not use them as the ordinary
+    verified-interpreter execution route.
     Never use system Python, transient environments, ad hoc pip/uv pip patches,
     uvx, --with/--isolated, auto-installing wrappers or team/root .venv by default.
     Load Agent Builder + python.md before creation, dependency/pin/lock change,
