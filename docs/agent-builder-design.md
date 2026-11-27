@@ -1,7 +1,7 @@
 ---
 title: Agent Builder — Approved Foundation and Shared Contracts
 description: Human-approved architecture for a modular persistent workspace agent; source-integrated replacement; runtime adoption remains a separate human action.
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 # Agent Builder — Approved Foundation and Shared Contracts
@@ -74,7 +74,7 @@ The agent may discover lessons the human missed and autonomously add narrowly ju
 
 ## Instruction ownership and context utilization
 
-Exactly one Agent Builder-owned block in canonical workspace AGENTS.md:
+For new or fully consolidated workspaces, exactly one Agent Builder-owned block in canonical workspace AGENTS.md:
 
 ```markdown
 <!-- BEGIN AGENT BUILDER -->
@@ -86,7 +86,7 @@ Exactly one Agent Builder-owned block in canonical workspace AGENTS.md:
 <!-- END AGENT BUILDER -->
 ```
 
-Illustrative internal headings, not separate blocks; omit empty subsections. Preserve human-authored/outside content, customized instructions, unrelated owners and block position. Central ownership is not regeneration. Read immediately before changes, reject duplicate/incomplete/nested/ambiguous markers, reconcile concurrent edits, check scoped diff/readback and verify relevant locators. Supporting detail must be saved and verified before replacing it with a pointer. Do not silently absorb independent repository AGENTS.md or Git Workflow sections. Agent Builder must be loaded for maintaining its own guidance.
+Illustrative internal headings, not separate blocks; omit empty subsections. On 2026-11-27 the human clarified that established workspace migration is incremental and approval-scoped: functional compatibility before structural conformity, optional consolidation/extraction may be deferred, and compatible retained legacy blocks may coexist with at most one Agent Builder block without competing authority. See [migration guidance](../skills/agent-builder/references/migration.md). Preserve human-authored/outside content, customized instructions, unrelated owners and block position. Central ownership is not regeneration. Read immediately before changes, reject duplicate/incomplete/nested/ambiguous markers, reconcile concurrent edits, check scoped diff/readback and verify relevant locators. Supporting detail must be saved and verified before replacing it with a pointer. Do not silently absorb independent repository AGENTS.md or Git Workflow sections. Agent Builder must be loaded for maintaining its own guidance.
 
 **Context utilization is first-class and does not require loading Agent Builder.** AGENTS.md carries confirmed roots, recognizable when-to-read cues, essential before-action constraints and enough actionable discovery/usage instructions to make relevant context actually utilized in ordinary work. The root skill owns the procedure for maintaining these cues. Finding guidance is not proof of harness loading or compliance.
 
