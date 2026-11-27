@@ -1,7 +1,7 @@
 ---
 title: Workspace Configuration
 description: Current persistent-workspace routing, continuity, maintenance and migration contract.
-updated: 2026-11-26
+updated: 2026-11-27
 ---
 
 # Workspace Configuration
@@ -21,7 +21,7 @@ One canonical editable workspace AGENTS.md, with one Agent Builder-managed block
 
 ### Interactive capture and deferred offline memory maintenance
 
-Human-triggered maintenance selects relevant references and smallest useful changes. Capture reusable agent-facing records with provenance and uncertainty; retain selected originals, no automatic inbox cleanup or new synthesis layer. Legacy knowledge pages remain readable, with consequential claims checked against evidence. Managed artifact creation/update/retirement/restoration requires explicit intent. Retirement moves selected artifacts to searchable retired/; the root links its index and lists active managed artifacts only. No routine retired-artifact updates. Offline reflection/dreaming remains deferred; no background sync or worker launch is implied. The [memory pilot](memory-pilot.md) is independent.
+Human-triggered maintenance selects relevant references and smallest useful changes. Normal is default; explicit Quick mode focuses on current evidence and essential checks, without weakening permissions or required outcomes. The root skill owns the canonical capability nouns. Todo and Next prompt are explicit opt-in capabilities, not default maintenance. Capture reusable agent-facing records with provenance and uncertainty; retain selected originals, no automatic inbox cleanup or new synthesis layer. Legacy knowledge pages remain readable, with consequential claims checked against evidence. Managed artifact creation/update/retirement/restoration requires explicit intent. Retirement moves selected artifacts to searchable retired/; the root links its index and lists active managed artifacts only. No routine retired-artifact updates. Offline reflection/dreaming remains deferred; no background sync or worker launch is implied. The [memory pilot](memory-pilot.md) is independent.
 
 ### Ownership and maintenance
 
@@ -65,6 +65,12 @@ Use known task or index then bounded search across dates and aliases; read the a
 ## Coordinated Handoff and Closeout
 
 Explicit pause/handoff/closeout authorizes bounded relevant maintenance, not launching workers, implementation, publication or migration. Load tasks.md and only justified additional references. Preserve supporting material before pointers, reconcile actual task and index, keep required incomplete work pending unless explicitly waived, and provide a short resume cue. Narrower "task only" and repository rules prevail. Routine checkpoints do not trigger a whole-context review.
+
+## Optional human-facing aids
+
+[Todo](../skills/agent-builder/references/todo.md) maintains a confirmed stable Markdown list with Human / Agent / Waiting headings only on a Todo request. Tasks remain authoritative for detailed execution and permissions; small standalone actions need no task. Do not create or refresh a list automatically or require a new workspace guidance block.
+
+[Next prompt](../skills/agent-builder/references/next-prompt.md) produces a copy-ready continuation prompt on request, after any requested maintenance. A prompt-only request is read-only; existing handoff behavior remains intact.
 
 ## Operational Lessons
 

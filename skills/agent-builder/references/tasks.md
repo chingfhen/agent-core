@@ -24,6 +24,10 @@ Keep three concepts independent:
 
 Select routine priorities autonomously during authorized maintenance using established human intent, meaningful dependencies, value and actual progress; favor valuable unblocked permitted next actions over starting more work. Do not redefine strategy or silently displace explicit human priorities. Closed has a reason: Completed (required outcomes and verification established), Cancelled or Superseded (clear human intent). Record real outcomes and residual work; never imply cancelled work was implemented. Reopen when continuation is authorized and the outcome is genuinely unfinished again.
 
+## Optional human-facing aids
+
+Tasks and their index remain authoritative for detailed execution, readiness and permissions. Todo is a separate opt-in aid ([todo.md](todo.md)), not a second task index; never refresh it automatically during task maintenance or execution. A Next prompt ([next-prompt.md](next-prompt.md)) is generated only on request, after any requested persistence, using existing task locators rather than duplicating state. Normal handoff retains its short resume cue. Quick/Normal maintenance mode is independent of task-authoring depth; do not omit essential task context to make a sync faster.
+
 ## Author a useful brief
 
 Choose depth autonomously from the work's uncertainty, consequences, continuity needs and intended executor. Honor an explicit human mode. Standard is the fallback when no other depth fits better, not a mandatory default that overrides judgment. Keep the named modes available without a compulsory mode announcement; explain a depth choice only if material to supervision.

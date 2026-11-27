@@ -120,6 +120,9 @@ skills/agent-builder/
     lessons.md
     scripts.md
     python.md
+    migration.md
+    todo.md         # opt-in
+    next-prompt.md  # opt-in
 ```
 
 Root owns architecture, setup/project/repository registration, AGENTS.md management, continuity/handoff, permissions, routing, shared conventions, coordination and verification. No separate workspace.md or continuity.md by default. Keep root thin; retain specialist KB authoring/backend, script craft or other references only where progressive loading materially helps; extract further setup/recovery detail only if justified. Module-level procedures retain source expertise, not merely summaries.
@@ -135,10 +138,21 @@ Root owns architecture, setup/project/repository registration, AGENTS.md managem
 | Make repeatable personal script / script maintenance | SKILL.md then scripts.md |
 | Create, change or repair Python purpose environment | SKILL.md then python.md |
 | Handoff / closeout / general maintenance | SKILL.md, then agent-selected relevant references (tasks.md for task handoff/closeout) |
+| Update/show my todo | SKILL.md then todo.md (explicit request only) |
+| Give me the next prompt | SKILL.md then next-prompt.md (explicit request only) |
 
 A maintenance cue must lead to actual reading of the root and named specialized reference, not merely a claim of activation. Additional references are agent-selected when material; named cue is primary scope, not a mandatory all-module pass. Explicit "load Agent Builder" alone makes it available, not permission to write absent maintenance intent. Ordinary discovery/utilization needs neither root nor references. Preserve familiar natural language cues and test real activation. If necessary retain a thin compatibility entry point referencing one canonical procedure; no duplicate authority.
 
 Coordinate one pass: establish relevant findings once; identify primary authority and justified interventions; read applicable references; persist supporting resources and verify before links or task handoff; update affected state/indexes; verify and report material outcomes/no-ops/gaps. Lessons may identify script/docs/KB interventions, but do not recursively start another handoff. A docs sync may maintain relevant other resources under the broader authorized maintenance scope; "docs only" does not. Handoff outcome preserves decisions, evidence, permissions, uncertainty, deliverables and next permitted action; no worker launch. No orchestrator service, event bus, rigid schema or duplicate summary.
+
+## Human usability additions (approved 2026-11-27)
+
+- Stable capability nouns and natural-language cues are canonical in [Agent Builder's routing table](../skills/agent-builder/SKILL.md). Multiple named capabilities can be combined; narrower gates prevail. No new skills or tooling.
+- Normal is the default maintenance mode. Explicit Quick mode prioritizes current evidence and obvious useful changes, skips optional discovery/hygiene and redundant checks, and preserves required outcomes, safety, permission and verification. Depth is request-scoped and independent of task-authoring depth; no deep mode.
+- Optional [Todo](../skills/agent-builder/references/todo.md) is a stable, plain Markdown list with Human / Agent / Waiting headings. It can contain small standalone actions and links to authoritative tasks; write for ten-second human comprehension. Update only on an explicit Todo cue, using available evidence and minimal investigation. No default refresh, mandatory global dashboard or new task/index.
+- Optional [Next prompt](../skills/agent-builder/references/next-prompt.md) returns a copy-ready prompt after any requested maintenance, pointing to actual saved state or providing minimal self-contained context when no task exists. It does not itself imply sync, new persistence or execution permission. Ordinary handoff still returns a short resume cue.
+
+These are approved source-level workflow additions, not demonstrated runtime behavior. Existing permissions, ownership, migration and distribution boundaries remain unchanged.
 
 ## Python utilization versus maintenance (intentional change)
 

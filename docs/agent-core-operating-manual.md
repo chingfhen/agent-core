@@ -210,6 +210,20 @@ Agent Builder owns persistent workspace context. Ask to set up or refresh the ag
 
 If sync reports a modified/unowned obsolete copy, stop and review the exact path; preserve custom work and decide manually how to resolve the conflict. Do not force-delete or hand-copy managed skills. For rollback, restore the previous approved canonical manifest/source revision in the canonical checkout through an authorized Git operation and sync the selected harness. Ordinary removal of agent-builder does not uninstall it: after restoring originals, explicitly resolve that exact installed copy with ownership verification, without pruning unrelated skills. Transaction rollback on publication failure is automatic; rollback of a successful adoption is separate.
 
+### Everyday Agent Builder cues
+
+Use the [canonical capability nouns](../skills/agent-builder/SKILL.md#activation-and-routing) to address or combine resources. Normal maintenance is the default; explicitly say "quick sync" for a faster, current-context-focused pass. Quick preserves essential checks and permissions.
+
+| Say | Result |
+| --- | --- |
+| `/agent-builder sync` | Normal maintenance of relevant core resources. |
+| `/agent-builder quick sync tasks, docs and KB` | Fast pass with those named capabilities primary. |
+| `/agent-builder update my todo` | Refresh the optional Human / Agent / Waiting Markdown action list. |
+| `/agent-builder give me the next prompt` | Copy-ready continuation prompt, without implicit persistence. |
+| `/agent-builder sync and give me the next prompt` | Maintain context first, then produce the prompt. |
+
+Todo and Next prompt are opt-in, not automatic during general sync. They can be combined with other explicit requests. No separate tool or installation is needed.
+
 ### Hand Work to the Next Session or Close It Out
 
 Say "hand this off to a fresh session" or "close this task". Agent Builder reads tasks.md and only other justified references, saves verified supporting material before updating the task/index, preserves unfinished obligations and reports actual next permitted action. "Task only" narrows scope. No worker launch or execution permission is implied. New paths use YYYY-MM/workstream/YYYY-MM-DD--description.md and index.md; established filenames and uppercase INDEX.md stay intact.

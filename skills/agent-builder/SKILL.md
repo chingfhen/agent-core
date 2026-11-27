@@ -1,6 +1,6 @@
 ---
 name: agent-builder
-description: Maintain a persistent workspace agent's durable project and personal context. Use for setup, established-workspace migration, explicit Git persistence or recovery assistance, project or repository registration, human-triggered tasks/docs/KB (including managed artifact retirement/restoration)/behavior/lessons/scripts maintenance, handoff or closeout, saved-task execution, and Python environment maintenance. Select the relevant references; ordinary context discovery and use do not require this skill. Replaces legacy project-task, project-docs, knowledge-base/inbox, agent-lessons, scripts, Python and workspace-setup workflows.
+description: Maintain a persistent workspace agent's durable project and personal context. Use for setup, established-workspace migration, explicit Git persistence or recovery assistance, project or repository registration, human-triggered tasks/docs/KB (including managed artifact retirement/restoration)/behavior/lessons/scripts maintenance, handoff or closeout, explicitly requested todo or next prompt, saved-task execution, and Python environment maintenance. Select the relevant references; ordinary context discovery and use do not require this skill. Replaces legacy project-task, project-docs, knowledge-base/inbox, agent-lessons, scripts, Python and workspace-setup workflows.
 disable-model-invocation: false
 ---
 
@@ -87,19 +87,34 @@ This skill replaces the former `manage-project-tasks`, `maintain-project-docs`, 
 
 A human maintenance request authorizes a bounded pass over directly relevant context, subject to local restrictions. The named capability is primary, not necessarily exclusive; explicit limits (e.g. docs only, task only, read-only) prevail. Select additional modules only when their outputs materially help. Load this root and actually read each applicable reference before its maintenance procedure. Do not run every module, require the human to file individual findings or recursively start handoffs. Merely asking to load this skill without maintenance intent does not authorize writes.
 
-| Cue | Procedure |
-| --- | --- |
-| Set up agent / register project or repository / update routing | Root shared responsibilities |
-| Assess or migrate an established agent to Agent Builder | [migration.md](references/migration.md); concise proposal and scoped human approval before migration |
-| Set up Git persistence / help configure workspace allowlist / recover agent workspace or instruction loading | Root persistence and recovery (explicit request only) |
-| Sync tasks / manage or execute a saved task | [tasks.md](references/tasks.md) |
-| Sync docs / maintain documentation | [docs.md](references/docs.md) |
-| Handoff / closeout / general maintenance | Root coordination; tasks.md for task handoff/closeout; other justified references |
-| Sync KB / capture / selected archive capture / process, clear or sweep inbox (legacy cue) / managed artifact / retire or restore managed artifacts | [knowledge-base.md](references/knowledge-base.md) |
-| Remember this behavior / update future behavior / clear persistent human instruction | [behaviors.md](references/behaviors.md) |
-| Capture lessons / agent lessons / learn from this session / improve future agent behavior | [lessons.md](references/lessons.md) |
-| Project scripts / automate what we did / make a repeatable personal script / script maintenance | [scripts.md](references/scripts.md) |
-| Create a Python environment for X / manage Python environments / create, change, sync or repair a purpose environment | [python.md](references/python.md) |
+The following stable capability nouns are the human-facing vocabulary. Recognize natural aliases and combinations (e.g. "sync tasks, docs and KB"); named capabilities are primary, and "only" restricts scope. The table is authoritative for routing, not a mandatory checklist.
+
+| Canonical noun | Example cue | Procedure |
+| --- | --- | --- |
+| Tasks | Sync tasks / manage or execute a saved task | [tasks.md](references/tasks.md) |
+| Docs | Sync docs / maintain documentation | [docs.md](references/docs.md) |
+| KB | Sync KB / capture / process, clear or sweep inbox (legacy cue) | [knowledge-base.md](references/knowledge-base.md) |
+| Managed artifacts | Create, update, retire or restore a managed artifact (explicit) | [knowledge-base.md](references/knowledge-base.md) |
+| Archive | Capture selected archive originals | [knowledge-base.md](references/knowledge-base.md) |
+| Behaviors | Remember, update or clear a standing behavior | [behaviors.md](references/behaviors.md) |
+| Lessons | Capture agent lessons / learn from this session | [lessons.md](references/lessons.md) |
+| Scripts | Make a repeatable personal script / script maintenance | [scripts.md](references/scripts.md) |
+| Python environments | Create, change, sync or repair a purpose environment | [python.md](references/python.md) |
+| Workspace | Set up agent / register project or repository / update routing | Root shared responsibilities |
+| Persistence | Set up Git persistence / help configure workspace allowlist | Root (explicit request only) |
+| Recovery | Recover agent workspace or instruction loading | Root (explicit request only) |
+| Migration | Assess or migrate an established agent | [migration.md](references/migration.md); scoped human approval before migration |
+| Todo | Update my todo / show my todo | [todo.md](references/todo.md) (opt-in) |
+| Next prompt | Give me the next prompt / prompt for the next agent | [next-prompt.md](references/next-prompt.md) (opt-in) |
+
+General sync, handoff and closeout are coordinating operations, not additional resource nouns. Use tasks.md for task handoff/closeout and other justified references. Todo and Next prompt are optional capabilities: read their reference only when the human requests that capability; never auto-refresh a todo (even an existing one) or generate a next prompt on generic sync, routine checkpoints, setup, migration or ordinary handoff. A normal handoff still returns its short resume cue. A next-prompt-only request is read-only; combined with sync, generate it after requested maintenance. A todo-only request does not authorize unrelated maintenance. Respect existing explicit-intent and approval gates for all other capabilities.
+
+### Maintenance modes
+
+- **Normal (default):** select the useful maintenance work within the actual request, retrieve additional context when it materially improves the outcome, and verify proportionately.
+- **Quick (explicit, e.g. "quick sync" or "quick sync tasks and docs"):** prioritize a fast finish. Use current conversation, existing evidence and known affected destinations first. Save obvious material changes; skip optional discovery, historical reconciliation, broader hygiene, speculative improvements and redundant checks. Read required references and directly affected sources, perform requested capabilities and essential permission, fidelity, consistency and verification checks. If a required action cannot safely finish quickly, complete what is safe and report the specific remaining work; never silently omit a required outcome or claim completion. Do not lower the quality of an affected task or weaken any gate.
+
+Modes are request-scoped, not persistent. Quick is never inferred from a short conversation; the human explicitly requests it. No separate deep mode: honor an expressly requested thorough review within its scope. Task authoring depth (Brief/Standard/Detailed) remains independent. Neither mode creates write authority or triggers opt-in capabilities.
 
 Clear human intent to remember, change or remove a persistent behavior is a maintenance cue; an ordinary preference statement about the current task is not. Review-only requests do not authorize edits. If a cue mixes explicit persistent intent with operational learning, choose both references only as needed. Ordinary work and read-side retrieval do not trigger automatic context maintenance. Explicit standing permissions can establish scoped boundaries; otherwise wait for the human cue. Executing an authorized saved task may include that task's checkpoint/index bookkeeping, subject to stricter local rules, but does not imply general maintenance or implementation permission. A request to pause/handoff unfinished project work is a maintenance cue, not authorization to implement. A concrete Python maintenance need during authorized execution is a scoped exception: load root and python.md, maintain the established personal resource autonomously within its compatibility and permission boundaries, then complete the workload. Routine compatible environment use is not maintenance. Script stewardship retains human-triggered timing; ordinary temporary scripts and reuse are execution, not durable collection maintenance. No automatic purpose deletion. No continuous audit, background sync, automatic worker launch, spending, destructive action, relocation, external transfer, commit/push, publication or deployment is implied. Respect explicit backend save boundaries.
 
@@ -114,7 +129,7 @@ Autonomy means choosing necessary work, including doing less. Reuse available di
 
 A lesson may autonomously introduce narrow, evidence-based operational checks and safer defaults within established authority, not new permanent human approval gates, inferred preferences, expanded permissions or changed project direction. Raise consequential proposed changes to human-owned boundaries rather than saving them as lessons. Reuse the appropriate resource owner; no recursive maintenance.
 
-For fresh-session handoff, preserve goal, deliverables, decisions and rationale, actual progress/verification, evidence pointers, dependencies, blockers, permissions and next permitted action. Load tasks.md for a task handoff/closeout; use the actual task as the continuation brief. Reconcile stale imperatives/checklists and verify required links and index state; check that a fresh agent can identify the next permitted action without the chat. Return a short resume cue (workspace/project and exact task locator or unambiguous workstream), not another copy of the task. Explicit closeout evaluates relevant persistence before closure; routine completed task bookkeeping does not require a whole context pass. Keep required incomplete work pending unless explicitly waived/cancelled. A casual ending or ordinary orientation does not authorize task creation or maintenance. No worker launch or new execution is implied.
+For fresh-session handoff, preserve goal, deliverables, decisions and rationale, actual progress/verification, evidence pointers, dependencies, blockers, permissions and next permitted action. Load tasks.md for a task handoff/closeout; use the actual task as the continuation brief. Reconcile stale imperatives/checklists and verify required links and index state; check that a fresh agent can identify the next permitted action without the chat. Return a short resume cue (workspace/project and exact task locator or unambiguous workstream), not another copy of the task. If the human explicitly asks for the Next prompt capability, load next-prompt.md and provide that copy-ready prompt after any requested maintenance instead of a duplicate cue. Explicit closeout evaluates relevant persistence before closure; routine completed task bookkeeping does not require a whole context pass. Keep required incomplete work pending unless explicitly waived/cancelled. A casual ending or ordinary orientation does not authorize task creation or maintenance. No worker launch or new execution is implied.
 
 ## Managed guidance and utilization
 
