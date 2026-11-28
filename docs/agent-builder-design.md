@@ -1,7 +1,7 @@
 ---
 title: Agent Builder — Approved Foundation and Shared Contracts
 description: Human-approved architecture for a modular persistent workspace agent; source-integrated replacement; runtime adoption remains a separate human action.
-updated: 2026-11-27
+updated: 2026-11-28
 ---
 
 # Agent Builder — Approved Foundation and Shared Contracts
@@ -185,6 +185,8 @@ Task 02 decisions: task index contains unfinished work only; stable closed files
 ## Environment extension (approved 2026-11-28)
 
 Agent Builder additionally owns durable expected external service access and non-secret setup/utilization knowledge, not runtime configuration or credentials. One optional free-form environment.md resource (new default .work-context/environment.md), a concise managed guidance cue and a specialized reference suffice. Proactive ordinary use is independent of maintenance; request-led setup/check/repair/sync and necessary authorized restoration preserve actual-access verification, account/project scope, confidentiality and existing permissions. Protocol choice is flexible; no automatic portability, provisioning, startup audit or registry. Source implementation is not proof of installed behavior or restored access. See [environment.md](../skills/agent-builder/references/environment.md) for the current procedure.
+
+**Source delivery (2026-11-28):** [9b4ccd2](https://github.com/chingfhen/agent-core/commit/9b4ccd2976428fafcd70c418b688bc5e0cc75408) implemented Environment and its root routing, migration and affected documentation. Branch-head readback and 12 static contract checks passed; no code, dependencies, actual connections or workspace guidance were changed. Installation, adoption and demonstrated utilization/recovery remain pending real-world validation. [KB decision rationale and audit](https://github.com/chingfhen/knowledge-base/blob/main/knowledge-base/records/2026-11/agent-workflows/2026-11-28--agent-builder-environment.md).
 
 ## Migration and acceptance
 
