@@ -17,7 +17,7 @@ request-only workflows; availability/loading does not authorize unrelated effect
 
 | Skill | Reach for it when… | Boundary |
 | --- | --- | --- |
-| [agent-builder](../skills/agent-builder/SKILL.md) | Set up or recover a workspace agent; sync tasks/docs/KB, remember behavior, capture lessons, maintain scripts or Python environments, hand off or close out. | Request-scoped maintenance; selective reference loading, proactive read/use, existing paths and narrower gates preserved. |
+| [agent-builder](../skills/agent-builder/SKILL.md) | Set up or recover a workspace agent; sync tasks/docs/KB, remember behavior, capture lessons, maintain scripts, Python environments or external service Environment, hand off or close out. | Request-scoped maintenance; selective reference loading, proactive read/use, existing paths and narrower gates preserved. |
 | [ease-into-work](../skills/ease-into-work/SKILL.md) | "Help me get into TripVerge", "I have ten minutes to reconnect", or "what could I explore tonight?" | Read-only, choice-preserving re-entry using saved project tasks; execution and stopping remain with their owning workflows. |
 | [define-success](../skills/define-success/SKILL.md) | "Let's define the goal/success", "what would good look like?", or challenge incomplete success criteria together. | Request-led collaborative outcome discovery and selective questioning; no automatic task writes, implementation, or tests. |
 | [tech-design-options](../skills/tech-design-options/SKILL.md) | Request a comparison of materially different technical approaches to a consequential design choice. | Request-led; recommends a leader or a bounded discriminator, without reopening approved work or authorizing execution. |

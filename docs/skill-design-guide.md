@@ -64,7 +64,7 @@ Use **one skill per job**. Similar *steps* do not imply duplicate skills when ou
 Keep these boundaries clear:
 - `tech-design-options`: compare and recommend technical solution designs when requested; ordinary planning does not require it.
 - `code-design`: shape or review a bounded code structure when requested; ordinary execution does not require it.
-- `agent-builder`: maintain a persistent workspace's tasks, docs, KB/archive, behaviors, lessons, scripts, Python environments, routing and explicit persistence/recovery. Select applicable references; ordinary utilization does not require maintenance invocation.
+- `agent-builder`: maintain a persistent workspace's tasks, docs, KB/archive, behaviors, lessons, scripts, Python environments, external service Environment, routing and explicit persistence/recovery. Select applicable references; ordinary utilization does not require maintenance invocation.
 - `learning`: develop human understanding from mechanisms, examples, and judgment; no automatic KB persistence or code changes.
 - `review-before-approval`: support a consequential approval.
 - `resolve-human-blockers`: clear a human-owned obstacle during execution.
